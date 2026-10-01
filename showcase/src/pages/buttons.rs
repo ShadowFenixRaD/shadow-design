@@ -33,7 +33,7 @@ pub fn ButtonsPage() -> Element {
                     }
                     span { class: "text-sm text-zinc-300 ml-2 font-mono",
                         "Click registrati: "
-                        strong { class: "text-blue-400 text-base", "{click_count}" }
+                        strong { class: "text-purple-400 text-base", "{click_count}" }
                     }
                 }
             }

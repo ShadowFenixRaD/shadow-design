@@ -3,10 +3,10 @@ use dioxus::prelude::*;
 #[component]
 pub fn FeatureBanner(feature_name: &'static str) -> Element {
     rsx! {
-        div { class: "mb-6 p-4 rounded-xl bg-blue-950/20 border border-blue-900/40 flex items-center justify-between text-sm",
+        div { class: "mb-6 p-4 rounded-xl bg-purple-950/25 border border-purple-900/50 flex items-center justify-between text-sm shadow-md shadow-purple-950/20",
             div { class: "flex items-center gap-2",
-                span { class: "text-blue-400 font-semibold", "📦 Feature Cargo:" }
-                code { class: "px-2 py-0.5 rounded bg-zinc-900 text-blue-300 font-mono text-xs border border-zinc-700",
+                span { class: "text-purple-400 font-semibold", "📦 Feature Cargo:" }
+                code { class: "px-2 py-0.5 rounded bg-black text-purple-300 font-mono text-xs border border-purple-900/60",
                     "shadow-design = {{ features = [\"{feature_name}\"] }}"
                 }
             }

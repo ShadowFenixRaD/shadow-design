@@ -15,22 +15,22 @@ impl ButtonVariant {
     pub fn classes(&self) -> &'static str {
         match self {
             ButtonVariant::Primary => {
-                "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg border border-blue-500"
+                "bg-purple-800 hover:bg-purple-700 active:bg-purple-900 text-white shadow-lg shadow-purple-950/70 border border-purple-600/70 hover:border-purple-400 hover:shadow-purple-900/60"
             }
             ButtonVariant::Secondary => {
-                "bg-zinc-800 hover:bg-zinc-700 text-zinc-100 shadow-md border border-zinc-700"
+                "bg-zinc-950 hover:bg-zinc-900 text-zinc-200 shadow-md border border-purple-950/80 hover:border-purple-800/60 hover:text-white"
             }
             ButtonVariant::Outline => {
-                "bg-transparent hover:bg-zinc-800/70 text-zinc-200 border border-zinc-600 hover:border-zinc-400"
+                "bg-transparent hover:bg-purple-950/30 text-purple-300 border border-purple-800/60 hover:border-purple-500 hover:text-purple-100"
             }
             ButtonVariant::Ghost => {
-                "bg-transparent hover:bg-zinc-800 text-zinc-300 hover:text-white"
+                "bg-transparent hover:bg-purple-950/40 text-zinc-300 hover:text-purple-200"
             }
             ButtonVariant::Danger => {
-                "bg-rose-600 hover:bg-rose-700 text-white shadow-md border border-rose-500"
+                "bg-rose-700 hover:bg-rose-600 text-white shadow-md shadow-rose-950/50 border border-rose-600"
             }
             ButtonVariant::Success => {
-                "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md border border-emerald-500"
+                "bg-emerald-700 hover:bg-emerald-600 text-white shadow-md shadow-emerald-950/50 border border-emerald-600"
             }
         }
     }

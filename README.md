@@ -1,6 +1,6 @@
 # Shadow Design
 
-Suite di componenti UI modulari per applicazioni web Dioxus 0.7.
+Suite di componenti UI modulari per applicazioni web Dioxus 0.7, progettata per l'organizzazione **shadowfenix** con tema predefinito a sfondo nero assoluto (`0 0 0`) e accenti in viola scuro intenso.
 
 ## Struttura del Workspace
 

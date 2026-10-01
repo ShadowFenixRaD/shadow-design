@@ -44,9 +44,9 @@ pub fn InputsPage() -> Element {
                         }
                     }
 
-                    div { class: "p-4 rounded-xl bg-zinc-950/70 border border-zinc-800 text-sm space-y-2",
+                    div { class: "p-4 rounded-xl bg-black border border-purple-950/70 text-sm space-y-2 shadow-inner",
                         p { class: "font-semibold text-zinc-300", "Stato Reattivo in tempo reale:" }
-                        div { class: "font-mono text-xs text-blue-400", "username = \"{username}\"" }
+                        div { class: "font-mono text-xs text-purple-400", "username = \"{username}\"" }
                         div { class: "font-mono text-xs text-emerald-400", "email = \"{email}\"" }
                     }
                 }

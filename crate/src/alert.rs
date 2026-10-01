@@ -13,23 +13,23 @@ impl AlertVariant {
     pub fn classes(&self) -> &'static str {
         match self {
             AlertVariant::Info => {
-                "bg-blue-950/40 text-blue-100 border-blue-900/60 border-l-4 border-l-blue-500"
+                "bg-purple-950/40 text-purple-100 border-purple-900/60 border-l-4 border-l-purple-600 shadow-lg shadow-purple-950/30"
             }
             AlertVariant::Success => {
-                "bg-emerald-950/40 text-emerald-100 border-emerald-900/60 border-l-4 border-l-emerald-500"
+                "bg-emerald-950/40 text-emerald-100 border-emerald-900/60 border-l-4 border-l-emerald-500 shadow-lg shadow-black/40"
             }
             AlertVariant::Warning => {
-                "bg-amber-950/40 text-amber-100 border-amber-900/60 border-l-4 border-l-amber-500"
+                "bg-amber-950/40 text-amber-100 border-amber-900/60 border-l-4 border-l-amber-500 shadow-lg shadow-black/40"
             }
             AlertVariant::Danger => {
-                "bg-rose-950/40 text-rose-100 border-rose-900/60 border-l-4 border-l-rose-500"
+                "bg-rose-950/40 text-rose-100 border-rose-900/60 border-l-4 border-l-rose-500 shadow-lg shadow-black/40"
             }
         }
     }
 
     pub fn title_class(&self) -> &'static str {
         match self {
-            AlertVariant::Info => "text-blue-300",
+            AlertVariant::Info => "text-purple-300",
             AlertVariant::Success => "text-emerald-300",
             AlertVariant::Warning => "text-amber-300",
             AlertVariant::Danger => "text-rose-300",

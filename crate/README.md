@@ -1,6 +1,6 @@
 # Shadow Design
 
-Libreria di componenti UI modulari per applicazioni web Dioxus 0.7.
+Libreria di componenti UI modulari per Dioxus 0.7 per l'ecosistema **shadowfenix**, caratterizzata dal tema a sfondo nero assoluto (`0 0 0`) ed accenti viola intenso.
 
 ## 📦 Installazione in Cargo.toml
 

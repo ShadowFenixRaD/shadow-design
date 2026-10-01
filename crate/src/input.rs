@@ -15,7 +15,7 @@ pub fn TextInput(
     let border_color = if error.is_some() {
         "border-rose-500 focus:border-rose-400 focus:ring-rose-500/20"
     } else {
-        "border-zinc-700 focus:border-blue-500 focus:ring-blue-500/20"
+        "border-zinc-800 focus:border-purple-500 focus:ring-purple-600/30"
     };
 
     rsx! {
@@ -29,7 +29,7 @@ pub fn TextInput(
                 value: "{value}",
                 placeholder: placeholder.as_deref().unwrap_or_default(),
                 disabled,
-                class: "px-3.5 py-2 bg-zinc-900 text-zinc-100 rounded-lg border {border_color} focus:outline-none focus:ring-2 transition-all placeholder:text-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-inner",
+                class: "px-3.5 py-2 bg-black text-zinc-100 rounded-lg border {border_color} focus:outline-none focus:ring-2 transition-all placeholder:text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-inner",
                 oninput: move |e| {
                     *value.write() = e.value();
                 },

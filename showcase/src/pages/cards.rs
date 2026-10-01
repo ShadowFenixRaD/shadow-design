@@ -39,9 +39,9 @@ pub fn CardsPage() -> Element {
                 title: "Livelli di Ombra (Shadows)".to_string(),
                 shadow: CardShadow::Sm,
                 div { class: "grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2",
-                    div { class: "p-4 rounded-lg bg-zinc-800/60 border border-zinc-700/60 text-xs text-center shadow-sm", "CardShadow::Sm" }
-                    div { class: "p-4 rounded-lg bg-zinc-800/60 border border-zinc-700/60 text-xs text-center shadow-md", "CardShadow::Md" }
-                    div { class: "p-4 rounded-lg bg-zinc-800/60 border border-zinc-700/60 text-xs text-center shadow-2xl", "CardShadow::Xl" }
+                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-950/70 text-xs text-center shadow-sm shadow-black", "CardShadow::Sm" }
+                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-900/50 text-xs text-center shadow-lg shadow-purple-950/30", "CardShadow::Md" }
+                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-800/50 text-xs text-center shadow-2xl shadow-purple-950/60", "CardShadow::Xl" }
                 }
             }
         }
