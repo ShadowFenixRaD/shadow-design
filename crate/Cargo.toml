@@ -1,0 +1,28 @@
+[package]
+name = "shadow-design"
+version = "0.1.0"
+edition = "2021"
+authors = ["ShadowfenixRaD", "Christian Torbidone <killerbossoriginal@gmail.com>"]
+description = "UI component library for Dioxus web applications"
+
+[dependencies]
+dioxus = { workspace = true }
+
+[features]
+default = ["all"]
+all = [
+    "button",
+    "card",
+    "input",
+    "badge",
+    "navbar",
+    "modal",
+    "alert",
+]
+button = []
+card = []
+input = []
+badge = []
+navbar = []
+modal = []
+alert = []

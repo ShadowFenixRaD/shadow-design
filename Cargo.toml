@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = [
+    "crate",
+    "showcase"
+]
+default-members = ["showcase"]
+
+[workspace.dependencies]
+dioxus = { version = "0.7.1" }
