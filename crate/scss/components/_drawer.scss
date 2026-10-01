@@ -1,0 +1,40 @@
+// ==============================================================================
+// Shadow Design — Drawer Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+.sd-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: z('drawer-back');
+  background-color: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.sd-drawer-panel {
+  position: fixed;
+  inset-block: 0;
+  z-index: z('drawer');
+  background-color: #0a0a0f;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+
+  &--left {
+    left: 0;
+    border-right: $border-hairline;
+  }
+
+  &--right {
+    right: 0;
+    border-left: $border-hairline;
+  }
+
+  &--glow {
+    box-shadow: 0 0 40px $violet-glow, 0 25px 50px rgba(0, 0, 0, 0.9);
+  }
+}

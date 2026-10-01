@@ -1,0 +1,59 @@
+// ==============================================================================
+// Shadow Design — SCSS Mixins
+// ==============================================================================
+@use 'variables' as *;
+
+// Specular Highlight Superiore (Micro-riflessione ottica 1px)
+@mixin specular-top($opacity: 0.08) {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, $opacity);
+}
+
+// Specular Accent Highlight (con alone interno)
+@mixin specular-accent($color, $glow-color) {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 0 20px $glow-color;
+}
+
+// Glow Perimetrale Regolabile
+@mixin glow($color: $violet-glow, $blur: 24px, $spread: 0px) {
+  box-shadow: 0 0 $blur $spread $color;
+}
+
+// Micro-scrollbar scura e compatta
+@mixin custom-scrollbar($width: 6px, $track: $color-void, $thumb: $zinc-800, $thumb-hover: $zinc-600) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+  &::-webkit-scrollbar-track {
+    background: $track;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $thumb;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: $thumb-hover;
+  }
+}
+
+// Glassmorphism scuro
+@mixin glass-panel($bg: rgba(9, 9, 13, 0.75), $blur: 12px) {
+  background-color: $bg;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+// Feedback tattile al tocco/click
+@mixin tactile-press($scale: 0.96) {
+  transition: transform $duration-fast $ease-tactile;
+  &:active {
+    transform: scale($scale);
+  }
+}
+
+// Troncamento testo a una riga
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

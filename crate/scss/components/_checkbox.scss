@@ -1,0 +1,86 @@
+// ==============================================================================
+// Shadow Design — Checkbox Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-family: $font-sans;
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &__box {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: $color-surface-1;
+    border: $border-hairline;
+    transition: all $duration-fast ease;
+
+    @include tactile-press(0.92);
+
+    // Misure
+    &--sm {
+      width: 16px;
+      height: 16px;
+      border-radius: $radius-sharp;
+    }
+
+    &--md {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+
+    &--lg {
+      width: 24px;
+      height: 24px;
+      border-radius: $radius-sm;
+    }
+
+    // Stati
+    &--checked {
+      background-color: $violet-primary;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      @include specular-top(0.2);
+    }
+
+    &--glow {
+      box-shadow: 0 0 12px $violet-glow;
+    }
+
+    &--error {
+      border-color: $color-danger;
+    }
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 500;
+    color: $zinc-200;
+  }
+
+  &__description {
+    font-size: 11px;
+    color: $zinc-500;
+    line-height: 1.4;
+  }
+}

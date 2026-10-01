@@ -1,0 +1,41 @@
+// ==============================================================================
+// Shadow Design — Z-Index Hierarchy Matrix
+// ==============================================================================
+@use 'sass:map';
+
+$z-layers: (
+  'base':          0,
+  'sticky':        20,
+  'header':        30,
+  'dropdown-back': 995,
+  'dropdown':      1000,
+  'drawer-back':   65,
+  'drawer':        70,
+  'modal-back':    75,
+  'modal':         80,
+  'modal-content': 85,
+  'notification':  90,
+  'tooltip':       100
+);
+
+@function z($layer) {
+  @if not map.has-key($z-layers, $layer) {
+    @warn "Unknown `#{$layer}` in $z-layers.";
+    @return 1;
+  }
+  @return map.get($z-layers, $layer);
+}
+
+// Classi di utilità corrispondenti
+.z-layer-base          { z-index: z('base'); }
+.z-layer-sticky        { z-index: z('sticky'); }
+.z-layer-header        { z-index: z('header'); }
+.z-layer-dropdown-back { z-index: z('dropdown-back'); }
+.z-layer-dropdown      { z-index: z('dropdown'); }
+.z-layer-drawer-back   { z-index: z('drawer-back'); }
+.z-layer-drawer        { z-index: z('drawer'); }
+.z-layer-modal-back    { z-index: z('modal-back'); }
+.z-layer-modal         { z-index: z('modal'); }
+.z-layer-modal-content { z-index: z('modal-content'); }
+.z-layer-notification  { z-index: z('notification'); }
+.z-layer-tooltip       { z-index: z('tooltip'); }

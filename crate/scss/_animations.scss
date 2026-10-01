@@ -1,0 +1,191 @@
+// ==============================================================================
+// Shadow Design — Motion, Keyframes & Animation System
+// ==============================================================================
+@use 'variables' as *;
+
+// --- Keyframes Universali ---
+
+// 1. Fade Animations
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+// 2. Slide Animations
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInBottom {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInTop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+// 3. Scale Animations
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 4. Modal Pop Entrance
+@keyframes modalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// 5. Toast Entry & Exit
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(32px, 0, 0) scale(0.92);
+  }
+}
+
+// 6. Dropdown Reveal
+@keyframes dropdownEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// 7. Drawer Sliders
+@keyframes drawerSlideLeft {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes drawerSlideRight {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+// 8. Glow Pulses
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(168, 85, 247, 0.60);
+  }
+}
+
+// 9. Spinner Rotate
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// 10. Indeterminate Progress Bar
+@keyframes indeterminateSlide {
+  0% {
+    transform: scaleX(0.2) translateX(-150%);
+  }
+  50% {
+    transform: scaleX(0.8) translateX(0);
+  }
+  100% {
+    transform: scaleX(0.2) translateX(150%);
+  }
+}
+
+// --- Classi Utility di Animazione ---
+.animate-fade-in         { animation: fadeIn $duration-normal $ease-tactile forwards; }
+.animate-fade-out        { animation: fadeOut $duration-fast ease-in forwards; }
+.animate-slide-in-right  { animation: slideInRight $duration-normal $ease-tactile forwards; }
+.animate-slide-in-left   { animation: slideInLeft $duration-normal $ease-tactile forwards; }
+.animate-slide-in-bottom { animation: slideInBottom $duration-normal $ease-tactile forwards; }
+.animate-slide-in-top    { animation: slideInTop $duration-normal $ease-tactile forwards; }
+.animate-scale-in        { animation: scaleIn $duration-normal $ease-tactile forwards; }
+.animate-pulse-glow      { animation: pulseGlow 2.8s ease-in-out infinite; }
+.animate-spin            { animation: spin 0.8s linear infinite; }
+
+// Component Dedicated Animations
+.animate-toast-enter     { animation: toastEnter $duration-normal $ease-tactile forwards; }
+.animate-toast-exit      { animation: toastExit $duration-fast ease-in forwards; }
+.animate-modal-enter     { animation: modalEnter $duration-normal $ease-tactile forwards; }
+.animate-dropdown-enter  { animation: dropdownEnter 180ms $ease-tactile forwards; }
+.animate-drawer-left,
+.animate-drawer-slide-left  { animation: drawerSlideLeft $duration-normal $ease-tactile forwards; }
+.animate-drawer-right,
+.animate-drawer-slide-right { animation: drawerSlideRight $duration-normal $ease-tactile forwards; }
+.animate-indeterminate   { animation: indeterminateSlide 1.5s ease-in-out infinite; }
+
+// Micro-transizioni tattili
+.tactile-press {
+  transition: transform $duration-fast $ease-tactile;
+  &:active {
+    transform: scale(0.97);
+  }
+}

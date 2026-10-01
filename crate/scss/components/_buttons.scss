@@ -1,0 +1,156 @@
+// ==============================================================================
+// Shadow Design — Button Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-sans;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  text-align: center;
+  transition: all $duration-fast ease-in-out;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  border-style: solid;
+  border-width: 1px;
+
+  @include tactile-press(0.97);
+
+  &:disabled, &[disabled] {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+  }
+
+  // Dimensioni
+  &--xs {
+    height: 24px;
+    padding: 0 8px;
+    font-size: 11px;
+    gap: 4px;
+    border-radius: $radius-sharp;
+  }
+
+  &--sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    gap: 6px;
+    border-radius: $radius-sm;
+  }
+
+  &--md {
+    height: 40px;
+    padding: 0 18px;
+    font-size: 14px;
+    gap: 8px;
+    border-radius: $radius-md;
+  }
+
+  &--lg {
+    height: 48px;
+    padding: 0 24px;
+    font-size: 15px;
+    gap: 10px;
+    border-radius: $radius-lg;
+  }
+
+  &--xl {
+    height: 54px;
+    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 600;
+    gap: 12px;
+    border-radius: $radius-lg;
+  }
+
+  &--full {
+    width: 100%;
+  }
+
+  // Varianti
+  &--primary {
+    background-color: $violet-primary;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.15);
+    @include specular-top(0.25);
+
+    &:hover {
+      background-color: color.adjust($violet-primary, $lightness: 5%);
+      @include glow($violet-glow, 20px);
+    }
+  }
+
+  &--secondary {
+    background-color: $color-surface-2;
+    color: $zinc-200;
+    border-color: rgba(255, 255, 255, 0.08);
+    @include specular-top(0.08);
+
+    &:hover {
+      background-color: $color-surface-3;
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+  }
+
+  &--outline {
+    background-color: transparent;
+    color: $zinc-300;
+    border-color: rgba(255, 255, 255, 0.12);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: $zinc-400;
+    border-color: transparent;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+  }
+
+  &--danger {
+    background-color: rgba(244, 63, 94, 0.15);
+    color: #fda4af;
+    border-color: rgba(244, 63, 94, 0.35);
+
+    &:hover {
+      background-color: rgba(244, 63, 94, 0.25);
+      border-color: rgba(244, 63, 94, 0.55);
+      color: #ffffff;
+      @include glow(rgba(244, 63, 94, 0.3), 20px);
+    }
+  }
+
+  &--success {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.35);
+
+    &:hover {
+      background-color: rgba(16, 185, 129, 0.25);
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #ffffff;
+      @include glow(rgba(16, 185, 129, 0.3), 20px);
+    }
+  }
+}

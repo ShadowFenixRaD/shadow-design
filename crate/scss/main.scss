@@ -1,0 +1,76 @@
+// ==============================================================================
+// Shadow Design — Library Master SCSS Entrypoint
+// ==============================================================================
+@use 'sass:math';
+@use 'variables' as *;
+@use 'zindex' as *;
+@use 'mixins' as *;
+@use 'reset' as *;
+@use 'animations' as *;
+@use 'utilities' as *;
+@use 'theme_presets' as *;
+
+// Moduli Componenti
+@use 'components/buttons' as *;
+@use 'components/cards' as *;
+@use 'components/inputs' as *;
+@use 'components/checkbox' as *;
+@use 'components/modal' as *;
+@use 'components/drawer' as *;
+@use 'components/dropdown' as *;
+@use 'components/notifications' as *;
+
+// Font import Geist
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: #{$font-sans};
+  --font-mono: #{$font-mono};
+  --color-void: #{$color-void};
+  --color-surface-1: #{$color-surface-1};
+  --color-surface-2: #{$color-surface-2};
+  --color-surface-3: #{$color-surface-3};
+}
+
+// Micro-scrollbar ultra-dark
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-void;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $zinc-800;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $zinc-600;
+}
+
+// Text Selection
+::selection {
+  background-color: rgba(147, 51, 234, 0.35);
+  color: #ffffff;
+}
+
+// Utilities Ottiche
+.specular-top {
+  @include specular-top(0.08);
+}
+
+.specular-top-accent {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 0 20px rgba(147, 51, 234, 0.2);
+}
+
+.hairline-border {
+  border: $border-hairline;
+}
+
+.glow-violet { box-shadow: 0 0 25px $violet-glow; }
+.glow-crimson { box-shadow: 0 0 25px $crimson-glow; }
+.glow-cyan { box-shadow: 0 0 25px $cyan-glow; }
+.glow-emerald { box-shadow: 0 0 25px $emerald-glow; }

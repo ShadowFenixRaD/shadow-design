@@ -1,0 +1,52 @@
+// ==============================================================================
+// Shadow Design — Modal Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+@use '../animations' as *;
+
+.sd-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: z('modal-back');
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.sd-modal-dialog {
+  position: relative;
+  z-index: z('modal');
+  width: 100%;
+  max-width: 520px;
+  background-color: $color-surface-1;
+  border: $border-hairline;
+  border-radius: $radius-lg;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  @include specular-top(0.1);
+
+  &--glow {
+    box-shadow: 0 0 45px $violet-glow, 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: $border-hairline-subtle;
+    background-color: rgba(14, 14, 20, 0.7);
+  }
+
+  &__body {
+    padding: 24px;
+    max-height: calc(85vh - 120px);
+    overflow-y: auto;
+  }
+}

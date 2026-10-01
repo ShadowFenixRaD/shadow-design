@@ -1,0 +1,126 @@
+// ==============================================================================
+// Shadow Design — Input Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.sd-input-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $zinc-300;
+}
+
+.sd-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.sd-input {
+  width: 100%;
+  height: 42px;
+  background-color: #060608;
+  color: $zinc-100;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0 14px;
+  font-family: $font-sans;
+  font-size: 14px;
+  line-height: normal;
+  outline: none;
+  box-sizing: border-box;
+  transition: all $duration-fast ease;
+
+  &::placeholder {
+    color: $zinc-500;
+  }
+
+  &:focus {
+    border-color: $violet-primary;
+    background-color: $color-surface-2;
+    @include glow($violet-glow, 16px);
+  }
+
+  &--error {
+    border-color: $color-danger;
+    &:focus {
+      @include glow(rgba(244, 63, 94, 0.3), 16px);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // Modificatori spaziali automatici per icone
+  &--has-left-icon {
+    padding-left: 42px !important;
+  }
+
+  &--has-right-icon {
+    padding-right: 42px !important;
+  }
+
+  &--has-both-icons {
+    padding-left: 42px !important;
+    padding-right: 42px !important;
+  }
+}
+
+// Icone vettoriali posizionate con precisione assoluta a metà altezza
+.sd-input-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: $zinc-400;
+  z-index: 10;
+  line-height: 1;
+  transition: color $duration-fast ease;
+
+  &--left {
+    left: 14px;
+    pointer-events: none;
+  }
+
+  &--right {
+    right: 14px;
+  }
+
+  &--interactive {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: none;
+
+    &:hover {
+      color: #ffffff;
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.88);
+    }
+  }
+
+  svg {
+    display: block;
+    margin: auto;
+    flex-shrink: 0;
+  }
+}

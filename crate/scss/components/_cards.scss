@@ -1,0 +1,60 @@
+// ==============================================================================
+// Shadow Design — Card Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-card {
+  position: relative;
+  background-color: $color-surface-1;
+  border: $border-hairline;
+  border-radius: $radius-lg;
+  transition: all $duration-normal ease;
+  @include specular-top(0.06);
+
+  &--interactive {
+    cursor: pointer;
+    &:hover {
+      background-color: color.adjust($color-surface-1, $lightness: 2%);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+  }
+
+  &--elevated {
+    background-color: $color-surface-2;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+  }
+
+  &--metric {
+    background: linear-gradient(135deg, $color-surface-1 0%, rgba(147, 51, 234, 0.04) 100%);
+  }
+
+  &--glow-violet:hover {
+    border-color: rgba(147, 51, 234, 0.4);
+    box-shadow: 0 0 25px $violet-glow;
+  }
+
+  &__header {
+    padding: 16px 24px;
+    border-bottom: $border-hairline-subtle;
+    background-color: rgba(12, 12, 18, 0.7);
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  &__body {
+    padding: 20px 24px;
+  }
+
+  &__footer {
+    padding: 12px 24px;
+    border-top: $border-hairline-subtle;
+    background-color: rgba(7, 7, 10, 0.85);
+    font-size: 12px;
+    color: $zinc-400;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+  }
+}

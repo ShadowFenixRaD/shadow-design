@@ -1,0 +1,96 @@
+// ==============================================================================
+// Shadow Design — Modern Preflight Reset (Elimina i default del browser)
+// ==============================================================================
+@use 'variables' as *;
+
+// 1. Box Sizing Universale
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// 2. Document & Body
+html, body {
+  background-color: $color-void;
+  color: $zinc-100;
+  font-family: $font-sans;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+// 3. Reset Totale per Button (Evita che diventino bianchi o grigi per default browser)
+button, [type="button"], [type="reset"], [type="submit"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  text-align: inherit;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+
+  &:disabled, &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// 4. Form Controls (Input, Textarea, Select)
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+// 5. Tipografia & Link
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+code, kbd, samp, pre {
+  font-family: $font-mono;
+  font-size: 1em;
+}
+
+img, svg, video, canvas, audio, iframe, embed, object {
+  display: block;
+  vertical-align: middle;
+}
