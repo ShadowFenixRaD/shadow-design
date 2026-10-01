@@ -14,17 +14,37 @@ all = [
     "button",
     "card",
     "input",
+    "checkbox",
     "badge",
     "navbar",
     "modal",
     "alert",
     "theme",
+    "icon",
+    "typography",
+    "notification",
+    "tabs",
+    "switch",
+    "tooltip",
+    "drawer",
+    "dropdown",
+    "animation",
 ]
 button = []
 card = []
 input = []
+checkbox = []
 badge = []
 navbar = []
 modal = []
 alert = []
 theme = []
+icon = []
+typography = []
+notification = []
+tabs = []
+switch = []
+tooltip = []
+drawer = []
+dropdown = []
+animation = []

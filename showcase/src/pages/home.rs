@@ -1,148 +1,135 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
+use crate::components::CodeBlock;
+
 #[component]
 pub fn Home() -> Element {
     let mut theme = use_theme();
-    let custom_accent = use_signal(|| "".to_string());
+
+    let install_code = r#"[dependencies]
+# Importa solo i moduli desiderati per il massimo delle performance:
+shadow-design = { path = "../shadow-design/crate", features = ["button", "card", "theme", "icon"] }
+
+# Oppure include l'intera suite:
+# shadow-design = { path = "../shadow-design/crate", features = ["all"] }"#
+        .to_string();
+
+    let rust_example = r#"use dioxus::prelude::*;
+use shadow_design::prelude::*;
+
+#[component]
+pub fn App() -> Element {
+    rsx! {
+        Card {
+            title: "Pannello Operativo".to_string(),
+            variant: CardVariant::Interactive,
+            hover_glow: true,
+            p { "Interfaccia tactile dark mode pronta all'uso." }
+            Button {
+                variant: ButtonVariant::Primary,
+                left_icon: rsx! { Icon { kind: IconKind::Check, size: 15 } },
+                "Salva Modifiche"
+            }
+        }
+    }
+}"#
+    .to_string();
 
     rsx! {
         div { class: "max-w-4xl space-y-10",
-            // Hero section with shadow aura
-            div { class: "relative overflow-hidden rounded-2xl border border-purple-900/60 bg-gradient-to-b from-[#120520] via-[#08030f] to-black p-8 shadow-[0_0_50px_rgba(88,28,135,0.25)]",
-                div { class: "relative z-10 space-y-4",
+            // Hero Section: Cyber-Industrial Tactile Craft
+            div { class: "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07070b] p-8 sm:p-10 shadow-2xl shadow-black/80 specular-top",
+                div { class: "relative z-10 space-y-5",
                     div { class: "flex items-center gap-3",
-                        span { class: "px-3 py-1 text-xs font-mono font-semibold rounded-full bg-purple-950/80 text-purple-300 border border-purple-800/70 shadow-[0_0_12px_rgba(147,51,234,0.3)]",
-                            "🔥 ORGANIZZAZIONE SHADOWFENIX"
+                        Badge {
+                            label: "SHADOWFENIX ECOSYSTEM".to_string(),
+                            variant: BadgeVariant::Primary,
+                            pill: true,
+                            dot: true,
                         }
-                        span { class: "text-xs text-zinc-500 font-mono", "TEMA: SHADOW & PURPLE" }
+                        span { class: "text-xs text-zinc-500 font-mono", "DIOXUS 0.7 • CRAFT UI" }
                     }
-                    h1 { class: "text-4xl font-extrabold tracking-tight text-white",
-                        "Shadow Design"
-                    }
-                    p { class: "text-zinc-300 text-lg leading-relaxed max-w-2xl",
-                        "Libreria di componenti UI modulari per Dioxus 0.7 creata per l'ecosistema "
-                        strong { class: "text-purple-300 font-semibold", "shadowfenix" }
-                        ". Caratterizzata da uno sfondo nero assoluto (0 0 0), accenti in viola scuro intenso, classi pre-fatte e supporto completo per la personalizzazione tramite la nuova feature "
-                        strong { class: "text-purple-300 font-mono", "Theme" }
-                        "."
+                    div { class: "space-y-2",
+                        Heading { order: HeadingOrder::H1, "Shadow Design" }
+                        Text { size: TextSize::Lg, dimmed: true,
+                            "Libreria di componenti UI modulare ad alte prestazioni per Dioxus 0.7. Architettura del tema in stile Mantine, gerarchia a 4 livelli di superficie scura, finiture hairline a 1px con top specular highlights e zero dipendenze esterne."
+                        }
                     }
                     div { class: "flex flex-wrap items-center gap-3 pt-2",
-                        Button {
-                            variant: ButtonVariant::Primary,
-                            "Esplora Componenti"
+                        Link {
+                            to: crate::Route::ButtonsPage {},
+                            Button {
+                                variant: ButtonVariant::Primary,
+                                left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 15 } },
+                                "Esplora Componenti"
+                            }
                         }
-                        Button {
-                            variant: ButtonVariant::Outline,
-                            "Documentazione Cargo"
+                        Link {
+                            to: crate::Route::TypographyPage {},
+                            Button {
+                                variant: ButtonVariant::Secondary,
+                                left_icon: rsx! { Icon { kind: IconKind::Code, size: 15 } },
+                                "Tipografia Geist"
+                            }
                         }
                     }
                 }
-                // Atmospheric decorative elements
-                div { class: "absolute -right-16 -top-16 w-64 h-64 rounded-full bg-purple-600/15 blur-3xl pointer-events-none" }
-                div { class: "absolute right-20 -bottom-10 w-48 h-48 rounded-full bg-purple-900/20 blur-2xl pointer-events-none" }
             }
 
-            // Theme Feature Card
+            // Mantine-Style Theme Showcase Card
             Card {
-                title: "🎨 Feature Theme: Classi Pre-fatte e Personalizzazione Totale".to_string(),
-                subtitle: "Non occorre riscrivere codice e classi ripetitive in decine di file".to_string(),
+                title: "Mantine-Style Theme Engine".to_string(),
+                subtitle: "Controllo centralizzato di tonalità colore, raggio di curvatura e micro-glow".to_string(),
                 shadow: CardShadow::Lg,
                 div { class: "space-y-6",
-                    p { class: "text-sm text-zinc-300 leading-relaxed",
-                        "Grazie alla feature "
-                        code { class: "px-1.5 py-0.5 rounded bg-black text-purple-300 font-mono text-xs border border-purple-900/60", "theme" }
-                        ", puoi usare classi pre-fatte centralizzate senza duplicare stili. Tutti i componenti ("
-                        code { class: "text-xs font-mono text-zinc-400", "Button, Card, TextInput, Badge, Navbar, Modal, Alert" }
-                        ") adottano automaticamente il tema corrente e si aggiornano in tempo reale."
+                    Text { size: TextSize::Sm,
+                        "Il nuovo motore del tema permette di commutare palette primarie ad alta leggibilità, scalare il raggio di curvatura (Sharp, Medium, Soft) e regolare l'intensità del bagliore ottico su tutti i componenti senza duplicare una singola classe Tailwind."
                     }
 
-                    // Playground Interattivo di personalizzazione
-                    div { class: "p-5 rounded-xl bg-black border border-purple-950/80 space-y-4 shadow-inner",
-                        div { class: "flex items-center justify-between",
-                            span { class: "text-xs font-bold text-white uppercase tracking-wider font-mono",
+                    // Selettore Rapido Preset
+                    div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-4 shadow-inner",
+                        div { class: "flex flex-wrap items-center justify-between gap-2",
+                            span { class: "text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5",
+                                Icon { kind: IconKind::Palette, size: 14 }
                                 "Collaudo Reattività Tema (Live Preview)"
                             }
-                            span { class: "text-xs font-mono px-2 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-800/60",
+                            span { class: "text-xs font-mono px-2 py-0.5 rounded bg-purple-950/60 text-purple-200 border border-purple-500/30",
                                 "Attivo: {theme().name}"
                             }
                         }
 
                         div { class: "flex flex-wrap items-center gap-2",
-                            span { class: "text-xs text-zinc-400 mr-2", "Preset disponibili:" }
                             Button {
                                 size: ButtonSize::Sm,
-                                variant: if theme().name.contains("Shadow") { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                onclick: move |_| *theme.write() = Theme::shadow(),
-                                "Shadow (Nero + Viola Scuro)"
-                            }
-                            Button {
-                                size: ButtonSize::Sm,
-                                variant: if theme().name.contains("Obsidian") { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                onclick: move |_| *theme.write() = Theme::obsidian(),
-                                "Obsidian Stealth"
+                                variant: if theme().primary_color == PrimaryColor::Violet { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Violet),
+                                "Violet (Default)"
                             }
                             Button {
                                 size: ButtonSize::Sm,
-                                variant: if theme().name.contains("Crimson") { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                onclick: move |_| *theme.write() = Theme::crimson(),
-                                "Crimson Fenix"
-                            }
-                        }
-
-                        // Form per sovrascrittura personalizzata
-                        div { class: "pt-2 border-t border-purple-950/60 flex flex-col sm:flex-row items-stretch sm:items-end gap-3",
-                            div { class: "flex-1",
-                                TextInput {
-                                    value: custom_accent,
-                                    label: "Sovrascrivi pulsante primario con classi custom:".to_string(),
-                                    placeholder: "es: bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg".to_string(),
-                                }
+                                variant: if theme().primary_color == PrimaryColor::Obsidian { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Obsidian),
+                                "Obsidian Titanium"
                             }
                             Button {
-                                size: ButtonSize::Md,
-                                variant: ButtonVariant::Primary,
-                                onclick: move |_| {
-                                    let val = custom_accent();
-                                    if !val.trim().is_empty() {
-                                        theme.write().button_primary = val;
-                                        theme.write().name = "Personalizzato".to_string();
-                                    }
-                                },
-                                "Applica Sovrascrittura"
+                                size: ButtonSize::Sm,
+                                variant: if theme().primary_color == PrimaryColor::Crimson { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Crimson),
+                                "Crimson Phoenix"
                             }
-                        }
-                    }
-
-                    // Guida all'uso in codice Rust
-                    div { class: "space-y-3",
-                        p { class: "font-semibold text-white text-sm", "1. Come usare le classi pre-fatte nel tuo codice Rust:" }
-                        pre { class: "p-4 rounded-xl bg-black font-mono text-xs text-purple-300 border border-purple-950/80 overflow-x-auto shadow-inner",
-                            "use dioxus::prelude::*;\nuse shadow_design::prelude::*;\n\n#[component]\npub fn View() -> Element {{\n    // Accesso diretto alle classi pre-fatte del tema:\n    let theme = use_theme();\n\n    rsx! {{\n        div {{\n            class: \"{{theme().root}}\",\n            header {{ class: \"{{theme().header}}\", \"Mio Header\" }}\n            aside {{ class: \"{{theme().sidebar}}\", \"Mia Sidebar\" }}\n            main {{\n                class: \"{{theme().content}}\",\n                Button {{ variant: ButtonVariant::Primary, \"Pulsante a tema\" }}\n            }}\n        }}\n    }}\n}}"
-                        }
-                    }
-
-                    // Guida a sovrascrittura e personalizzazione
-                    div { class: "space-y-3",
-                        p { class: "font-semibold text-white text-sm", "2. Come personalizzare e sovrascrivere il tema globale:" }
-                        pre { class: "p-4 rounded-xl bg-black font-mono text-xs text-emerald-300 border border-purple-950/80 overflow-x-auto shadow-inner",
-                            "// Creazione di un tema personalizzato con il builder:\nlet mio_tema = Theme::shadow()\n    .with_name(\"Mio Brand\")\n    .with_primary(\"bg-indigo-700 hover:bg-indigo-600 text-white shadow-lg\")\n    .with_card_base(\"bg-[#0a0a10] border border-indigo-950 rounded-2xl\");\n\n// Fornitura a livello root dell'applicazione:\nrsx! {{\n    ThemeProvider {{\n        theme: use_signal(|| mio_tema),\n        App {{}}\n    }}\n}}\n\n// Oppure modifica a runtime da qualsiasi componente:\nlet mut theme = use_theme();\ntheme.write().button_primary = \"bg-purple-600 text-white\".to_string();"
-                        }
-                    }
-
-                    // Utility CSS Tailwind
-                    div { class: "space-y-3",
-                        p { class: "font-semibold text-white text-sm", "3. Classi pre-fatte disponibili in Tailwind CSS:" }
-                        p { class: "text-xs text-zinc-400",
-                            "Se preferisci applicare le classi direttamente nel markup HTML/RSX senza invocare use_theme(), sono definite le seguenti utility:"
-                        }
-                        div { class: "grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs",
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-root" }
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-header" }
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-sidebar" }
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-card" }
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-surface" }
-                            div { class: "p-2 rounded bg-black border border-purple-950/70 text-purple-300", "theme-glow" }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: if theme().primary_color == PrimaryColor::Cyan { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Cyan),
+                                "Cyber Cyan"
+                            }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: if theme().primary_color == PrimaryColor::Emerald { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Emerald),
+                                "Emerald Matrix"
+                            }
                         }
                     }
                 }
@@ -151,10 +138,11 @@ pub fn Home() -> Element {
             // Architecture Grid
             div { class: "grid grid-cols-1 md:grid-cols-2 gap-4",
                 Card {
-                    title: "📦 crate (shadow-design)".to_string(),
+                    title: "Libreria (crate/shadow-design)".to_string(),
+                    subtitle: "Zero bloat: architettura cargo modulare".to_string(),
                     shadow: CardShadow::Md,
-                    p { class: "text-sm text-zinc-300 mb-3 leading-relaxed",
-                        "La libreria UI condivisa di shadowfenix. Ogni componente è isolato e compilabile singolarmente attivando la relativa feature."
+                    p { class: "text-xs text-zinc-300 mb-3 leading-relaxed",
+                        "Ogni componente è racchiuso dietro una feature flag Cargo indipendente. Compila esclusivamente il codice che la tua applicazione utilizza."
                     }
                     div { class: "flex flex-wrap gap-1.5",
                         Badge { label: "button".to_string(), variant: BadgeVariant::Primary }
@@ -165,35 +153,40 @@ pub fn Home() -> Element {
                         Badge { label: "modal".to_string(), variant: BadgeVariant::Primary }
                         Badge { label: "alert".to_string(), variant: BadgeVariant::Primary }
                         Badge { label: "theme".to_string(), variant: BadgeVariant::Primary }
+                        Badge { label: "icon".to_string(), variant: BadgeVariant::Primary }
+                        Badge { label: "typography".to_string(), variant: BadgeVariant::Primary }
                     }
                 }
 
                 Card {
-                    title: "🖼️ showcase (espositore)".to_string(),
+                    title: "Showcase (showcase)".to_string(),
+                    subtitle: "Ambiente di collaudo interattivo".to_string(),
                     shadow: CardShadow::Md,
-                    p { class: "text-sm text-zinc-300 mb-3 leading-relaxed",
-                        "Applicazione interattiva per visualizzare, verificare e collaudare ogni singolo elemento prima di integrarlo nei progetti web."
+                    p { class: "text-xs text-zinc-300 mb-3 leading-relaxed",
+                        "Ogni componente include schede interattive per il collaudo in tempo reale, visualizzatore di codice RSX copiabile con un click e tabella reference dei parametri API."
                     }
-                    div { class: "flex items-center gap-2",
-                        Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "Tailwind CSS v4".to_string(), variant: BadgeVariant::Success }
-                        Badge { label: "Reactive Theme".to_string(), variant: BadgeVariant::Primary }
+                    div { class: "flex flex-wrap gap-2",
+                        Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Success, dot: true }
+                        Badge { label: "Geist Fonts".to_string(), variant: BadgeVariant::Default }
+                        Badge { label: "Native SVG".to_string(), variant: BadgeVariant::Primary }
+                        Badge { label: "Tailwind CSS v4".to_string(), variant: BadgeVariant::Default }
                     }
                 }
             }
 
-            // Quick Usage Guide
+            // Installation & Quick Start
             Card {
-                title: "Come utilizzarlo nei progetti shadowfenix".to_string(),
+                title: "Guida Rapida all'Integrazione".to_string(),
+                subtitle: "Come aggiungere Shadow Design ai tuoi progetti Rust Dioxus".to_string(),
                 shadow: CardShadow::Lg,
-                div { class: "space-y-4 text-sm text-zinc-300",
-                    p { "Aggiungi la dipendenza selezionando solo i componenti desiderati per un bundle snello:" }
-                    pre { class: "p-4 rounded-xl bg-black font-mono text-xs text-purple-300 border border-purple-950/80 overflow-x-auto shadow-inner",
-                        "[dependencies]\nshadow-design = {{ path = \"../shadow-design/crate\", features = [\"button\", \"card\", \"theme\"] }}\n\n# Oppure per includere tutta la suite:\n# shadow-design = {{ path = \"../shadow-design/crate\", features = [\"all\"] }}"
+                div { class: "space-y-4",
+                    div { class: "space-y-2",
+                        span { class: "text-xs font-semibold text-zinc-300", "1. Configura Cargo.toml:" }
+                        CodeBlock { code: install_code, language: "toml" }
                     }
-                    p { "Nel tuo codice Rust Dioxus 0.7:" }
-                    pre { class: "p-4 rounded-xl bg-black font-mono text-xs text-emerald-300 border border-purple-950/80 overflow-x-auto shadow-inner",
-                        "use dioxus::prelude::*;\nuse shadow_design::prelude::*;\n\n#[component]\npub fn View() -> Element {{\n    rsx! {{\n        Card {{\n            title: \"Titolo della Card\".to_string(),\n            Button {{\n                variant: ButtonVariant::Primary,\n                \"Azione Primaria\"\n            }}\n        }}\n    }}\n}}"
+                    div { class: "space-y-2 pt-2",
+                        span { class: "text-xs font-semibold text-zinc-300", "2. Utilizza i componenti nel tuo codice RSX:" }
+                        CodeBlock { code: rust_example, language: "rust" }
                     }
                 }
             }
