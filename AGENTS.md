@@ -75,27 +75,74 @@ Il file `crate/Cargo.toml` definisce feature individuali per consentire ai consu
 | Feature Flag | Descrizione | Modulo |
 | :--- | :--- | :--- |
 | `all` | Abilita l'intera suite di componenti e il tema | Include tutte le feature sottostanti |
-| `button` | Pulsanti con varianti, dimensioni e stati interattivi | `crate::button` |
-| `card` | Schede contenitore con intestazione, footer e ombre | `crate::card` |
-| `input` | Input di testo reattivi collegati a `Signal<String>` | `crate::input` |
-| `badge` | Etichette di stato e indicatori a pillola | `crate::badge` |
-| `navbar` | Barra di navigazione responsive | `crate::navbar` |
-| `modal` | Finestre di dialogo in overlay con backdrop | `crate::modal` |
-| `alert` | Riquadri di notifica con icone semantiche | `crate::alert` |
-| `theme` | Sistema reattivo per personalizzazione classi UI | `crate::theme` |
+| `button` | Pulsanti con varianti, dimensioni, loading spinner e stati tattili | `crate::button` |
+| `card` | Schede contenitore con varianti (Interactive, Metric, Elevated) e ombre | `crate::card` |
+| `input` | Input di testo reattivi con icone statiche/cliccabili (`on_left_icon_click`, `on_right_icon_click`), clear button e Signal<String> | `crate::input` |
+| `badge` | Etichette di stato, indicatori a pillola e dot animato | `crate::badge` |
+| `navbar` | Barra di navigazione responsive con specular top highlight | `crate::navbar` |
+| `modal` | Finestre di dialogo in overlay con backdrop click-to-close | `crate::modal` |
+| `alert` | Riquadri di notifica con icone SVG native e dismiss manuale | `crate::alert` |
+| `theme` | Engine reattivo in stile Mantine (PrimaryColor, RadiusScale, GlowMode) | `crate::theme` |
+| `icon` | Modulo icone vettoriali native SVG (stroke 1.5px, zero dipendenze) | `crate::icon` |
+| `typography` | Componenti tipografici basati su Geist (Heading, Text, Kbd, Code) | `crate::typography` |
+| `notification` | Sistema Toast globale (NotificationProvider, use_notification, dismiss) | `crate::notification` |
+| `tabs` | Navigazione a schede orizzontali stile Mantine (TabList, Tab, TabPanel) | `crate::tabs` |
+| `switch` | Interruttori a scatto tattili ad alta precisione con descrizioni | `crate::switch` |
+| `tooltip` | Micro-etichette fluttuanti su hover a 4 direzioni (Top, Bottom, Left, Right) | `crate::tooltip` |
+| `drawer` | Pannelli laterali a scomparsa da sinistra o destra con backdrop | `crate::drawer` |
+| `dropdown` | Menu a tendina contestuali ancorati al trigger con dismiss automatico | `crate::dropdown` |
+| `checkbox` | Caselle di selezione tattili (Sm/Md/Lg, indeterminate, error, glow) | `crate::checkbox` |
+| `animation` | Sistema di transizioni ottiche e micro-animazioni Dioxus (Fade, Slide, Scale, Pulse) | `crate::animation` |
+
+### Gerarchia Z-Index Standardizzata
+Per prevenire clipping e sovrapposizioni errate (es. Dropdown clippato da Card o nascosto sotto altri elementi):
+- `Card` e `ShowcaseTabs` non usano `overflow-hidden` forzato sull'intero contenitore per permettere ai menu fluttuanti di estendersi all'esterno.
+- `Dropdown` supporta `DropdownPlacement` (`BottomRight`, `BottomLeft`, `TopRight`, `TopLeft`): quando posizionato vicino al fondo di una card, il preset `Top` apre il menu verso l'alto evitando di fuoriuscire dal layout.
+- Quando aperto, il Dropdown riceve priorità assoluta: Backdrop `z-[995]`, Container `z-[999]`, Menu `z-[1000]`.
+- Scala Z-index universale:
+  - Header / Sticky: `z-30`
+  - Drawer: Backdrop `z-[65]`, Panel `z-[70]`
+  - Modal: Backdrop `z-[75]`, Dialog `z-[80]` / `z-[85]`
+  - Notifications: Container `z-[90]`
+  - Tooltips: Bubble `z-[100]`
+  - Dropdown Attivo: Container `z-[999]`, Menu `z-[1000]`
+
+### Architettura 100% SCSS & Supporto Nativo Dioxus `asset!()` nella Crate
+TailwindCSS è stato completamente rimosso dal progetto. L'intera suite di stili è ora scritta in puro SCSS e risiede direttamente all'interno della crate libreria in `crate/scss/`, esposta nativamente tramite la macro di Dioxus in [crate/src/lib.rs](file:///c:/Users/KillerBoss/Documents/shadow-design/crate/src/lib.rs):
+```rust
+pub const STYLES: Asset = asset!("/scss/main.scss");
+```
+E consumata direttamente dalle applicazioni (come lo showcase) tramite:
+```rust
+document::Link { rel: "stylesheet", href: shadow_design::STYLES }
+```
+- `_variables.scss`: Token per colori, surface 4-livelli, font Geist, raggi di curvatura.
+- `_zindex.scss`: Mappa `$z-layers` e funzione `z($layer)` per un layer management matematicamente affidabile.
+- `_mixins.scss`: Mixin per specular highlights, ambient glow, micro-scrollbar, tactile press.
+- `_reset.scss`: CSS Preflight Reset totale che azzera i default del browser per `button`, `input`, `textarea`, `select`, eliminando alla radice il problema dei bottoni con background bianco o grigio nativo del browser.
+- `_animations.scss`: Keyframes per toast in/out, modal scale-in, dropdown unroll, drawer slides, indeterminate slide, spin, pulse glow e classi `.animate-*`.
+- `_utilities.scss`: Motore di utilità SCSS universale (Flexbox, Grid, Sizing, Spacing, Typography, Colors, Borders, Shadows).
+- `_theme_presets.scss`: Presets e classi cromatiche per i 5 temi (Violet, Obsidian, Crimson, Cyan, Emerald), anelli di selezione (`ring-2`), scale attive e glow matrix dinamica.
+- `components/_*.scss`: Moduli specifici per ciascun componente UI, inclusi `.sd-btn`, `.sd-card`, `.sd-input`, `.sd-checkbox`, `.sd-modal`, `.sd-drawer`, `.sd-dropdown`, `.sd-toast`.
+- `main.scss`: Entrypoint master all'interno di `crate/scss/` che assembla e compila l'intera suite.
 
 ### Supporto Duale al Tema (`Theme` vs Fallback statico)
 Tutti i componenti in `crate/src/` sono scritti per funzionare in due modalità grazie a `#[cfg]`:
 1. **Con feature `theme` attiva**: Leggono le classi Tailwind in modo reattivo invocando `crate::theme::use_theme()`. Quando il tema cambia a runtime, tutti i componenti istanziati si aggiornano immediatamente.
 2. **Senza feature `theme` attiva**: Fanno fallback trasparente su classi statiche predefinite hardcoded nei componenti (zero overhead se il sistema a tema non è richiesto).
 
-### Sistema del Tema (`crate/src/theme.rs`)
-- **`Theme`**: Struttura dati che raggruppa tutti i token CSS di layout, accenti e classi di ogni componente.
+### Sistema del Tema in stile Mantine (`crate/src/theme.rs`)
+- **`Theme`**: Struttura dati che raggruppa tutti i token CSS di layout, superfici a 4 livelli, accenti e classi di ogni componente.
 - **Preset inclusi**:
-  - `Theme::shadow()` (Default): Nero assoluto + viola intenso.
-  - `Theme::obsidian()`: Nero puro + grafite/argento minimalista.
-  - `Theme::crimson()`: Nero + rosso cremisi acceso della fenice.
-- **Builder pattern**: Metodi come `.with_primary(...)`, `.with_card_base(...)`, `.with_glow(...)` per personalizzare o creare varianti aziendali al volo.
+  - `Theme::shadow()` (Default): Ultraviolet Shadow (Nero profondo + accenti viola e specular highlights).
+  - `Theme::obsidian()`: Obsidian Titanium (Monocromatico rigoroso argento e titanio).
+  - `Theme::crimson()`: Crimson Phoenix (Nero profondo con fiamme cremisi fenice).
+  - `Theme::cyan()`: Cyber Cyan (Ciano elettrico ad alto contrasto).
+  - `Theme::emerald()`: Emerald Matrix (Verde smeraldo ad alta nitidezza).
+- **Scale di Personalizzazione**:
+  - `PrimaryColor`: Violet, Obsidian, Crimson, Cyan, Emerald.
+  - `RadiusScale`: Sharp (2px), Medium (8px), Soft (14px).
+  - `GlowMode`: Subtle, Expressive, Off.
 - **Context API Dioxus**: `ThemeProvider` per fornire il tema all'albero di componenti e `use_theme()` per consumarlo o scrivervi (`theme.write()`).
 
 ---
@@ -106,12 +153,13 @@ Tutti i componenti in `crate/src/` sono scritti per funzionare in due modalità 
 
 - **Routing (Dioxus 0.7)**: Gestito tramite l'enum `Route` in `showcase/src/main.rs`.
 - **Layout Shell (`showcase/src/components/layout.rs`)**:
-  - Fornisce la barra superiore con logo Shadowfenix e selettore in tempo reale del tema (`Shadow`, `Obsidian`, `Crimson`).
-  - Barra laterale con navigazione alle pagine dei singoli componenti.
+  - Fornisce la barra superiore con logo Shadowfenix e toolbar interattiva Mantine (palette swatches, radius selector, glow toggle).
+  - Barra laterale con navigazione alle pagine dei singoli componenti e icone SVG native.
   - Renderizza la pagina corrente tramite `Outlet::<Route> {}`.
-- **Tailwind CSS v4 Integration**:
-  - `showcase/tailwind.css` fa `@import "tailwindcss";` e include come `@source` sia la cartella `../crate` che `./src`.
-  - Definisce utility custom come `@utility theme-root`, `@utility theme-card`, `@utility theme-glow`.
+- **ComponentShowcase a 3 Schede (`ShowcaseTabs`)**:
+  - **Playground**: Controlli interattivi live (varianti, dimensioni, stati, switch).
+  - **Codice RSX**: Snippet di codice copiabile negli appunti con feedback "Copiato!".
+  - **API Props**: Tabella dettagliata dei parametri (Nome, Tipo Rust, Default, Descrizione).
 
 ---
 
