@@ -1,265 +1,171 @@
-You are an expert [0.7 Dioxus](https://dioxuslabs.com/learn/0.7) assistant. Dioxus 0.7 changes every api in dioxus. Only use this up to date documentation. `cx`, `Scope`, and `use_state` are gone
+# AGENTS.md — Shadow Design Workspace Guide
 
-Provide concise code examples with detailed descriptions
+Istruzioni operative, architettura e standard di sviluppo per agenti AI e sviluppatori che lavorano su **Shadow Design**.
 
-# Dioxus Dependency
+---
 
-You can add Dioxus to your `Cargo.toml` like this:
+## 1. Panoramica del Progetto
 
-```toml
-[dependencies]
-dioxus = { version = "0.7.1" }
+**Shadow Design** è una libreria di componenti UI modulare e ad alte prestazioni progettata per **Dioxus 0.7** (applicazioni Web, Desktop e Mobile), nata all'interno dell'ecosistema **Shadowfenix**.
 
-[features]
-default = ["web", "webview", "server"]
-web = ["dioxus/web"]
-webview = ["dioxus/desktop"]
-server = ["dioxus/server"]
+### Filosofia Estetica
+- **Sfondo**: Nero assoluto (`#000000`, `bg-black`).
+- **Accenti Cromatici**: Viola scuro intenso (`purple-950`, `purple-900`, `purple-800`), con preset alternativi Obsidian (monocromatico) e Crimson (fenice rossa).
+- **Dettagli**: Micro-glow (`shadow-[0_0_20px_rgba(107,33,168,0.3)]`), bordi semi-trasparenti sottili e contrasti elevati.
+- **Modularità**: Architettura *zero-bloat* dove ogni componente è vincolato a una feature flag Cargo indipendente.
+
+---
+
+## 2. Struttura del Workspace Cargo
+
+Il progetto è configurato come un Cargo workspace con due membri principali:
+
+```text
+shadow-design/
+├── Cargo.toml               # Workspace root (resolver = "2", Dioxus 0.7.1)
+├── Cargo.lock               # Dipendenze bloccate del workspace
+├── clippy.toml              # Regole di linting per Dioxus 0.7 / Generational Box
+├── AGENTS.md                # Questo file d'istruzioni
+├── crate/                   # Crate libreria: shadow-design
+│   ├── Cargo.toml           # Manifest della libreria con feature flags
+│   └── src/
+│       ├── lib.rs           # Entry point libreria, re-export condizionali e prelude
+│       ├── theme.rs         # Sistema reattivo del tema, Context e Preset
+│       ├── button.rs        # Componente Button, varianti e dimensioni
+│       ├── card.rs          # Componente Card con header, footer e ombre
+│       ├── input.rs         # Componente TextInput collegato a Signal<String>
+│       ├── badge.rs         # Componente Badge con stili pill/rettangolari
+│       ├── navbar.rs        # Componente Navbar responsive
+│       ├── modal.rs         # Componente Modal controllato da Signal<bool>
+│       └── alert.rs         # Componente Alert con icone automatiche
+└── showcase/                # Crate applicativo: Espositore componenti
+    ├── Cargo.toml           # Manifest dell'app (dipende da shadow-design { all })
+    ├── Dioxus.toml          # Configurazione Dioxus CLI (dx)
+    ├── tailwind.css         # Configurazione sorgente Tailwind CSS v4 (@utility)
+    ├── assets/
+    │   ├── main.css         # Reset globale, scrollbar viola scuro, stili custom
+    │   ├── tailwind.css     # CSS compilato per il browser
+    │   ├── header.svg       # Logo vettoriale Shadowfenix
+    │   └── favicon.ico      # Icona dell'applicazione
+    └── src/
+        ├── main.rs          # App root, caricamento asset e Dioxus Router
+        ├── components/
+        │   ├── mod.rs
+        │   ├── layout.rs    # Shell con Navbar, Sidebar e Theme Switcher live
+        │   └── banner.rs    # Banner informativo con comando Cargo feature
+        └── pages/
+            ├── mod.rs
+            ├── home.rs      # Panoramica, hero e test dinamico del Theme
+            ├── buttons.rs   # Showcase e playground interattivo di Button
+            ├── cards.rs     # Showcase di Card e livelli di ombra
+            ├── inputs.rs    # Showcase di TextInput con binding reattivo
+            ├── badges.rs    # Showcase di Badge e varianti
+            ├── alerts.rs    # Showcase di Alert di sistema
+            ├── modals.rs    # Showcase e test di apertura modale
+            └── navbar.rs    # Anteprima di Navbar
 ```
 
-# Launching your application
+---
 
-You need to create a main function that sets up the Dioxus runtime and mounts your root component.
+## 3. Crate Libreria (`crate` / `shadow-design`)
 
-```rust
-use dioxus::prelude::*;
+### Feature Flags Cargo
+Il file `crate/Cargo.toml` definisce feature individuali per consentire ai consumatori di importare esclusivamente ciò di cui necessitano:
 
-fn main() {
-	dioxus::launch(App);
-}
+| Feature Flag | Descrizione | Modulo |
+| :--- | :--- | :--- |
+| `all` | Abilita l'intera suite di componenti e il tema | Include tutte le feature sottostanti |
+| `button` | Pulsanti con varianti, dimensioni e stati interattivi | `crate::button` |
+| `card` | Schede contenitore con intestazione, footer e ombre | `crate::card` |
+| `input` | Input di testo reattivi collegati a `Signal<String>` | `crate::input` |
+| `badge` | Etichette di stato e indicatori a pillola | `crate::badge` |
+| `navbar` | Barra di navigazione responsive | `crate::navbar` |
+| `modal` | Finestre di dialogo in overlay con backdrop | `crate::modal` |
+| `alert` | Riquadri di notifica con icone semantiche | `crate::alert` |
+| `theme` | Sistema reattivo per personalizzazione classi UI | `crate::theme` |
 
-#[component]
-fn App() -> Element {
-	rsx! { "Hello, Dioxus!" }
-}
-```
+### Supporto Duale al Tema (`Theme` vs Fallback statico)
+Tutti i componenti in `crate/src/` sono scritti per funzionare in due modalità grazie a `#[cfg]`:
+1. **Con feature `theme` attiva**: Leggono le classi Tailwind in modo reattivo invocando `crate::theme::use_theme()`. Quando il tema cambia a runtime, tutti i componenti istanziati si aggiornano immediatamente.
+2. **Senza feature `theme` attiva**: Fanno fallback trasparente su classi statiche predefinite hardcoded nei componenti (zero overhead se il sistema a tema non è richiesto).
 
-Then serve with `dx serve`:
+### Sistema del Tema (`crate/src/theme.rs`)
+- **`Theme`**: Struttura dati che raggruppa tutti i token CSS di layout, accenti e classi di ogni componente.
+- **Preset inclusi**:
+  - `Theme::shadow()` (Default): Nero assoluto + viola intenso.
+  - `Theme::obsidian()`: Nero puro + grafite/argento minimalista.
+  - `Theme::crimson()`: Nero + rosso cremisi acceso della fenice.
+- **Builder pattern**: Metodi come `.with_primary(...)`, `.with_card_base(...)`, `.with_glow(...)` per personalizzare o creare varianti aziendali al volo.
+- **Context API Dioxus**: `ThemeProvider` per fornire il tema all'albero di componenti e `use_theme()` per consumarlo o scrivervi (`theme.write()`).
 
-```sh
-curl -sSL http://dioxus.dev/install.sh | sh
+---
+
+## 4. Crate Showcase (`showcase`)
+
+È l'applicazione web interattiva usata per collaudare e mostrare visivamente tutti i componenti.
+
+- **Routing (Dioxus 0.7)**: Gestito tramite l'enum `Route` in `showcase/src/main.rs`.
+- **Layout Shell (`showcase/src/components/layout.rs`)**:
+  - Fornisce la barra superiore con logo Shadowfenix e selettore in tempo reale del tema (`Shadow`, `Obsidian`, `Crimson`).
+  - Barra laterale con navigazione alle pagine dei singoli componenti.
+  - Renderizza la pagina corrente tramite `Outlet::<Route> {}`.
+- **Tailwind CSS v4 Integration**:
+  - `showcase/tailwind.css` fa `@import "tailwindcss";` e include come `@source` sia la cartella `../crate` che `./src`.
+  - Definisce utility custom come `@utility theme-root`, `@utility theme-card`, `@utility theme-glow`.
+
+---
+
+## 5. Regole e Convenzioni per lo Sviluppo
+
+### Dioxus 0.7 API Standards
+- **No API obsolete**: `cx`, `Scope`, `use_state` non esistono più in Dioxus 0.7.
+- **Stato reattivo**:
+  - Usa `use_signal(|| init_val)`.
+  - Lettura: `sig()` oppure `*sig.read()`.
+  - Scrittura: `*sig.write() = new_val` oppure `sig.with_mut(|v| ...)`.
+- **Proprietà dei Componenti**:
+  - Devono implementare `Clone` e `PartialEq`.
+  - Usa tipi posseduti (`String`, `Option<String>`, `Signal<T>`), non riferimenti (`&str`, `&[T]`).
+  - Per eventi, usa `Option<EventHandler<MouseEvent>>` o simili.
+- **Sintassi RSX**:
+  - Cicli con `for item in items { ... }`.
+  - Condizionali diretti con `if condition { ... }`.
+  - Attributi condizionali e stringhe formattate con `{base} {extra}`.
+
+### Regole di Concorrenza e Linting (`clippy.toml`)
+Il repository include configurazioni specifiche per evitare deadlock e panic nei thread asincroni Dioxus:
+- **NON trattenere mai riferimenti o lock attraverso punti di `.await`**:
+  - `generational_box::GenerationalRef`
+  - `generational_box::GenerationalRefMut`
+  - `dioxus_signals::WriteLock`
+- Se devi eseguire un `.await`, rilascia sempre prima il lock dello Signal o della box generazionale (ad esempio clonando il valore prima dell'await o chiudendo il blocco di scope del lock).
+
+### Linee Guida per Aggiungere Nuovi Componenti
+Quando si aggiunge un nuovo componente a `shadow-design`:
+1. Crea il file `crate/src/<componente>.rs`.
+2. Aggiungi la feature in `crate/Cargo.toml` (sia come feature isolata, sia come dipendenza di `all`).
+3. In `crate/src/lib.rs`, esponi il modulo con `#[cfg(feature = "...")]` e includilo in `pub mod prelude`.
+4. Nel componente, gestisci sia il supporto reattivo a `crate::theme::use_theme()` sia il fallback statico senza feature `theme`.
+5. Se il componente richiede stili nel tema, aggiorna `Theme` in `crate/src/theme.rs` con i campi corrispondenti e i metodi builder.
+6. Aggiungi la pagina dimostrativa corrispondente in `showcase/src/pages/` e registrala nel Router e nella Sidebar.
+
+---
+
+## 6. Comandi Utili per il Workflow
+
+Esegui sempre i comandi dalla root del workspace o specificando il package target:
+
+```bash
+# Verifica rapida della compilazione dell'intero workspace
+cargo check --workspace
+
+# Analisi statica con linter Clippy (rispetta clippy.toml)
+cargo clippy --workspace
+
+# Esecuzione dei test
+cargo test --workspace
+
+# Avvio del server di sviluppo dello Showcase (con hot-reload)
+cd showcase
 dx serve
 ```
-
-# UI with RSX
-
-```rust
-rsx! {
-	div {
-		class: "container", // Attribute
-		color: "red", // Inline styles
-		width: if condition { "100%" }, // Conditional attributes
-		"Hello, Dioxus!"
-	}
-	// Prefer loops over iterators
-	for i in 0..5 {
-		div { "{i}" } // use elements or components directly in loops
-	}
-	if condition {
-		div { "Condition is true!" } // use elements or components directly in conditionals
-	}
-
-	{children} // Expressions are wrapped in brace
-	{(0..5).map(|i| rsx! { span { "Item {i}" } })} // Iterators must be wrapped in braces
-}
-```
-
-# Assets
-
-The asset macro can be used to link to local files to use in your project. All links start with `/` and are relative to the root of your project.
-
-```rust
-rsx! {
-	img {
-		src: asset!("/assets/image.png"),
-		alt: "An image",
-	}
-}
-```
-
-## Styles
-
-The `document::Stylesheet` component will inject the stylesheet into the `<head>` of the document
-
-```rust
-rsx! {
-	document::Stylesheet {
-		href: asset!("/assets/styles.css"),
-	}
-}
-```
-
-# Components
-
-Components are the building blocks of apps
-
-* Component are functions annotated with the `#[component]` macro.
-* The function name must start with a capital letter or contain an underscore.
-* A component re-renders only under two conditions:
-	1.  Its props change (as determined by `PartialEq`).
-	2.  An internal reactive state it depends on is updated.
-
-```rust
-#[component]
-fn Input(mut value: Signal<String>) -> Element {
-	rsx! {
-		input {
-            value,
-			oninput: move |e| {
-				*value.write() = e.value();
-			},
-			onkeydown: move |e| {
-				if e.key() == Key::Enter {
-					value.write().clear();
-				}
-			},
-		}
-	}
-}
-```
-
-Each component accepts function arguments (props)
-
-* Props must be owned values, not references. Use `String` and `Vec<T>` instead of `&str` or `&[T]`.
-* Props must implement `PartialEq` and `Clone`.
-* To make props reactive and copy, you can wrap the type in `ReadOnlySignal`. Any reactive state like memos and resources that read `ReadOnlySignal` props will automatically re-run when the prop changes.
-
-# State
-
-A signal is a wrapper around a value that automatically tracks where it's read and written. Changing a signal's value causes code that relies on the signal to rerun.
-
-## Local State
-
-The `use_signal` hook creates state that is local to a single component. You can call the signal like a function (e.g. `my_signal()`) to clone the value, or use `.read()` to get a reference. `.write()` gets a mutable reference to the value.
-
-Use `use_memo` to create a memoized value that recalculates when its dependencies change. Memos are useful for expensive calculations that you don't want to repeat unnecessarily.
-
-```rust
-#[component]
-fn Counter() -> Element {
-	let mut count = use_signal(|| 0);
-	let mut doubled = use_memo(move || count() * 2); // doubled will re-run when count changes because it reads the signal
-
-	rsx! {
-		h1 { "Count: {count}" } // Counter will re-render when count changes because it reads the signal
-		h2 { "Doubled: {doubled}" }
-		button {
-			onclick: move |_| *count.write() += 1, // Writing to the signal rerenders Counter
-			"Increment"
-		}
-		button {
-			onclick: move |_| count.with_mut(|count| *count += 1), // use with_mut to mutate the signal
-			"Increment with with_mut"
-		}
-	}
-}
-```
-
-## Context API
-
-The Context API allows you to share state down the component tree. A parent provides the state using `use_context_provider`, and any child can access it with `use_context`
-
-```rust
-#[component]
-fn App() -> Element {
-	let mut theme = use_signal(|| "light".to_string());
-	use_context_provider(|| theme); // Provide a type to children
-	rsx! { Child {} }
-}
-
-#[component]
-fn Child() -> Element {
-	let theme = use_context::<Signal<String>>(); // Consume the same type
-	rsx! {
-		div {
-			"Current theme: {theme}"
-		}
-	}
-}
-```
-
-# Async
-
-For state that depends on an asynchronous operation (like a network request), Dioxus provides a hook called `use_resource`. This hook manages the lifecycle of the async task and provides the result to your component.
-
-* The `use_resource` hook takes an `async` closure. It re-runs this closure whenever any signals it depends on (reads) are updated
-* The `Resource` object returned can be in several states when read:
-1. `None` if the resource is still loading
-2. `Some(value)` if the resource has successfully loaded
-
-```rust
-let mut dog = use_resource(move || async move {
-	// api request
-});
-
-match dog() {
-	Some(dog_info) => rsx! { Dog { dog_info } },
-	None => rsx! { "Loading..." },
-}
-```
-
-# Routing
-
-All possible routes are defined in a single Rust `enum` that derives `Routable`. Each variant represents a route and is annotated with `#[route("/path")]`. Dynamic Segments can capture parts of the URL path as parameters by using `:name` in the route string. These become fields in the enum variant.
-
-The `Router<Route> {}` component is the entry point that manages rendering the correct component for the current URL.
-
-You can use the `#[layout(NavBar)]` to create a layout shared between pages and place an `Outlet<Route> {}` inside your layout component. The child routes will be rendered in the outlet.
-
-```rust
-#[derive(Routable, Clone, PartialEq)]
-enum Route {
-	#[layout(NavBar)] // This will use NavBar as the layout for all routes
-		#[route("/")]
-		Home {},
-		#[route("/blog/:id")] // Dynamic segment
-		BlogPost { id: i32 },
-}
-
-#[component]
-fn NavBar() -> Element {
-	rsx! {
-		a { href: "/", "Home" }
-		Outlet<Route> {} // Renders Home or BlogPost
-	}
-}
-
-#[component]
-fn App() -> Element {
-	rsx! { Router::<Route> {} }
-}
-```
-
-```toml
-dioxus = { version = "0.7.1", features = ["router"] }
-```
-
-# Fullstack
-
-Fullstack enables server rendering and ipc calls. It uses Cargo features (`server` and a client feature like `web`) to split the code into a server and client binaries.
-
-```toml
-dioxus = { version = "0.7.1", features = ["fullstack"] }
-```
-
-## Server Functions
-
-Use the `#[post]` / `#[get]` macros to define an `async` function that will only run on the server. On the server, this macro generates an API endpoint. On the client, it generates a function that makes an HTTP request to that endpoint.
-
-```rust
-#[post("/api/double/:path/&query")]
-async fn double_server(number: i32, path: String, query: i32) -> Result<i32, ServerFnError> {
-	tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-	Ok(number * 2)
-}
-```
-
-## Hydration
-
-Hydration is the process of making a server-rendered HTML page interactive on the client. The server sends the initial HTML, and then the client-side runs, attaches event listeners, and takes control of future rendering.
-
-### Errors
-The initial UI rendered by the component on the client must be identical to the UI rendered on the server.
-
-* Use the `use_server_future` hook instead of `use_resource`. It runs the future on the server, serializes the result, and sends it to the client, ensuring the client has the data immediately for its first render.
-* Any code that relies on browser-specific APIs (like accessing `localStorage`) must be run *after* hydration. Place this code inside a `use_effect` hook.

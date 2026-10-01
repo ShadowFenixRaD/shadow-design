@@ -5,10 +5,34 @@ use crate::{Route, HEADER_SVG};
 
 #[component]
 pub fn Layout() -> Element {
+    let mut theme = use_theme();
+
+    let is_shadow = theme().name.contains("Shadow");
+    let is_obsidian = theme().name.contains("Obsidian");
+    let is_crimson = theme().name.contains("Crimson");
+
+    let shadow_btn = if is_shadow {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-purple-900 border-purple-500 text-white font-bold"
+    } else {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-black/60 border-zinc-800 text-zinc-400 hover:text-white"
+    };
+
+    let obsidian_btn = if is_obsidian {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-zinc-800 border-zinc-400 text-white font-bold"
+    } else {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-black/60 border-zinc-800 text-zinc-400 hover:text-white"
+    };
+
+    let crimson_btn = if is_crimson {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-rose-900 border-rose-500 text-white font-bold"
+    } else {
+        "px-2 py-1 text-[10px] rounded border font-mono transition-all cursor-pointer bg-black/60 border-zinc-800 text-zinc-400 hover:text-white"
+    };
+
     rsx! {
-        div { class: "min-h-screen flex flex-col bg-[#000000] text-zinc-100 selection:bg-purple-800 selection:text-white",
+        div { class: "{theme().root}",
             // Header
-            header { class: "border-b border-purple-950/60 bg-black/90 backdrop-blur-md sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.8)]",
+            header { class: "{theme().header} sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between",
                 div { class: "flex items-center gap-4",
                     Link {
                         to: Route::Home {},
@@ -29,7 +53,9 @@ pub fn Layout() -> Element {
                     }
                 }
                 div { class: "flex items-center gap-4 text-sm text-zinc-400",
-                    span { class: "hidden sm:inline text-xs text-purple-400/90 font-mono tracking-wide px-2.5 py-1 rounded-full border border-purple-900/60 bg-purple-950/30 shadow-[0_0_10px_rgba(107,33,168,0.2)]", "ORGANIZZAZIONE SHADOWFENIX" }
+                    span { class: "hidden sm:inline text-xs font-mono tracking-wide px-2.5 py-1 rounded-full border border-purple-900/60 bg-purple-950/30 text-purple-300",
+                        "TEMA: {theme().name.to_uppercase()}"
+                    }
                     span { class: "text-xs text-zinc-400", "Espositore Componenti UI" }
                 }
             }
@@ -37,16 +63,16 @@ pub fn Layout() -> Element {
             // Main container with Sidebar and Content
             div { class: "flex-1 flex max-w-7xl w-full mx-auto",
                 // Sidebar
-                aside { class: "w-64 border-r border-purple-950/40 p-5 flex flex-col gap-6 shrink-0 bg-black",
+                aside { class: "{theme().sidebar} w-64 p-5 flex flex-col gap-6 shrink-0",
                     div {
-                        p { class: "text-xs font-semibold text-purple-400/80 uppercase tracking-wider mb-2 font-mono", "Generale" }
+                        p { class: "text-xs font-semibold {theme().text_accent} uppercase tracking-wider mb-2 font-mono", "Generale" }
                         div { class: "flex flex-col gap-1",
                             SidebarLink { to: Route::Home {}, icon: "🏠", label: "Panoramica" }
                         }
                     }
 
                     div {
-                        p { class: "text-xs font-semibold text-purple-400/80 uppercase tracking-wider mb-2 font-mono", "Componenti UI" }
+                        p { class: "text-xs font-semibold {theme().text_accent} uppercase tracking-wider mb-2 font-mono", "Componenti UI" }
                         div { class: "flex flex-col gap-1",
                             SidebarLink { to: Route::ButtonsPage {}, icon: "🔘", label: "Button" }
                             SidebarLink { to: Route::CardsPage {}, icon: "🃏", label: "Card" }
@@ -58,17 +84,37 @@ pub fn Layout() -> Element {
                         }
                     }
 
-                    div { class: "mt-auto p-3.5 rounded-xl bg-[#09080e] border border-purple-950/70 text-xs text-zinc-400 shadow-lg shadow-purple-950/20",
-                        div { class: "flex items-center gap-1.5 mb-1 text-purple-300 font-semibold",
-                            span { "✨" }
-                            span { "Shadow Theme" }
+                    // Selettore Rapido Feature Theme
+                    div { class: "{theme().surface} rounded-xl p-3.5 text-xs text-zinc-400 shadow-lg",
+                        div { class: "flex items-center justify-between mb-2",
+                            div { class: "flex items-center gap-1.5 font-semibold text-purple-300",
+                                span { "🎨" }
+                                span { "Feature Theme" }
+                            }
                         }
-                        p { class: "text-zinc-400 text-[11px] leading-relaxed", "Sfondo nero puro 0 0 0 e viola scuro profondo ispirato a shadowfenix." }
+                        p { class: "text-[11px] mb-2.5 text-zinc-400", "Cambia o sovrascrivi il tema in tempo reale:" }
+                        div { class: "grid grid-cols-3 gap-1.5",
+                            button {
+                                class: "{shadow_btn}",
+                                onclick: move |_| *theme.write() = Theme::shadow(),
+                                "Shadow"
+                            }
+                            button {
+                                class: "{obsidian_btn}",
+                                onclick: move |_| *theme.write() = Theme::obsidian(),
+                                "Obsidian"
+                            }
+                            button {
+                                class: "{crimson_btn}",
+                                onclick: move |_| *theme.write() = Theme::crimson(),
+                                "Crimson"
+                            }
+                        }
                     }
                 }
 
                 // Page Content
-                main { class: "flex-1 p-8 overflow-y-auto bg-black",
+                main { class: "{theme().content} flex-1 p-8 overflow-y-auto",
                     Outlet::<Route> {}
                 }
             }
@@ -78,11 +124,12 @@ pub fn Layout() -> Element {
 
 #[component]
 pub fn SidebarLink(to: Route, icon: &'static str, label: &'static str) -> Element {
+    let theme = use_theme();
     rsx! {
         Link {
             to,
-            class: "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-purple-200 hover:bg-purple-950/30 transition-all",
-            active_class: "bg-purple-950/60 text-purple-300 font-semibold border border-purple-800/60 shadow-[0_0_15px_rgba(107,33,168,0.25)]",
+            class: "{theme().sidebar_link}",
+            active_class: "{theme().sidebar_link_active}",
             span { class: "text-base", "{icon}" }
             span { "{label}" }
         }

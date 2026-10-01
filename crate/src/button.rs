@@ -64,6 +64,11 @@ pub fn Button(
     children: Element,
 ) -> Element {
     let base = "inline-flex items-center justify-center font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none";
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let variant_classes = theme().button_variant_classes(variant).to_string();
+    #[cfg(not(feature = "theme"))]
     let variant_classes = variant.classes();
     let size_classes = size.classes();
 

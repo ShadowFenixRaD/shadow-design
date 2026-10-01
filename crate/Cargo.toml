@@ -18,6 +18,7 @@ all = [
     "navbar",
     "modal",
     "alert",
+    "theme",
 ]
 button = []
 card = []
@@ -26,3 +27,4 @@ badge = []
 navbar = []
 modal = []
 alert = []
+theme = []

@@ -32,6 +32,11 @@ pub fn Badge(
     #[props(default)] class: String,
 ) -> Element {
     let radius = if pill { "rounded-full" } else { "rounded-md" };
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let variant_classes = theme().badge_variant_classes(variant).to_string();
+    #[cfg(not(feature = "theme"))]
     let variant_classes = variant.classes();
 
     rsx! {

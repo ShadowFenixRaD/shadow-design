@@ -31,13 +31,32 @@ pub fn Card(
     #[props(default)] footer: Option<Element>,
     children: Element,
 ) -> Element {
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let shadow_class = theme().card_shadow_classes(shadow).to_string();
+    #[cfg(feature = "theme")]
+    let base_class = theme().card_base.clone();
+    #[cfg(feature = "theme")]
+    let header_class = theme().card_header.clone();
+    #[cfg(feature = "theme")]
+    let footer_class = theme().card_footer.clone();
+
+    #[cfg(not(feature = "theme"))]
     let shadow_class = shadow.classes();
+    #[cfg(not(feature = "theme"))]
+    let base_class = "bg-[#08080a] border border-purple-950/60 text-zinc-100 rounded-xl overflow-hidden hover:border-purple-900/50 transition-all";
+    #[cfg(not(feature = "theme"))]
+    let header_class = "px-6 py-4 border-b border-purple-950/50 bg-[#0d0d12]/90";
+    #[cfg(not(feature = "theme"))]
+    let footer_class = "px-6 py-3 bg-[#050507]/90 border-t border-purple-950/50 text-sm text-zinc-400";
+
     rsx! {
         div {
-            class: "bg-[#08080a] border border-purple-950/60 text-zinc-100 rounded-xl overflow-hidden hover:border-purple-900/50 transition-all {shadow_class} {class}",
+            class: "{base_class} {shadow_class} {class}",
             if title.is_some() || subtitle.is_some() {
                 div {
-                    class: "px-6 py-4 border-b border-purple-950/50 bg-[#0d0d12]/90",
+                    class: "{header_class}",
                     if let Some(t) = title {
                         h3 { class: "text-lg font-semibold text-white", "{t}" }
                     }
@@ -52,7 +71,7 @@ pub fn Card(
             }
             if let Some(f) = footer {
                 div {
-                    class: "px-6 py-3 bg-[#050507]/90 border-t border-purple-950/50 text-sm text-zinc-400",
+                    class: "{footer_class}",
                     {f}
                 }
             }

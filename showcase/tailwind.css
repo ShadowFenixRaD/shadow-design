@@ -1,3 +1,40 @@
 @import "tailwindcss";
 @source "../crate";
 @source "./src";
+
+/* Classi pre-fatte per il tema Shadow Design & Shadowfenix */
+@utility theme-root {
+  background-color: #000000;
+  color: #f4f4f5;
+}
+
+@utility theme-header {
+  background-color: rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid rgba(59, 7, 100, 0.6);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+}
+
+@utility theme-sidebar {
+  background-color: #000000;
+  border-right: 1px solid rgba(59, 7, 100, 0.4);
+}
+
+@utility theme-card {
+  background-color: #08080a;
+  border: 1px solid rgba(59, 7, 100, 0.6);
+  border-radius: 0.75rem;
+}
+
+@utility theme-surface {
+  background-color: #09080e;
+  border: 1px solid rgba(59, 7, 100, 0.7);
+}
+
+@utility theme-glow {
+  box-shadow: 0 0 25px rgba(107, 33, 168, 0.3);
+}
+
+@utility theme-border {
+  border-color: rgba(59, 7, 100, 0.6);
+}

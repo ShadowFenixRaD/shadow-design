@@ -27,6 +27,8 @@ pub mod navbar;
 pub mod modal;
 #[cfg(feature = "alert")]
 pub mod alert;
+#[cfg(feature = "theme")]
+pub mod theme;
 
 pub mod prelude {
     #[cfg(feature = "button")]
@@ -43,4 +45,6 @@ pub mod prelude {
     pub use crate::modal::*;
     #[cfg(feature = "alert")]
     pub use crate::alert::*;
+    #[cfg(feature = "theme")]
+    pub use crate::theme::*;
 }

@@ -57,6 +57,7 @@ shadow-design = { path = "../shadow-design/crate", features = ["button", "card",
 | `navbar` | `Navbar` | Barra di navigazione responsive con brand e link |
 | `modal` | `Modal` | Finestre di dialogo con backdrop e controllate da Signal |
 | `alert` | `Alert`, `AlertVariant` | Notifiche e banner colorati |
+| `theme` | `Theme`, `ThemeProvider`, `use_theme` | Gestione centralizzata del tema, classi pre-fatte e personalizzazione globale dinamica |
 | `all` | *Tutti i componenti* | Abilita l'intera suite |
 
 ---

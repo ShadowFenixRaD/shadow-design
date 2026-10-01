@@ -12,11 +12,25 @@ pub fn TextInput(
     #[props(default)] class: String,
 ) -> Element {
     let itype = input_type.unwrap_or_else(|| "text".to_string());
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
     let border_color = if error.is_some() {
-        "border-rose-500 focus:border-rose-400 focus:ring-rose-500/20"
+        theme().input_error_border.clone()
     } else {
-        "border-zinc-800 focus:border-purple-500 focus:ring-purple-600/30"
+        theme().input_normal_border.clone()
     };
+    #[cfg(feature = "theme")]
+    let input_base = theme().input_base.clone();
+
+    #[cfg(not(feature = "theme"))]
+    let border_color = if error.is_some() {
+        "border-rose-500 focus:border-rose-400 focus:ring-rose-500/20".to_string()
+    } else {
+        "border-zinc-800 focus:border-purple-500 focus:ring-purple-600/30".to_string()
+    };
+    #[cfg(not(feature = "theme"))]
+    let input_base = "px-3.5 py-2 bg-black text-zinc-100 rounded-lg border focus:outline-none focus:ring-2 transition-all placeholder:text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-inner".to_string();
 
     rsx! {
         div {
@@ -29,7 +43,7 @@ pub fn TextInput(
                 value: "{value}",
                 placeholder: placeholder.as_deref().unwrap_or_default(),
                 disabled,
-                class: "px-3.5 py-2 bg-black text-zinc-100 rounded-lg border {border_color} focus:outline-none focus:ring-2 transition-all placeholder:text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-inner",
+                class: "{input_base} {border_color}",
                 oninput: move |e| {
                     *value.write() = e.value();
                 },

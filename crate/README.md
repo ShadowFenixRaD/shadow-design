@@ -140,3 +140,57 @@ pub fn MyView() -> Element {
     }
 }
 ```
+
+---
+
+## 🎨 Feature `theme`: Classi Pre-fatte e Personalizzazione Globale
+
+Abilitando la feature `theme`, hai a disposizione il gestore del tema centralizzato:
+
+```toml
+[dependencies]
+shadow-design = { path = "../shadow-design/crate", features = ["button", "card", "theme"] }
+```
+
+### 1. Utilizzo diretto delle classi pre-fatte:
+
+```rust
+use dioxus::prelude::*;
+use shadow_design::prelude::*;
+
+#[component]
+pub fn Layout() -> Element {
+    let theme = use_theme();
+
+    rsx! {
+        div { class: "{theme().root}",
+            header { class: "{theme().header}", "Header" }
+            aside { class: "{theme().sidebar}", "Sidebar" }
+            main { class: "{theme().content}",
+                Button { variant: ButtonVariant::Primary, "Pulsante Dinamico" }
+            }
+        }
+    }
+}
+```
+
+### 2. Personalizzare o sovrascrivere il tema globale:
+
+```rust
+// Con il ThemeProvider a livello radice:
+let my_theme = Theme::shadow()
+    .with_primary("bg-indigo-700 hover:bg-indigo-600 text-white shadow-lg")
+    .with_card_base("bg-zinc-950 border border-indigo-900 rounded-2xl");
+
+rsx! {
+    ThemeProvider { theme: use_signal(|| my_theme),
+        App {}
+    }
+}
+
+// Oppure modificando il Signal<Theme> da qualsiasi punto dell'albero:
+let mut theme = use_theme();
+*theme.write() = Theme::obsidian(); // cambia al preset Obsidian
+theme.write().button_primary = "bg-purple-600 text-white".to_string(); // sovrascrittura mirata
+```
+

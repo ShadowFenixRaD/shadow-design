@@ -53,8 +53,18 @@ pub fn Alert(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let variant_classes = theme().alert_variant_classes(variant).to_string();
+    #[cfg(feature = "theme")]
+    let title_class = theme().alert_title_classes(variant).to_string();
+
+    #[cfg(not(feature = "theme"))]
     let variant_classes = variant.classes();
+    #[cfg(not(feature = "theme"))]
     let title_class = variant.title_class();
+
     let icon = variant.icon();
 
     rsx! {
