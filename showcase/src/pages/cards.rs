@@ -1,47 +1,180 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::FeatureBanner;
+use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn CardsPage() -> Element {
+    let mut selected_variant = use_signal(|| CardVariant::Default);
+    let mut selected_shadow = use_signal(|| CardShadow::Md);
+    let mut enable_glow = use_signal(|| false);
+
+    let props = vec![
+        PropRow {
+            name: "title",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Titolo primario dell'intestazione della card",
+        },
+        PropRow {
+            name: "subtitle",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Sottotitolo o didascalia esplicativa",
+        },
+        PropRow {
+            name: "variant",
+            r#type: "CardVariant",
+            default: "CardVariant::Default",
+            description: "Variante visiva (Default, Elevated, Interactive, Metric)",
+        },
+        PropRow {
+            name: "shadow",
+            r#type: "CardShadow",
+            default: "CardShadow::Md",
+            description: "Livello di elevazione e profondità dell'ombra ottica",
+        },
+        PropRow {
+            name: "hover_glow",
+            r#type: "bool",
+            default: "false",
+            description:
+                "Attiva un micro-glow coordinato con il colore primario al passaggio del cursore",
+        },
+        PropRow {
+            name: "footer",
+            r#type: "Option<Element>",
+            default: "None",
+            description: "Slot per la sezione a piè di pagina con sfondo dedicato",
+        },
+    ];
+
+    let code_snippet = r#"Card {
+    title: "Metric Analytics".to_string(),
+    subtitle: "Dati registrati nelle ultime 24 ore".to_string(),
+    variant: CardVariant::Interactive,
+    hover_glow: true,
+    div { class: "text-2xl font-bold text-white", "99.98%" }
+    footer: rsx! {
+        span { class: "text-xs text-zinc-400", "Aggiornato in tempo reale" }
+    }
+}"#
+    .to_string();
+
     rsx! {
         div { class: "max-w-4xl space-y-8",
             div {
-                h2 { class: "text-2xl font-bold text-white", "Card Component" }
-                p { class: "text-zinc-400 text-sm mt-1", "Contenitori di contenuto strutturato con intestazione, corpo, footer e diversi livelli di ombra." }
+                Heading { order: HeadingOrder::H2, "Card" }
+                Text { dimmed: true, size: TextSize::Sm, "Superfici di contenimento a 4 livelli, rifinite con bordi hairline a 1px, top specular highlights e micro-glow selettivi." }
             }
 
             FeatureBanner { feature_name: "card" }
 
-            div { class: "grid grid-cols-1 md:grid-cols-2 gap-6",
-                Card {
-                    title: "Card Standard".to_string(),
-                    subtitle: "Con titolo e sottotitolo".to_string(),
-                    shadow: CardShadow::Md,
-                    p { class: "text-sm text-zinc-300", "Questo è il corpo principale della card. Supporta qualsiasi elemento o componente nidificato." }
-                }
-
-                Card {
-                    title: "Card con Footer".to_string(),
-                    shadow: CardShadow::Lg,
-                    footer: rsx! {
-                        div { class: "flex justify-between items-center",
-                            span { "Ultima modifica: Oggi" }
-                            Button { size: ButtonSize::Sm, variant: ButtonVariant::Ghost, "Dettagli" }
+            ShowcaseTabs {
+                preview: rsx! {
+                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
+                        // Live Card Preview
+                        div { class: "w-full",
+                            Card {
+                                title: "Pannello di Controllo".to_string(),
+                                subtitle: "Stato del server e metriche".to_string(),
+                                variant: selected_variant(),
+                                shadow: selected_shadow(),
+                                hover_glow: enable_glow(),
+                                footer: rsx! {
+                                    div { class: "flex items-center justify-between",
+                                        span { class: "text-xs text-zinc-500", "Stato: Operativo" }
+                                        Button { size: ButtonSize::Xs, variant: ButtonVariant::Ghost, "Espandi" }
+                                    }
+                                },
+                                div { class: "space-y-2",
+                                    p { class: "text-xs text-zinc-300", "Contenuto interno della card con tipografia ad alto contrasto e bordi ottici calibrati." }
+                                    Badge { label: "Cluster Attivo".to_string(), variant: BadgeVariant::Success, dot: true }
+                                }
+                            }
                         }
-                    },
-                    p { class: "text-sm text-zinc-300", "Questa card include una sezione footer integrata ideale per metadati e azioni rapide." }
-                }
+
+                        // Configurator
+                        div { class: "space-y-4 text-xs font-mono",
+                            div {
+                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Card:" }
+                                div { class: "flex flex-wrap gap-1.5",
+                                    for v in [CardVariant::Default, CardVariant::Elevated, CardVariant::Interactive, CardVariant::Metric] {
+                                        button {
+                                            r#type: "button",
+                                            class: if selected_variant() == v {
+                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
+                                            } else {
+                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
+                                            },
+                                            onclick: move |_| selected_variant.set(v),
+                                            "{v:?}"
+                                        }
+                                    }
+                                }
+                            }
+
+                            div {
+                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Livello Ombra:" }
+                                div { class: "flex flex-wrap gap-1.5",
+                                    for s in [CardShadow::None, CardShadow::Sm, CardShadow::Md, CardShadow::Lg, CardShadow::Xl] {
+                                        button {
+                                            r#type: "button",
+                                            class: if selected_shadow() == s {
+                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
+                                            } else {
+                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
+                                            },
+                                            onclick: move |_| selected_shadow.set(s),
+                                            "{s:?}"
+                                        }
+                                    }
+                                }
+                            }
+
+                            div { class: "pt-2 border-t border-white/[0.06]",
+                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
+                                    input {
+                                        r#type: "checkbox",
+                                        checked: "{enable_glow}",
+                                        onchange: move |e| enable_glow.set(e.checked()),
+                                    }
+                                    "Attiva Micro-Glow su Hover"
+                                }
+                            }
+                        }
+                    }
+                },
+                code: code_snippet,
+                props: props,
             }
 
-            Card {
-                title: "Livelli di Ombra (Shadows)".to_string(),
-                shadow: CardShadow::Sm,
-                div { class: "grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2",
-                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-950/70 text-xs text-center shadow-sm shadow-black", "CardShadow::Sm" }
-                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-900/50 text-xs text-center shadow-lg shadow-purple-950/30", "CardShadow::Md" }
-                    div { class: "p-4 rounded-lg bg-[#0a0a0f] border border-purple-800/50 text-xs text-center shadow-2xl shadow-purple-950/60", "CardShadow::Xl" }
+            // Visual Examples
+            div { class: "grid grid-cols-1 md:grid-cols-3 gap-4",
+                Card {
+                    variant: CardVariant::Metric,
+                    div { class: "space-y-1",
+                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Latenza Media" }
+                        div { class: "text-2xl font-extrabold text-white tracking-tight", "1.2 ms" }
+                        span { class: "text-[11px] text-emerald-400 font-mono", "+14% performance" }
+                    }
+                }
+                Card {
+                    variant: CardVariant::Interactive,
+                    hover_glow: true,
+                    div { class: "space-y-1",
+                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Richieste Totali" }
+                        div { class: "text-2xl font-extrabold text-white tracking-tight", "4.8M" }
+                        span { class: "text-[11px] text-purple-300 font-mono", "Hover per micro-glow" }
+                    }
+                }
+                Card {
+                    variant: CardVariant::Elevated,
+                    div { class: "space-y-1",
+                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Affidabilità" }
+                        div { class: "text-2xl font-extrabold text-white tracking-tight", "99.99%" }
+                        span { class: "text-[11px] text-zinc-500 font-mono", "Livello Surface 2" }
+                    }
                 }
             }
         }

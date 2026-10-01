@@ -1,17 +1,14 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn Navbar(
-    brand: Element,
-    #[props(default)] class: String,
-    children: Element,
-) -> Element {
+pub fn Navbar(brand: Element, #[props(default)] class: String, children: Element) -> Element {
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
     let nav_base = theme().navbar_base.clone();
+
     #[cfg(not(feature = "theme"))]
-    let nav_base = "w-full bg-black/90 backdrop-blur-md border-b border-purple-950/60 shadow-[0_4px_25px_rgba(0,0,0,0.9)] px-6 py-3.5 sticky top-0 z-40".to_string();
+    let nav_base = "w-full bg-[#030305]/85 backdrop-blur-md border-b border-white/[0.08] shadow-[0_4px_25px_rgba(0,0,0,0.9)] px-6 py-3.5 sticky top-0 z-40 specular-top".to_string();
 
     rsx! {
         nav {
