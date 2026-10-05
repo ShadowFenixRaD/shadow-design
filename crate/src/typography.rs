@@ -12,14 +12,14 @@ pub enum HeadingOrder {
 }
 
 impl HeadingOrder {
-    pub fn classes(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            HeadingOrder::H1 => "text-3xl sm:text-4xl font-extrabold tracking-tight text-white",
-            HeadingOrder::H2 => "text-2xl sm:text-3xl font-bold tracking-tight text-white",
-            HeadingOrder::H3 => "text-xl sm:text-2xl font-bold tracking-tight text-white",
-            HeadingOrder::H4 => "text-lg font-semibold tracking-tight text-white",
-            HeadingOrder::H5 => "text-base font-semibold text-zinc-100",
-            HeadingOrder::H6 => "text-sm font-semibold text-zinc-200",
+            HeadingOrder::H1 => "sd-heading--h1",
+            HeadingOrder::H2 => "sd-heading--h2",
+            HeadingOrder::H3 => "sd-heading--h3",
+            HeadingOrder::H4 => "sd-heading--h4",
+            HeadingOrder::H5 => "sd-heading--h5",
+            HeadingOrder::H6 => "sd-heading--h6",
         }
     }
 }
@@ -30,15 +30,15 @@ pub fn Heading(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
-    let order_classes = order.classes();
+    let order_class = order.scss_class();
 
     match order {
-        HeadingOrder::H1 => rsx! { h1 { class: "{order_classes} {class}", {children} } },
-        HeadingOrder::H2 => rsx! { h2 { class: "{order_classes} {class}", {children} } },
-        HeadingOrder::H3 => rsx! { h3 { class: "{order_classes} {class}", {children} } },
-        HeadingOrder::H4 => rsx! { h4 { class: "{order_classes} {class}", {children} } },
-        HeadingOrder::H5 => rsx! { h5 { class: "{order_classes} {class}", {children} } },
-        HeadingOrder::H6 => rsx! { h6 { class: "{order_classes} {class}", {children} } },
+        HeadingOrder::H1 => rsx! { h1 { class: "sd-heading {order_class} {class}", {children} } },
+        HeadingOrder::H2 => rsx! { h2 { class: "sd-heading {order_class} {class}", {children} } },
+        HeadingOrder::H3 => rsx! { h3 { class: "sd-heading {order_class} {class}", {children} } },
+        HeadingOrder::H4 => rsx! { h4 { class: "sd-heading {order_class} {class}", {children} } },
+        HeadingOrder::H5 => rsx! { h5 { class: "sd-heading {order_class} {class}", {children} } },
+        HeadingOrder::H6 => rsx! { h6 { class: "sd-heading {order_class} {class}", {children} } },
     }
 }
 
@@ -53,13 +53,13 @@ pub enum TextSize {
 }
 
 impl TextSize {
-    pub fn classes(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            TextSize::Xs => "text-xs",
-            TextSize::Sm => "text-sm",
-            TextSize::Md => "text-base",
-            TextSize::Lg => "text-lg",
-            TextSize::Xl => "text-xl",
+            TextSize::Xs => "sd-text--xs",
+            TextSize::Sm => "sd-text--sm",
+            TextSize::Md => "sd-text--md",
+            TextSize::Lg => "sd-text--lg",
+            TextSize::Xl => "sd-text--xl",
         }
     }
 }
@@ -71,16 +71,12 @@ pub fn Text(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
-    let size_class = size.classes();
-    let color_class = if dimmed {
-        "text-zinc-400"
-    } else {
-        "text-zinc-200"
-    };
+    let size_class = size.scss_class();
+    let dimmed_class = if dimmed { "sd-text--dimmed" } else { "" };
 
     rsx! {
         p {
-            class: "leading-relaxed {size_class} {color_class} {class}",
+            class: "sd-text {size_class} {dimmed_class} {class}",
             {children}
         }
     }
@@ -90,7 +86,7 @@ pub fn Text(
 pub fn Kbd(#[props(default)] class: String, children: Element) -> Element {
     rsx! {
         kbd {
-            class: "inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium rounded bg-[#121218] text-zinc-300 border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] select-none {class}",
+            class: "sd-kbd {class}",
             {children}
         }
     }
@@ -100,7 +96,7 @@ pub fn Kbd(#[props(default)] class: String, children: Element) -> Element {
 pub fn Code(#[props(default)] class: String, children: Element) -> Element {
     rsx! {
         code {
-            class: "inline-block px-1.5 py-0.5 text-xs font-mono rounded bg-[#0a0a0f] text-purple-300 border border-white/10 {class}",
+            class: "sd-code {class}",
             {children}
         }
     }

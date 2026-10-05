@@ -36,8 +36,7 @@ pub fn Layout() -> Element {
                     }
                 }
 
-                // Mantine-Style Theme Controls Toolbar
-                div { class: "flex items-center gap-3 bg-[#060608] px-3 py-1.5 rounded-xl border border-white/[0.08] shadow-inner",
+                div { class: "sd-toolbar",
                     // Swatches per Colore Primario
                     div { class: "flex items-center gap-1.5 pr-2.5 border-r border-white/[0.08]",
                         span { class: "text-[10px] font-mono text-zinc-400 uppercase mr-1 hidden md:inline", "Color:" }
@@ -229,7 +228,7 @@ fn ColorSwatchButton(
 ) -> Element {
     let hex = color.hex();
     let ring_class = if is_active {
-        "ring-2 ring-white ring-offset-2 ring-offset-black scale-110"
+        "sd-swatch-active"
     } else {
         "hover:scale-105 opacity-80 hover:opacity-100"
     };
@@ -237,7 +236,7 @@ fn ColorSwatchButton(
     rsx! {
         button {
             r#type: "button",
-            class: "w-5 h-5 rounded-full cursor-pointer transition-all duration-150 {ring_class}",
+            class: "w-5 h-5 rounded-full border border-white/20 cursor-pointer transition-all duration-150 {ring_class}",
             style: "background-color: {hex};",
             title,
             onclick: move |e| onclick.call(e),

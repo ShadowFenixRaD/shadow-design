@@ -41,10 +41,7 @@ shadow-design/
 └── showcase/                # Crate applicativo: Espositore componenti
     ├── Cargo.toml           # Manifest dell'app (dipende da shadow-design { all })
     ├── Dioxus.toml          # Configurazione Dioxus CLI (dx)
-    ├── tailwind.css         # Configurazione sorgente Tailwind CSS v4 (@utility)
     ├── assets/
-    │   ├── main.css         # Reset globale, scrollbar viola scuro, stili custom
-    │   ├── tailwind.css     # CSS compilato per il browser
     │   ├── header.svg       # Logo vettoriale Shadowfenix
     │   └── favicon.ico      # Icona dell'applicazione
     └── src/
@@ -123,12 +120,12 @@ document::Link { rel: "stylesheet", href: shadow_design::STYLES }
 - `_animations.scss`: Keyframes per toast in/out, modal scale-in, dropdown unroll, drawer slides, indeterminate slide, spin, pulse glow e classi `.animate-*`.
 - `_utilities.scss`: Motore di utilità SCSS universale (Flexbox, Grid, Sizing, Spacing, Typography, Colors, Borders, Shadows).
 - `_theme_presets.scss`: Presets e classi cromatiche per i 5 temi (Violet, Obsidian, Crimson, Cyan, Emerald), anelli di selezione (`ring-2`), scale attive e glow matrix dinamica.
-- `components/_*.scss`: Moduli specifici per ciascun componente UI, inclusi `.sd-btn`, `.sd-card`, `.sd-input`, `.sd-checkbox`, `.sd-modal`, `.sd-drawer`, `.sd-dropdown`, `.sd-toast`.
+- `components/_*.scss`: Moduli specifici per ciascun componente UI, inclusi `.sd-btn`, `.sd-card`, `.sd-input`, `.sd-checkbox`, `.sd-modal`, `.sd-drawer`, `.sd-dropdown`, `.sd-toast`, `.sd-alert`, `.sd-badge`, `.sd-navbar`, `.sd-switch`, `.sd-tabs`, `.sd-tooltip`, `.sd-heading`/`.sd-text`.
 - `main.scss`: Entrypoint master all'interno di `crate/scss/` che assembla e compila l'intera suite.
 
 ### Supporto Duale al Tema (`Theme` vs Fallback statico)
 Tutti i componenti in `crate/src/` sono scritti per funzionare in due modalità grazie a `#[cfg]`:
-1. **Con feature `theme` attiva**: Leggono le classi Tailwind in modo reattivo invocando `crate::theme::use_theme()`. Quando il tema cambia a runtime, tutti i componenti istanziati si aggiornano immediatamente.
+1. **Con feature `theme` attiva**: Leggono le classi SCSS in modo reattivo invocando `crate::theme::use_theme()`. Quando il tema cambia a runtime, tutti i componenti istanziati si aggiornano immediatamente.
 2. **Senza feature `theme` attiva**: Fanno fallback trasparente su classi statiche predefinite hardcoded nei componenti (zero overhead se il sistema a tema non è richiesto).
 
 ### Sistema del Tema in stile Mantine (`crate/src/theme.rs`)

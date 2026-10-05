@@ -16,7 +16,7 @@ pub fn NavbarDemoPage() -> Element {
             name: "class",
             r#type: "String",
             default: "\"\"",
-            description: "Classi Tailwind personalizzate per sovrascrivere o arricchire la barra",
+            description: "Classi CSS/SCSS personalizzate per sovrascrivere o arricchire la barra",
         },
         PropRow {
             name: "children",

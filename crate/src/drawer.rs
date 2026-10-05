@@ -17,11 +17,11 @@ pub enum DrawerSize {
 }
 
 impl DrawerSize {
-    pub fn width_class(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            DrawerSize::Sm => "w-72 sm:w-80",
-            DrawerSize::Md => "w-80 sm:w-96",
-            DrawerSize::Lg => "w-96 sm:w-[32rem]",
+            DrawerSize::Sm => "sd-drawer-panel--sm",
+            DrawerSize::Md => "sd-drawer-panel--md",
+            DrawerSize::Lg => "sd-drawer-panel--lg",
         }
     }
 }
@@ -48,12 +48,9 @@ pub fn Drawer(
     let has_glow = glow.unwrap_or(false);
 
     let glow_class = if has_glow {
-        match position {
-            DrawerPosition::Left => "shadow-[0_0_40px_rgba(168,85,247,0.25)]",
-            DrawerPosition::Right => "shadow-[0_0_40px_rgba(168,85,247,0.25)]",
-        }
+        "sd-drawer-panel--glow"
     } else {
-        "shadow-2xl"
+        ""
     };
 
     #[cfg(feature = "animation")]
@@ -63,37 +60,35 @@ pub fn Drawer(
     };
     #[cfg(not(feature = "animation"))]
     let anim_class = match position {
-        DrawerPosition::Left => "animate-in slide-in-from-left duration-200",
-        DrawerPosition::Right => "animate-in slide-in-from-right duration-200",
+        DrawerPosition::Left => "animate-drawer-slide-left",
+        DrawerPosition::Right => "animate-drawer-slide-right",
     };
 
     let pos_class = match position {
-        DrawerPosition::Left => "inset-y-0 left-0 border-r border-white/10",
-        DrawerPosition::Right => "inset-y-0 right-0 border-l border-white/10",
+        DrawerPosition::Left => "sd-drawer-panel--left",
+        DrawerPosition::Right => "sd-drawer-panel--right",
     };
-    let width = size.width_class();
+    let size_class = size.scss_class();
 
     rsx! {
         div {
-            class: "fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm transition-all",
+            class: "sd-drawer-backdrop",
             onclick: move |_| *is_open.write() = false,
             div {
-                class: "fixed {pos_class} {width} bg-[#0a0a0f] {glow_class} {anim_class} flex flex-col z-[70] overflow-hidden {class}",
+                class: "sd-drawer-panel {pos_class} {size_class} {glow_class} {anim_class} {class}",
                 onclick: move |e| e.stop_propagation(),
-                // Drawer Header
-                div { class: "flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#0e0e14]",
-                    h3 { class: "text-sm sm:text-base font-bold text-white tracking-tight",
+                div { class: "sd-drawer__header",
+                    h3 { class: "sd-drawer__title",
                         "{title.as_deref().unwrap_or_default()}"
                     }
                     button {
                         r#type: "button",
-                        class: "p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.08] transition-colors cursor-pointer",
+                        class: "sd-drawer__close",
                         onclick: move |_| *is_open.write() = false,
                         Icon { kind: IconKind::X, size: 16 }
                     }
                 }
-                // Drawer Body
-                div { class: "flex-1 p-6 overflow-y-auto",
+                div { class: "sd-drawer__body",
                     {children}
                 }
             }

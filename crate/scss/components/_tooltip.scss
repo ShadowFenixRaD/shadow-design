@@ -1,0 +1,85 @@
+// ==============================================================================
+// Shadow Design — Tooltip Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+.sd-tooltip {
+  position: relative;
+  display: inline-flex;
+
+  &:hover .sd-tooltip__bubble {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  &__bubble {
+    position: absolute;
+    z-index: z('tooltip');
+    padding: 4px 10px;
+    font-family: $font-sans;
+    font-size: 11px;
+    font-weight: 500;
+    color: $zinc-200;
+    background-color: #0e0e14;
+    border: $border-hairline;
+    border-radius: $radius-sm;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity $duration-fast ease, transform $duration-fast ease;
+    @include specular-top(0.08);
+
+    &--top {
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      margin-bottom: 8px;
+    }
+
+    &--bottom {
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-4px);
+      margin-top: 8px;
+    }
+
+    &--left {
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(4px);
+      margin-right: 8px;
+    }
+
+    &--right {
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(-4px);
+      margin-left: 8px;
+    }
+
+    &--glow {
+      box-shadow: 0 0 15px rgba(147, 51, 234, 0.3), 0 10px 25px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  &:hover .sd-tooltip__bubble--top {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  &:hover .sd-tooltip__bubble--bottom {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  &:hover .sd-tooltip__bubble--left {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  &:hover .sd-tooltip__bubble--right {
+    transform: translateY(-50%) translateX(0);
+  }
+}

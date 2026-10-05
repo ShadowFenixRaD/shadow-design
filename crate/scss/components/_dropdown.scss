@@ -25,25 +25,41 @@
 .sd-dropdown-menu {
   position: absolute;
   z-index: z('dropdown');
-  margin-top: 6px;
   background-color: #0b0b10;
   border: $border-hairline;
   border-radius: $radius-md;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
   overflow: hidden;
   min-width: 180px;
+  font-family: $font-sans;
   @include specular-top(0.08);
+
+  &--bottom-right {
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+  }
+
+  &--bottom-left {
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+  }
+
+  &--top-right {
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 6px;
+  }
+
+  &--top-left {
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 6px;
+  }
 
   &--glow {
     box-shadow: 0 0 30px $violet-glow, 0 16px 36px rgba(0, 0, 0, 0.7);
-  }
-
-  &--left {
-    left: 0;
-  }
-
-  &--right {
-    right: 0;
   }
 }
 
@@ -52,13 +68,16 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 8px 14px;
   font-size: 13px;
+  font-family: $font-sans;
   color: $zinc-300;
   background: transparent;
   border: none;
   cursor: pointer;
   text-align: left;
+  line-height: 1.4;
+  user-select: none;
   transition: all $duration-fast ease;
 
   &:hover {
@@ -73,4 +92,10 @@
       color: #ffffff;
     }
   }
+}
+
+.sd-dropdown-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.06);
+  margin: 4px 0;
 }

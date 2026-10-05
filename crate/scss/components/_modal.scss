@@ -17,6 +17,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
+  transition: all $duration-normal ease;
 }
 
 .sd-modal-dialog {
@@ -24,11 +25,12 @@
   z-index: z('modal');
   width: 100%;
   max-width: 520px;
-  background-color: $color-surface-1;
+  background-color: #0d0d14;
   border: $border-hairline;
   border-radius: $radius-lg;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
   overflow: hidden;
+  font-family: $font-sans;
   @include specular-top(0.1);
 
   &--glow {
@@ -41,12 +43,40 @@
     justify-content: space-between;
     padding: 18px 24px;
     border-bottom: $border-hairline-subtle;
-    background-color: rgba(14, 14, 20, 0.7);
+    background-color: rgba(18, 18, 28, 0.8);
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  &__close {
+    color: $zinc-400;
+    font-size: 14px;
+    padding: 6px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all $duration-fast ease;
+
+    &:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
   }
 
   &__body {
     padding: 24px;
     max-height: calc(85vh - 120px);
     overflow-y: auto;
+    color: $zinc-200;
   }
 }

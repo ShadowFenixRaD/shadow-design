@@ -33,11 +33,11 @@ impl PrimaryColor {
 
     pub fn hex(&self) -> &'static str {
         match self {
-            PrimaryColor::Violet => "#9333ea",
-            PrimaryColor::Obsidian => "#71717a",
-            PrimaryColor::Crimson => "#e11d48",
-            PrimaryColor::Cyan => "#06b6d4",
-            PrimaryColor::Emerald => "#10b981",
+            PrimaryColor::Violet => "#3b0764",
+            PrimaryColor::Obsidian => "#ffffff",
+            PrimaryColor::Crimson => "#ff1744",
+            PrimaryColor::Cyan => "#00f0ff",
+            PrimaryColor::Emerald => "#00ff9d",
         }
     }
 }
@@ -62,7 +62,7 @@ impl RadiusScale {
 
     pub fn sm(&self) -> &'static str {
         match self {
-            RadiusScale::Sharp => "rounded-[2px]",
+            RadiusScale::Sharp => "sd-radius-sharp",
             RadiusScale::Medium => "rounded-md",
             RadiusScale::Soft => "rounded-lg",
         }
@@ -70,7 +70,7 @@ impl RadiusScale {
 
     pub fn md(&self) -> &'static str {
         match self {
-            RadiusScale::Sharp => "rounded-[3px]",
+            RadiusScale::Sharp => "sd-radius-sharp",
             RadiusScale::Medium => "rounded-lg",
             RadiusScale::Soft => "rounded-xl",
         }
@@ -78,7 +78,7 @@ impl RadiusScale {
 
     pub fn lg(&self) -> &'static str {
         match self {
-            RadiusScale::Sharp => "rounded-[4px]",
+            RadiusScale::Sharp => "sd-radius-sharp",
             RadiusScale::Medium => "rounded-xl",
             RadiusScale::Soft => "rounded-2xl",
         }
@@ -216,7 +216,7 @@ impl Theme {
     ) {
         if mode == GlowMode::Off {
             return (
-                "shadow-none".to_string(),
+                String::new(),
                 String::new(),
                 String::new(),
                 String::new(),
@@ -230,131 +230,72 @@ impl Theme {
             );
         }
 
-        let is_exp = mode == GlowMode::Expressive;
-
         match color {
-            PrimaryColor::Violet => {
-                if is_exp {
-                    (
-                        "shadow-[0_0_30px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_24px_rgba(147,51,234,0.5)]".to_string(),
-                        "shadow-[0_0_35px_rgba(147,51,234,0.28)]".to_string(),
-                        "shadow-[0_0_20px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_15px_rgba(147,51,234,0.4)]".to_string(),
-                        "shadow-[0_0_60px_rgba(147,51,234,0.4)]".to_string(),
-                        "shadow-[0_0_25px_rgba(147,51,234,0.3)]".to_string(),
-                        "shadow-[0_0_30px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_28px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_16px_rgba(147,51,234,0.5)]".to_string(),
-                        "shadow-[0_0_14px_rgba(147,51,234,0.5)]".to_string(),
-                    )
-                } else {
-                    (
-                        "shadow-[0_0_18px_rgba(147,51,234,0.2)]".to_string(),
-                        "shadow-[0_0_16px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_22px_rgba(147,51,234,0.16)]".to_string(),
-                        "shadow-[0_0_14px_rgba(147,51,234,0.22)]".to_string(),
-                        "shadow-[0_0_10px_rgba(147,51,234,0.25)]".to_string(),
-                        "shadow-[0_0_40px_rgba(147,51,234,0.25)]".to_string(),
-                        "shadow-[0_0_18px_rgba(147,51,234,0.18)]".to_string(),
-                        "shadow-[0_0_22px_rgba(147,51,234,0.22)]".to_string(),
-                        "shadow-[0_0_20px_rgba(147,51,234,0.22)]".to_string(),
-                        "shadow-[0_0_12px_rgba(147,51,234,0.35)]".to_string(),
-                        "shadow-[0_0_10px_rgba(147,51,234,0.35)]".to_string(),
-                    )
-                }
-            }
-            PrimaryColor::Obsidian => {
-                if is_exp {
-                    (
-                        "shadow-[0_0_25px_rgba(255,255,255,0.15)]".to_string(),
-                        "shadow-[0_0_18px_rgba(255,255,255,0.2)]".to_string(),
-                        "shadow-[0_0_25px_rgba(255,255,255,0.12)]".to_string(),
-                        "shadow-[0_0_15px_rgba(255,255,255,0.18)]".to_string(),
-                        "shadow-[0_0_10px_rgba(255,255,255,0.2)]".to_string(),
-                        "shadow-[0_0_45px_rgba(255,255,255,0.15)]".to_string(),
-                        "shadow-[0_0_20px_rgba(255,255,255,0.1)]".to_string(),
-                        "shadow-[0_0_20px_rgba(255,255,255,0.15)]".to_string(),
-                        "shadow-[0_0_20px_rgba(255,255,255,0.15)]".to_string(),
-                        "shadow-[0_0_12px_rgba(255,255,255,0.2)]".to_string(),
-                        "shadow-[0_0_10px_rgba(255,255,255,0.2)]".to_string(),
-                    )
-                } else {
-                    (
-                        "shadow-[0_0_15px_rgba(255,255,255,0.06)]".to_string(),
-                        "shadow-[0_0_12px_rgba(255,255,255,0.1)]".to_string(),
-                        "shadow-[0_0_16px_rgba(255,255,255,0.06)]".to_string(),
-                        "shadow-[0_0_10px_rgba(255,255,255,0.08)]".to_string(),
-                        "shadow-[0_0_8px_rgba(255,255,255,0.1)]".to_string(),
-                        "shadow-[0_0_30px_rgba(255,255,255,0.08)]".to_string(),
-                        "shadow-[0_0_12px_rgba(255,255,255,0.06)]".to_string(),
-                        "shadow-[0_0_14px_rgba(255,255,255,0.08)]".to_string(),
-                        "shadow-[0_0_12px_rgba(255,255,255,0.08)]".to_string(),
-                        "shadow-[0_0_8px_rgba(255,255,255,0.1)]".to_string(),
-                        "shadow-[0_0_7px_rgba(255,255,255,0.1)]".to_string(),
-                    )
-                }
-            }
-            PrimaryColor::Crimson => {
-                let (r, a1, a2) = (
-                    "244,63,94",
-                    if is_exp { "0.35" } else { "0.2" },
-                    if is_exp { "0.5" } else { "0.35" },
-                );
-                (
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_18px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_25px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_15px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_45px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_24px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_22px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_10px_rgba({},{})]", r, a2),
-                )
-            }
-            PrimaryColor::Cyan => {
-                let (r, a1, a2) = (
-                    "6,182,212",
-                    if is_exp { "0.35" } else { "0.2" },
-                    if is_exp { "0.5" } else { "0.35" },
-                );
-                (
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_18px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_25px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_15px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_45px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_24px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_22px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_10px_rgba({},{})]", r, a2),
-                )
-            }
-            PrimaryColor::Emerald => {
-                let (r, a1, a2) = (
-                    "16,185,129",
-                    if is_exp { "0.35" } else { "0.2" },
-                    if is_exp { "0.5" } else { "0.35" },
-                );
-                (
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_18px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_25px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_15px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_45px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_20px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_24px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_22px_rgba({},{})]", r, a1),
-                    format!("shadow-[0_0_12px_rgba({},{})]", r, a2),
-                    format!("shadow-[0_0_10px_rgba({},{})]", r, a2),
-                )
-            }
+            PrimaryColor::Violet => (
+                "glow-violet".to_string(),
+                "sd-btn--glow".to_string(),
+                "sd-card--hover-glow".to_string(),
+                "".to_string(),
+                "sd-badge--glow".to_string(),
+                "sd-modal-dialog--glow".to_string(),
+                "sd-alert--glow-info".to_string(),
+                "sd-dropdown-menu--glow".to_string(),
+                "sd-toast--glow-info".to_string(),
+                "sd-switch__track--glow".to_string(),
+                "sd-checkbox__box--glow".to_string(),
+            ),
+            PrimaryColor::Obsidian => (
+                "".to_string(),
+                "sd-btn--glow-obsidian".to_string(),
+                "sd-card--hover-glow".to_string(),
+                "".to_string(),
+                "sd-badge--glow".to_string(),
+                "sd-modal-dialog--glow".to_string(),
+                "sd-alert--glow-info".to_string(),
+                "sd-dropdown-menu--glow".to_string(),
+                "sd-toast--glow-info".to_string(),
+                "sd-switch__track--glow-obsidian".to_string(),
+                "sd-checkbox__box--glow".to_string(),
+            ),
+            PrimaryColor::Crimson => (
+                "glow-crimson".to_string(),
+                "sd-btn--glow-crimson".to_string(),
+                "sd-card--hover-glow".to_string(),
+                "".to_string(),
+                "sd-badge--glow".to_string(),
+                "sd-modal-dialog--glow".to_string(),
+                "sd-alert--glow-danger".to_string(),
+                "sd-dropdown-menu--glow".to_string(),
+                "sd-toast--glow-danger".to_string(),
+                "sd-switch__track--glow-crimson".to_string(),
+                "sd-checkbox__box--glow".to_string(),
+            ),
+            PrimaryColor::Cyan => (
+                "glow-cyan".to_string(),
+                "sd-btn--glow-cyan".to_string(),
+                "sd-card--hover-glow".to_string(),
+                "".to_string(),
+                "sd-badge--glow".to_string(),
+                "sd-modal-dialog--glow".to_string(),
+                "sd-alert--glow-info".to_string(),
+                "sd-dropdown-menu--glow".to_string(),
+                "sd-toast--glow-info".to_string(),
+                "sd-switch__track--glow-cyan".to_string(),
+                "sd-checkbox__box--glow".to_string(),
+            ),
+            PrimaryColor::Emerald => (
+                "glow-emerald".to_string(),
+                "sd-btn--glow-emerald".to_string(),
+                "sd-card--hover-glow".to_string(),
+                "".to_string(),
+                "sd-badge--glow".to_string(),
+                "sd-modal-dialog--glow".to_string(),
+                "sd-alert--glow-success".to_string(),
+                "sd-dropdown-menu--glow".to_string(),
+                "sd-toast--glow-success".to_string(),
+                "sd-switch__track--glow-emerald".to_string(),
+                "sd-checkbox__box--glow".to_string(),
+            ),
         }
     }
 
@@ -369,20 +310,20 @@ impl Theme {
             radius_scale: RadiusScale::Medium,
             glow_mode: GlowMode::Subtle,
 
-            surface_0: "bg-[#030305]".to_string(),
-            surface_1: "bg-[#09090d]".to_string(),
-            surface_2: "bg-[#111118]".to_string(),
-            surface_3: "bg-[#181824]".to_string(),
+            surface_0: "#030305".to_string(),
+            surface_1: "#09090d".to_string(),
+            surface_2: "#111118".to_string(),
+            surface_3: "#181824".to_string(),
 
-            root: "min-h-screen flex flex-col bg-[#030305] text-zinc-100 selection:bg-purple-900/50 selection:text-white".to_string(),
-            header: "border-b border-white/[0.08] bg-[#030305]/85 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.8)] specular-top".to_string(),
-            sidebar: "border-r border-white/[0.06] bg-[#030305]".to_string(),
-            sidebar_link: "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04] transition-all cursor-pointer select-none".to_string(),
-            sidebar_link_active: "bg-purple-950/40 text-purple-200 font-semibold border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.15)]".to_string(),
-            content: "bg-[#030305] text-zinc-100".to_string(),
-            surface: "bg-[#09090d] border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]".to_string(),
-            panel: "bg-[#111118] border border-white/[0.1] shadow-2xl shadow-black/80".to_string(),
-            banner: "mb-6 p-4 rounded-xl bg-[#09090d] border border-purple-500/25 shadow-lg shadow-purple-950/20".to_string(),
+            root: "sd-root".to_string(),
+            header: "sd-header".to_string(),
+            sidebar: "sd-sidebar".to_string(),
+            sidebar_link: "sd-sidebar-link".to_string(),
+            sidebar_link_active: "sd-sidebar-link--active".to_string(),
+            content: "sd-content".to_string(),
+            surface: "sd-surface".to_string(),
+            panel: "sd-panel".to_string(),
+            banner: "sd-banner".to_string(),
 
             border: "border-white/[0.08]".to_string(),
             border_subtle: "border-white/[0.05]".to_string(),
@@ -402,48 +343,48 @@ impl Theme {
             glow_switch: gs,
             glow_checkbox: gcb,
 
-            button_primary: "bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white shadow-md shadow-purple-950/50 border border-purple-400/40 hover:shadow-[0_0_15px_rgba(147,51,234,0.35)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] active:scale-[0.98]".to_string(),
-            button_secondary: "bg-[#121218] hover:bg-[#1a1a24] active:bg-[#0e0e14] text-zinc-200 border border-white/[0.08] hover:border-white/20 hover:text-white shadow-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] active:scale-[0.98]".to_string(),
-            button_outline: "bg-transparent hover:bg-purple-950/30 text-purple-300 border border-purple-500/30 hover:border-purple-400/60 hover:text-purple-100 active:scale-[0.98]".to_string(),
-            button_ghost: "bg-transparent hover:bg-white/[0.06] text-zinc-300 hover:text-white active:scale-[0.98]".to_string(),
-            button_danger: "bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white shadow-md shadow-rose-950/50 border border-rose-400/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] active:scale-[0.98]".to_string(),
-            button_success: "bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-md shadow-emerald-950/50 border border-emerald-400/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] active:scale-[0.98]".to_string(),
+            button_primary: "sd-btn--primary".to_string(),
+            button_secondary: "sd-btn--secondary".to_string(),
+            button_outline: "sd-btn--outline".to_string(),
+            button_ghost: "sd-btn--ghost".to_string(),
+            button_danger: "sd-btn--danger".to_string(),
+            button_success: "sd-btn--success".to_string(),
 
-            card_base: "bg-[#09090d] border border-white/[0.08] text-zinc-100 rounded-xl hover:border-white/15 transition-all shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]".to_string(),
-            card_header: "px-6 py-4 border-b border-white/[0.06] bg-[#0c0c12]/80".to_string(),
-            card_footer: "px-6 py-3 bg-[#07070a]/90 border-t border-white/[0.06] text-xs text-zinc-400".to_string(),
-            card_shadow_none: "shadow-none".to_string(),
-            card_shadow_sm: "shadow-sm shadow-black".to_string(),
-            card_shadow_md: "shadow-lg shadow-black/80 hover:shadow-purple-950/30 transition-shadow".to_string(),
-            card_shadow_lg: "shadow-xl shadow-black/90 hover:shadow-purple-950/50 transition-shadow".to_string(),
-            card_shadow_xl: "shadow-2xl shadow-purple-950/40 border-purple-500/20".to_string(),
+            card_base: "sd-card".to_string(),
+            card_header: "sd-card__header".to_string(),
+            card_footer: "sd-card__footer".to_string(),
+            card_shadow_none: "sd-card--shadow-none".to_string(),
+            card_shadow_sm: "sd-card--shadow-sm".to_string(),
+            card_shadow_md: "sd-card--shadow-md".to_string(),
+            card_shadow_lg: "sd-card--shadow-lg".to_string(),
+            card_shadow_xl: "sd-card--shadow-xl".to_string(),
 
-            input_base: "px-3.5 py-2 bg-[#060608] text-zinc-100 rounded-lg border focus:outline-none focus:ring-2 transition-all placeholder:text-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]".to_string(),
-            input_normal_border: "border-white/[0.08] focus:border-purple-500/60 focus:ring-purple-600/20 hover:border-white/15".to_string(),
-            input_error_border: "border-rose-500/70 focus:border-rose-400 focus:ring-rose-500/20".to_string(),
+            input_base: "sd-input".to_string(),
+            input_normal_border: "".to_string(),
+            input_error_border: "sd-input--error".to_string(),
 
-            badge_default: "bg-[#14141c] text-zinc-300 border-white/[0.08]".to_string(),
-            badge_primary: "bg-purple-950/50 text-purple-300 border-purple-500/30 shadow-[0_0_10px_rgba(147,51,234,0.15)]".to_string(),
-            badge_success: "bg-emerald-950/50 text-emerald-300 border-emerald-500/30".to_string(),
-            badge_warning: "bg-amber-950/50 text-amber-300 border-amber-500/30".to_string(),
-            badge_danger: "bg-rose-950/50 text-rose-300 border-rose-500/30".to_string(),
-            badge_outline: "bg-transparent text-purple-300 border-purple-500/30".to_string(),
+            badge_default: "sd-badge--default".to_string(),
+            badge_primary: "sd-badge--primary".to_string(),
+            badge_success: "sd-badge--success".to_string(),
+            badge_warning: "sd-badge--warning".to_string(),
+            badge_danger: "sd-badge--danger".to_string(),
+            badge_outline: "sd-badge--outline".to_string(),
 
-            navbar_base: "w-full bg-[#030305]/90 backdrop-blur-md border-b border-white/[0.08] shadow-[0_4px_25px_rgba(0,0,0,0.9)] px-6 py-3.5 sticky top-0 z-30".to_string(),
+            navbar_base: "sd-navbar".to_string(),
 
-            modal_backdrop: "fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all".to_string(),
-            modal_dialog: "bg-[#0d0d14] border border-white/15 rounded-2xl max-w-lg w-full shadow-2xl shadow-purple-950/50 overflow-hidden specular-top".to_string(),
-            modal_header: "flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#12121c]".to_string(),
-            modal_close: "text-zinc-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors cursor-pointer".to_string(),
+            modal_backdrop: "sd-modal-backdrop".to_string(),
+            modal_dialog: "sd-modal-dialog".to_string(),
+            modal_header: "sd-modal-dialog__header".to_string(),
+            modal_close: "sd-modal-dialog__close".to_string(),
 
-            alert_info: "bg-[#0e0e1a] text-purple-100 border-purple-500/30 border-l-4 border-l-purple-500 shadow-lg shadow-purple-950/20".to_string(),
-            alert_success: "bg-[#0b1410] text-emerald-100 border-emerald-500/30 border-l-4 border-l-emerald-500 shadow-lg shadow-black/40".to_string(),
-            alert_warning: "bg-[#141208] text-amber-100 border-amber-500/30 border-l-4 border-l-amber-500 shadow-lg shadow-black/40".to_string(),
-            alert_danger: "bg-[#170a0e] text-rose-100 border-rose-500/30 border-l-4 border-l-rose-500 shadow-lg shadow-black/40".to_string(),
-            alert_title_info: "text-purple-300 font-semibold".to_string(),
-            alert_title_success: "text-emerald-300 font-semibold".to_string(),
-            alert_title_warning: "text-amber-300 font-semibold".to_string(),
-            alert_title_danger: "text-rose-300 font-semibold".to_string(),
+            alert_info: "sd-alert--info".to_string(),
+            alert_success: "sd-alert--success".to_string(),
+            alert_warning: "sd-alert--warning".to_string(),
+            alert_danger: "sd-alert--danger".to_string(),
+            alert_title_info: "sd-alert__title--info".to_string(),
+            alert_title_success: "sd-alert__title--success".to_string(),
+            alert_title_warning: "sd-alert__title--warning".to_string(),
+            alert_title_danger: "sd-alert__title--danger".to_string(),
         }
     }
 
@@ -452,16 +393,13 @@ impl Theme {
         let mut t = Self::shadow();
         t.name = "Obsidian Titanium".to_string();
         t.primary_color = PrimaryColor::Obsidian;
-        t.sidebar_link_active =
-            "bg-zinc-800 text-white font-semibold border border-zinc-600 shadow-md".to_string();
+        t.sidebar_link_active = "sd-sidebar-link--active-obsidian".to_string();
         t.border_accent = "border-zinc-500/40".to_string();
         t.text_accent = "text-zinc-300".to_string();
         t.text_accent_bright = "text-white".to_string();
-        t.button_primary = "bg-zinc-100 hover:bg-white text-zinc-950 font-semibold shadow-md border border-white active:scale-[0.98]".to_string();
-        t.badge_primary = "bg-zinc-800 text-zinc-100 border-zinc-600".to_string();
-        t.input_normal_border =
-            "border-white/[0.08] focus:border-zinc-400 focus:ring-zinc-400/20".to_string();
-        t.banner = "mb-6 p-4 rounded-xl bg-[#09090d] border border-zinc-700 shadow-md".to_string();
+        t.button_primary = "sd-btn--primary-obsidian".to_string();
+        t.badge_primary = "sd-badge--default".to_string();
+        t.banner = "sd-banner sd-banner--obsidian".to_string();
 
         let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
             Self::calculate_glows(PrimaryColor::Obsidian, t.glow_mode);
@@ -484,15 +422,13 @@ impl Theme {
         let mut t = Self::shadow();
         t.name = "Crimson Phoenix".to_string();
         t.primary_color = PrimaryColor::Crimson;
-        t.sidebar_link_active = "bg-rose-950/40 text-rose-200 font-semibold border border-rose-500/30 shadow-[0_0_15px_rgba(225,29,72,0.15)]".to_string();
+        t.sidebar_link_active = "sd-sidebar-link--active-crimson".to_string();
         t.border_accent = "border-rose-500/40".to_string();
         t.text_accent = "text-rose-400".to_string();
         t.text_accent_bright = "text-rose-300".to_string();
-        t.button_primary = "bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white shadow-md shadow-rose-950/50 border border-rose-400/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] active:scale-[0.98]".to_string();
-        t.badge_primary = "bg-rose-950/50 text-rose-300 border-rose-500/30".to_string();
-        t.input_normal_border =
-            "border-white/[0.08] focus:border-rose-500/60 focus:ring-rose-600/20".to_string();
-        t.banner = "mb-6 p-4 rounded-xl bg-[#09090d] border border-rose-500/30 shadow-lg shadow-rose-950/20".to_string();
+        t.button_primary = "sd-btn--primary-crimson".to_string();
+        t.badge_primary = "sd-badge--danger".to_string();
+        t.banner = "sd-banner sd-banner--crimson".to_string();
 
         let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
             Self::calculate_glows(PrimaryColor::Crimson, t.glow_mode);
@@ -515,15 +451,13 @@ impl Theme {
         let mut t = Self::shadow();
         t.name = "Cyber Cyan".to_string();
         t.primary_color = PrimaryColor::Cyan;
-        t.sidebar_link_active = "bg-cyan-950/40 text-cyan-200 font-semibold border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]".to_string();
+        t.sidebar_link_active = "sd-sidebar-link--active-cyan".to_string();
         t.border_accent = "border-cyan-500/40".to_string();
         t.text_accent = "text-cyan-400".to_string();
         t.text_accent_bright = "text-cyan-300".to_string();
-        t.button_primary = "bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-black font-semibold shadow-md shadow-cyan-950/50 border border-cyan-300/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)] active:scale-[0.98]".to_string();
-        t.badge_primary = "bg-cyan-950/50 text-cyan-300 border-cyan-500/30".to_string();
-        t.input_normal_border =
-            "border-white/[0.08] focus:border-cyan-500/60 focus:ring-cyan-600/20".to_string();
-        t.banner = "mb-6 p-4 rounded-xl bg-[#09090d] border border-cyan-500/30 shadow-lg shadow-cyan-950/20".to_string();
+        t.button_primary = "sd-btn--primary-cyan".to_string();
+        t.badge_primary = "sd-badge--primary".to_string();
+        t.banner = "sd-banner sd-banner--cyan".to_string();
 
         let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
             Self::calculate_glows(PrimaryColor::Cyan, t.glow_mode);
@@ -546,15 +480,13 @@ impl Theme {
         let mut t = Self::shadow();
         t.name = "Emerald Matrix".to_string();
         t.primary_color = PrimaryColor::Emerald;
-        t.sidebar_link_active = "bg-emerald-950/40 text-emerald-200 font-semibold border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]".to_string();
+        t.sidebar_link_active = "sd-sidebar-link--active-emerald".to_string();
         t.border_accent = "border-emerald-500/40".to_string();
         t.text_accent = "text-emerald-400".to_string();
         t.text_accent_bright = "text-emerald-300".to_string();
-        t.button_primary = "bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-md shadow-emerald-950/50 border border-emerald-400/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] active:scale-[0.98]".to_string();
-        t.badge_primary = "bg-emerald-950/50 text-emerald-300 border-emerald-500/30".to_string();
-        t.input_normal_border =
-            "border-white/[0.08] focus:border-emerald-500/60 focus:ring-emerald-600/20".to_string();
-        t.banner = "mb-6 p-4 rounded-xl bg-[#09090d] border border-emerald-500/30 shadow-lg shadow-emerald-950/20".to_string();
+        t.button_primary = "sd-btn--primary-emerald".to_string();
+        t.badge_primary = "sd-badge--success".to_string();
+        t.banner = "sd-banner sd-banner--emerald".to_string();
 
         let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
             Self::calculate_glows(PrimaryColor::Emerald, t.glow_mode);

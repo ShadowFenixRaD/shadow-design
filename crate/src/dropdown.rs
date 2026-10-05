@@ -11,12 +11,12 @@ pub enum DropdownPlacement {
 }
 
 impl DropdownPlacement {
-    pub fn menu_classes(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            DropdownPlacement::BottomRight => "top-full right-0 mt-2",
-            DropdownPlacement::BottomLeft => "top-full left-0 mt-2",
-            DropdownPlacement::TopRight => "bottom-full right-0 mb-2",
-            DropdownPlacement::TopLeft => "bottom-full left-0 mb-2",
+            DropdownPlacement::BottomRight => "sd-dropdown-menu--bottom-right",
+            DropdownPlacement::BottomLeft => "sd-dropdown-menu--bottom-left",
+            DropdownPlacement::TopRight => "sd-dropdown-menu--top-right",
+            DropdownPlacement::TopLeft => "sd-dropdown-menu--top-left",
         }
     }
 }
@@ -36,29 +36,34 @@ pub fn Dropdown(
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
     let glow_class = match glow {
-        Some(true) => theme().glow_dropdown.clone(),
-        Some(false) => String::new(),
+        Some(true) => "sd-dropdown-menu--glow",
+        Some(false) => "",
         None => {
             if theme().glow_mode != crate::theme::GlowMode::Off {
-                theme().glow_dropdown.clone()
+                "sd-dropdown-menu--glow"
             } else {
-                String::new()
+                ""
             }
         }
     };
 
     #[cfg(not(feature = "theme"))]
     let glow_class = if glow == Some(true) {
-        "shadow-[0_0_25px_rgba(147,51,234,0.25)]"
+        "sd-dropdown-menu--glow"
     } else {
         ""
     };
 
-    let z_container = if open { "z-[999]" } else { "z-10" };
-    let pos_class = placement.menu_classes();
+    let open_container_class = if open { "sd-dropdown-container--open" } else { "" };
+    let placement_class = placement.scss_class();
+
+    #[cfg(feature = "animation")]
+    let anim_class = crate::animation::Animations::DROPDOWN_ENTER;
+    #[cfg(not(feature = "animation"))]
+    let anim_class = "animate-dropdown-enter";
 
     rsx! {
-        div { class: "relative inline-block text-left sd-dropdown-container {z_container} {class}",
+        div { class: "sd-dropdown-container {open_container_class} {class}",
             div {
                 onclick: move |_| {
                     let next = !*is_open.read();
@@ -67,14 +72,15 @@ pub fn Dropdown(
                 {trigger}
             }
             if open {
-                // Invisible click-outside backdrop sopra il layout ma sotto il menu
                 div {
-                    class: "fixed inset-0 z-[995] sd-dropdown-backdrop",
-                    onclick: move |_| *is_open.write() = false,
+                    class: "sd-dropdown-backdrop",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        *is_open.write() = false;
+                    },
                 }
-                // Menu panel con z-index 1000 prioritario assoluto
                 div {
-                    class: "absolute {pos_class} w-56 rounded-xl bg-[#0c0c12] border border-white/10 shadow-2xl p-1.5 z-[1000] sd-dropdown-menu specular-top animate-dropdown-enter {glow_class}",
+                    class: "sd-dropdown-menu {placement_class} {glow_class} {anim_class}",
                     onclick: move |e| e.stop_propagation(),
                     {children}
                 }
@@ -91,19 +97,15 @@ pub fn DropdownItem(
     onclick: Option<EventHandler<MouseEvent>>,
     children: Element,
 ) -> Element {
-    let text_color = if danger {
-        "text-rose-400 hover:text-rose-200 hover:bg-rose-950/40"
-    } else {
-        "text-zinc-300 hover:text-white hover:bg-white/[0.06]"
-    };
+    let danger_class = if danger { "sd-dropdown-item--danger" } else { "" };
 
     rsx! {
         button {
             r#type: "button",
-            class: "w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer text-left {text_color} {class}",
+            class: "sd-dropdown-item {danger_class} {class}",
             onclick: move |e| {
-                if let Some(handler) = onclick.as_ref() {
-                    handler.call(e);
+                if let Some(h) = onclick.as_ref() {
+                    h.call(e);
                 }
             },
             if let Some(i) = icon {
@@ -117,6 +119,6 @@ pub fn DropdownItem(
 #[component]
 pub fn DropdownDivider() -> Element {
     rsx! {
-        div { class: "my-1 border-t border-white/[0.06]" }
+        div { class: "sd-dropdown-divider" }
     }
 }

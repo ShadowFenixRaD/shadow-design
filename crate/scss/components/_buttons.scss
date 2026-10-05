@@ -79,16 +79,100 @@
     width: 100%;
   }
 
+  // Glows
+  &--glow {
+    box-shadow: 0 0 22px $violet-glow, 0 4px 18px rgba(59, 7, 100, 0.6);
+  }
+
+  &--glow-crimson {
+    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6);
+  }
+
+  &--glow-cyan {
+    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6);
+  }
+
+  &--glow-emerald {
+    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6);
+  }
+
+  &--glow-obsidian {
+    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7);
+  }
+
   // Varianti
   &--primary {
     background-color: $violet-primary;
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.15);
-    @include specular-top(0.25);
+    color: #f3e8ff;
+    border-color: rgba(168, 85, 247, 0.45);
+    box-shadow: 0 4px 18px rgba(59, 7, 100, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    @include specular-top(0.2);
 
     &:hover {
-      background-color: color.adjust($violet-primary, $lightness: 5%);
-      @include glow($violet-glow, 20px);
+      background-color: color.adjust($violet-primary, $lightness: 6%);
+      border-color: rgba(192, 132, 252, 0.7);
+      color: #ffffff;
+      box-shadow: 0 0 22px rgba(168, 85, 247, 0.4), 0 6px 22px rgba(59, 7, 100, 0.7);
+    }
+  }
+
+  &--primary-crimson {
+    background-color: #4c0519;
+    color: #ffe4e6;
+    border-color: rgba(255, 23, 68, 0.45);
+    box-shadow: 0 4px 18px rgba(76, 5, 25, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    @include specular-top(0.2);
+
+    &:hover {
+      background-color: color.adjust(#4c0519, $lightness: 8%);
+      border-color: rgba(255, 82, 119, 0.75);
+      color: #ffffff;
+      box-shadow: 0 0 22px rgba(255, 23, 68, 0.45), 0 6px 22px rgba(76, 5, 25, 0.7);
+    }
+  }
+
+  &--primary-cyan {
+    background-color: #083344;
+    color: #cffafe;
+    border-color: rgba(0, 240, 255, 0.45);
+    box-shadow: 0 4px 18px rgba(8, 51, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    @include specular-top(0.2);
+
+    &:hover {
+      background-color: color.adjust(#083344, $lightness: 8%);
+      border-color: rgba(128, 247, 255, 0.75);
+      color: #ffffff;
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45), 0 6px 22px rgba(8, 51, 68, 0.7);
+    }
+  }
+
+  &--primary-emerald {
+    background-color: #022c22;
+    color: #d1fae5;
+    border-color: rgba(0, 255, 157, 0.45);
+    box-shadow: 0 4px 18px rgba(2, 44, 34, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    @include specular-top(0.2);
+
+    &:hover {
+      background-color: color.adjust(#022c22, $lightness: 8%);
+      border-color: rgba(110, 231, 183, 0.75);
+      color: #ffffff;
+      box-shadow: 0 0 22px rgba(0, 255, 157, 0.45), 0 6px 22px rgba(2, 44, 34, 0.7);
+    }
+  }
+
+  &--primary-obsidian {
+    background-color: #18181b;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    @include specular-top(0.2);
+
+    &:hover {
+      background-color: #27272a;
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 6px 22px rgba(0, 0, 0, 0.8);
     }
   }
 
@@ -96,12 +180,14 @@
     background-color: $color-surface-2;
     color: $zinc-200;
     border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     @include specular-top(0.08);
 
     &:hover {
       background-color: $color-surface-3;
       border-color: rgba(255, 255, 255, 0.18);
       color: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
     }
   }
 
@@ -129,28 +215,32 @@
   }
 
   &--danger {
-    background-color: rgba(244, 63, 94, 0.15);
-    color: #fda4af;
-    border-color: rgba(244, 63, 94, 0.35);
+    background-color: rgba(255, 23, 68, 0.16);
+    color: #ff859b;
+    border-color: rgba(255, 23, 68, 0.4);
+    box-shadow: 0 2px 12px rgba(76, 5, 25, 0.4);
+    @include specular-top(0.1);
 
     &:hover {
-      background-color: rgba(244, 63, 94, 0.25);
-      border-color: rgba(244, 63, 94, 0.55);
+      background-color: rgba(255, 23, 68, 0.28);
+      border-color: rgba(255, 82, 119, 0.7);
       color: #ffffff;
-      @include glow(rgba(244, 63, 94, 0.3), 20px);
+      box-shadow: 0 0 20px rgba(255, 23, 68, 0.45), 0 4px 16px rgba(76, 5, 25, 0.6);
     }
   }
 
   &--success {
-    background-color: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
-    border-color: rgba(16, 185, 129, 0.35);
+    background-color: rgba(0, 255, 157, 0.12);
+    color: #5dfcc3;
+    border-color: rgba(0, 255, 157, 0.4);
+    box-shadow: 0 2px 12px rgba(2, 44, 34, 0.4);
+    @include specular-top(0.1);
 
     &:hover {
-      background-color: rgba(16, 185, 129, 0.25);
-      border-color: rgba(16, 185, 129, 0.55);
+      background-color: rgba(0, 255, 157, 0.24);
+      border-color: rgba(52, 211, 153, 0.7);
       color: #ffffff;
-      @include glow(rgba(16, 185, 129, 0.3), 20px);
+      box-shadow: 0 0 20px rgba(0, 255, 157, 0.45), 0 4px 16px rgba(2, 44, 34, 0.6);
     }
   }
 }

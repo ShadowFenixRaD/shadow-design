@@ -1,0 +1,41 @@
+// ==============================================================================
+// Shadow Design — Navbar Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+.sd-navbar {
+  position: sticky;
+  top: 0;
+  z-index: z('header');
+  width: 100%;
+  background-color: rgba(3, 3, 5, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: $border-hairline;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85);
+  padding: 12px 24px;
+  @include specular-top(0.08);
+
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}

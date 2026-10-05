@@ -131,7 +131,7 @@ pub fn BadgesPage() -> Element {
                 div { class: "flex flex-wrap items-center gap-2.5",
                     Badge { label: "Rust 1.85".to_string(), variant: BadgeVariant::Default }
                     Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Primary }
-                    Badge { label: "Tailwind v4".to_string(), variant: BadgeVariant::Success }
+                    Badge { label: "SCSS Nativo".to_string(), variant: BadgeVariant::Success }
                     Badge { label: "Zero Bloat".to_string(), variant: BadgeVariant::Outline }
                 }
             }

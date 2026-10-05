@@ -6,6 +6,6 @@ Per l'architettura completa del workspace, la struttura di tutti i componenti, l
 👉 **[AGENTS.md](../AGENTS.md)** nella root del repository.
 
 ### Note specifiche per Showcase
-- **Esecuzione dev server**: `dx serve` eseguito all'interno di questa directory (`showcase/`).
+- **Esecuzione dev server**: `dx serve` eseguito all'interno di questa directory (`showcase/`). Integrazione asset SCSS automatica e diretta.
 - **Pagine & Router**: Tutte le route sono censite nell'enum `Route` in [showcase/src/main.rs](file:///c:/Users/KillerBoss/Documents/shadow-design/showcase/src/main.rs).
-- **Stili Tailwind**: Le classi custom sono in [showcase/tailwind.css](file:///c:/Users/KillerBoss/Documents/shadow-design/showcase/tailwind.css) e compilate in [showcase/assets/tailwind.css](file:///c:/Users/KillerBoss/Documents/shadow-design/showcase/assets/tailwind.css).
+- **Stili SCSS**: Gli stili risiedono in `crate/scss/` e vengono inclusi tramite `shadow_design::STYLES`. Nessun comando o compilatore esterno richiesto.

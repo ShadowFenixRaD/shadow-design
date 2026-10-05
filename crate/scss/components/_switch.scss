@@ -1,0 +1,118 @@
+// ==============================================================================
+// Shadow Design — Switch Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-switch {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  user-select: none;
+  cursor: pointer;
+  font-family: $font-sans;
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &__track {
+    position: relative;
+    display: inline-flex;
+    height: 24px;
+    width: 44px;
+    flex-shrink: 0;
+    align-items: center;
+    border-radius: $radius-full;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #14141c;
+    transition: background-color $duration-normal ease, border-color $duration-normal ease, box-shadow $duration-normal ease;
+
+    &--checked {
+      background-color: $violet-primary;
+      border-color: rgba(192, 132, 252, 0.6);
+      box-shadow: 0 0 14px $violet-glow;
+    }
+
+    &--checked-crimson {
+      background-color: #4c0519;
+      border-color: rgba(255, 82, 119, 0.6);
+      box-shadow: 0 0 14px $crimson-glow;
+    }
+
+    &--checked-cyan {
+      background-color: #083344;
+      border-color: rgba(128, 247, 255, 0.6);
+      box-shadow: 0 0 14px $cyan-glow;
+    }
+
+    &--checked-emerald {
+      background-color: #022c22;
+      border-color: rgba(0, 255, 157, 0.6);
+      box-shadow: 0 0 14px $emerald-glow;
+    }
+
+    &--checked-obsidian {
+      background-color: #27272a;
+      border-color: #ffffff;
+      box-shadow: 0 0 12px $obsidian-glow;
+    }
+
+    &--glow {
+      box-shadow: 0 0 16px $violet-glow;
+    }
+
+    &--glow-crimson {
+      box-shadow: 0 0 16px $crimson-glow;
+    }
+
+    &--glow-cyan {
+      box-shadow: 0 0 16px $cyan-glow;
+    }
+
+    &--glow-emerald {
+      box-shadow: 0 0 16px $emerald-glow;
+    }
+
+    &--glow-obsidian {
+      box-shadow: 0 0 14px $obsidian-glow;
+    }
+  }
+
+  &__thumb {
+    pointer-events: none;
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    border-radius: $radius-full;
+    background-color: $zinc-300;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    transform: translateX(2px);
+    transition: transform $duration-normal $ease-tactile, background-color $duration-normal ease;
+
+    &--checked {
+      background-color: #ffffff;
+      transform: translateX(22px);
+    }
+  }
+
+  &__label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $zinc-200;
+  }
+
+  &__description {
+    font-size: 11px;
+    color: $zinc-400;
+    line-height: 1.4;
+  }
+}

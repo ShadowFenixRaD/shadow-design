@@ -84,7 +84,7 @@ pub fn App() -> Element {
                 shadow: CardShadow::Lg,
                 div { class: "space-y-6",
                     Text { size: TextSize::Sm,
-                        "Il nuovo motore del tema permette di commutare palette primarie ad alta leggibilità, scalare il raggio di curvatura (Sharp, Medium, Soft) e regolare l'intensità del bagliore ottico su tutti i componenti senza duplicare una singola classe Tailwind."
+                        "Il nuovo motore del tema permette di commutare palette primarie ad alta leggibilità, scalare il raggio di curvatura (Sharp, Medium, Soft) e regolare l'intensità del bagliore ottico su tutti i componenti con architettura pura SCSS nativa."
                     }
 
                     // Selettore Rapido Preset
@@ -169,7 +169,7 @@ pub fn App() -> Element {
                         Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Success, dot: true }
                         Badge { label: "Geist Fonts".to_string(), variant: BadgeVariant::Default }
                         Badge { label: "Native SVG".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "Tailwind CSS v4".to_string(), variant: BadgeVariant::Default }
+                        Badge { label: "SCSS Nativo Dioxus".to_string(), variant: BadgeVariant::Default }
                     }
                 }
             }

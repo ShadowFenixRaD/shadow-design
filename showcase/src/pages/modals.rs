@@ -24,7 +24,7 @@ pub fn ModalsPage() -> Element {
             name: "class",
             r#type: "String",
             default: "\"\"",
-            description: "Classi Tailwind personalizzate per il corpo del dialog",
+            description: "Classi CSS/SCSS personalizzate per il corpo del dialog",
         },
     ];
 

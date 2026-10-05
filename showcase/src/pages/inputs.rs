@@ -5,7 +5,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn InputsPage() -> Element {
-    let username = use_signal(|| "christian_shadow".to_string());
+    let username = use_signal(|| "shadow".to_string());
     let search_query = use_signal(|| "".to_string());
     let password = use_signal(|| "secret_password".to_string());
     let email = use_signal(|| "".to_string());

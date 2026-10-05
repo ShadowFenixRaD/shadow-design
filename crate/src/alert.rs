@@ -11,29 +11,30 @@ pub enum AlertVariant {
 }
 
 impl AlertVariant {
-    pub fn classes(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            AlertVariant::Info => {
-                "bg-[#0e0e1a] text-purple-100 border-purple-500/30 border-l-4 border-l-purple-500 shadow-lg shadow-purple-950/20"
-            }
-            AlertVariant::Success => {
-                "bg-[#0b1410] text-emerald-100 border-emerald-500/30 border-l-4 border-l-emerald-500 shadow-lg shadow-black/40"
-            }
-            AlertVariant::Warning => {
-                "bg-[#141208] text-amber-100 border-amber-500/30 border-l-4 border-l-amber-500 shadow-lg shadow-black/40"
-            }
-            AlertVariant::Danger => {
-                "bg-[#170a0e] text-rose-100 border-rose-500/30 border-l-4 border-l-rose-500 shadow-lg shadow-black/40"
-            }
+            AlertVariant::Info => "sd-alert--info",
+            AlertVariant::Success => "sd-alert--success",
+            AlertVariant::Warning => "sd-alert--warning",
+            AlertVariant::Danger => "sd-alert--danger",
+        }
+    }
+
+    pub fn glow_class(&self) -> &'static str {
+        match self {
+            AlertVariant::Info => "sd-alert--glow-info",
+            AlertVariant::Success => "sd-alert--glow-success",
+            AlertVariant::Warning => "sd-alert--glow-warning",
+            AlertVariant::Danger => "sd-alert--glow-danger",
         }
     }
 
     pub fn title_class(&self) -> &'static str {
         match self {
-            AlertVariant::Info => "text-purple-300 font-semibold",
-            AlertVariant::Success => "text-emerald-300 font-semibold",
-            AlertVariant::Warning => "text-amber-300 font-semibold",
-            AlertVariant::Danger => "text-rose-300 font-semibold",
+            AlertVariant::Info => "sd-alert__title--info",
+            AlertVariant::Success => "sd-alert__title--success",
+            AlertVariant::Warning => "sd-alert__title--warning",
+            AlertVariant::Danger => "sd-alert__title--danger",
         }
     }
 
@@ -46,12 +47,12 @@ impl AlertVariant {
         }
     }
 
-    pub fn icon_color(&self) -> &'static str {
+    pub fn icon_color_class(&self) -> &'static str {
         match self {
-            AlertVariant::Info => "text-purple-400",
-            AlertVariant::Success => "text-emerald-400",
-            AlertVariant::Warning => "text-amber-400",
-            AlertVariant::Danger => "text-rose-400",
+            AlertVariant::Info => "sd-alert__icon--info",
+            AlertVariant::Success => "sd-alert__icon--success",
+            AlertVariant::Warning => "sd-alert__icon--warning",
+            AlertVariant::Danger => "sd-alert__icon--danger",
         }
     }
 }
@@ -65,58 +66,48 @@ pub fn Alert(
     on_close: Option<EventHandler<MouseEvent>>,
     children: Element,
 ) -> Element {
+    let variant_class = variant.scss_class();
+    let title_variant_class = variant.title_class();
+    let icon_color_class = variant.icon_color_class();
+
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
-    #[cfg(feature = "theme")]
-    let variant_classes = theme().alert_variant_classes(variant).to_string();
-    #[cfg(feature = "theme")]
-    let title_class = theme().alert_title_classes(variant).to_string();
     #[cfg(feature = "theme")]
     let radius_class = theme().radius_scale.md();
     #[cfg(feature = "theme")]
     let glow_class = if theme().is_component_glow_enabled("alert", glow) {
-        match variant {
-            AlertVariant::Info => "shadow-[0_0_20px_rgba(168,85,247,0.18)]",
-            AlertVariant::Success => "shadow-[0_0_20px_rgba(16,185,129,0.18)]",
-            AlertVariant::Warning => "shadow-[0_0_20px_rgba(245,158,11,0.18)]",
-            AlertVariant::Danger => "shadow-[0_0_20px_rgba(244,63,94,0.22)]",
-        }
+        variant.glow_class()
     } else {
         ""
     };
 
     #[cfg(not(feature = "theme"))]
-    let variant_classes = variant.classes();
-    #[cfg(not(feature = "theme"))]
-    let title_class = variant.title_class();
-    #[cfg(not(feature = "theme"))]
-    let radius_class = "rounded-xl";
+    let radius_class = "";
     #[cfg(not(feature = "theme"))]
     let glow_class = if glow.unwrap_or(false) {
-        "shadow-[0_0_20px_rgba(168,85,247,0.18)]"
+        variant.glow_class()
     } else {
         ""
     };
 
     let icon_kind = variant.icon_kind();
-    let icon_color = variant.icon_color();
 
     rsx! {
         div {
-            class: "p-4 border flex items-start gap-3 shadow-md {radius_class} {variant_classes} {glow_class} {class}",
-            span { class: "mt-0.5 shrink-0 {icon_color}",
+            class: "sd-alert {variant_class} {glow_class} {radius_class} {class}",
+            span { class: "sd-alert__icon {icon_color_class}",
                 Icon { kind: icon_kind, size: 18 }
             }
-            div { class: "flex flex-col gap-0.5 flex-1 min-w-0",
+            div { class: "sd-alert__content",
                 if let Some(t) = title {
-                    h4 { class: "text-xs sm:text-sm {title_class}", "{t}" }
+                    h4 { class: "sd-alert__title {title_variant_class}", "{t}" }
                 }
-                div { class: "text-xs sm:text-sm opacity-90 leading-relaxed text-zinc-300", {children} }
+                div { class: "sd-alert__body", {children} }
             }
             if let Some(close_handler) = on_close {
                 button {
                     r#type: "button",
-                    class: "text-zinc-500 hover:text-white p-1 rounded transition-colors cursor-pointer shrink-0 -mr-1 -mt-1",
+                    class: "sd-alert__close",
                     onclick: move |e| close_handler.call(e),
                     Icon { kind: IconKind::X, size: 14 }
                 }

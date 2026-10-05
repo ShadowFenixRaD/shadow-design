@@ -52,7 +52,35 @@
     // Stati
     &--checked {
       background-color: $violet-primary;
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(168, 85, 247, 0.6);
+      color: #ffffff;
+      @include specular-top(0.2);
+    }
+
+    &--checked-crimson {
+      background-color: #4c0519;
+      border-color: rgba(255, 23, 68, 0.6);
+      color: #ffffff;
+      @include specular-top(0.2);
+    }
+
+    &--checked-cyan {
+      background-color: #083344;
+      border-color: rgba(0, 240, 255, 0.6);
+      color: #ffffff;
+      @include specular-top(0.2);
+    }
+
+    &--checked-emerald {
+      background-color: #022c22;
+      border-color: rgba(0, 255, 157, 0.6);
+      color: #ffffff;
+      @include specular-top(0.2);
+    }
+
+    &--checked-obsidian {
+      background-color: #18181b;
+      border-color: rgba(255, 255, 255, 0.4);
       color: #ffffff;
       @include specular-top(0.2);
     }
@@ -81,6 +109,12 @@
   &__description {
     font-size: 11px;
     color: $zinc-500;
+    line-height: 1.4;
+  }
+
+  &__error-text {
+    font-size: 11px;
+    color: $color-danger;
     line-height: 1.4;
   }
 }

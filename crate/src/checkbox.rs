@@ -10,11 +10,11 @@ pub enum CheckboxSize {
 }
 
 impl CheckboxSize {
-    pub fn box_classes(&self) -> &'static str {
+    pub fn scss_class(&self) -> &'static str {
         match self {
-            CheckboxSize::Sm => "w-4 h-4 rounded-[3px]",
-            CheckboxSize::Md => "w-5 h-5 rounded-md",
-            CheckboxSize::Lg => "w-6 h-6 rounded-lg",
+            CheckboxSize::Sm => "sd-checkbox__box--sm",
+            CheckboxSize::Md => "sd-checkbox__box--md",
+            CheckboxSize::Lg => "sd-checkbox__box--lg",
         }
     }
 
@@ -44,83 +44,82 @@ pub fn Checkbox(
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
-    let active_color = match theme().primary_color {
-        crate::theme::PrimaryColor::Violet => "bg-purple-600 border-purple-400 text-white",
-        crate::theme::PrimaryColor::Obsidian => "bg-zinc-100 border-white text-black",
-        crate::theme::PrimaryColor::Crimson => "bg-rose-600 border-rose-400 text-white",
-        crate::theme::PrimaryColor::Cyan => "bg-cyan-500 border-cyan-300 text-black",
-        crate::theme::PrimaryColor::Emerald => "bg-emerald-600 border-emerald-400 text-white",
+    let active_color_class = match theme().primary_color {
+        crate::theme::PrimaryColor::Violet => "sd-checkbox__box--checked",
+        crate::theme::PrimaryColor::Obsidian => "sd-checkbox__box--checked-obsidian",
+        crate::theme::PrimaryColor::Crimson => "sd-checkbox__box--checked-crimson",
+        crate::theme::PrimaryColor::Cyan => "sd-checkbox__box--checked-cyan",
+        crate::theme::PrimaryColor::Emerald => "sd-checkbox__box--checked-emerald",
     };
     #[cfg(feature = "theme")]
     let glow_class = match glow {
-        Some(true) => theme().glow_checkbox.clone(),
-        Some(false) => String::new(),
+        Some(true) => "sd-checkbox__box--glow",
+        Some(false) => "",
         None => {
             if theme().glow_mode != crate::theme::GlowMode::Off && (is_checked || indeterminate) {
-                theme().glow_checkbox.clone()
+                "sd-checkbox__box--glow"
             } else {
-                String::new()
+                ""
             }
         }
     };
 
     #[cfg(not(feature = "theme"))]
-    let active_color = "bg-purple-600 border-purple-400 text-white";
+    let active_color_class = "sd-checkbox__box--checked";
     #[cfg(not(feature = "theme"))]
     let glow_class = if is_checked || indeterminate {
-        "shadow-[0_0_10px_rgba(147,51,234,0.35)]"
+        "sd-checkbox__box--glow"
     } else {
         ""
     };
 
-    let state_class = if is_checked || indeterminate {
-        format!(
-            "{} shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] {}",
-            active_color, glow_class
-        )
-    } else if error.is_some() {
-        "bg-[#060608] border-rose-500/70 hover:border-rose-400 text-transparent".to_string()
+    let checked_class = if is_checked || indeterminate {
+        active_color_class
     } else {
-        "bg-[#060608] border-white/20 hover:border-white/40 text-transparent".to_string()
+        ""
     };
 
-    let box_size = size.box_classes();
-    let is_disabled = disabled;
-    let cursor_class = if is_disabled {
-        "opacity-50 cursor-not-allowed pointer-events-none"
+    let error_class = if error.is_some() {
+        "sd-checkbox__box--error"
     } else {
-        "cursor-pointer"
+        ""
+    };
+
+    let box_size = size.scss_class();
+    let is_disabled = disabled;
+    let disabled_class = if is_disabled {
+        "sd-checkbox--disabled"
+    } else {
+        ""
     };
 
     rsx! {
         div {
-            class: "inline-flex items-start gap-2.5 select-none {cursor_class} {class}",
+            class: "sd-checkbox {disabled_class} {class}",
             onclick: move |_| {
                 if !is_disabled {
                     let next = !*checked.read();
                     *checked.write() = next;
                 }
             },
-            // Custom tactile checkbox box
             div {
-                class: "relative flex items-center justify-center shrink-0 border transition-all duration-150 ease-out active:scale-95 mt-0.5 {box_size} {state_class}",
+                class: "sd-checkbox__box {box_size} {checked_class} {glow_class} {error_class}",
                 if indeterminate {
-                    span { class: "block w-2.5 h-0.5 bg-current rounded-full" }
+                    span { style: "display: block; width: 10px; height: 2px; background: currentColor; border-radius: 9999px;" }
                 } else if is_checked {
                     Icon { kind: IconKind::Check, size: size.icon_size() }
                 }
             }
-            // Label & description
             if label.is_some() || description.is_some() || error.is_some() {
-                div { class: "flex flex-col gap-0.5",
+                div { class: "sd-checkbox__label",
                     if let Some(lbl) = label {
-                        span { class: "text-xs font-medium text-zinc-200 leading-tight", "{lbl}" }
+                        span { class: "sd-checkbox__title", "{lbl}" }
                     }
                     if let Some(desc) = description {
-                        span { class: "text-[11px] text-zinc-500 leading-normal", "{desc}" }
+                        span { class: "sd-checkbox__description", "{desc}" }
                     }
                     if let Some(err) = error {
-                        span { class: "text-[11px] text-rose-400 font-medium", "{err}" }
+                        span { class: "sd-checkbox__error-text", "{err}" }
                     }
                 }
             }
