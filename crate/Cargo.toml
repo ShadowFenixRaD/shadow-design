@@ -3,7 +3,19 @@ name = "shadow-design"
 version = "0.1.0"
 edition = "2021"
 authors = ["ShadowfenixRaD", "Christian Torbidone <killerbossoriginal@gmail.com>"]
-description = "UI component library for Dioxus web applications"
+description = "Modular, high-performance UI component library for Dioxus 0.7 applications"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://source.shadowfenix.net/development/shadow-design"
+keywords = ["dioxus", "ui", "components", "wasm", "web"]
+categories = ["gui", "wasm", "web-programming"]
+include = [
+    "src/**/*",
+    "scss/**/*",
+    "README.md",
+    "Cargo.toml",
+    "LICENSE*",
+]
 
 [dependencies]
 dioxus = { workspace = true }
