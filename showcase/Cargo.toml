@@ -10,6 +10,8 @@ publish = false
 [dependencies]
 dioxus = { workspace = true, features = ["router"] }
 shadow-design = { path = "../crate", features = ["all"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [features]
 default = ["web"]

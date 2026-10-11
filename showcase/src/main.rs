@@ -7,8 +7,8 @@ mod pages;
 use components::Layout;
 use pages::{
     AlertsPage, BadgesPage, ButtonsPage, CardsPage, CheckboxPage, DrawerPage, DropdownPage, Home,
-    InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SwitchPage, TabsPage, TooltipPage,
-    TypographyPage,
+    InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SwitchPage, TabsPage,
+    ThemeBuilderPage, TooltipPage, TypographyPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -17,6 +17,8 @@ pub enum Route {
     #[layout(Layout)]
     #[route("/")]
     Home {},
+    #[route("/theme-builder")]
+    ThemeBuilderPage {},
     #[route("/typography")]
     TypographyPage {},
     #[route("/buttons")]
@@ -59,11 +61,38 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    let mut theme = use_signal(Theme::default);
+    use_context_provider(|| theme);
+
+    // Resistenza ai riavvii e ai refresh: ripristino automatico da localStorage
+    use_effect(move || {
+        spawn(async move {
+            let mut eval = document::eval(
+                r#"
+                try {
+                    let saved = localStorage.getItem("shadow_design_custom_theme");
+                    dioxus.send(saved ? saved : "");
+                } catch(e) {
+                    dioxus.send("");
+                }
+                "#,
+            );
+            if let Ok(json_str) = eval.recv::<String>().await {
+                if !json_str.is_empty() {
+                    if let Ok(loaded) = serde_json::from_str::<Theme>(&json_str) {
+                        *theme.write() = loaded;
+                    }
+                }
+            }
+        });
+    });
+
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Link { rel: "stylesheet", href: STYLES }
+        document::Style { "{theme().to_css_variables()}" }
         NotificationProvider {
             Router::<Route> {}
         }

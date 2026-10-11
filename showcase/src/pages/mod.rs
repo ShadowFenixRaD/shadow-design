@@ -12,6 +12,7 @@ pub mod navbar;
 pub mod notifications;
 pub mod switch;
 pub mod tabs;
+pub mod theme_builder;
 pub mod tooltip;
 pub mod typography;
 
@@ -29,5 +30,6 @@ pub use navbar::NavbarDemoPage;
 pub use notifications::NotificationsPage;
 pub use switch::SwitchPage;
 pub use tabs::TabsPage;
+pub use theme_builder::ThemeBuilderPage;
 pub use tooltip::TooltipPage;
 pub use typography::TypographyPage;

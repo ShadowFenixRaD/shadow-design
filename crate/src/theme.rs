@@ -12,6 +12,7 @@ use crate::card::CardShadow;
 
 /// Palette di colori primari in stile Mantine / Material-UI, con supporto a colori Custom estendibili.
 #[derive(Clone, PartialEq, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PrimaryColor {
     #[default]
     Violet,
@@ -95,6 +96,7 @@ impl PrimaryColor {
 
 /// Scala globale per i raggi di curvatura (Border Radius).
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RadiusScale {
     Sharp,
     #[default]
@@ -138,6 +140,7 @@ impl RadiusScale {
 
 /// Intensità del micro-glow ottico radiale.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum GlowMode {
     #[default]
     Subtle,
@@ -147,6 +150,7 @@ pub enum GlowMode {
 
 /// Stile di elevazione delle ombre (Livello 1): Neon Glow, Hard Block cartoon, Soft o Flat.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ElevationStyle {
     #[default]
     NeonGlow,     // Specular neon glow sfumato (Cyberpunk / Ultraviolet)
@@ -157,6 +161,7 @@ pub enum ElevationStyle {
 
 /// Personalizzazione specifica per un componente (Livello 2 - Component Level).
 #[derive(Clone, PartialEq, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ComponentOverride {
     /// Classe base aggiuntiva o sostitutiva
     pub base_class: Option<String>,
@@ -209,6 +214,7 @@ impl ComponentOverride {
 /// Struttura centrale del tema per Shadow Design ispirata a Mantine e Material-UI.
 /// Supporta personalizzazione gerarchica su 3 livelli.
 #[derive(Clone, PartialEq, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Theme {
     pub name: String,
     pub primary_color: PrimaryColor,

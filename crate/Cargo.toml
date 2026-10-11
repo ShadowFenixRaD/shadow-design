@@ -19,6 +19,7 @@ include = [
 
 [dependencies]
 dioxus = { workspace = true }
+serde = { workspace = true, optional = true }
 
 [features]
 default = ["all"]
@@ -41,7 +42,9 @@ all = [
     "drawer",
     "dropdown",
     "animation",
+    "serde",
 ]
+serde = ["dep:serde"]
 button = []
 card = []
 input = []

@@ -4733,6 +4733,7 @@ name = "shadow-design"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "serde",
 ]
 
 [[package]]
@@ -4755,6 +4756,8 @@ name = "showcase"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "serde",
+ "serde_json",
  "shadow-design",
 ]
 

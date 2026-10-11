@@ -132,6 +132,16 @@ pub fn Layout() -> Element {
                             }
                         }
                     }
+
+                    // Link Rapido Theme Builder
+                    div { class: "pl-2 border-l border-white/[0.08]",
+                        Link {
+                            to: Route::ThemeBuilderPage {},
+                            class: "flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono font-semibold rounded bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-500/40 transition-all shadow-sm",
+                            Icon { kind: IconKind::Palette, size: 12 }
+                            span { class: "hidden sm:inline", "Custom Builder" }
+                        }
+                    }
                 }
             }
 
@@ -146,6 +156,7 @@ pub fn Layout() -> Element {
                         }
                         div { class: "flex flex-col gap-1",
                             SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica" }
+                            SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder" }
                             SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography" }
                         }
                     }
@@ -189,7 +200,10 @@ pub fn Layout() -> Element {
                                 Icon { kind: IconKind::Palette, size: 14 }
                                 span { "Mantine Engine" }
                             }
-                            span { class: "text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-950/60 text-purple-200 border border-purple-500/30",
+                            Link {
+                                to: Route::ThemeBuilderPage {},
+                                class: "text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950/60 hover:bg-purple-900 text-purple-200 border border-purple-500/30 transition-colors cursor-pointer",
+                                title: "Apri Theme Builder",
                                 "{theme().name}"
                             }
                         }
