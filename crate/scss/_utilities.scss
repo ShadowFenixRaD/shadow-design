@@ -6,6 +6,7 @@
 @use 'variables' as *;
 @use 'zindex' as *;
 
+@layer sd-utilities {
 // ------------------------------------------------------------------------------
 // 1. Display, Overflow & Visibility
 // ------------------------------------------------------------------------------
@@ -521,4 +522,5 @@ $spacers: (
 
 @media (min-width: 1280px) {
   .xl\:inline      { display: inline; }
+}
 }

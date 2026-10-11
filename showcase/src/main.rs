@@ -87,12 +87,30 @@ fn App() -> Element {
         });
     });
 
+    // Iniezione reattiva delle variabili CSS Custom Properties senza mutazione di document::Style
+    use_effect(move || {
+        let css = theme().to_css_variables();
+        spawn(async move {
+            let js = format!(
+                r#"
+                let el = document.getElementById("sd-dynamic-theme-vars");
+                if (!el) {{
+                    el = document.createElement("style");
+                    el.id = "sd-dynamic-theme-vars";
+                    document.head.appendChild(el);
+                }}
+                el.textContent = `{css}`;
+                "#
+            );
+            let _ = document::eval(&js).await;
+        });
+    });
+
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Link { rel: "stylesheet", href: STYLES }
-        document::Style { "{theme().to_css_variables()}" }
         NotificationProvider {
             Router::<Route> {}
         }

@@ -88,7 +88,7 @@ pub fn App() -> Element {
                     }
 
                     // Selettore Rapido Preset
-                    div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-4 shadow-inner",
+                    div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.14] space-y-4 shadow-inner",
                         div { class: "flex flex-wrap items-center justify-between gap-2",
                             span { class: "text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5",
                                 Icon { kind: IconKind::Palette, size: 14 }
@@ -99,36 +99,50 @@ pub fn App() -> Element {
                             }
                         }
 
-                        div { class: "flex flex-wrap items-center gap-2",
+                        div { class: "flex flex-wrap items-center gap-2.5",
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Violet { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#a855f7] inline-block shadow-[0_0_6px_#a855f7]" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Violet),
                                 "Violet (Default)"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Obsidian { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#ffffff] inline-block shadow-[0_0_6px_#ffffff]" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Obsidian),
                                 "Obsidian Titanium"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Crimson { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#ff1744] inline-block shadow-[0_0_6px_#ff1744]" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Crimson),
                                 "Crimson Phoenix"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Cyan { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#00f0ff] inline-block shadow-[0_0_6px_#00f0ff]" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Cyan),
                                 "Cyber Cyan"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Emerald { ButtonVariant::Primary } else { ButtonVariant::Secondary },
+                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#00ff9d] inline-block shadow-[0_0_6px_#00ff9d]" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Emerald),
                                 "Emerald Matrix"
+                            }
+                            Link {
+                                to: crate::Route::ThemeBuilderPage {},
+                                Button {
+                                    size: ButtonSize::Sm,
+                                    variant: ButtonVariant::Outline,
+                                    left_icon: rsx! { Icon { kind: IconKind::Settings, size: 13 } },
+                                    "Theme Builder Studio"
+                                }
                             }
                         }
                     }

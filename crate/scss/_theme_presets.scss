@@ -4,12 +4,13 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+@layer sd-theme {
 // ------------------------------------------------------------------------------
-// 1. Radius Scale Classes
+// 1. Radius Scale Classes (Sharp 2px, Medium 8px, Soft 14px)
 // ------------------------------------------------------------------------------
 .sd-radius-sharp, .rounded-\[2px\], [class*="rounded-[2px]"] { border-radius: 2px !important; }
-.sd-radius-md, .rounded-\[3px\], [class*="rounded-[3px]"]   { border-radius: 3px !important; }
-.sd-radius-soft, .rounded-\[4px\], [class*="rounded-[4px]"] { border-radius: 4px !important; }
+.sd-radius-md, .rounded-\[8px\], [class*="rounded-[8px]"]   { border-radius: 8px !important; }
+.sd-radius-soft, .rounded-\[14px\], [class*="rounded-[14px]"] { border-radius: 14px !important; }
 
 // Active Scale
 .active\:scale-\[0\.98\]:active, [class*="active:scale-[0.98]"]:active { transform: scale(0.98); }
@@ -288,3 +289,4 @@
 
 .hover\:border-white\/15:hover, [class*="hover:border-white/15"]:hover { border-color: rgba(255, 255, 255, 0.15); }
 .hover\:border-white\/20:hover, [class*="hover:border-white/20"]:hover { border-color: rgba(255, 255, 255, 0.20); }
+}

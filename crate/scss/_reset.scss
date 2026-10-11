@@ -1,96 +1,97 @@
 // ==============================================================================
-// Shadow Design — Modern Preflight Reset (Elimina i default del browser)
+// Shadow Design — Modern Preflight Reset
 // ==============================================================================
 @use 'variables' as *;
 
-// 1. Box Sizing Universale
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+// Dichiarazione universale dell'ordine dei livelli CSS:
+// reset < base < components < utilities < theme
+@layer sd-reset, sd-base, sd-components, sd-utilities, sd-theme;
 
-// 2. Document & Body
-html, body {
-  background-color: $color-void;
-  color: $zinc-100;
-  font-family: $font-sans;
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
-}
-
-// 3. Reset Totale per Button (Evita che diventino bianchi o grigi per default browser)
-button, [type="button"], [type="reset"], [type="submit"] {
-  appearance: none;
-  -webkit-appearance: none;
-  background-color: transparent;
-  background-image: none;
-  border: none;
-  color: inherit;
-  font: inherit;
-  font-family: inherit;
-  line-height: inherit;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  outline: none;
-  text-align: inherit;
-  text-decoration: none;
-  user-select: none;
-  vertical-align: middle;
-
-  &:disabled, &[disabled] {
-    cursor: not-allowed;
-    opacity: 0.5;
+@layer sd-reset {
+  // 1. Box Sizing Universale
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
-}
 
-// 4. Form Controls (Input, Textarea, Select)
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  outline: none;
-}
+  // 2. Azzeramento margini predefiniti
+  body, h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote, dl, dd {
+    margin: 0;
+  }
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="search"] {
-  appearance: none;
-  -webkit-appearance: none;
-}
+  // 3. Document & Body
+  html, body {
+    background-color: $color-void;
+    color: $zinc-100;
+    font-family: $font-sans;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
 
-// 5. Tipografia & Link
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-  color: inherit;
-}
+  // 4. Normalizzazione Button (cancella solo gli stili nativi del browser)
+  button, [type="button"], [type="reset"], [type="submit"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    vertical-align: middle;
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+    &:disabled, &[disabled] {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
 
-ul, ol {
-  list-style: none;
-}
+  // 5. Form Controls (Input, Textarea, Select)
+  input, textarea, select {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: transparent;
+    outline: none;
+  }
 
-code, kbd, samp, pre {
-  font-family: $font-mono;
-  font-size: 1em;
-}
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="search"] {
+    appearance: none;
+    -webkit-appearance: none;
+  }
 
-img, svg, video, canvas, audio, iframe, embed, object {
-  display: block;
-  vertical-align: middle;
+  // 6. Tipografia & Link
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ul, ol {
+    list-style: none;
+    padding: 0;
+  }
+
+  code, kbd, samp, pre {
+    font-family: $font-mono;
+    font-size: 1em;
+  }
+
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
 }
