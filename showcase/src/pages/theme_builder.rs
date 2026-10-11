@@ -162,7 +162,10 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                         size: ButtonSize::Sm,
                         left_icon: rsx! { Icon { kind: IconKind::Copy, size: 14 } },
                         onclick: move |_| {
-                            let _ = document::eval(&format!("navigator.clipboard.writeText({:?});", rust_to_copy));
+                            let _ = document::eval(&format!(
+                                "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
+                                rust_to_copy
+                            ));
                             toast.info("Codice Rust (ThemeBuilder) copiato negli appunti!");
                         },
                         "Copia Rust Code"
@@ -722,7 +725,10 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                     variant: ButtonVariant::Secondary,
                                     left_icon: rsx! { Icon { kind: IconKind::Copy, size: 12 } },
                                     onclick: move |_| {
-                                        let _ = document::eval(&format!("navigator.clipboard.writeText({:?});", json_to_copy));
+                                        let _ = document::eval(&format!(
+                                            "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
+                                            json_to_copy
+                                        ));
                                         toast.info("JSON del tema copiato negli appunti!");
                                     },
                                     "Copia JSON"

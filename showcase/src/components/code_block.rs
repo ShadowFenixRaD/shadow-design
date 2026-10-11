@@ -19,7 +19,10 @@ pub fn CodeBlock(
                     r#type: "button",
                     class: "flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-all cursor-pointer bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white border border-white/10 active:scale-95",
                     onclick: move |_| {
-                        let _ = document::eval(&format!("navigator.clipboard.writeText({:?});", code_to_copy));
+                        let _ = document::eval(&format!(
+                            "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
+                            code_to_copy
+                        ));
                         copied.set(true);
                     },
                     if copied() {

@@ -95,16 +95,27 @@ fn App() -> Element {
         spawn(async move {
             let js = format!(
                 r#"
-                let el = document.getElementById("sd-dynamic-theme-vars");
-                if (!el) {{
-                    el = document.createElement("style");
-                    el.id = "sd-dynamic-theme-vars";
-                    document.head.appendChild(el);
-                }}
-                el.textContent = `{css}`;
+                (function() {{
+                    try {{
+                        var el = document.getElementById("sd-dynamic-theme-vars");
+                        if (!el) {{
+                            el = document.createElement("style");
+                            el.id = "sd-dynamic-theme-vars";
+                            var target = document.head || document.documentElement;
+                            if (target) {{
+                                target.appendChild(el);
+                            }}
+                        }}
+                        if (el) {{
+                            el.textContent = `{css}`;
+                        }}
+                    }} catch(e) {{
+                        console.warn("Theme vars injection warning:", e);
+                    }}
+                }})();
                 "#
             );
-            let _ = document::eval(&js).await;
+            let _ = document::eval(&js);
         });
     });
 
