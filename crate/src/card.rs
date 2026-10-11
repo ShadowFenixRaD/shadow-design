@@ -64,43 +64,54 @@ pub fn Card(
     };
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme().radius_scale.md();
+    let radius_class = theme_val.radius_scale.md();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("card").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("card", &class);
     #[cfg(feature = "theme")]
     let glow_class = match glow {
-        Some(true) => match theme().primary_color {
-            crate::theme::PrimaryColor::Violet => "sd-card--glow-violet",
-            crate::theme::PrimaryColor::Obsidian => "sd-card--glow-obsidian",
-            crate::theme::PrimaryColor::Crimson => "sd-card--glow-crimson",
-            crate::theme::PrimaryColor::Cyan => "sd-card--glow-cyan",
-            crate::theme::PrimaryColor::Emerald => "sd-card--glow-emerald",
+        Some(true) => match &theme_val.primary_color {
+            crate::theme::PrimaryColor::Violet => "sd-card--glow-violet".to_string(),
+            crate::theme::PrimaryColor::Obsidian => "sd-card--glow-obsidian".to_string(),
+            crate::theme::PrimaryColor::Crimson => "sd-card--glow-crimson".to_string(),
+            crate::theme::PrimaryColor::Cyan => "sd-card--glow-cyan".to_string(),
+            crate::theme::PrimaryColor::Emerald => "sd-card--glow-emerald".to_string(),
+            crate::theme::PrimaryColor::Custom { .. } => {
+                format!("sd-card--glow-{}", theme_val.primary_color.css_prefix())
+            }
         },
-        Some(false) => "",
+        Some(false) => "".to_string(),
         None => {
             if hover_glow
-                || (theme().glow_mode != crate::theme::GlowMode::Off
+                || (theme_val.glow_mode != crate::theme::GlowMode::Off
                     && variant == CardVariant::Interactive)
             {
-                "sd-card--hover-glow"
+                theme_val.resolve_elevation_class("card", None)
             } else {
-                ""
+                "".to_string()
             }
         }
     };
 
     #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
     let radius_class = "";
     #[cfg(not(feature = "theme"))]
     let glow_class = if hover_glow || glow == Some(true) {
-        "sd-card--hover-glow"
+        "sd-card--hover-glow".to_string()
     } else {
-        ""
+        "".to_string()
     };
 
     rsx! {
         div {
-            class: "sd-card {variant_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class}",
+            class: "sd-card {base_override} {variant_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
             if title.is_some() || subtitle.is_some() {
                 div { class: "sd-card__header",
                     if let Some(t) = title {

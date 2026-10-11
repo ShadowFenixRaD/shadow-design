@@ -41,16 +41,23 @@ pub fn Drawer(
     }
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let has_glow = theme().is_component_glow_enabled("drawer", glow);
-    #[cfg(not(feature = "theme"))]
-    let has_glow = glow.unwrap_or(false);
+    let base_override = theme_val.resolve_component_base("drawer").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("drawer", &class);
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("drawer", glow);
 
-    let glow_class = if has_glow {
-        "sd-drawer-panel--glow"
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow.unwrap_or(false) {
+        "sd-drawer-panel--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     #[cfg(feature = "animation")]
@@ -75,7 +82,7 @@ pub fn Drawer(
             class: "sd-drawer-backdrop",
             onclick: move |_| *is_open.write() = false,
             div {
-                class: "sd-drawer-panel {pos_class} {size_class} {glow_class} {anim_class} {class}",
+                class: "sd-drawer-panel {base_override} {pos_class} {size_class} {glow_class} {anim_class} {class_modifiers} {class}",
                 onclick: move |e| e.stop_propagation(),
                 div { class: "sd-drawer__header",
                     h3 { class: "sd-drawer__title",

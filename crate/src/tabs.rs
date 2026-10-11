@@ -3,9 +3,21 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn TabList(#[props(default)] class: String, children: Element) -> Element {
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("tabs").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("tabs", &class);
+
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+
     rsx! {
         div {
-            class: "sd-tabs-list {class}",
+            class: "sd-tabs-list {base_override} {class_modifiers} {class}",
             {children}
         }
     }
@@ -24,10 +36,22 @@ pub fn Tab(
     let target = value.clone();
     let active_class = if is_active { "sd-tab--active" } else { "" };
 
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("tab").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("tab", &class);
+
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+
     rsx! {
         button {
             r#type: "button",
-            class: "sd-tab {active_class} {class}",
+            class: "sd-tab {base_override} {active_class} {class_modifiers} {class}",
             onclick: move |_| *active.write() = target.clone(),
             if let Some(i) = icon {
                 span { class: "sd-tab__icon",
@@ -53,9 +77,21 @@ pub fn TabPanel(
         return rsx! {};
     }
 
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("tab-panel").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("tab-panel", &class);
+
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+
     rsx! {
         div {
-            class: "sd-tab-panel {class}",
+            class: "sd-tab-panel {base_override} {class_modifiers} {class}",
             {children}
         }
     }

@@ -33,25 +33,23 @@ pub fn Dropdown(
     let open = *is_open.read();
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => "sd-dropdown-menu--glow",
-        Some(false) => "",
-        None => {
-            if theme().glow_mode != crate::theme::GlowMode::Off {
-                "sd-dropdown-menu--glow"
-            } else {
-                ""
-            }
-        }
-    };
+    let base_override = theme_val.resolve_component_base("dropdown").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("dropdown", &class);
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("dropdown", glow);
 
     #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
     let glow_class = if glow == Some(true) {
-        "sd-dropdown-menu--glow"
+        "sd-dropdown-menu--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     let open_container_class = if open { "sd-dropdown-container--open" } else { "" };
@@ -63,7 +61,7 @@ pub fn Dropdown(
     let anim_class = "animate-dropdown-enter";
 
     rsx! {
-        div { class: "sd-dropdown-container {open_container_class} {class}",
+        div { class: "sd-dropdown-container {open_container_class} {class_modifiers} {class}",
             div {
                 onclick: move |_| {
                     let next = !*is_open.read();
@@ -80,7 +78,7 @@ pub fn Dropdown(
                     },
                 }
                 div {
-                    class: "sd-dropdown-menu {placement_class} {glow_class} {anim_class}",
+                    class: "sd-dropdown-menu {base_override} {placement_class} {glow_class} {anim_class}",
                     onclick: move |e| e.stop_propagation(),
                     {children}
                 }
@@ -99,19 +97,33 @@ pub fn DropdownItem(
 ) -> Element {
     let danger_class = if danger { "sd-dropdown-item--danger" } else { "" };
 
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("dropdown-item").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("dropdown-item", &class);
+
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+
     rsx! {
         button {
             r#type: "button",
-            class: "sd-dropdown-item {danger_class} {class}",
+            class: "sd-dropdown-item {base_override} {danger_class} {class_modifiers} {class}",
             onclick: move |e| {
                 if let Some(h) = onclick.as_ref() {
                     h.call(e);
                 }
             },
             if let Some(i) = icon {
-                Icon { kind: i, size: 14 }
+                span { class: "sd-dropdown-item__icon",
+                    Icon { kind: i, size: 15 }
+                }
             }
-            {children}
+            span { class: "sd-dropdown-item__text", {children} }
         }
     }
 }

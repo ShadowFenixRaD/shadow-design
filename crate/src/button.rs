@@ -22,6 +22,17 @@ impl ButtonVariant {
             ButtonVariant::Success => "sd-btn--success",
         }
     }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            ButtonVariant::Primary => "primary",
+            ButtonVariant::Secondary => "secondary",
+            ButtonVariant::Outline => "outline",
+            ButtonVariant::Ghost => "ghost",
+            ButtonVariant::Danger => "danger",
+            ButtonVariant::Success => "success",
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
@@ -44,6 +55,16 @@ impl ButtonSize {
             ButtonSize::Xl => "sd-btn--xl",
         }
     }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            ButtonSize::Xs => "xs",
+            ButtonSize::Sm => "sm",
+            ButtonSize::Md => "md",
+            ButtonSize::Lg => "lg",
+            ButtonSize::Xl => "xl",
+        }
+    }
 }
 
 #[component]
@@ -64,54 +85,61 @@ pub fn Button(
     let full_class = if full_width { "sd-btn--full" } else { "" };
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
 
     #[cfg(feature = "theme")]
-    let variant_class = if variant == ButtonVariant::Primary {
-        match theme().primary_color {
-            crate::theme::PrimaryColor::Violet => "sd-btn--primary",
-            crate::theme::PrimaryColor::Obsidian => "sd-btn--primary-obsidian",
-            crate::theme::PrimaryColor::Crimson => "sd-btn--primary-crimson",
-            crate::theme::PrimaryColor::Cyan => "sd-btn--primary-cyan",
-            crate::theme::PrimaryColor::Emerald => "sd-btn--primary-emerald",
+    let default_primary = match &theme_val.primary_color {
+        crate::theme::PrimaryColor::Violet => "sd-btn--primary".to_string(),
+        crate::theme::PrimaryColor::Obsidian => "sd-btn--primary-obsidian".to_string(),
+        crate::theme::PrimaryColor::Crimson => "sd-btn--primary-crimson".to_string(),
+        crate::theme::PrimaryColor::Cyan => "sd-btn--primary-cyan".to_string(),
+        crate::theme::PrimaryColor::Emerald => "sd-btn--primary-emerald".to_string(),
+        crate::theme::PrimaryColor::Custom { .. } => {
+            format!("sd-btn--primary-{}", theme_val.primary_color.css_prefix())
         }
-    } else {
-        variant.scss_class()
     };
+
+    #[cfg(feature = "theme")]
+    let fallback_variant = if variant == ButtonVariant::Primary {
+        default_primary
+    } else {
+        variant.scss_class().to_string()
+    };
+
+    // Risoluzione a 3 Livelli: L1 (fallback) -> L2 (Theme override)
+    #[cfg(feature = "theme")]
+    let variant_class = theme_val.resolve_variant_class("button", variant.name(), &fallback_variant);
+
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("button").unwrap_or("");
+
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("button", &class);
 
     #[cfg(feature = "theme")]
     let radius_class = match size {
-        ButtonSize::Xs | ButtonSize::Sm => theme().radius_scale.sm(),
-        ButtonSize::Md => theme().radius_scale.md(),
-        ButtonSize::Lg | ButtonSize::Xl => theme().radius_scale.lg(),
+        ButtonSize::Xs | ButtonSize::Sm => theme_val.radius_scale.sm(),
+        ButtonSize::Md => theme_val.radius_scale.md(),
+        ButtonSize::Lg | ButtonSize::Xl => theme_val.radius_scale.lg(),
     };
 
     #[cfg(feature = "theme")]
-    let theme_val = theme();
-    #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => theme_val.component_glow("button"),
-        Some(false) => "",
-        None => {
-            if variant == ButtonVariant::Primary && theme_val.glow_mode != crate::theme::GlowMode::Off
-            {
-                theme_val.component_glow("button")
-            } else {
-                ""
-            }
-        }
-    };
+    let glow_class = theme_val.resolve_elevation_class("button", glow);
 
     #[cfg(not(feature = "theme"))]
-    let variant_class = variant.scss_class();
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
+    let variant_class = variant.scss_class().to_string();
     #[cfg(not(feature = "theme"))]
     let radius_class = "";
     #[cfg(not(feature = "theme"))]
     let glow_class = if glow == Some(true) || (glow.is_none() && variant == ButtonVariant::Primary)
     {
-        "sd-btn--glow"
+        "sd-btn--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     let is_disabled = disabled || loading;
@@ -119,7 +147,7 @@ pub fn Button(
     rsx! {
         button {
             r#type: "button",
-            class: "sd-btn {variant_class} {size_class} {full_class} {radius_class} {glow_class} {class}",
+            class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {radius_class} {glow_class} {class_modifiers} {class}",
             disabled: is_disabled,
             onclick: move |evt| {
                 if !is_disabled {
@@ -149,12 +177,12 @@ pub fn Button(
                     }
                 }
             } else if let Some(licon) = left_icon {
-                span { class: "shrink-0 inline-flex items-center", {licon} }
+                span { class: "sd-btn__icon sd-btn__icon--left", {licon} }
             }
-            {children}
+            span { class: "sd-btn__text", {children} }
             if !loading {
                 if let Some(ricon) = right_icon {
-                    span { class: "shrink-0 inline-flex items-center", {ricon} }
+                    span { class: "sd-btn__icon sd-btn__icon--right", {ricon} }
                 }
             }
         }

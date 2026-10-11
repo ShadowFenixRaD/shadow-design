@@ -14,25 +14,23 @@ pub fn Modal(
     }
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => "sd-modal-dialog--glow",
-        Some(false) => "",
-        None => {
-            if theme().glow_mode != crate::theme::GlowMode::Off {
-                "sd-modal-dialog--glow"
-            } else {
-                ""
-            }
-        }
-    };
+    let base_override = theme_val.resolve_component_base("modal").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("modal", &class);
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("modal", glow);
 
     #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
     let glow_class = if glow == Some(true) {
-        "sd-modal-dialog--glow"
+        "sd-modal-dialog--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     #[cfg(feature = "animation")]
@@ -45,7 +43,7 @@ pub fn Modal(
             class: "sd-modal-backdrop",
             onclick: move |_| *is_open.write() = false,
             div {
-                class: "sd-modal-dialog {glow_class} {anim_class} {class}",
+                class: "sd-modal-dialog {base_override} {glow_class} {anim_class} {class_modifiers} {class}",
                 onclick: move |e| e.stop_propagation(),
                 div {
                     class: "sd-modal-dialog__header",

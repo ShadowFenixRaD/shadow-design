@@ -20,6 +20,15 @@ impl AlertVariant {
         }
     }
 
+    pub fn name(&self) -> &'static str {
+        match self {
+            AlertVariant::Info => "info",
+            AlertVariant::Success => "success",
+            AlertVariant::Warning => "warning",
+            AlertVariant::Danger => "danger",
+        }
+    }
+
     pub fn glow_class(&self) -> &'static str {
         match self {
             AlertVariant::Info => "sd-alert--glow-info",
@@ -66,35 +75,42 @@ pub fn Alert(
     on_close: Option<EventHandler<MouseEvent>>,
     children: Element,
 ) -> Element {
-    let variant_class = variant.scss_class();
     let title_variant_class = variant.title_class();
     let icon_color_class = variant.icon_color_class();
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme().radius_scale.md();
+    let radius_class = theme_val.radius_scale.md();
     #[cfg(feature = "theme")]
-    let glow_class = if theme().is_component_glow_enabled("alert", glow) {
-        variant.glow_class()
-    } else {
-        ""
-    };
+    let base_override = theme_val.resolve_component_base("alert").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("alert", &class);
+    #[cfg(feature = "theme")]
+    let variant_class = theme_val.resolve_variant_class("alert", variant.name(), variant.scss_class());
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("alert", glow);
 
+    #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
+    let variant_class = variant.scss_class().to_string();
     #[cfg(not(feature = "theme"))]
     let radius_class = "";
     #[cfg(not(feature = "theme"))]
     let glow_class = if glow.unwrap_or(false) {
-        variant.glow_class()
+        variant.glow_class().to_string()
     } else {
-        ""
+        String::new()
     };
 
     let icon_kind = variant.icon_kind();
 
     rsx! {
         div {
-            class: "sd-alert {variant_class} {glow_class} {radius_class} {class}",
+            class: "sd-alert {base_override} {variant_class} {glow_class} {radius_class} {class_modifiers} {class}",
             span { class: "sd-alert__icon {icon_color_class}",
                 Icon { kind: icon_kind, size: 18 }
             }

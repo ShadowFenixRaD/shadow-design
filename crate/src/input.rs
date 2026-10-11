@@ -21,12 +21,28 @@ pub fn TextInput(
     let itype = input_type.unwrap_or_else(|| "text".to_string());
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme().radius_scale.md();
+    let radius_class = theme_val.radius_scale.md();
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("input").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("input", &class);
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("input", glow);
 
     #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
     let radius_class = "";
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow.unwrap_or(false) {
+        "sd-input--glow".to_string()
+    } else {
+        String::new()
+    };
 
     let has_clear = clearable && !value().is_empty() && !disabled;
     let has_left = left_icon.is_some();
@@ -59,7 +75,7 @@ pub fn TextInput(
 
     rsx! {
         div {
-            class: "sd-input-wrapper {class}",
+            class: "sd-input-wrapper {class_modifiers} {class}",
             if let Some(lbl) = label {
                 label { class: "sd-input-label", "{lbl}" }
             }
@@ -89,7 +105,7 @@ pub fn TextInput(
                     value: "{value}",
                     placeholder: placeholder.as_deref().unwrap_or_default(),
                     disabled,
-                    class: "sd-input {icon_class} {error_class} {radius_class}",
+                    class: "sd-input {base_override} {icon_class} {error_class} {radius_class} {glow_class}",
                     oninput: move |e| {
                         *value.write() = e.value();
                     },

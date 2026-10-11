@@ -31,33 +31,31 @@ pub fn Tooltip(
     let position_class = position.bubble_class();
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => "sd-tooltip__bubble--glow",
-        Some(false) => "",
-        None => {
-            if theme().glow_mode != crate::theme::GlowMode::Off {
-                "sd-tooltip__bubble--glow"
-            } else {
-                ""
-            }
-        }
-    };
+    let base_override = theme_val.resolve_component_base("tooltip").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("tooltip", &class);
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("tooltip", glow);
 
     #[cfg(not(feature = "theme"))]
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
     let glow_class = if glow == Some(true) {
-        "sd-tooltip__bubble--glow"
+        "sd-tooltip__bubble--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     rsx! {
         div {
-            class: "sd-tooltip {class}",
+            class: "sd-tooltip {class_modifiers} {class}",
             {children}
             div {
-                class: "sd-tooltip__bubble {position_class} {glow_class}",
+                class: "sd-tooltip__bubble {base_override} {position_class} {glow_class}",
                 "{content}"
             }
         }

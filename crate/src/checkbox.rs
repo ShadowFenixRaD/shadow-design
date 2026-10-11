@@ -42,39 +42,44 @@ pub fn Checkbox(
     let is_checked = *checked.read();
 
     #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
+    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let active_color_class = match theme().primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-checkbox__box--checked",
-        crate::theme::PrimaryColor::Obsidian => "sd-checkbox__box--checked-obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-checkbox__box--checked-crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-checkbox__box--checked-cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-checkbox__box--checked-emerald",
-    };
-    #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => "sd-checkbox__box--glow",
-        Some(false) => "",
-        None => {
-            if theme().glow_mode != crate::theme::GlowMode::Off && (is_checked || indeterminate) {
-                "sd-checkbox__box--glow"
-            } else {
-                ""
-            }
+    let active_color_class = match &theme_val.primary_color {
+        crate::theme::PrimaryColor::Violet => "sd-checkbox__box--checked".to_string(),
+        crate::theme::PrimaryColor::Obsidian => "sd-checkbox__box--checked-obsidian".to_string(),
+        crate::theme::PrimaryColor::Crimson => "sd-checkbox__box--checked-crimson".to_string(),
+        crate::theme::PrimaryColor::Cyan => "sd-checkbox__box--checked-cyan".to_string(),
+        crate::theme::PrimaryColor::Emerald => "sd-checkbox__box--checked-emerald".to_string(),
+        crate::theme::PrimaryColor::Custom { .. } => {
+            format!("sd-checkbox__box--checked-{}", theme_val.primary_color.css_prefix())
         }
     };
+    #[cfg(feature = "theme")]
+    let glow_class = if is_checked || indeterminate {
+        theme_val.resolve_elevation_class("checkbox", glow)
+    } else {
+        String::new()
+    };
+    #[cfg(feature = "theme")]
+    let base_override = theme_val.resolve_component_base("checkbox").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("checkbox", &class);
 
     #[cfg(not(feature = "theme"))]
-    let active_color_class = "sd-checkbox__box--checked";
+    let base_override = "";
     #[cfg(not(feature = "theme"))]
-    let glow_class = if is_checked || indeterminate {
-        "sd-checkbox__box--glow"
+    let class_modifiers = String::new();
+    #[cfg(not(feature = "theme"))]
+    let active_color_class = "sd-checkbox__box--checked".to_string();
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow == Some(true) || (glow.is_none() && (is_checked || indeterminate)) {
+        "sd-checkbox__box--glow".to_string()
     } else {
-        ""
+        String::new()
     };
 
     let checked_class = if is_checked || indeterminate {
-        active_color_class
+        active_color_class.as_str()
     } else {
         ""
     };
@@ -95,7 +100,7 @@ pub fn Checkbox(
 
     rsx! {
         div {
-            class: "sd-checkbox {disabled_class} {class}",
+            class: "sd-checkbox {base_override} {disabled_class} {class_modifiers} {class}",
             onclick: move |_| {
                 if !is_disabled {
                     let next = !*checked.read();
