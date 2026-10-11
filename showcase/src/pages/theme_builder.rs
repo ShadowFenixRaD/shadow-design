@@ -8,16 +8,22 @@ pub const STORAGE_KEY: &str = "shadow_design_custom_theme";
 pub fn save_theme_to_storage(theme: &Theme) {
     if let Ok(json) = serde_json::to_string(theme) {
         let js = format!(
-            "try {{ localStorage.setItem('{}', {:?}); }} catch(e) {{}}",
+            "try {{ localStorage.setItem('{}', {:?}); }} catch(e) {{}} return true;",
             STORAGE_KEY, json
         );
-        let _ = document::eval(&js);
+        let eval = document::eval(&js);
+        spawn(async move {
+            let _ = eval.await;
+        });
     }
 }
 
 pub fn clear_theme_from_storage() {
-    let js = format!("try {{ localStorage.removeItem('{}'); }} catch(e) {{}}", STORAGE_KEY);
-    let _ = document::eval(&js);
+    let js = format!("try {{ localStorage.removeItem('{}'); }} catch(e) {{}} return true;", STORAGE_KEY);
+    let eval = document::eval(&js);
+    spawn(async move {
+        let _ = eval.await;
+    });
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Default)]

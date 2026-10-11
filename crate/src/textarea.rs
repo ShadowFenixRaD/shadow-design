@@ -43,6 +43,12 @@ pub fn Textarea(
     /// Mostra un pulsante rapido (X) per cancellare il contenuto.
     #[props(default)]
     clearable: bool,
+    /// Permette di ridimensionare manualmente la larghezza in basso a destra (resize orizzontale o both).
+    #[props(default)]
+    resize_width: bool,
+    /// Permette di ridimensionare manualmente l'altezza in basso a destra (resize verticale o both).
+    #[props(default)]
+    resize_height: bool,
     /// Alone ottico perimetrale coordinato con il tema attivo.
     #[props(default)]
     glow: Option<bool>,
@@ -82,7 +88,11 @@ pub fn Textarea(
 
     // Calcolo righe dinamiche per autosize
     let rows_to_display = if autosize {
-        let lines = text_val.matches('\n').count() + 1;
+        let lines = if text_val.is_empty() {
+            1
+        } else {
+            text_val.lines().count().max(1)
+        };
         let mut r = lines.max(min_rows);
         if let Some(max_r) = max_rows {
             r = r.min(max_r);
@@ -90,6 +100,13 @@ pub fn Textarea(
         r
     } else {
         min_rows
+    };
+
+    let resize_style = match (resize_width, resize_height) {
+        (true, true) => "resize: both;",
+        (true, false) => "resize: horizontal;",
+        (false, true) => "resize: vertical;",
+        (false, false) => "resize: none;",
     };
 
     let has_clear_btn = clearable && !text_val.is_empty() && !disabled && !readonly;
@@ -115,6 +132,7 @@ pub fn Textarea(
                 class: "sd-textarea-container",
                 textarea {
                     class: "sd-textarea {autosize_class} {error_class} {disabled_class} {clear_padding_class} {base_override} {radius_class} {glow_class}",
+                    style: "{resize_style}",
                     placeholder: placeholder.unwrap_or_default(),
                     disabled,
                     readonly,
@@ -212,6 +230,12 @@ pub fn AutoResizeTextarea(
     /// Mostra un pulsante rapido per cancellare il testo.
     #[props(default)]
     clearable: bool,
+    /// Permette di ridimensionare manualmente la larghezza in basso a destra (resize orizzontale o both).
+    #[props(default)]
+    resize_width: bool,
+    /// Permette di ridimensionare manualmente l'altezza in basso a destra (resize verticale o both).
+    #[props(default)]
+    resize_height: bool,
     /// Alone ottico perimetrale coordinato con il tema attivo.
     #[props(default)]
     glow: Option<bool>,
@@ -237,6 +261,8 @@ pub fn AutoResizeTextarea(
             show_count,
             max_length,
             clearable,
+            resize_width,
+            resize_height,
             glow,
             class,
             on_change,
@@ -248,8 +274,9 @@ pub fn AutoResizeTextarea(
 mod tests {
     #[test]
     fn test_autosize_row_calculation() {
-        let text = "riga 1\nriga 2\nriga 3\nriga 4";
-        let lines = text.matches('\n').count() + 1;
+        let text = "riga 1\nriga 2\nriga 3\nriga 4\n";
+        // lines() esclude l'eventuale newline finale vuoto per evitare spazio morto
+        let lines = text.lines().count().max(1);
         assert_eq!(lines, 4);
 
         let min_rows = 2;

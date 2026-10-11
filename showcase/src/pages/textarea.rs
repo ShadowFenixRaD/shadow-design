@@ -6,9 +6,10 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 #[component]
 pub fn TextareaPage() -> Element {
     let bio = use_signal(|| "Ingegnere di sistemi distribuiti ed estimatore di architetture zero-runtime.".to_string());
-    let auto_note = use_signal(|| "Prima riga di appunti...\nSeconda riga espansa automaticamente!\n".to_string());
+    let auto_note = use_signal(|| "Prima riga di appunti...\nSeconda riga espansa automaticamente!".to_string());
     let commit_msg = use_signal(|| "feat(core): implement zero-cost abstractions".to_string());
     let feedback = use_signal(String::new);
+    let resize_demo_text = use_signal(|| "Trascina la maniglia in basso a destra per ridimensionare questo campo liberamente sia in larghezza che in altezza!".to_string());
 
     let props = vec![
         PropRow {
@@ -32,7 +33,7 @@ pub fn TextareaPage() -> Element {
         PropRow {
             name: "min_rows",
             r#type: "usize",
-            default: "3",
+            default: "3 (2 in AutoResizeTextarea)",
             description: "Numero minimo di righe verticali visibili",
         },
         PropRow {
@@ -46,6 +47,18 @@ pub fn TextareaPage() -> Element {
             r#type: "bool",
             default: "false",
             description: "Abilita l'adattamento verticale dinamico proporzionale al contenuto digitato",
+        },
+        PropRow {
+            name: "resize_width",
+            r#type: "bool",
+            default: "false",
+            description: "Abilita la maniglia di ridimensionamento manuale per la larghezza in basso a destra (resize orizzontale o both)",
+        },
+        PropRow {
+            name: "resize_height",
+            r#type: "bool",
+            default: "false",
+            description: "Abilita la maniglia di ridimensionamento manuale per l'altezza in basso a destra (resize verticale o both)",
         },
         PropRow {
             name: "show_count",
@@ -81,6 +94,7 @@ pub fn TextareaPage() -> Element {
 
     let code_snippet = r#"let mut bio = use_signal(|| "Testo iniziale...".to_string());
 let mut log_message = use_signal(String::new);
+let mut note_resize = use_signal(String::new);
 
 // 1. Textarea standard con contatore caratteri e clearable
 Textarea {
@@ -100,17 +114,26 @@ AutoResizeTextarea {
     min_rows: 2,
     max_rows: Some(6),
     clearable: true,
+}
+
+// 3. Textarea con ridimensionamento manuale di larghezza e altezza
+Textarea {
+    value: note_resize,
+    label: Some("Note con Resize Manuale".to_string()),
+    resize_width: true,
+    resize_height: true,
+    min_rows: 3,
 }"#
     .to_string();
 
     let bio_chars = bio().chars().count();
-    let auto_lines = auto_note().matches('\n').count() + 1;
+    let auto_lines = auto_note().lines().count().max(1);
 
     rsx! {
         div { class: "max-w-4xl space-y-8",
             div {
                 Heading { order: HeadingOrder::H2, "Textarea" }
-                Text { dimmed: true, size: TextSize::Sm, "Aree di testo multilinea ad alta precisione con espansione verticale dinamica proporzionale al contenuto (AutoResizeTextarea), conteggio caratteri, cancellazione rapida (clearable) e supporto al tema Mantine." }
+                Text { dimmed: true, size: TextSize::Sm, "Aree di testo multilinea ad alta precisione con espansione verticale dinamica proporzionale al contenuto (AutoResizeTextarea), ridimensionamento manuale configurabile (resize_width, resize_height), conteggio caratteri, cancellazione rapida (clearable) e supporto al tema Mantine." }
             }
 
             FeatureBanner { feature_name: "textarea" }
@@ -136,7 +159,7 @@ AutoResizeTextarea {
                                 value: auto_note,
                                 label: Some("Appunti Live (AutoResizeTextarea)".to_string()),
                                 placeholder: Some("Aggiungi righe per vedere l'espansione automatica dell'altezza...".to_string()),
-                                help_text: Some("Minimo 2 righe, espansione fino a 6 righe".to_string()),
+                                help_text: Some("Minimo 2 righe, si adatta fedelmente al testo senza spazio morto".to_string()),
                                 min_rows: 2,
                                 max_rows: Some(6),
                                 clearable: true,
@@ -157,15 +180,15 @@ AutoResizeTextarea {
                             p { class: "text-zinc-400 font-semibold uppercase text-[10px] tracking-wider", "Stato Reattivo Signal:" }
                             div { class: "p-3 rounded-lg bg-black/60 border border-white/[0.04] space-y-2.5",
                                 div { class: "text-purple-300",
-                                    span { class: "text-zinc-500", "bio.len = " }
+                                     span { class: "text-zinc-500", "bio.len = " }
                                     "{bio_chars} / 200"
                                 }
                                 div { class: "text-cyan-300",
-                                    span { class: "text-zinc-500", "auto_note.lines = " }
+                                     span { class: "text-zinc-500", "auto_note.lines = " }
                                     "{auto_lines} righe calcolate"
                                 }
                                 div { class: "text-emerald-300",
-                                    span { class: "text-zinc-500", "commit_msg = " }
+                                     span { class: "text-zinc-500", "commit_msg = " }
                                     "\"{commit_msg}\""
                                 }
                             }
@@ -177,6 +200,29 @@ AutoResizeTextarea {
                 },
                 code: code_snippet,
                 props: props,
+            }
+
+            // Sezione Ridimensionamento Manuale
+            Card {
+                title: "Ridimensionamento Manuale (Resize Width & Height)".to_string(),
+                subtitle: "Parametri opzionali 'resize_width' e 'resize_height' per abilitare il trascinamento manuale dall'angolo in basso a destra".to_string(),
+                div { class: "grid grid-cols-1 md:grid-cols-2 gap-6 pt-2",
+                    Textarea {
+                        value: use_signal(|| "Trascina l'angolo in basso a destra: questo campo consente di modificare solo l'altezza in verticale.".to_string()),
+                        label: Some("Resize Solo Altezza (resize_height: true)".to_string()),
+                        resize_height: true,
+                        min_rows: 3,
+                    }
+
+                    Textarea {
+                        value: resize_demo_text,
+                        label: Some("Resize Completo (resize_width: true, resize_height: true)".to_string()),
+                        help_text: Some("Trascina l'angolo in basso a destra in orizzontale o in verticale".to_string()),
+                        resize_width: true,
+                        resize_height: true,
+                        min_rows: 3,
+                    }
+                }
             }
 
             // Varianti ed Error States
