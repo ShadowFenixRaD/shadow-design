@@ -5,6 +5,7 @@
 @use '../zindex' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-tooltip {
   position: relative;
   display: inline-flex;
@@ -83,3 +84,5 @@
     transform: translateY(-50%) translateX(0);
   }
 }
+}
+

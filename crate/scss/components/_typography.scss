@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-heading {
   font-family: $font-sans;
   font-weight: 700;
@@ -86,3 +87,5 @@
   color: #d8b4fe;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+}
+

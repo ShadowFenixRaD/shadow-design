@@ -394,22 +394,23 @@ $spacers: (
 .bg-black\/80, [class*="bg-black/80"] { background-color: rgba(0, 0, 0, 0.8) !important; }
 
 // Borders
-.border          { border: 1px solid rgba(255, 255, 255, 0.08); }
-.border-t        { border-top: 1px solid rgba(255, 255, 255, 0.08); }
-.border-b        { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.border-l        { border-left: 1px solid rgba(255, 255, 255, 0.08); }
-.border-r        { border-right: 1px solid rgba(255, 255, 255, 0.08); }
+.border          { border: 1px solid rgba(255, 255, 255, 0.15); }
+.border-t        { border-top: 1px solid rgba(255, 255, 255, 0.15); }
+.border-b        { border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+.border-l        { border-left: 1px solid rgba(255, 255, 255, 0.15); }
+.border-r        { border-right: 1px solid rgba(255, 255, 255, 0.15); }
 .border-l-4      { border-left-width: 4px; }
 .border-none     { border: none; }
 
 .border-white    { border-color: #ffffff; }
-.border-white\/10, [class*="border-white/10"] { border-color: rgba(255, 255, 255, 0.1); }
-.border-white\/15, [class*="border-white/15"] { border-color: rgba(255, 255, 255, 0.15); }
-.border-white\/\[0\.04\], [class*="border-white/[0.04]"] { border-color: rgba(255, 255, 255, 0.04); }
-.border-white\/\[0\.05\], [class*="border-white/[0.05]"] { border-color: rgba(255, 255, 255, 0.05); }
-.border-white\/\[0\.06\], [class*="border-white/[0.06]"] { border-color: rgba(255, 255, 255, 0.06); }
-.border-white\/\[0\.08\], [class*="border-white/[0.08]"] { border-color: rgba(255, 255, 255, 0.08); }
-.border-white\/\[0\.1\], [class*="border-white/[0.1]"]   { border-color: rgba(255, 255, 255, 0.1); }
+.border-white\/10, [class*="border-white/10"] { border-color: rgba(255, 255, 255, 0.18); }
+.border-white\/15, [class*="border-white/15"] { border-color: rgba(255, 255, 255, 0.22); }
+.border-white\/20, [class*="border-white/20"] { border-color: rgba(255, 255, 255, 0.26); }
+.border-white\/\[0\.04\], [class*="border-white/[0.04]"] { border-color: rgba(255, 255, 255, 0.12); }
+.border-white\/\[0\.05\], [class*="border-white/[0.05]"] { border-color: rgba(255, 255, 255, 0.14); }
+.border-white\/\[0\.06\], [class*="border-white/[0.06]"] { border-color: rgba(255, 255, 255, 0.16); }
+.border-white\/\[0\.08\], [class*="border-white/[0.08]"] { border-color: rgba(255, 255, 255, 0.18); }
+.border-white\/\[0\.1\], [class*="border-white/[0.1]"]   { border-color: rgba(255, 255, 255, 0.20); }
 
 .border-purple-400 { border-color: #c084fc; }
 .border-purple-500 { border-color: #a855f7; }

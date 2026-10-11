@@ -6,6 +6,7 @@
 @use '../mixins' as *;
 @use '../animations' as *;
 
+@layer sd-components {
 .sd-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -26,7 +27,7 @@
   width: 100%;
   max-width: 520px;
   background-color: #0d0d14;
-  border: $border-hairline;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: $radius-lg;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
   overflow: hidden;
@@ -42,7 +43,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 18px 24px;
-    border-bottom: $border-hairline-subtle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     background-color: rgba(18, 18, 28, 0.8);
   }
 
@@ -80,3 +81,5 @@
     color: $zinc-200;
   }
 }
+}
+

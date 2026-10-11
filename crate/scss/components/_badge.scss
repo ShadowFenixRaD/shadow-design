@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-badge {
   display: inline-flex;
   align-items: center;
@@ -27,7 +28,7 @@
   &--default {
     background-color: #14141c;
     color: $zinc-300;
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
   }
 
   &--primary {
@@ -111,3 +112,5 @@
     opacity: 0;
   }
 }
+}
+

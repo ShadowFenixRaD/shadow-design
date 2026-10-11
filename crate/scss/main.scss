@@ -27,6 +27,9 @@
 @use 'components/tooltip' as *;
 @use 'components/typography' as *;
 
+// CSS Cascade Layers — assicura che gli stili applicativi esterni abbiano sempre la precedenza
+@layer sd-reset, sd-base, sd-components, sd-theme;
+
 // Font import Geist
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap');
 

@@ -5,6 +5,7 @@
 @use '../zindex' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-notification-container {
   position: fixed;
   bottom: 20px;
@@ -121,3 +122,5 @@
     }
   }
 }
+}
+

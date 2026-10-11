@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-checkbox {
   display: inline-flex;
   align-items: flex-start;
@@ -118,3 +119,5 @@
     line-height: 1.4;
   }
 }
+}
+

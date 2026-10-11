@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-switch {
   display: flex;
   align-items: flex-start;
@@ -26,7 +27,7 @@
     flex-shrink: 0;
     align-items: center;
     border-radius: $radius-full;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     background-color: #14141c;
     transition: background-color $duration-normal ease, border-color $duration-normal ease, box-shadow $duration-normal ease;
 
@@ -116,3 +117,5 @@
     line-height: 1.4;
   }
 }
+}
+

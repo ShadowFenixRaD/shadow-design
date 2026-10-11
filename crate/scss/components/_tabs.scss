@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-tabs-list {
   display: flex;
   flex-wrap: wrap;
@@ -78,3 +79,5 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+}
+

@@ -5,6 +5,7 @@
 @use '../zindex' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-navbar {
   position: sticky;
   top: 0;
@@ -39,3 +40,5 @@
     gap: 16px;
   }
 }
+}
+

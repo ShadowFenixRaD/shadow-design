@@ -4,6 +4,7 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+@layer sd-components {
 .sd-alert {
   display: flex;
   align-items: flex-start;
@@ -119,3 +120,5 @@
     }
   }
 }
+}
+
