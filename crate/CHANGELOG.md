@@ -5,6 +5,54 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ---
 
+## [0.2.0] — 2026-10-11
+
+Nuova versione che introduce il motore di temi multi-livello con risoluzione a cascata a 3 livelli, supporto completo a Serde e persistenza `localStorage`, lo studio interattivo **Theme Builder**, correzioni strutturali ai layer CSS Cascade, e isolamento rigoroso delle feature flags.
+
+### 🚀 Nuove Funzionalità
+
+- **Motore di Temi Multi-Livello (Livello 1 / 2 / 3)**:
+  - Supporto per tonalità colore arbitrarie con `PrimaryColor::Custom { name, hex, css_prefix }` e derivazione automatica dello slug CSS.
+  - Nuovo enum `ElevationStyle` con 4 stili di profondità:
+    - `NeonGlow`: bagliore ottico perimetrale al neon.
+    - `HardBlock`: ombre solide fumettistiche/manga ad alto impatto per interfacce stile Cartoon.
+    - `SoftElevated`: ombreggiature diffuse tradizionali.
+    - `Flat`: grafica minimalista priva di ombre.
+  - Supporto per `ComponentOverride` a Livello 2: personalizzazione di classi base, varianti, ombre e modificatori per singolo componente.
+  - Nuovo `ThemeBuilder` fluido e chainable per comporre temi in modo programmatico:
+    `ThemeBuilder::new().primary_color(...).elevation_style(...).component_override(...).build()`.
+  - Iniezione dinamica di CSS Custom Properties a runtime tramite `Theme::to_css_variables()`.
+- **Serializzazione e Deserializzazione Serde (`serde`)**:
+  - Aggiunto `#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]` per `Theme`, `PrimaryColor`, `RadiusScale`, `GlowMode`, `ElevationStyle` e `ComponentOverride`.
+- **Interactive Theme Builder Studio (`/theme-builder`)**:
+  - Pagina applicativa dedicata nello showcase per la creazione, anteprima e collaudo live di temi personalizzati.
+  - 4 schede di configurazione: *Palette & Superfici* (con color picker nativo HTML), *Forme & Elevazione*, *Override di Livello 2* e *Import/Export JSON*.
+  - Preset a selezione rapida (Ultraviolet, Obsidian, Crimson, Cyan, Emerald e il nuovo *Cartoon Pop*).
+  - Persistenza automatica su `localStorage` resistente ai riavvii del browser e propagazione immediata a tutte le pagine dello showcase.
+  - Generatore istantaneo di codice Rust `ThemeBuilder` copiabile negli appunti.
+
+### 🐛 Correzioni & Miglioramenti
+
+- **Riorganizzazione Livelli CSS Cascade Layers**:
+  - Formalizzato l'ordine gerarchico dei livelli: `@layer sd-reset, sd-base, sd-components, sd-utilities, sd-theme;`.
+  - Racchiuso `_reset.scss` in `@layer sd-reset`: risolto il problema critico per cui gli stili unlayered del reset azzeravano il padding e i bordi di `.sd-btn`.
+- **Spaziature Bottoni e Icone**:
+  - Ripristinato e calibrato il padding orizzontale su tutte le dimensioni (Xs-Xl) con `box-sizing: border-box`.
+  - Spaziatura tra icone e testo delegata interamente a `gap: 6px/8px`, eliminando sovrapposizioni e margini non sincronizzati.
+- **Bordi e Finiture delle Card**:
+  - Bordo netto e nitido su tutti e 4 i lati (`border: 1px solid rgba(255, 255, 255, 0.18)`).
+  - Concatenazione corretta di top specular hairline (`inset 0 1px 0 rgba(255, 255, 255, 0.12)`) con le ombre esterne (`0 4px 24px rgba(0, 0, 0, 0.55)`).
+  - Linee divisorie nitide da 1px per header e footer (`rgba(255, 255, 255, 0.14)`).
+  - Corretti i valori effettivi di `RadiusScale` in `_theme_presets.scss` (Sharp: `2px`, Medium: `8px`, Soft: `14px`).
+- **Eliminazione Warning Dioxus**:
+  - Rimosso `document::Style { "{theme().to_css_variables()}" }` reattivo (che causava `Changing props of Style {} is not supported`).
+  - Sostituito con iniezione asincrona reattiva via `document::eval` in `<style id="sd-dynamic-theme-vars">`.
+- **Isolamento Feature Flags Cargo**:
+  - Dichiarata correttamente la dipendenza interna `icon` per i componenti che espongono o usano icone nei loro tipi o markup (`input`, `checkbox`, `modal`, `alert`, `notification`, `tabs`, `drawer`, `dropdown`).
+  - Verificato con successo che ogni singola feature compila isolatamente senza errori.
+
+---
+
 ## [0.1.0] — 2026-10-09
 
 **Data di Pubblicazione su crates.io**: Venerdì 9 Ottobre 2026, ore 18:05:00 CEST (16:05:00 UTC)  

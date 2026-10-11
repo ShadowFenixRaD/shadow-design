@@ -30,7 +30,7 @@ pub fn Layout() -> Element {
                         }
                     }
                     Badge {
-                        label: "v0.1.0 • Dioxus 0.7".to_string(),
+                        label: "v0.2.0 • Dioxus 0.7".to_string(),
                         variant: BadgeVariant::Primary,
                         pill: true,
                     }

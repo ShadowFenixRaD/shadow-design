@@ -9,10 +9,10 @@ Libreria di componenti UI modulare e ad alte prestazioni per **Dioxus 0.7**, cos
 ```toml
 [dependencies]
 # Importa solo ciò che ti serve:
-shadow-design = { version = "0.1.0", features = ["button", "card", "theme"] }
+shadow-design = { version = "0.2.0", features = ["button", "card", "theme"] }
 
 # Oppure l'intera suite:
-# shadow-design = { version = "0.1.0", features = ["all"] }
+# shadow-design = { version = "0.2.0", features = ["all"] }
 ```
 
 ---

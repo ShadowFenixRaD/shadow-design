@@ -40,10 +40,10 @@ Aggiungi `shadow-design` nel `Cargo.toml` del tuo sito, selezionando solo le fea
 
 ```toml
 [dependencies]
-shadow-design = { version = "0.1.0", features = ["button", "card", "theme"] }
+shadow-design = { version = "0.2.0", features = ["button", "card", "theme"] }
 
 # Oppure importa l'intera suite:
-# shadow-design = { version = "0.1.0", features = ["all"] }
+# shadow-design = { version = "0.2.0", features = ["all"] }
 ```
 
 ### 🎨 Integrazione Asset SCSS (`STYLES`)

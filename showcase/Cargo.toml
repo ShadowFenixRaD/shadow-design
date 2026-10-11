@@ -1,6 +1,6 @@
 [package]
 name = "showcase"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["ShadowfenixRaD", "Christian Torbidone <killerbossoriginal@gmail.com>"]
 edition = "2021"
 publish = false
