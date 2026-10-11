@@ -28,6 +28,7 @@ all = [
     "button",
     "card",
     "input",
+    "select",
     "checkbox",
     "badge",
     "navbar",
@@ -49,6 +50,7 @@ serde = ["dep:serde"]
 button = []
 card = []
 input = ["icon"]
+select = ["icon"]
 checkbox = ["icon"]
 badge = []
 navbar = []
