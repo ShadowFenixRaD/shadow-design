@@ -170,6 +170,7 @@ pub fn Layout() -> Element {
                             SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button" }
                             SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card" }
                             SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput" }
+                            SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea" }
                             SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox" }
                             SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge" }
                             SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert" }

@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AlertsPage, BadgesPage, ButtonsPage, CardsPage, CheckboxPage, DrawerPage, DropdownPage, Home,
     InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SwitchPage, TabsPage,
-    ThemeBuilderPage, TooltipPage, TypographyPage,
+    TextareaPage, ThemeBuilderPage, TooltipPage, TypographyPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -27,6 +27,8 @@ pub enum Route {
     CardsPage {},
     #[route("/inputs")]
     InputsPage {},
+    #[route("/textarea")]
+    TextareaPage {},
     #[route("/checkbox")]
     CheckboxPage {},
     #[route("/badges")]
