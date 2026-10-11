@@ -150,30 +150,54 @@ pub fn CardsPage() -> Element {
             }
 
             // Visual Examples
-            div { class: "grid grid-cols-1 md:grid-cols-3 gap-4",
+            div { class: "grid grid-cols-1 md:grid-cols-3 gap-5",
                 Card {
                     variant: CardVariant::Metric,
-                    div { class: "space-y-1",
-                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Latenza Media" }
-                        div { class: "text-2xl font-extrabold text-white tracking-tight", "1.2 ms" }
-                        span { class: "text-[11px] text-emerald-400 font-mono", "+14% performance" }
+                    div { class: "flex items-start justify-between gap-3",
+                        div { class: "space-y-1.5",
+                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Latenza Media" }
+                            div { class: "text-2xl font-extrabold text-white tracking-tight", "1.2 ms" }
+                            span { class: "text-[11px] text-emerald-400 font-mono flex items-center gap-1",
+                                Icon { kind: IconKind::Check, size: 12 }
+                                "+14% performance"
+                            }
+                        }
+                        span { class: "p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0",
+                            Icon { kind: IconKind::Sparkles, size: 18 }
+                        }
                     }
                 }
                 Card {
                     variant: CardVariant::Interactive,
                     hover_glow: true,
-                    div { class: "space-y-1",
-                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Richieste Totali" }
-                        div { class: "text-2xl font-extrabold text-white tracking-tight", "4.8M" }
-                        span { class: "text-[11px] text-purple-300 font-mono", "Hover per micro-glow" }
+                    div { class: "flex items-start justify-between gap-3",
+                        div { class: "space-y-1.5",
+                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Richieste Totali" }
+                            div { class: "text-2xl font-extrabold text-white tracking-tight", "4.8M" }
+                            span { class: "text-[11px] text-purple-300 font-mono flex items-center gap-1",
+                                Icon { kind: IconKind::Layers, size: 12 }
+                                "Hover per micro-glow"
+                            }
+                        }
+                        span { class: "p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 flex items-center justify-center shrink-0",
+                            Icon { kind: IconKind::Layers, size: 18 }
+                        }
                     }
                 }
                 Card {
                     variant: CardVariant::Elevated,
-                    div { class: "space-y-1",
-                        span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400", "Affidabilità" }
-                        div { class: "text-2xl font-extrabold text-white tracking-tight", "99.99%" }
-                        span { class: "text-[11px] text-zinc-500 font-mono", "Livello Surface 2" }
+                    div { class: "flex items-start justify-between gap-3",
+                        div { class: "space-y-1.5",
+                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Affidabilità" }
+                            div { class: "text-2xl font-extrabold text-white tracking-tight", "99.99%" }
+                            span { class: "text-[11px] text-zinc-400 font-mono flex items-center gap-1",
+                                Icon { kind: IconKind::CheckCircle, size: 12 }
+                                "Livello Surface 2"
+                            }
+                        }
+                        span { class: "p-2.5 rounded-xl bg-zinc-800/60 border border-white/10 text-zinc-300 flex items-center justify-center shrink-0",
+                            Icon { kind: IconKind::CheckCircle, size: 18 }
+                        }
                     }
                 }
             }
