@@ -178,6 +178,22 @@ pub mod theme;
 pub mod tooltip;
 #[cfg(feature = "typography")]
 pub mod typography;
+#[cfg(feature = "avatar")]
+pub mod avatar;
+#[cfg(feature = "chat")]
+pub mod chat;
+#[cfg(feature = "progress")]
+pub mod progress;
+#[cfg(feature = "attachment_card")]
+pub mod attachment_card;
+#[cfg(feature = "segmented_control")]
+pub mod segmented_control;
+#[cfg(feature = "divider")]
+pub mod divider;
+#[cfg(feature = "tree")]
+pub mod tree;
+#[cfg(feature = "skeleton")]
+pub mod skeleton;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -216,5 +232,21 @@ pub mod prelude {
     pub use crate::tooltip::*;
     #[cfg(feature = "typography")]
     pub use crate::typography::*;
+    #[cfg(feature = "avatar")]
+    pub use crate::avatar::*;
+    #[cfg(feature = "chat")]
+    pub use crate::chat::*;
+    #[cfg(feature = "progress")]
+    pub use crate::progress::*;
+    #[cfg(feature = "attachment_card")]
+    pub use crate::attachment_card::*;
+    #[cfg(feature = "segmented_control")]
+    pub use crate::segmented_control::*;
+    #[cfg(feature = "divider")]
+    pub use crate::divider::*;
+    #[cfg(feature = "tree")]
+    pub use crate::tree::*;
+    #[cfg(feature = "skeleton")]
+    pub use crate::skeleton::*;
     pub use crate::STYLES;
 }

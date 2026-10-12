@@ -193,6 +193,23 @@ pub fn Layout() -> Element {
                         }
                     }
 
+                    div {
+                        p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                            Icon { kind: IconKind::MessageSquare, size: 12 }
+                            "Chat & Mesh P2P"
+                        }
+                        div { class: "flex flex-col gap-1",
+                            SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar" }
+                            SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble" }
+                            SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard" }
+                            SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress" }
+                            SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl" }
+                            SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider" }
+                            SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)" }
+                            SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton" }
+                        }
+                    }
+
                     // Telemetria Tema Attivo
                     div { class: "{theme().surface} rounded-xl p-3.5 text-xs text-zinc-400 mt-auto",
                         div { class: "flex items-center justify-between mb-2 pb-2 border-b border-white/[0.06]",

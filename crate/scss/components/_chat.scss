@@ -1,0 +1,113 @@
+// ==============================================================================
+// Shadow Design — MessageBubble & Chat Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-chat-bubble-container {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &.sd-chat-bubble--incoming {
+      justify-content: flex-start;
+    }
+
+    &.sd-chat-bubble--outgoing {
+      justify-content: flex-end;
+    }
+  }
+
+  .sd-chat-bubble {
+    position: relative;
+    max-width: 78%;
+    min-width: 80px;
+    padding: 10px 14px;
+    font-family: $font-sans;
+    font-size: 13.5px;
+    line-height: 1.5;
+    transition: transform $duration-fast ease, box-shadow $duration-fast ease;
+
+    &--incoming {
+      background-color: $color-surface-1;
+      border: $border-hairline;
+      color: $zinc-100;
+      border-radius: $radius-md;
+      border-bottom-left-radius: $radius-xs;
+      @include specular-top(0.04);
+    }
+
+    &--outgoing {
+      background: linear-gradient(135deg, rgba(59, 7, 100, 0.7) 0%, rgba(26, 11, 46, 0.9) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #ffffff;
+      border-radius: $radius-md;
+      border-bottom-right-radius: $radius-xs;
+      box-shadow: 0 0 20px rgba(107, 33, 168, 0.22);
+      @include specular-top(0.1);
+    }
+
+    &__sender {
+      font-size: 11px;
+      font-weight: 600;
+      color: #c084fc;
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    &__content {
+      word-break: break-word;
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 10px;
+      color: $zinc-400;
+      user-select: none;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(168, 85, 247, 0.25);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #e9d5ff;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    &__time {
+      font-feature-settings: 'tnum';
+      opacity: 0.85;
+    }
+
+    &__status {
+      display: inline-flex;
+      align-items: center;
+
+      &--sending {
+        color: $zinc-500;
+      }
+
+      &--sent {
+        color: $zinc-400;
+      }
+
+      &--delivered {
+        color: #38bdf8;
+      }
+
+      &--failed {
+        color: #f43f5e;
+      }
+    }
+  }
+}

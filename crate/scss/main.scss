@@ -26,6 +26,14 @@
 @use 'components/tabs' as *;
 @use 'components/tooltip' as *;
 @use 'components/typography' as *;
+@use 'components/avatar' as *;
+@use 'components/chat' as *;
+@use 'components/progress' as *;
+@use 'components/attachment_card' as *;
+@use 'components/segmented_control' as *;
+@use 'components/divider' as *;
+@use 'components/tree' as *;
+@use 'components/skeleton' as *;
 
 @layer sd-base {
   :root {

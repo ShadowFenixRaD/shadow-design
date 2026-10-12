@@ -1,0 +1,106 @@
+// ==============================================================================
+// Shadow Design — SegmentedControl Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-segmented-control {
+    display: inline-flex;
+    align-items: center;
+    background-color: $color-surface-1;
+    border: $border-hairline;
+    border-radius: $radius-full;
+    position: relative;
+    user-select: none;
+    gap: 3px;
+    padding: 3px;
+    @include specular-top(0.04);
+
+    &--sm {
+      padding: 2px;
+
+      .sd-segmented-control__item {
+        padding: 3px 10px;
+        font-size: 11px;
+      }
+    }
+
+    &--md {
+      padding: 3px;
+
+      .sd-segmented-control__item {
+        padding: 5px 14px;
+        font-size: 12.5px;
+      }
+    }
+
+    &--lg {
+      padding: 4px;
+
+      .sd-segmented-control__item {
+        padding: 7px 18px;
+        font-size: 14px;
+      }
+    }
+
+    &--full-width {
+      display: flex;
+      width: 100%;
+
+      .sd-segmented-control__item {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    &__item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: $zinc-400;
+      font-family: $font-sans;
+      font-weight: 500;
+      border-radius: $radius-full;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all $duration-fast ease;
+      z-index: 1;
+
+      &:hover:not(&--disabled) {
+        color: $zinc-200;
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      &--active {
+        color: #ffffff !important;
+        background-color: #171722 !important;
+        border-color: rgba(168, 85, 247, 0.45) !important;
+        box-shadow: 0 0 16px rgba(107, 33, 168, 0.35);
+        font-weight: 600;
+      }
+
+      &--disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    }
+
+    &__icon {
+      flex-shrink: 0;
+    }
+
+    &__label {
+      line-height: 1;
+    }
+  }
+}
