@@ -58,20 +58,25 @@ pub fn AttachmentCard(
                 class: "sd-attachment-card__top",
 
                 // Avatar tondo sulla sinistra
-                div {
-                    class: "sd-attachment-card__avatar",
-                    if let Some(custom_avatar) = avatar {
+                if let Some(custom_avatar) = avatar {
+                    div {
+                        class: "sd-attachment-card__avatar-custom shrink-0",
                         {custom_avatar}
-                    } else if let Some(src) = avatar_src {
-                        img {
-                            src: "{src}",
-                            alt: "{title}",
-                            class: "sd-attachment-card__avatar-img",
+                    }
+                } else {
+                    div {
+                        class: "sd-attachment-card__avatar",
+                        if let Some(src) = avatar_src {
+                            img {
+                                src: "{src}",
+                                alt: "{title}",
+                                class: "sd-attachment-card__avatar-img",
+                            }
+                        } else if let Some(custom_icon) = avatar_icon {
+                            RenderSvgIcon { icon: custom_icon, size: 20 }
+                        } else {
+                            Icon { kind: IconKind::Paperclip, size: 20 }
                         }
-                    } else if let Some(custom_icon) = avatar_icon {
-                        RenderSvgIcon { icon: custom_icon, size: 20 }
-                    } else {
-                        Icon { kind: IconKind::Paperclip, size: 20 }
                     }
                 }
 
