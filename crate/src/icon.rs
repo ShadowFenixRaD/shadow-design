@@ -120,6 +120,7 @@ pub fn Icon(
     #[props(default)] class: String,
 ) -> Element {
     let size_str = size.to_string();
+    let spinner_class = if matches!(kind, IconKind::Spinner) { " animate-spin" } else { "" };
 
     rsx! {
         svg {
@@ -132,7 +133,7 @@ pub fn Icon(
             stroke_width: "1.5",
             stroke_linecap: "round",
             stroke_linejoin: "round",
-            class: "shrink-0 {class}",
+            class: "shrink-0 {class}{spinner_class}",
             match kind {
                 IconKind::ChevronRight => rsx! {
                     path { d: "m9 18 6-6-6-6" }
@@ -253,7 +254,6 @@ pub fn Icon(
                 },
                 IconKind::Spinner => rsx! {
                     path {
-                        class: "animate-spin origin-center",
                         d: "M21 12a9 9 0 1 1-6.219-8.56"
                     }
                 },

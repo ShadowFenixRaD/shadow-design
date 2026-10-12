@@ -7,13 +7,10 @@
 @layer sd-components {
   @keyframes sd-indeterminate-shimmer {
     0% {
-      transform: translateX(-100%);
-    }
-    50% {
-      transform: translateX(10%);
+      transform: translateX(-125%);
     }
     100% {
-      transform: translateX(100%);
+      transform: translateX(275%);
     }
   }
 
@@ -85,8 +82,9 @@
 
     // Modalità Indeterminata
     &--indeterminate &__bar {
-      width: 45% !important;
-      animation: sd-indeterminate-shimmer 1.8s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+      width: 40% !important;
+      will-change: transform;
+      animation: sd-indeterminate-shimmer 1.6s infinite ease-in-out;
     }
   }
 }

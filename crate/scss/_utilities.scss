@@ -523,4 +523,6 @@ $spacers: (
 @media (min-width: 1280px) {
   .xl\:inline      { display: inline; }
 }
+
+.origin-center { transform-origin: center; }
 }
