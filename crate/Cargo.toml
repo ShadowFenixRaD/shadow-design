@@ -47,6 +47,7 @@ all = [
     "chat",
     "progress",
     "attachment_card",
+    "contact_card",
     "segmented_control",
     "divider",
     "tree",
@@ -75,8 +76,10 @@ animation = []
 avatar = ["icon"]
 chat = ["icon"]
 progress = []
-attachment_card = ["icon", "progress"]
+attachment_card = ["card", "icon", "progress", "button"]
 attachment-card = ["attachment_card"]
+contact_card = ["card", "avatar"]
+contact-card = ["contact_card"]
 segmented_control = ["icon"]
 segmented-control = ["segmented_control"]
 divider = []

@@ -186,6 +186,8 @@ pub mod chat;
 pub mod progress;
 #[cfg(feature = "attachment_card")]
 pub mod attachment_card;
+#[cfg(feature = "contact_card")]
+pub mod contact_card;
 #[cfg(feature = "segmented_control")]
 pub mod segmented_control;
 #[cfg(feature = "divider")]
@@ -240,6 +242,8 @@ pub mod prelude {
     pub use crate::progress::*;
     #[cfg(feature = "attachment_card")]
     pub use crate::attachment_card::*;
+    #[cfg(feature = "contact_card")]
+    pub use crate::contact_card::*;
     #[cfg(feature = "segmented_control")]
     pub use crate::segmented_control::*;
     #[cfg(feature = "divider")]

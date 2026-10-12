@@ -91,8 +91,8 @@ pub fn AttachmentCardsPage() -> Element {
                                     on_share: if with_actions() { Some(EventHandler::new(|_| {})) } else { None },
                                 }
                             } else {
-                                AttachmentCard {
-                                    title: "Doctor Satoshi (Node #01)".to_string(),
+                                ContactCard {
+                                    name: "Doctor Satoshi (Node #01)".to_string(),
                                     subtitle: Some("Nodo Creatore Mesh • 4ms".to_string()),
                                     avatar: Some(rsx! {
                                         Avatar {
@@ -102,8 +102,6 @@ pub fn AttachmentCardsPage() -> Element {
                                         }
                                     }),
                                     description: if with_description() { Some("Chiave pubblica post-quantum verificata sulla rete beacon.".to_string()) } else { None },
-                                    on_download: if with_actions() { Some(EventHandler::new(|_| {})) } else { None },
-                                    on_share: if with_actions() { Some(EventHandler::new(|_| {})) } else { None },
                                 }
                             }
                         }

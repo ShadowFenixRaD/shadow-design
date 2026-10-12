@@ -136,3 +136,25 @@ fn test_card_shadows_and_variants() {
     assert_eq!(CardVariant::Metric.scss_class(), "sd-card--metric");
 }
 
+#[test]
+fn test_contact_and_attachment_cards() {
+    use dioxus::prelude::*;
+
+    let _vdom = VirtualDom::new(|| {
+        rsx! {
+            ContactCard {
+                name: "Doctor Satoshi".to_string(),
+                subtitle: Some("Creator Node".to_string()),
+                description: Some("Mesh operator".to_string()),
+            }
+            AttachmentCard {
+                title: "ledger.bin".to_string(),
+                subtitle: Some("14.2 MB • Encrypted".to_string()),
+                image: Some("https://example.com/cover.png".to_string()),
+                progress: Some(42.0),
+            }
+        }
+    });
+}
+
+
