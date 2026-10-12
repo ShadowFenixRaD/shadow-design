@@ -121,3 +121,18 @@ fn test_new_icon_kinds() {
         assert_eq!(svg, SvgIcon::Kind(kind));
     }
 }
+
+#[test]
+fn test_card_shadows_and_variants() {
+    assert_eq!(CardShadow::None.scss_class(), "sd-card--shadow-none");
+    assert_eq!(CardShadow::Sm.scss_class(), "sd-card--shadow-sm");
+    assert_eq!(CardShadow::Md.scss_class(), "sd-card--shadow-md");
+    assert_eq!(CardShadow::Lg.scss_class(), "sd-card--shadow-lg");
+    assert_eq!(CardShadow::Xl.scss_class(), "sd-card--shadow-xl");
+
+    assert_eq!(CardVariant::Default.scss_class(), "");
+    assert_eq!(CardVariant::Elevated.scss_class(), "sd-card--elevated");
+    assert_eq!(CardVariant::Interactive.scss_class(), "sd-card--interactive");
+    assert_eq!(CardVariant::Metric.scss_class(), "sd-card--metric");
+}
+

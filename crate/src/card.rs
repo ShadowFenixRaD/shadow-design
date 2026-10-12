@@ -46,14 +46,21 @@ impl CardVariant {
 pub fn Card(
     #[props(default)] title: Option<String>,
     #[props(default)] subtitle: Option<String>,
+    #[props(default)] avatar: Option<Element>,
     #[props(default)] variant: CardVariant,
     #[props(default)] shadow: CardShadow,
     #[props(default)] hover_glow: bool,
     #[props(default)] glow: Option<bool>,
     #[props(default = false)] overflow_hidden: bool,
     #[props(default)] class: String,
+    #[props(default)] progress: Option<f32>,
+    #[props(default)] buttons: Option<Element>,
+    #[props(default)] image: Option<String>,
+    #[props(default)] image_alt: Option<String>,
+    #[props(default)] image_height: Option<String>,
+    #[props(default)] on_click: Option<EventHandler<MouseEvent>>,
     #[props(default)] footer: Option<Element>,
-    children: Element,
+    #[props(default)] children: Element,
 ) -> Element {
     let variant_class = variant.scss_class();
     let shadow_class = shadow.scss_class();
@@ -61,6 +68,53 @@ pub fn Card(
         "sd-card--overflow-hidden"
     } else {
         ""
+    };
+
+    let has_avatar = avatar.is_some();
+    let has_title_or_sub = title.is_some() || subtitle.is_some();
+    let header_layout_class = if has_avatar && has_title_or_sub {
+        "sd-card__header--with-avatar"
+    } else if has_avatar {
+        "sd-card__header--avatar-only"
+    } else if has_title_or_sub {
+        "sd-card__header--title-only"
+    } else {
+        ""
+    };
+
+    let alt_str = image_alt.as_deref().unwrap_or_default();
+
+    let img_style = image_height
+        .as_deref()
+        .map(|h| format!("height: {h};"))
+        .unwrap_or_default();
+
+    let progress_element = if let Some(prog_val) = progress {
+        #[cfg(feature = "progress")]
+        rsx! {
+            div {
+                class: "sd-card__progress",
+                crate::progress::ProgressBar {
+                    value: prog_val,
+                    size: crate::progress::ProgressSize::Sm,
+                }
+            }
+        }
+        #[cfg(not(feature = "progress"))]
+        rsx! {
+            div {
+                class: "sd-card__progress",
+                div {
+                    class: "sd-card__progress-track",
+                    div {
+                        class: "sd-card__progress-fill",
+                        style: "width: {prog_val.clamp(0.0, 100.0)}%;",
+                    }
+                }
+            }
+        }
+    } else {
+        rsx! {}
     };
 
     #[cfg(feature = "theme")]
@@ -112,21 +166,67 @@ pub fn Card(
     rsx! {
         div {
             class: "sd-card {base_override} {variant_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
-            if title.is_some() || subtitle.is_some() {
-                div { class: "sd-card__header",
-                    if let Some(t) = title {
-                        h3 { class: "sd-card__title", "{t}" }
+            onclick: move |evt| {
+                if let Some(h) = &on_click {
+                    h.call(evt);
+                }
+            },
+
+            // Intestazione con Avatar, Titolo e Sottotitolo
+            if has_avatar || has_title_or_sub {
+                div {
+                    class: "sd-card__header {header_layout_class}",
+                    if let Some(av) = avatar {
+                        div { class: "sd-card__avatar", {av} }
                     }
-                    if let Some(s) = subtitle {
-                        p { class: "sd-card__subtitle", "{s}" }
+                    if has_title_or_sub {
+                        div {
+                            class: "sd-card__header-text",
+                            if let Some(t) = title {
+                                h3 { class: "sd-card__title", "{t}" }
+                            }
+                            if let Some(s) = subtitle {
+                                p { class: "sd-card__subtitle", "{s}" }
+                            }
+                        }
                     }
                 }
             }
-            div { class: "sd-card__body",
+
+            // Corpo principale della card
+            div {
+                class: "sd-card__body",
                 {children}
             }
+
+            // Sezione Progress Bar (avanzamento)
+            {progress_element}
+
+            // Sezione Bottoni / Azioni dedicata in basso
+            if let Some(btns) = buttons {
+                div {
+                    class: "sd-card__buttons",
+                    {btns}
+                }
+            }
+
+            // Sezione Immagine in basso (occupa tutto il fondo seguendo i bordi)
+            if let Some(img_url) = image {
+                div {
+                    class: "sd-card__image-container",
+                    img {
+                        src: "{img_url}",
+                        alt: "{alt_str}",
+                        class: "sd-card__image",
+                        style: "{img_style}",
+                    }
+                }
+            }
+
+            // Footer a piè di pagina
             if let Some(f) = footer {
-                div { class: "sd-card__footer",
+                div {
+                    class: "sd-card__footer",
                     {f}
                 }
             }

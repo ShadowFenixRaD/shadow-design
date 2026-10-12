@@ -8,19 +8,56 @@ pub fn CardsPage() -> Element {
     let mut selected_variant = use_signal(|| CardVariant::Default);
     let mut selected_shadow = use_signal(|| CardShadow::Md);
     let mut enable_glow = use_signal(|| false);
+    let mut with_avatar = use_signal(|| true);
+    let mut with_title = use_signal(|| true);
+    let mut with_subtitle = use_signal(|| true);
+    let mut with_progress = use_signal(|| false);
+    let mut with_buttons = use_signal(|| true);
+    let mut with_image = use_signal(|| false);
+    let mut with_max_height = use_signal(|| false);
 
     let props = vec![
         PropRow {
             name: "title",
             r#type: "Option<String>",
             default: "None",
-            description: "Titolo primario dell'intestazione della card",
+            description: "Titolo primario dell'intestazione (centrato se senza avatar, affiancato se con avatar)",
         },
         PropRow {
             name: "subtitle",
             r#type: "Option<String>",
             default: "None",
-            description: "Sottotitolo o didascalia esplicativa",
+            description: "Sottotitolo più piccolo e scuro coordinato con il titolo",
+        },
+        PropRow {
+            name: "avatar",
+            r#type: "Option<Element>",
+            default: "None",
+            description: "Elemento avatar o icona (centrato se senza titolo, al fianco se con titolo)",
+        },
+        PropRow {
+            name: "buttons",
+            r#type: "Option<Element>",
+            default: "None",
+            description: "Sezione bottoni ed azioni dedicata in basso alla card",
+        },
+        PropRow {
+            name: "progress",
+            r#type: "Option<f32>",
+            default: "None",
+            description: "Avanzamento percentuale (0.0 .. 100.0) con barra ProgressBar integrata",
+        },
+        PropRow {
+            name: "image",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Immagine a tutta larghezza in basso con adattamento e ritaglio bordi",
+        },
+        PropRow {
+            name: "image_height",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Altezza personalizzata opzionale per l'immagine inferiore (es. '160px')",
         },
         PropRow {
             name: "variant",
@@ -38,34 +75,39 @@ pub fn CardsPage() -> Element {
             name: "hover_glow",
             r#type: "bool",
             default: "false",
-            description:
-                "Attiva un micro-glow coordinato con il colore primario al passaggio del cursore",
+            description: "Micro-glow coordinato con il colore del tema attivo al passaggio del mouse",
         },
         PropRow {
             name: "footer",
             r#type: "Option<Element>",
             default: "None",
-            description: "Slot per la sezione a piè di pagina con sfondo dedicato",
+            description: "Slot per la sezione a piè di pagina con sfondo e divisore dedicato",
         },
     ];
 
     let code_snippet = r#"Card {
-    title: "Metric Analytics".to_string(),
-    subtitle: "Dati registrati nelle ultime 24 ore".to_string(),
-    variant: CardVariant::Interactive,
-    hover_glow: true,
-    div { class: "text-2xl font-bold text-white", "99.98%" }
-    footer: rsx! {
-        span { class: "text-xs text-zinc-400", "Aggiornato in tempo reale" }
-    }
+    avatar: rsx! {
+        Avatar { name: Some("Shadow Core".to_string()), size: AvatarSize::Md, status: PresenceStatus::Online }
+    },
+    title: Some("Mesh Node Cluster".to_string()),
+    subtitle: Some("Topologia di rete crittografica P2P".to_string()),
+    progress: Some(82.0),
+    buttons: rsx! {
+        Button { size: ButtonSize::Sm, variant: ButtonVariant::Primary, "Connetti" }
+        Button { size: ButtonSize::Sm, variant: ButtonVariant::Outline, "Dettagli" }
+    },
+    image: Some("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80".to_string()),
+    p { class: "text-xs text-zinc-300", "Nodo di sincronizzazione Kyber-1024 attivo." }
 }"#
     .to_string();
+
+    let max_h_class = if with_max_height() { "max-h-[420px]" } else { "" };
 
     rsx! {
         div { class: "max-w-4xl space-y-8",
             div {
-                Heading { order: HeadingOrder::H2, "Card" }
-                Text { dimmed: true, size: TextSize::Sm, "Superfici di contenimento a 4 livelli, rifinite con bordi hairline a 1px, top specular highlights e micro-glow selettivi." }
+                Heading { order: HeadingOrder::H2, "Card (Unificata)" }
+                Text { dimmed: true, size: TextSize::Sm, "Superficie modulare avanzata: supporto nativo per avatar, titolo centrato o affiancato, sottotitolo, progress bar, pulsanti d'azione dedicati e cover image inferiore con ritaglio bordi e max-height." }
             }
 
             FeatureBanner { feature_name: "card" }
@@ -74,22 +116,42 @@ pub fn CardsPage() -> Element {
                 preview: rsx! {
                     div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
                         // Live Card Preview
-                        div { class: "w-full",
+                        div { class: "w-full flex justify-center",
                             Card {
-                                title: "Pannello di Controllo".to_string(),
-                                subtitle: "Stato del server e metriche".to_string(),
+                                class: "{max_h_class} w-full max-w-sm",
+                                avatar: if with_avatar() {
+                                    Some(rsx! {
+                                        Avatar {
+                                            name: Some("Shadow Core".to_string()),
+                                            size: AvatarSize::Md,
+                                            status: PresenceStatus::Online,
+                                        }
+                                    })
+                                } else {
+                                    None
+                                },
+                                title: if with_title() { Some("Cluster Mesh #07".to_string()) } else { None },
+                                subtitle: if with_subtitle() { Some("Kyber-1024 Post-Quantum • 4 nodi attivi".to_string()) } else { None },
                                 variant: selected_variant(),
                                 shadow: selected_shadow(),
                                 hover_glow: enable_glow(),
-                                footer: rsx! {
-                                    div { class: "flex items-center justify-between",
-                                        span { class: "text-xs text-zinc-500", "Stato: Operativo" }
-                                        Button { size: ButtonSize::Xs, variant: ButtonVariant::Ghost, "Espandi" }
-                                    }
+                                progress: if with_progress() { Some(68.0) } else { None },
+                                buttons: if with_buttons() {
+                                    Some(rsx! {
+                                        Button { size: ButtonSize::Sm, variant: ButtonVariant::Primary, "Sincronizza" }
+                                        Button { size: ButtonSize::Sm, variant: ButtonVariant::Ghost, "Ispeziona" }
+                                    })
+                                } else {
+                                    None
+                                },
+                                image: if with_image() {
+                                    Some("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80".to_string())
+                                } else {
+                                    None
                                 },
                                 div { class: "space-y-2",
-                                    p { class: "text-xs text-zinc-300", "Contenuto interno della card con tipografia ad alto contrasto e bordi ottici calibrati." }
-                                    Badge { label: "Cluster Attivo".to_string(), variant: BadgeVariant::Success, dot: true }
+                                    p { class: "text-xs text-zinc-300", "Contenuto informativo della card con tipografia ad alto contrasto e bordi ottici calibrati." }
+                                    Badge { label: "Zero-Knowledge Validated".to_string(), variant: BadgeVariant::Success, dot: true }
                                 }
                             }
                         }
@@ -132,7 +194,61 @@ pub fn CardsPage() -> Element {
                                 }
                             }
 
-                            div { class: "pt-2 border-t border-white/[0.06]",
+                            div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
+                                span { class: "text-zinc-400 block uppercase tracking-wider text-[10px]", "Sezioni Attive:" }
+                                div { class: "grid grid-cols-2 gap-2 text-zinc-300",
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_avatar}",
+                                            onchange: move |e| with_avatar.set(e.checked()),
+                                        }
+                                        "Avatar"
+                                    }
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_title}",
+                                            onchange: move |e| with_title.set(e.checked()),
+                                        }
+                                        "Titolo"
+                                    }
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_subtitle}",
+                                            onchange: move |e| with_subtitle.set(e.checked()),
+                                        }
+                                        "Sottotitolo"
+                                    }
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_progress}",
+                                            onchange: move |e| with_progress.set(e.checked()),
+                                        }
+                                        "Progress Bar"
+                                    }
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_buttons}",
+                                            onchange: move |e| with_buttons.set(e.checked()),
+                                        }
+                                        "Bottoni in Basso"
+                                    }
+                                    label { class: "flex items-center gap-1.5 cursor-pointer",
+                                        input {
+                                            r#type: "checkbox",
+                                            checked: "{with_image}",
+                                            onchange: move |e| with_image.set(e.checked()),
+                                        }
+                                        "Immagine in Basso"
+                                    }
+                                }
+                            }
+
+                            div { class: "pt-2 border-t border-white/[0.06] space-y-2",
                                 label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
                                     input {
                                         r#type: "checkbox",
@@ -140,6 +256,14 @@ pub fn CardsPage() -> Element {
                                         onchange: move |e| enable_glow.set(e.checked()),
                                     }
                                     "Attiva Micro-Glow su Hover"
+                                }
+                                label { class: "flex items-center gap-1.5 cursor-pointer text-amber-300",
+                                    input {
+                                        r#type: "checkbox",
+                                        checked: "{with_max_height}",
+                                        onchange: move |e| with_max_height.set(e.checked()),
+                                    }
+                                    "Test Altezza Massima (Taglio Immagine)"
                                 }
                             }
                         }
