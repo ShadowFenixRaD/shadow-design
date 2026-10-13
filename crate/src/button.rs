@@ -73,6 +73,7 @@ pub fn Button(
     #[props(default)] size: ButtonSize,
     #[props(default)] disabled: bool,
     #[props(default)] loading: bool,
+    #[props(default)] loading_label: Option<String>,
     #[props(default)] full_width: bool,
     #[props(default)] glow: Option<bool>,
     #[props(default)] left_icon: Option<Element>,
@@ -83,32 +84,37 @@ pub fn Button(
 ) -> Element {
     let size_class = size.scss_class();
     let full_class = if full_width { "sd-btn--full" } else { "" };
+    let loading_class = if loading { "sd-btn--loading" } else { "" };
 
+    // DS-03: By default (glow is None), only filled emphasis variants glow
+    let should_glow_by_default = matches!(
+        variant,
+        ButtonVariant::Primary | ButtonVariant::Danger | ButtonVariant::Success
+    );
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-
-    #[cfg(feature = "theme")]
-    let default_primary = match &theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-btn--primary".to_string(),
-        crate::theme::PrimaryColor::Obsidian => "sd-btn--primary-obsidian".to_string(),
-        crate::theme::PrimaryColor::Crimson => "sd-btn--primary-crimson".to_string(),
-        crate::theme::PrimaryColor::Cyan => "sd-btn--primary-cyan".to_string(),
-        crate::theme::PrimaryColor::Emerald => "sd-btn--primary-emerald".to_string(),
-        crate::theme::PrimaryColor::Custom { .. } => {
-            format!("sd-btn--primary-{}", theme_val.primary_color.css_prefix())
+    let effective_glow = match glow {
+        Some(g) => Some(g),
+        None => {
+            if should_glow_by_default {
+                None
+            } else {
+                Some(false)
+            }
         }
     };
 
     #[cfg(feature = "theme")]
-    let fallback_variant = if variant == ButtonVariant::Primary {
-        default_primary
-    } else {
-        variant.scss_class().to_string()
-    };
-
-    // Risoluzione a 3 Livelli: L1 (fallback) -> L2 (Theme override)
+    let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
-    let variant_class = theme_val.resolve_variant_class("button", variant.name(), &fallback_variant);
+    let theme_val = theme.read();
+
+    // RS-05: Use theme_val.button_variant_classes(variant) as fallback
+    #[cfg(feature = "theme")]
+    let fallback_variant = theme_val.button_variant_classes(variant).to_string();
+
+    #[cfg(feature = "theme")]
+    let variant_class =
+        theme_val.resolve_variant_class("button", variant.name(), &fallback_variant);
 
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("button").unwrap_or("");
@@ -124,7 +130,7 @@ pub fn Button(
     };
 
     #[cfg(feature = "theme")]
-    let glow_class = theme_val.resolve_elevation_class("button", glow);
+    let glow_class = theme_val.resolve_elevation_class("button", effective_glow);
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -135,22 +141,24 @@ pub fn Button(
     #[cfg(not(feature = "theme"))]
     let radius_class = "";
     #[cfg(not(feature = "theme"))]
-    let glow_class = if glow == Some(true) || (glow.is_none() && variant == ButtonVariant::Primary)
-    {
+    let glow_class = if glow == Some(true) || (glow.is_none() && should_glow_by_default) {
         "sd-btn--glow".to_string()
     } else {
         String::new()
     };
 
-    let is_disabled = disabled || loading;
+    let locale = crate::locale::use_locale();
+    let effective_loading_label = loading_label.unwrap_or(locale.loading);
 
     rsx! {
         button {
             r#type: "button",
-            class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {radius_class} {glow_class} {class_modifiers} {class}",
-            disabled: is_disabled,
+            class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {loading_class} {radius_class} {glow_class} {class_modifiers} {class}",
+            disabled: disabled,
+            "aria-disabled": if disabled || loading { "true" } else { "false" },
+            "aria-busy": if loading { "true" } else { "false" },
             onclick: move |evt| {
-                if !is_disabled {
+                if !disabled && !loading {
                     if let Some(handler) = onclick.as_ref() {
                         handler.call(evt);
                     }
@@ -158,12 +166,14 @@ pub fn Button(
             },
             if loading {
                 svg {
-                    class: "animate-spin shrink-0 h-4 w-4 mr-1",
+                    class: "sd-spinner mr-1.5",
                     xmlns: "http://www.w3.org/2000/svg",
                     fill: "none",
                     view_box: "0 0 24 24",
+                    "aria-hidden": "true",
+                    "focusable": "false",
                     circle {
-                        class: "opacity-25",
+                        class: "sd-spinner__track",
                         cx: "12",
                         cy: "12",
                         r: "10",
@@ -171,11 +181,12 @@ pub fn Button(
                         stroke_width: "4",
                     }
                     path {
-                        class: "opacity-75",
+                        class: "sd-spinner__arc",
                         fill: "currentColor",
                         d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
                     }
                 }
+                span { class: "sd-visually-hidden", "{effective_loading_label}" }
             } else if let Some(licon) = left_icon {
                 span { class: "sd-btn__icon sd-btn__icon--left", {licon} }
             }

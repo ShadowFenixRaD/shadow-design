@@ -16,10 +16,14 @@
   &--disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none;
   }
 
   &__track {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
     position: relative;
     display: inline-flex;
     height: 24px;
@@ -27,14 +31,19 @@
     flex-shrink: 0;
     align-items: center;
     border-radius: $radius-full;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.34);
     background-color: #14141c;
     transition: background-color $duration-normal ease, border-color $duration-normal ease, box-shadow $duration-normal ease;
 
+    &:focus-visible {
+      outline: 2px solid var(--sd-focus-ring, #c084fc);
+      outline-offset: 2px;
+    }
+
     &--checked {
-      background-color: $violet-primary;
-      border-color: rgba(192, 132, 252, 0.6);
-      box-shadow: 0 0 14px $violet-glow;
+      background-color: var(--sd-accent, $violet-primary);
+      border-color: var(--sd-focus-ring, rgba(192, 132, 252, 0.6));
+      box-shadow: 0 0 14px var(--sd-accent-glow, $violet-glow);
     }
 
     &--checked-crimson {
@@ -62,7 +71,7 @@
     }
 
     &--glow {
-      box-shadow: 0 0 16px $violet-glow;
+      box-shadow: 0 0 16px var(--sd-accent-glow, $violet-glow);
     }
 
     &--glow-crimson {
@@ -90,12 +99,12 @@
     border-radius: $radius-full;
     background-color: $zinc-300;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    transform: translateX(2px);
+    transform: translateX(3px);
     transition: transform $duration-normal $ease-tactile, background-color $duration-normal ease;
 
     &--checked {
       background-color: #ffffff;
-      transform: translateX(22px);
+      transform: translateX(23px);
     }
   }
 

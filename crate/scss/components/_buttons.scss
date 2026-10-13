@@ -28,11 +28,15 @@
 
   @include tactile-press(0.97);
 
-  &:disabled, &[disabled] {
-    opacity: 0.45 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-    box-shadow: none !important;
+  &:disabled, &[disabled], &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &--loading {
+    opacity: 0.75;
+    cursor: wait;
   }
 
   // Dimensioni con padding confortevole
@@ -81,27 +85,6 @@
     width: 100%;
   }
 
-  // Glows
-  &--glow {
-    box-shadow: 0 0 22px $violet-glow, 0 4px 18px rgba(59, 7, 100, 0.6);
-  }
-
-  &--glow-crimson {
-    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6);
-  }
-
-  &--glow-cyan {
-    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6);
-  }
-
-  &--glow-emerald {
-    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6);
-  }
-
-  &--glow-obsidian {
-    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7);
-  }
-
   // Varianti
   &--primary {
     background-color: $violet-primary;
@@ -110,7 +93,7 @@
     box-shadow: 0 4px 18px rgba(59, 7, 100, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     @include specular-top(0.2);
 
-    &:hover {
+    &:hover:not(:disabled):not([aria-disabled="true"]) {
       background-color: color.adjust($violet-primary, $lightness: 6%);
       border-color: rgba(192, 132, 252, 0.7);
       color: #ffffff;
@@ -259,12 +242,54 @@
     box-shadow: 0 2px 12px rgba(2, 44, 34, 0.4);
     @include specular-top(0.1);
 
-    &:hover {
+    &:hover:not(:disabled):not([aria-disabled="true"]) {
       background-color: rgba(0, 255, 157, 0.24);
       border-color: rgba(52, 211, 153, 0.7);
       color: #ffffff;
       box-shadow: 0 0 20px rgba(0, 255, 157, 0.45), 0 4px 16px rgba(2, 44, 34, 0.6);
     }
+  }
+
+  // Composed Glow Modifiers placed after variants (DS-03)
+  &--glow {
+    box-shadow: 0 0 22px var(--sd-accent-glow, $violet-glow), 0 4px 18px rgba(59, 7, 100, 0.6) !important;
+  }
+
+  &--glow-crimson {
+    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6) !important;
+  }
+
+  &--glow-cyan {
+    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6) !important;
+  }
+
+  &--glow-emerald {
+    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6) !important;
+  }
+
+  &--glow-obsidian {
+    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7) !important;
+  }
+}
+
+// Accessible Button Loading Spinner (DS-23)
+.sd-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  animation: sd-spin 0.8s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+  flex-shrink: 0;
+
+  &__track {
+    opacity: 0.25;
+  }
+
+  &__arc {
+    opacity: 0.9;
   }
 }
 }

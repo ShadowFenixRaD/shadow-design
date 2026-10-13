@@ -162,6 +162,7 @@ use dioxus::prelude::*;
 pub const STYLES: Asset = asset!("/scss/main.scss");
 
 pub mod a11y;
+pub mod locale;
 pub(crate) mod glow;
 pub(crate) mod util;
 
@@ -284,5 +285,6 @@ pub mod prelude {
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
     pub use crate::a11y::ControlSize;
+    pub use crate::locale::*;
     pub use crate::STYLES;
 }

@@ -46,8 +46,8 @@
   padding: 6px 14px;
   background-color: #08080c;
   color: $zinc-100;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: $radius-md;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: var(--sd-radius-md, $radius-md);
   font-family: $font-sans;
   font-size: 14px;
   cursor: pointer;
@@ -57,14 +57,19 @@
   transition: all $duration-fast ease;
 
   &:hover:not(&--disabled) {
-    border-color: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.45);
     background-color: #0b0b12;
   }
 
+  &:focus-visible {
+    outline: 2px solid var(--sd-focus-ring, #c084fc);
+    outline-offset: 2px;
+  }
+
   &--open {
-    border-color: rgba(168, 85, 247, 0.6);
-    background-color: $color-surface-2;
-    @include glow($violet-glow, 16px);
+    border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
+    background-color: var(--sd-surface-2, $color-surface-2);
+    box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.35));
   }
 
   &--error {
@@ -80,7 +85,7 @@
   }
 
   &--glow {
-    box-shadow: 0 0 20px $violet-glow, inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px var(--sd-accent-glow, $violet-glow), inset 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -95,7 +100,7 @@
   white-space: nowrap;
 
   &--placeholder {
-    color: $zinc-600;
+    color: #8b8b94;
   }
 }
 
@@ -244,7 +249,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 8px 10px;
-  border-radius: $radius-sm;
+  border-radius: var(--sd-radius-sm, $radius-sm);
   font-size: 13px;
   color: $zinc-300;
   background: transparent;
@@ -261,13 +266,19 @@
     color: #ffffff;
   }
 
+  &--active {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    outline: 1px solid var(--sd-focus-ring, rgba(168, 85, 247, 0.4));
+  }
+
   &--selected {
-    background-color: rgba(168, 85, 247, 0.16);
-    color: #f3e8ff;
+    background-color: var(--sd-accent-soft-bg, rgba(168, 85, 247, 0.16));
+    color: var(--sd-accent-strong, #f3e8ff);
     font-weight: 500;
 
     &:hover {
-      background-color: rgba(168, 85, 247, 0.24);
+      background-color: var(--sd-accent-soft-bg, rgba(168, 85, 247, 0.24));
     }
   }
 
@@ -277,14 +288,14 @@
   }
 
   &--creatable {
-    color: #c084fc;
+    color: var(--sd-accent-strong, #c084fc);
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     margin-top: 4px;
     padding-top: 8px;
 
     &:hover {
-      background-color: rgba(168, 85, 247, 0.12);
-      color: #e9d5ff;
+      background-color: var(--sd-accent-soft-bg, rgba(168, 85, 247, 0.12));
+      color: var(--sd-accent-strong, #e9d5ff);
     }
   }
 }
@@ -306,7 +317,7 @@
 
 .sd-select-item-description {
   font-size: 11px;
-  color: $zinc-500;
+  color: $zinc-400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -316,7 +327,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #c084fc;
+  color: var(--sd-accent-strong, #c084fc);
   margin-left: 8px;
   flex-shrink: 0;
 }
@@ -325,7 +336,7 @@
   padding: 16px 12px;
   text-align: center;
   font-size: 13px;
-  color: $zinc-500;
+  color: $zinc-400;
   user-select: none;
 }
 
@@ -344,10 +355,10 @@
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  background-color: rgba(168, 85, 247, 0.18);
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  border-radius: $radius-sm;
-  color: #f3e8ff;
+  background-color: var(--sd-accent-soft-bg, rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(var(--sd-accent-rgb, 168, 85, 247), 0.35);
+  border-radius: var(--sd-radius-sm, $radius-sm);
+  color: var(--sd-accent-strong, #f3e8ff);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;

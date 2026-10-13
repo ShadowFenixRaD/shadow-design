@@ -16,12 +16,32 @@ pub fn TextInput(
     #[props(default)] on_left_icon_click: Option<EventHandler<MouseEvent>>,
     #[props(default)] on_right_icon_click: Option<EventHandler<MouseEvent>>,
     #[props(default)] input_type: Option<String>,
+    #[props(default)] id: Option<String>,
     #[props(default)] class: String,
 ) -> Element {
     let itype = input_type.unwrap_or_else(|| "text".to_string());
+    let input_id = crate::a11y::use_unique_id("sd-input", id);
+    let help_id = if help_text.is_some() {
+        Some(format!("{}-help", input_id))
+    } else {
+        None
+    };
+    let err_id = if error.is_some() {
+        Some(format!("{}-err", input_id))
+    } else {
+        None
+    };
+    let described_by = match (&help_id, &err_id) {
+        (Some(h), Some(e)) => Some(format!("{} {}", h, e)),
+        (Some(h), None) => Some(h.clone()),
+        (None, Some(e)) => Some(e.clone()),
+        (None, None) => None,
+    };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let theme_val = theme.read();
     #[cfg(feature = "theme")]
     let radius_class = theme_val.radius_scale.md();
     #[cfg(feature = "theme")]
@@ -30,6 +50,12 @@ pub fn TextInput(
     let class_modifiers = theme_val.resolve_class_modifiers("input", &class);
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("input", glow);
+    #[cfg(feature = "theme")]
+    let error_class = if error.is_some() {
+        theme_val.input_border_class(true)
+    } else {
+        theme_val.input_border_class(false)
+    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -42,6 +68,12 @@ pub fn TextInput(
         "sd-input--glow".to_string()
     } else {
         String::new()
+    };
+    #[cfg(not(feature = "theme"))]
+    let error_class = if error.is_some() {
+        "sd-input--error"
+    } else {
+        ""
     };
 
     let has_clear = clearable && !value().is_empty() && !disabled;
@@ -67,17 +99,17 @@ pub fn TextInput(
         (false, false) => "",
     };
 
-    let error_class = if error.is_some() {
-        "sd-input--error"
-    } else {
-        ""
-    };
+    let locale = crate::locale::use_locale();
 
     rsx! {
         div {
             class: "sd-input-wrapper {class_modifiers} {class}",
             if let Some(lbl) = label {
-                label { class: "sd-input-label", "{lbl}" }
+                label {
+                    r#for: "{input_id}",
+                    class: "sd-input-label",
+                    "{lbl}"
+                }
             }
             div {
                 class: "sd-input-container",
@@ -102,9 +134,12 @@ pub fn TextInput(
                 }
                 input {
                     r#type: "{itype}",
+                    id: "{input_id}",
                     value: "{value}",
                     placeholder: placeholder.as_deref().unwrap_or_default(),
                     disabled,
+                    "aria-invalid": if error.is_some() { "true" } else { "false" },
+                    "aria-describedby": described_by.as_deref().unwrap_or(""),
                     class: "sd-input {base_override} {icon_class} {error_class} {radius_class} {glow_class}",
                     oninput: move |e| {
                         *value.write() = e.value();
@@ -114,7 +149,8 @@ pub fn TextInput(
                     button {
                         r#type: "button",
                         class: "sd-input-icon sd-input-icon--right sd-input-icon--interactive",
-                        title: "Cancella testo",
+                        title: "{locale.clear_text}",
+                        "aria-label": "{locale.clear_text}",
                         onclick: move |e| {
                             e.stop_propagation();
                             *value.write() = String::new();
@@ -141,10 +177,19 @@ pub fn TextInput(
                     }
                 }
             }
-            if let Some(err) = error {
-                span { class: "sd-input-error", "{err}" }
-            } else if let Some(help) = help_text {
-                span { class: "sd-input-help", "{help}" }
+            if let Some(err) = error.as_ref() {
+                div {
+                    id: err_id.as_deref().unwrap_or(""),
+                    class: "sd-input-error",
+                    "{err}"
+                }
+            }
+            if let Some(help) = help_text.as_ref() {
+                div {
+                    id: help_id.as_deref().unwrap_or(""),
+                    class: "sd-input-help",
+                    "{help}"
+                }
             }
         }
     }

@@ -16,7 +16,6 @@
   &--disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none;
   }
 
   &__box {
@@ -26,7 +25,7 @@
     justify-content: center;
     flex-shrink: 0;
     background-color: $color-surface-1;
-    border: $border-hairline;
+    border: 1px solid rgba(255, 255, 255, 0.34);
     transition: all $duration-fast ease;
 
     @include tactile-press(0.92);
@@ -35,26 +34,26 @@
     &--sm {
       width: 16px;
       height: 16px;
-      border-radius: $radius-sharp;
+      border-radius: var(--sd-radius-xs, 2px);
     }
 
     &--md {
       width: 20px;
       height: 20px;
-      border-radius: 4px;
+      border-radius: var(--sd-radius-sm, 4px);
     }
 
     &--lg {
       width: 24px;
       height: 24px;
-      border-radius: $radius-sm;
+      border-radius: var(--sd-radius-md, 6px);
     }
 
     // Stati
     &--checked {
-      background-color: $violet-primary;
-      border-color: rgba(168, 85, 247, 0.6);
-      color: #ffffff;
+      background-color: var(--sd-accent, $violet-primary);
+      border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
+      color: var(--sd-accent-fg, #ffffff);
       @include specular-top(0.2);
     }
 
@@ -87,12 +86,18 @@
     }
 
     &--glow {
-      box-shadow: 0 0 12px $violet-glow;
+      box-shadow: 0 0 12px var(--sd-accent-glow, $violet-glow);
     }
 
     &--error {
       border-color: $color-danger;
     }
+  }
+
+  &:focus-within &__box,
+  &__box:focus-visible {
+    outline: 2px solid var(--sd-focus-ring, #c084fc);
+    outline-offset: 2px;
   }
 
   &__label {
@@ -109,7 +114,7 @@
 
   &__description {
     font-size: 11px;
-    color: $zinc-500;
+    color: $zinc-400;
     line-height: 1.4;
   }
 

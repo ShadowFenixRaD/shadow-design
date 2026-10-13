@@ -37,12 +37,33 @@ pub fn Checkbox(
     #[props(default)] indeterminate: bool,
     #[props(default)] size: CheckboxSize,
     #[props(default)] glow: Option<bool>,
+    #[props(default)] id: Option<String>,
     #[props(default)] class: String,
+    #[props(default)] on_change: Option<EventHandler<bool>>,
 ) -> Element {
     let is_checked = *checked.read();
+    let input_id = crate::a11y::use_unique_id("sd-checkbox", id);
+    let desc_id = if description.is_some() {
+        Some(format!("{}-desc", input_id))
+    } else {
+        None
+    };
+    let err_id = if error.is_some() {
+        Some(format!("{}-err", input_id))
+    } else {
+        None
+    };
+    let described_by = match (&desc_id, &err_id) {
+        (Some(d), Some(e)) => Some(format!("{} {}", d, e)),
+        (Some(d), None) => Some(d.clone()),
+        (None, Some(e)) => Some(e.clone()),
+        (None, None) => None,
+    };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let theme_val = theme.read();
     #[cfg(feature = "theme")]
     let active_color_class = match &theme_val.primary_color {
         crate::theme::PrimaryColor::Violet => "sd-checkbox__box--checked".to_string(),
@@ -51,7 +72,10 @@ pub fn Checkbox(
         crate::theme::PrimaryColor::Cyan => "sd-checkbox__box--checked-cyan".to_string(),
         crate::theme::PrimaryColor::Emerald => "sd-checkbox__box--checked-emerald".to_string(),
         crate::theme::PrimaryColor::Custom { .. } => {
-            format!("sd-checkbox__box--checked-{}", theme_val.primary_color.css_prefix())
+            format!(
+                "sd-checkbox__box--checked-{}",
+                theme_val.primary_color.css_prefix()
+            )
         }
     };
     #[cfg(feature = "theme")]
@@ -91,24 +115,38 @@ pub fn Checkbox(
     };
 
     let box_size = size.scss_class();
-    let is_disabled = disabled;
-    let disabled_class = if is_disabled {
+    let disabled_class = if disabled {
         "sd-checkbox--disabled"
     } else {
         ""
     };
 
     rsx! {
-        div {
+        label {
             class: "sd-checkbox {base_override} {disabled_class} {class_modifiers} {class}",
-            onclick: move |_| {
-                if !is_disabled {
-                    let next = !*checked.read();
-                    *checked.write() = next;
-                }
-            },
-            div {
+            r#for: "{input_id}",
+            input {
+                r#type: "checkbox",
+                class: "sd-visually-hidden",
+                id: "{input_id}",
+                checked: is_checked,
+                disabled: disabled,
+                "aria-checked": if indeterminate { "mixed" } else if is_checked { "true" } else { "false" },
+                "aria-invalid": if error.is_some() { "true" } else { "false" },
+                "aria-describedby": described_by.as_deref().unwrap_or(""),
+                onchange: move |e| {
+                    if !disabled {
+                        let next = if indeterminate { true } else { e.checked() };
+                        *checked.write() = next;
+                        if let Some(handler) = on_change.as_ref() {
+                            handler.call(next);
+                        }
+                    }
+                },
+            }
+            span {
                 class: "sd-checkbox__box {box_size} {checked_class} {glow_class} {error_class}",
+                "aria-hidden": "true",
                 if indeterminate {
                     span { style: "display: block; width: 10px; height: 2px; background: currentColor; border-radius: 9999px;" }
                 } else if is_checked {
@@ -116,15 +154,23 @@ pub fn Checkbox(
                 }
             }
             if label.is_some() || description.is_some() || error.is_some() {
-                div { class: "sd-checkbox__label",
-                    if let Some(lbl) = label {
+                span { class: "sd-checkbox__label",
+                    if let Some(lbl) = label.as_ref() {
                         span { class: "sd-checkbox__title", "{lbl}" }
                     }
-                    if let Some(desc) = description {
-                        span { class: "sd-checkbox__description", "{desc}" }
+                    if let Some(desc) = description.as_ref() {
+                        span {
+                            id: desc_id.as_deref().unwrap_or(""),
+                            class: "sd-checkbox__description",
+                            "{desc}"
+                        }
                     }
-                    if let Some(err) = error {
-                        span { class: "sd-checkbox__error-text", "{err}" }
+                    if let Some(err) = error.as_ref() {
+                        span {
+                            id: err_id.as_deref().unwrap_or(""),
+                            class: "sd-checkbox__error-text",
+                            "{err}"
+                        }
                     }
                 }
             }

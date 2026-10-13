@@ -7,12 +7,27 @@ pub fn Switch(
     #[props(default)] description: Option<String>,
     #[props(default)] disabled: bool,
     #[props(default)] glow: Option<bool>,
+    #[props(default)] id: Option<String>,
     #[props(default)] class: String,
+    #[props(default)] on_change: Option<EventHandler<bool>>,
 ) -> Element {
     let is_checked = *checked.read();
+    let switch_id = crate::a11y::use_unique_id("sd-switch", id);
+    let label_id = if label.is_some() {
+        Some(format!("{}-label", switch_id))
+    } else {
+        None
+    };
+    let desc_id = if description.is_some() {
+        Some(format!("{}-desc", switch_id))
+    } else {
+        None
+    };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let theme_val = theme.read();
     #[cfg(feature = "theme")]
     let track_checked_modifier = match &theme_val.primary_color {
         crate::theme::PrimaryColor::Violet => "sd-switch__track--checked".to_string(),
@@ -21,7 +36,10 @@ pub fn Switch(
         crate::theme::PrimaryColor::Cyan => "sd-switch__track--checked-cyan".to_string(),
         crate::theme::PrimaryColor::Emerald => "sd-switch__track--checked-emerald".to_string(),
         crate::theme::PrimaryColor::Custom { .. } => {
-            format!("sd-switch__track--checked-{}", theme_val.primary_color.css_prefix())
+            format!(
+                "sd-switch__track--checked-{}",
+                theme_val.primary_color.css_prefix()
+            )
         }
     };
     #[cfg(feature = "theme")]
@@ -60,30 +78,63 @@ pub fn Switch(
         ""
     };
 
-    let disabled_class = if disabled { "sd-switch--disabled" } else { "" };
+    let disabled_class = if disabled {
+        "sd-switch--disabled"
+    } else {
+        ""
+    };
 
     rsx! {
         div {
             class: "sd-switch {base_override} {disabled_class} {class_modifiers} {class}",
-            onclick: move |_| {
-                if !disabled {
-                    let next = !*checked.read();
-                    *checked.write() = next;
-                }
-            },
-            div {
+            button {
+                r#type: "button",
+                role: "switch",
+                id: "{switch_id}",
                 class: "sd-switch__track {track_active_class}",
+                disabled: disabled,
+                "aria-checked": if is_checked { "true" } else { "false" },
+                "aria-labelledby": label_id.as_deref().unwrap_or(""),
+                "aria-describedby": desc_id.as_deref().unwrap_or(""),
+                onclick: move |_| {
+                    if !disabled {
+                        let next = !*checked.read();
+                        *checked.write() = next;
+                        if let Some(handler) = on_change.as_ref() {
+                            handler.call(next);
+                        }
+                    }
+                },
                 span {
                     class: "sd-switch__thumb {thumb_active_class}",
+                    "aria-hidden": "true",
                 }
             }
             if label.is_some() || description.is_some() {
-                div { class: "sd-switch__label-group",
+                div {
+                    class: "sd-switch__label-group",
+                    onclick: move |_| {
+                        if !disabled {
+                            let next = !*checked.read();
+                            *checked.write() = next;
+                            if let Some(handler) = on_change.as_ref() {
+                                handler.call(next);
+                            }
+                        }
+                    },
                     if let Some(lbl) = label {
-                        span { class: "sd-switch__label", "{lbl}" }
+                        span {
+                            id: label_id.as_deref().unwrap_or(""),
+                            class: "sd-switch__label",
+                            "{lbl}"
+                        }
                     }
                     if let Some(desc) = description {
-                        span { class: "sd-switch__description", "{desc}" }
+                        span {
+                            id: desc_id.as_deref().unwrap_or(""),
+                            class: "sd-switch__description",
+                            "{desc}"
+                        }
                     }
                 }
             }
