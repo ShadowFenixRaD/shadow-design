@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AlertsPage, BadgesPage, ButtonsPage, CardsPage, CheckboxPage, DrawerPage, DropdownPage, Home,
     InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SelectPage, SwitchPage, TabsPage,
-    ThemeBuilderPage, TooltipPage, TypographyPage,
+    TextareaPage, ThemeBuilderPage, TooltipPage, TypographyPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -29,6 +29,8 @@ pub enum Route {
     InputsPage {},
     #[route("/select")]
     SelectPage {},
+    #[route("/textarea")]
+    TextareaPage {},
     #[route("/checkbox")]
     CheckboxPage {},
     #[route("/badges")]
@@ -66,23 +68,26 @@ fn App() -> Element {
     let mut theme = use_signal(Theme::default);
     use_context_provider(|| theme);
 
-    // Resistenza ai riavvii e ai refresh: ripristino automatico da localStorage
-    use_effect(move || {
+    // Resistenza ai riavvii e ai refresh: ripristino automatico da localStorage (eseguito solo una volta all'avvio)
+    use_hook(|| {
         spawn(async move {
-            let mut eval = document::eval(
+            let eval = document::eval(
                 r#"
                 try {
-                    let saved = localStorage.getItem("shadow_design_custom_theme");
-                    dioxus.send(saved ? saved : "");
+                    return (typeof window !== "undefined" && window.localStorage)
+                        ? (window.localStorage.getItem("shadow_design_custom_theme") || "")
+                        : "";
                 } catch(e) {
-                    dioxus.send("");
+                    return "";
                 }
                 "#,
             );
-            if let Ok(json_str) = eval.recv::<String>().await {
-                if !json_str.is_empty() {
-                    if let Ok(loaded) = serde_json::from_str::<Theme>(&json_str) {
-                        *theme.write() = loaded;
+            if let Ok(val) = eval.await {
+                if let Some(json_str) = val.as_str() {
+                    if !json_str.is_empty() {
+                        if let Ok(loaded) = serde_json::from_str::<Theme>(json_str) {
+                            *theme.write() = loaded;
+                        }
                     }
                 }
             }
@@ -93,18 +98,28 @@ fn App() -> Element {
     use_effect(move || {
         let css = theme().to_css_variables();
         spawn(async move {
-            let js = format!(
+            let eval = document::eval(&format!(
                 r#"
-                let el = document.getElementById("sd-dynamic-theme-vars");
-                if (!el) {{
-                    el = document.createElement("style");
-                    el.id = "sd-dynamic-theme-vars";
-                    document.head.appendChild(el);
+                try {{
+                    var el = document.getElementById("sd-dynamic-theme-vars");
+                    if (!el) {{
+                        el = document.createElement("style");
+                        el.id = "sd-dynamic-theme-vars";
+                        var target = document.head || document.documentElement;
+                        if (target) {{
+                            target.appendChild(el);
+                        }}
+                    }}
+                    if (el) {{
+                        el.textContent = `{css}`;
+                    }}
+                }} catch(e) {{
+                    console.warn("Theme vars injection warning:", e);
                 }}
-                el.textContent = `{css}`;
+                return true;
                 "#
-            );
-            let _ = document::eval(&js).await;
+            ));
+            let _ = eval.await;
         });
     });
 

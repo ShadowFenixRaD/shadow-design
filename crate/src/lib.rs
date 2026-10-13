@@ -84,7 +84,11 @@
 //! | `button` | [`button`] | Buttons with BEM variants, sizes, loading spinners, and tactile active states |
 //! | `card` | [`card`] | Container cards with elevated, interactive, and metric variants |
 //! | `input` | [`input`] | Reactive text inputs with clickable icons, clear buttons, and signal binding |
+<<<<<<< HEAD
 //! | `select` | [`select`] | Advanced dropdown Select, MultiSelect with tags, and Combobox autocomplete |
+=======
+//! | `textarea` | [`textarea`] | Multiline text areas with dynamic auto-resize, character count, and clear button |
+>>>>>>> origin/component/textarea
 //! | `checkbox` | [`checkbox`] | Tactile checkboxes with indeterminate and error states |
 //! | `badge` | [`badge`] | Status labels, pill badges, and pulsating live dots |
 //! | `navbar` | [`navbar`] | Responsive navigation bars with brand and action slots |
@@ -165,6 +169,8 @@ pub mod icon;
 pub mod input;
 #[cfg(feature = "select")]
 pub mod select;
+#[cfg(feature = "textarea")]
+pub mod textarea;
 #[cfg(feature = "modal")]
 pub mod modal;
 #[cfg(feature = "navbar")]
@@ -205,6 +211,8 @@ pub mod prelude {
     pub use crate::input::*;
     #[cfg(feature = "select")]
     pub use crate::select::*;
+    #[cfg(feature = "textarea")]
+    pub use crate::textarea::*;
     #[cfg(feature = "modal")]
     pub use crate::modal::*;
     #[cfg(feature = "navbar")]

@@ -29,6 +29,7 @@ all = [
     "card",
     "input",
     "select",
+    "textarea",
     "checkbox",
     "badge",
     "navbar",
@@ -51,6 +52,7 @@ button = []
 card = []
 input = ["icon"]
 select = ["icon"]
+textarea = ["icon"]
 checkbox = ["icon"]
 badge = []
 navbar = []

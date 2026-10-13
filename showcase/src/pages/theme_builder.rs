@@ -8,16 +8,22 @@ pub const STORAGE_KEY: &str = "shadow_design_custom_theme";
 pub fn save_theme_to_storage(theme: &Theme) {
     if let Ok(json) = serde_json::to_string(theme) {
         let js = format!(
-            "try {{ localStorage.setItem('{}', {:?}); }} catch(e) {{}}",
+            "try {{ localStorage.setItem('{}', {:?}); }} catch(e) {{}} return true;",
             STORAGE_KEY, json
         );
-        let _ = document::eval(&js);
+        let eval = document::eval(&js);
+        spawn(async move {
+            let _ = eval.await;
+        });
     }
 }
 
 pub fn clear_theme_from_storage() {
-    let js = format!("try {{ localStorage.removeItem('{}'); }} catch(e) {{}}", STORAGE_KEY);
-    let _ = document::eval(&js);
+    let js = format!("try {{ localStorage.removeItem('{}'); }} catch(e) {{}} return true;", STORAGE_KEY);
+    let eval = document::eval(&js);
+    spawn(async move {
+        let _ = eval.await;
+    });
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
@@ -162,7 +168,10 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                         size: ButtonSize::Sm,
                         left_icon: rsx! { Icon { kind: IconKind::Copy, size: 14 } },
                         onclick: move |_| {
-                            let _ = document::eval(&format!("navigator.clipboard.writeText({:?});", rust_to_copy));
+                            let _ = document::eval(&format!(
+                                "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
+                                rust_to_copy
+                            ));
                             toast.info("Codice Rust (ThemeBuilder) copiato negli appunti!");
                         },
                         "Copia Rust Code"
@@ -722,7 +731,10 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                     variant: ButtonVariant::Secondary,
                                     left_icon: rsx! { Icon { kind: IconKind::Copy, size: 12 } },
                                     onclick: move |_| {
-                                        let _ = document::eval(&format!("navigator.clipboard.writeText({:?});", json_to_copy));
+                                        let _ = document::eval(&format!(
+                                            "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
+                                            json_to_copy
+                                        ));
                                         toast.info("JSON del tema copiato negli appunti!");
                                     },
                                     "Copia JSON"
