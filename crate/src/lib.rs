@@ -101,6 +101,15 @@
 //! | `drawer` | [`drawer`] | Slide-over side panels from left or right with backdrop |
 //! | `dropdown` | [`dropdown`] | Trigger-anchored context menus with auto-dismiss |
 //! | `animation` | [`animation`] | Optical transitions and micro-animation wrappers |
+//! | `avatar` | [`avatar`] | User avatars, presence status dot, initials fallback, and avatar groups |
+//! | `chat` | [`chat`] | P2P & messaging chat bubbles with delivery status, security badges, and rich media |
+//! | `progress` | [`progress`] | Progress bars with semantic variants and shimmer indeterminate animations |
+//! | `attachment_card` | [`attachment_card`] | Media attachments and file transfer cards with action slots |
+//! | `contact_card` | [`contact_card`] | Contact profile cards with presence indicators and quick action buttons |
+//! | `segmented_control` | [`segmented_control`] | Tactile sliding segmented selectors with theme glow |
+//! | `divider` | [`divider`] | Horizontal and vertical translucent separators with label support |
+//! | `tree` | [`tree`] | Hierarchical tree views with collapsible nodes and connection lines |
+//! | `skeleton` | [`skeleton`] | Geometric loading placeholder shimmers (circle, rect, text) |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
