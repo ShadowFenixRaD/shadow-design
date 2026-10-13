@@ -84,11 +84,8 @@
 //! | `button` | [`button`] | Buttons with BEM variants, sizes, loading spinners, and tactile active states |
 //! | `card` | [`card`] | Container cards with elevated, interactive, and metric variants |
 //! | `input` | [`input`] | Reactive text inputs with clickable icons, clear buttons, and signal binding |
-<<<<<<< HEAD
 //! | `select` | [`select`] | Advanced dropdown Select, MultiSelect with tags, and Combobox autocomplete |
-=======
 //! | `textarea` | [`textarea`] | Multiline text areas with dynamic auto-resize, character count, and clear button |
->>>>>>> origin/component/textarea
 //! | `checkbox` | [`checkbox`] | Tactile checkboxes with indeterminate and error states |
 //! | `badge` | [`badge`] | Status labels, pill badges, and pulsating live dots |
 //! | `navbar` | [`navbar`] | Responsive navigation bars with brand and action slots |
