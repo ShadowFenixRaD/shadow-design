@@ -62,8 +62,21 @@
   }
 
   // Glow
-  &--glow {
-    box-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+  &--glow,
+  &--glow-primary {
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.35);
+  }
+
+  &--glow-success {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+  }
+
+  &--glow-warning {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+  }
+
+  &--glow-danger {
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.35);
   }
 
   &__dot-container {

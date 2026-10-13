@@ -42,8 +42,19 @@ impl CardVariant {
     }
 }
 
+/// Card component with support for multiple visual variants, elevations, media, and interactive models.
+///
+/// ### Accessibility & Interactive Behavior
+/// When using `CardVariant::Interactive`, provide either `onclick` or `href`:
+/// - When `href` is specified, the title renders as an accessible link (`<a>`) with a stretched link
+///   overlay so the entire card is clickable while maintaining valid document outline.
+/// - When `onclick` is specified, the card root gains `role="button"`, `tabindex="0"`, and activates
+///   on both `Enter` and `Space`.
+/// - Note: Interactive child controls (buttons, dropdown triggers, links) nested inside an interactive
+///   card should call `evt.stop_propagation()` to prevent triggering the card's parent action.
 #[component]
 pub fn Card(
+    #[props(default)] id: Option<String>,
     #[props(default)] title: Option<String>,
     #[props(default)] subtitle: Option<String>,
     #[props(default)] avatar: Option<Element>,
@@ -58,10 +69,33 @@ pub fn Card(
     #[props(default)] image: Option<String>,
     #[props(default)] image_alt: Option<String>,
     #[props(default)] image_height: Option<String>,
+    #[props(default)] onclick: Option<EventHandler<MouseEvent>>,
     #[props(default)] on_click: Option<EventHandler<MouseEvent>>,
+    #[props(default)] href: Option<String>,
     #[props(default)] footer: Option<Element>,
     #[props(default)] children: Element,
 ) -> Element {
+    let card_id = use_hook(|| {
+        if let Some(user_id) = id {
+            user_id
+        } else {
+            static NEXT_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+            format!("sd-card-{}", NEXT_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+        }
+    });
+    let title_id = format!("{card_id}-title");
+
+    let effective_onclick = onclick.or(on_click);
+    let is_link = href.is_some();
+    let is_button = !is_link && effective_onclick.is_some();
+    let is_actionable = is_link || is_button;
+
+    let actionable_class = if is_actionable {
+        "sd-card--actionable"
+    } else {
+        ""
+    };
+
     let variant_class = variant.scss_class();
     let shadow_class = shadow.scss_class();
     let overflow_class = if overflow_hidden {
@@ -163,14 +197,30 @@ pub fn Card(
         "".to_string()
     };
 
+    let handle_keydown = move |evt: KeyboardEvent| {
+        if is_button && (evt.key() == Key::Enter || evt.key() == Key::Character(" ".to_string())) {
+            evt.prevent_default();
+            let _ = document::eval(r#"
+                if (document.activeElement) {
+                    document.activeElement.click();
+                }
+            "#);
+        }
+    };
+
     rsx! {
         div {
-            class: "sd-card {base_override} {variant_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
+            id: "{card_id}",
+            class: "sd-card {base_override} {variant_class} {actionable_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
+            role: if is_button { "button" } else { "" },
+            tabindex: if is_button { "0" } else { "" },
+            "aria-labelledby": if is_button && title.is_some() { "{title_id}" } else { "" },
             onclick: move |evt| {
-                if let Some(h) = &on_click {
+                if let Some(h) = &effective_onclick {
                     h.call(evt);
                 }
             },
+            onkeydown: handle_keydown,
 
             // Intestazione con Avatar, Titolo e Sottotitolo
             if has_avatar || has_title_or_sub {
@@ -182,14 +232,32 @@ pub fn Card(
                     if has_title_or_sub {
                         div {
                             class: "sd-card__header-text",
-                            if let Some(t) = title {
-                                h3 { class: "sd-card__title", "{t}" }
+                            if let Some(t) = &title {
+                                h3 {
+                                    id: "{title_id}",
+                                    class: "sd-card__title",
+                                    if let Some(url) = &href {
+                                        a {
+                                            href: "{url}",
+                                            class: "sd-card__link",
+                                            "{t}"
+                                        }
+                                    } else {
+                                        "{t}"
+                                    }
+                                }
                             }
-                            if let Some(s) = subtitle {
+                            if let Some(s) = &subtitle {
                                 p { class: "sd-card__subtitle", "{s}" }
                             }
                         }
                     }
+                }
+            } else if let Some(url) = &href {
+                a {
+                    href: "{url}",
+                    class: "sd-card__link",
+                    "aria-label": "Card link",
                 }
             }
 
