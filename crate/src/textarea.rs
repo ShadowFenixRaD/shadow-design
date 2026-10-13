@@ -280,8 +280,8 @@ mod tests {
         assert_eq!(lines, 4);
 
         let min_rows = 2;
-        let max_rows = Some(3);
-        let calculated = lines.max(min_rows).min(max_rows.unwrap());
+        let max_rows = 3;
+        let calculated = lines.max(min_rows).min(max_rows);
         assert_eq!(calculated, 3);
     }
 

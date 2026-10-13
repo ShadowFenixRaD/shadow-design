@@ -1,105 +1,149 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::banner::FeatureBanner;
+use crate::components::props_table::PropRow;
+use crate::components::showcase_tabs::ShowcaseTabs;
 
 #[component]
 pub fn CardsPage() -> Element {
     let mut selected_variant = use_signal(|| CardVariant::Default);
     let mut selected_shadow = use_signal(|| CardShadow::Md);
-    let mut enable_glow = use_signal(|| false);
-    let mut with_avatar = use_signal(|| true);
-    let mut with_title = use_signal(|| true);
-    let mut with_subtitle = use_signal(|| true);
-    let mut with_progress = use_signal(|| false);
-    let mut with_buttons = use_signal(|| true);
-    let mut with_image = use_signal(|| false);
-    let mut with_max_height = use_signal(|| false);
+    let with_avatar = use_signal(|| true);
+    let with_title = use_signal(|| true);
+    let with_subtitle = use_signal(|| true);
+    let with_progress = use_signal(|| false);
+    let with_buttons = use_signal(|| true);
+    let with_image = use_signal(|| false);
+    let enable_glow = use_signal(|| false);
+    let with_max_height = use_signal(|| false);
 
     let props = vec![
+        PropRow {
+            name: "id",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Identificatore univoco HTML per il contenitore.",
+        },
         PropRow {
             name: "title",
             r#type: "Option<String>",
             default: "None",
-            description: "Titolo primario dell'intestazione (centrato se senza avatar, affiancato se con avatar)",
+            description: "Titolo primario dell'intestazione (renderizzato in h3).",
         },
         PropRow {
             name: "subtitle",
             r#type: "Option<String>",
             default: "None",
-            description: "Sottotitolo più piccolo e scuro coordinato con il titolo",
+            description: "Testo secondario sotto al titolo in grigio attenuato.",
         },
         PropRow {
             name: "avatar",
             r#type: "Option<Element>",
             default: "None",
-            description: "Elemento avatar o icona (centrato se senza titolo, al fianco se con titolo)",
-        },
-        PropRow {
-            name: "buttons",
-            r#type: "Option<Element>",
-            default: "None",
-            description: "Sezione bottoni ed azioni dedicata in basso alla card",
-        },
-        PropRow {
-            name: "progress",
-            r#type: "Option<f32>",
-            default: "None",
-            description: "Avanzamento percentuale (0.0 .. 100.0) con barra ProgressBar integrata",
-        },
-        PropRow {
-            name: "image",
-            r#type: "Option<String>",
-            default: "None",
-            description: "Immagine a tutta larghezza in basso con adattamento e ritaglio bordi",
-        },
-        PropRow {
-            name: "image_height",
-            r#type: "Option<String>",
-            default: "None",
-            description: "Altezza personalizzata opzionale per l'immagine inferiore (es. '160px')",
+            description: "Slot per icona o componente Avatar a sinistra dell'intestazione.",
         },
         PropRow {
             name: "variant",
             r#type: "CardVariant",
             default: "CardVariant::Default",
-            description: "Variante visiva (Default, Elevated, Interactive, Metric)",
+            description: "Variante visiva (Default, Elevated, Interactive, Metric).",
         },
         PropRow {
             name: "shadow",
             r#type: "CardShadow",
             default: "CardShadow::Md",
-            description: "Livello di elevazione e profondità dell'ombra ottica",
+            description: "Livello di elevazione e profondità dell'ombra ottica (None, Sm, Md, Lg, Xl).",
         },
         PropRow {
             name: "hover_glow",
             r#type: "bool",
             default: "false",
-            description: "Micro-glow coordinato con il colore del tema attivo al passaggio del mouse",
+            description: "Micro-glow coordinato con il colore del tema attivo al passaggio del mouse.",
+        },
+        PropRow {
+            name: "glow",
+            r#type: "Option<bool>",
+            default: "None",
+            description: "Controllo esplicito del bagliore ottico della scheda.",
+        },
+        PropRow {
+            name: "onclick / on_click",
+            r#type: "Option<EventHandler<MouseEvent>>",
+            default: "None",
+            description: "Callback di click per CardVariant::Interactive con role='button' e tastiera.",
+        },
+        PropRow {
+            name: "href",
+            r#type: "Option<String>",
+            default: "None",
+            description: "URL di destinazione per CardVariant::Interactive tramite link stretched accessibile.",
+        },
+        PropRow {
+            name: "progress",
+            r#type: "Option<f32>",
+            default: "None",
+            description: "Avanzamento percentuale (0.0 .. 100.0) con barra ProgressBar integrata.",
+        },
+        PropRow {
+            name: "buttons",
+            r#type: "Option<Element>",
+            default: "None",
+            description: "Slot inferiore per azioni rapide e pulsanti.",
+        },
+        PropRow {
+            name: "image",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Immagine a tutta larghezza in basso con adattamento e ritaglio bordi.",
+        },
+        PropRow {
+            name: "image_height",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Altezza personalizzata opzionale per l'immagine inferiore (es. '160px').",
         },
         PropRow {
             name: "footer",
             r#type: "Option<Element>",
             default: "None",
-            description: "Slot per la sezione a piè di pagina con sfondo e divisore dedicato",
+            description: "Slot per la sezione a piè di pagina con sfondo e divisore dedicato.",
+        },
+        PropRow {
+            name: "overflow_hidden",
+            r#type: "bool",
+            default: "false",
+            description: "Forza overflow hidden per ritagliare media senza occludere menu dropdown.",
+        },
+        PropRow {
+            name: "class",
+            r#type: "String",
+            default: "\"\"",
+            description: "Classi CSS aggiuntive applicate al contenitore.",
         },
     ];
 
     let code_snippet = r#"Card {
+    title: Some("Mesh Node Cluster".to_string()),
+    subtitle: Some("Topologia di rete crittografica P2P".to_string()),
+    variant: CardVariant::Interactive,
+    shadow: CardShadow::Lg,
+    hover_glow: true,
     avatar: rsx! {
         Avatar { name: Some("Shadow Core".to_string()), size: AvatarSize::Md, status: PresenceStatus::Online }
     },
-    title: Some("Mesh Node Cluster".to_string()),
-    subtitle: Some("Topologia di rete crittografica P2P".to_string()),
     progress: Some(82.0),
     buttons: rsx! {
         Button { size: ButtonSize::Sm, variant: ButtonVariant::Primary, "Connetti" }
         Button { size: ButtonSize::Sm, variant: ButtonVariant::Outline, "Dettagli" }
     },
     image: Some("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80".to_string()),
+    footer: rsx! {
+        span { class: "text-zinc-500", "Ultima sincronizzazione 2 minuti fa" }
+    },
     p { class: "text-xs text-zinc-300", "Nodo di sincronizzazione Kyber-1024 attivo." }
 }"#
-    .to_string();
+        .to_string();
 
     let max_h_class = if with_max_height() { "max-h-[420px]" } else { "" };
 
@@ -163,6 +207,7 @@ pub fn CardsPage() -> Element {
                                 div { class: "flex flex-wrap gap-1.5",
                                     for v in [CardVariant::Default, CardVariant::Elevated, CardVariant::Interactive, CardVariant::Metric] {
                                         button {
+                                            key: "{v:?}",
                                             r#type: "button",
                                             class: if selected_variant() == v {
                                                 "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
@@ -181,6 +226,7 @@ pub fn CardsPage() -> Element {
                                 div { class: "flex flex-wrap gap-1.5",
                                     for s in [CardShadow::None, CardShadow::Sm, CardShadow::Md, CardShadow::Lg, CardShadow::Xl] {
                                         button {
+                                            key: "{s:?}",
                                             r#type: "button",
                                             class: if selected_shadow() == s {
                                                 "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
@@ -197,73 +243,49 @@ pub fn CardsPage() -> Element {
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
                                 span { class: "text-zinc-400 block uppercase tracking-wider text-[10px]", "Sezioni Attive:" }
                                 div { class: "grid grid-cols-2 gap-2 text-zinc-300",
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_avatar}",
-                                            onchange: move |e| with_avatar.set(e.checked()),
-                                        }
-                                        "Avatar"
+                                    Checkbox {
+                                        checked: with_avatar,
+                                        label: Some("Avatar".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_title}",
-                                            onchange: move |e| with_title.set(e.checked()),
-                                        }
-                                        "Titolo"
+                                    Checkbox {
+                                        checked: with_title,
+                                        label: Some("Titolo".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_subtitle}",
-                                            onchange: move |e| with_subtitle.set(e.checked()),
-                                        }
-                                        "Sottotitolo"
+                                    Checkbox {
+                                        checked: with_subtitle,
+                                        label: Some("Sottotitolo".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_progress}",
-                                            onchange: move |e| with_progress.set(e.checked()),
-                                        }
-                                        "Progress Bar"
+                                    Checkbox {
+                                        checked: with_progress,
+                                        label: Some("Progress Bar".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_buttons}",
-                                            onchange: move |e| with_buttons.set(e.checked()),
-                                        }
-                                        "Bottoni in Basso"
+                                    Checkbox {
+                                        checked: with_buttons,
+                                        label: Some("Bottoni in Basso".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{with_image}",
-                                            onchange: move |e| with_image.set(e.checked()),
-                                        }
-                                        "Immagine in Basso"
+                                    Checkbox {
+                                        checked: with_image,
+                                        label: Some("Immagine in Basso".to_string()),
+                                        size: CheckboxSize::Sm,
                                     }
                                 }
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2",
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{enable_glow}",
-                                        onchange: move |e| enable_glow.set(e.checked()),
-                                    }
-                                    "Attiva Micro-Glow su Hover"
+                                Checkbox {
+                                    checked: enable_glow,
+                                    label: Some("Attiva Micro-Glow su Hover".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-amber-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_max_height}",
-                                        onchange: move |e| with_max_height.set(e.checked()),
-                                    }
-                                    "Test Altezza Massima (Taglio Immagine)"
+                                Checkbox {
+                                    checked: with_max_height,
+                                    label: Some("Test Altezza Massima (Taglio Immagine)".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }
@@ -294,6 +316,7 @@ pub fn CardsPage() -> Element {
                 Card {
                     variant: CardVariant::Interactive,
                     hover_glow: true,
+                    onclick: move |_| {},
                     div { class: "flex items-start justify-between gap-3",
                         div { class: "space-y-1.5",
                             span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Richieste Totali" }

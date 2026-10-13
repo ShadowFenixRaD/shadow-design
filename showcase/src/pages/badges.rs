@@ -6,8 +6,9 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 #[component]
 pub fn BadgesPage() -> Element {
     let mut selected_variant = use_signal(|| BadgeVariant::Primary);
-    let mut is_pill = use_signal(|| true);
-    let mut has_dot = use_signal(|| true);
+    let is_pill = use_signal(|| true);
+    let has_dot = use_signal(|| true);
+    let enable_glow = use_signal(|| false);
     let badge_text = use_signal(|| "Online".to_string());
 
     let props = vec![
@@ -34,6 +35,18 @@ pub fn BadgesPage() -> Element {
             r#type: "bool",
             default: "false",
             description: "Mostra un indicatore circolare con micro-animazione pulsante",
+        },
+        PropRow {
+            name: "glow",
+            r#type: "Option<bool>",
+            default: "None",
+            description: "Bagliore semantico coordinato con il colore della variante",
+        },
+        PropRow {
+            name: "class",
+            r#type: "String",
+            default: "\"\"",
+            description: "Classi CSS aggiuntive applicate all'elemento <span>",
         },
     ];
 
@@ -64,16 +77,26 @@ pub fn BadgesPage() -> Element {
                                 variant: selected_variant(),
                                 pill: is_pill(),
                                 dot: has_dot(),
+                                glow: if enable_glow() { Some(true) } else { None },
                             }
                         }
 
                         // Configurator
                         div { class: "space-y-4 text-xs font-mono",
                             div {
+                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Testo Etichetta:" }
+                                TextInput {
+                                    value: badge_text,
+                                    placeholder: "Testo badge...".to_string(),
+                                }
+                            }
+
+                            div {
                                 span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Semantica:" }
                                 div { class: "flex flex-wrap gap-1.5",
                                     for v in [BadgeVariant::Default, BadgeVariant::Primary, BadgeVariant::Success, BadgeVariant::Warning, BadgeVariant::Danger, BadgeVariant::Outline] {
                                         button {
+                                            key: "{v:?}",
                                             r#type: "button",
                                             class: if selected_variant() == v {
                                                 "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
@@ -87,22 +110,21 @@ pub fn BadgesPage() -> Element {
                                 }
                             }
 
-                            div { class: "flex flex-wrap gap-4 pt-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_pill}",
-                                        onchange: move |e| is_pill.set(e.checked()),
-                                    }
-                                    "Forma a Pillola (Pill)"
+                            div { class: "grid grid-cols-2 gap-3 pt-2 border-t border-white/[0.06]",
+                                Checkbox {
+                                    checked: is_pill,
+                                    label: Some("Forma a Pillola".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{has_dot}",
-                                        onchange: move |e| has_dot.set(e.checked()),
-                                    }
-                                    "Dot Pulsante (Live status)"
+                                Checkbox {
+                                    checked: has_dot,
+                                    label: Some("Dot Pulsante".to_string()),
+                                    size: CheckboxSize::Sm,
+                                }
+                                Checkbox {
+                                    checked: enable_glow,
+                                    label: Some("Micro-Glow Semantico".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }
@@ -114,25 +136,24 @@ pub fn BadgesPage() -> Element {
 
             // Visual Catalog
             Card {
-                title: "Indicatori con Status Dot Animato".to_string(),
-                subtitle: "Ideali per mostrare lo stato di servizi, pipeline o connessioni".to_string(),
-                div { class: "flex flex-wrap items-center gap-3",
-                    Badge { label: "Cluster Operativo".to_string(), variant: BadgeVariant::Success, dot: true, pill: true }
-                    Badge { label: "Deployment In Corso".to_string(), variant: BadgeVariant::Primary, dot: true, pill: true }
-                    Badge { label: "CPU Carico Alto".to_string(), variant: BadgeVariant::Warning, dot: true, pill: true }
-                    Badge { label: "Disconnesso".to_string(), variant: BadgeVariant::Danger, dot: true, pill: true }
-                    Badge { label: "Standby".to_string(), variant: BadgeVariant::Default, dot: true, pill: true }
-                }
-            }
-
-            Card {
-                title: "Varianti Rettangolari e Outline".to_string(),
-                subtitle: "Stile sobrio per tag di codice, categorie e metadati".to_string(),
-                div { class: "flex flex-wrap items-center gap-2.5",
-                    Badge { label: "Rust 1.85".to_string(), variant: BadgeVariant::Default }
-                    Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Primary }
-                    Badge { label: "SCSS Nativo".to_string(), variant: BadgeVariant::Success }
-                    Badge { label: "Zero Bloat".to_string(), variant: BadgeVariant::Outline }
+                title: "Varianti Semantiche e Forme".to_string(),
+                subtitle: "Anteprima comparativa di tutti gli stati e combinazioni grafiche".to_string(),
+                div { class: "space-y-4",
+                    div { class: "flex flex-wrap items-center gap-2.5",
+                        Badge { label: "Default".to_string(), variant: BadgeVariant::Default }
+                        Badge { label: "Primary".to_string(), variant: BadgeVariant::Primary }
+                        Badge { label: "Success".to_string(), variant: BadgeVariant::Success }
+                        Badge { label: "Warning".to_string(), variant: BadgeVariant::Warning }
+                        Badge { label: "Danger".to_string(), variant: BadgeVariant::Danger }
+                        Badge { label: "Outline".to_string(), variant: BadgeVariant::Outline }
+                    }
+                    div { class: "flex flex-wrap items-center gap-2.5 pt-3 border-t border-white/[0.06]",
+                        Badge { label: "Offline".to_string(), variant: BadgeVariant::Default, pill: true, dot: true }
+                        Badge { label: "Processing".to_string(), variant: BadgeVariant::Primary, pill: true, dot: true }
+                        Badge { label: "Operational".to_string(), variant: BadgeVariant::Success, pill: true, dot: true }
+                        Badge { label: "Degraded".to_string(), variant: BadgeVariant::Warning, pill: true, dot: true }
+                        Badge { label: "Critical".to_string(), variant: BadgeVariant::Danger, pill: true, dot: true }
+                    }
                 }
             }
         }

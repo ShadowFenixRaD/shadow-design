@@ -1,21 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PropRow, PropsTable, ShowcaseTabs};
 
 #[component]
 pub fn SelectPage() -> Element {
-    // Stato per Select singolo standard
     let selected_framework = use_signal(|| Some("dioxus".to_string()));
-
-    // Stato per Select con ricerca e opzioni raggruppate
     let selected_role = use_signal(|| None::<String>);
-
-    // Stato per MultiSelect con chip
     let selected_skills = use_signal(|| vec!["rust".to_string(), "dioxus".to_string()]);
-
-    // Stato per Combobox autocomplete
     let combobox_val = use_signal(|| "Neon".to_string());
+    let mut active_api_tab = use_signal(|| 0usize);
 
     let frameworks_data = vec![
         SelectItem::new("dioxus", "Dioxus 0.7")
@@ -64,77 +58,183 @@ pub fn SelectPage() -> Element {
         SelectItem::new("CartoonPop", "Cartoon Pop"),
     ];
 
-    let props = vec![
+    let select_props = vec![
         PropRow {
             name: "data",
             r#type: "Vec<SelectItem>",
             default: "-",
-            description: "Collezione di voci selezionabili (supporta value, label, description, group e disabled)",
+            description: "Collezione di opzioni (supporta value, label, description, group e disabled)",
         },
         PropRow {
             name: "value",
             r#type: "Signal<Option<String>>",
             default: "-",
-            description: "Signal reattivo Dioxus 0.7 per il valore selezionato nel Select singolo",
+            description: "Signal reattivo per il valore selezionato corrente",
         },
         PropRow {
-            name: "values",
-            r#type: "Signal<Vec<String>>",
-            default: "-",
-            description: "Signal reattivo Dioxus 0.7 per l'elenco dei valori selezionati in MultiSelect",
+            name: "label",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Etichetta superiore collegata con id e for accessibili",
+        },
+        PropRow {
+            name: "description",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Testo di supporto/didascalia sotto all'etichetta",
         },
         PropRow {
             name: "placeholder",
             r#type: "Option<String>",
             default: "\"Seleziona un'opzione...\"",
-            description: "Testo segnaposto informativo visibile quando non è selezionata alcuna voce",
+            description: "Testo segnaposto informativo visibile prima della selezione",
         },
         PropRow {
             name: "searchable",
             r#type: "bool",
             default: "false",
-            description: "Abilita la barra di ricerca live sticky con filtraggio fuzzy istantaneo",
+            description: "Abilita la casella di ricerca rapida all'interno del menu",
         },
         PropRow {
             name: "clearable",
             r#type: "bool",
             default: "false",
-            description: "Mostra un pulsante di cancellazione rapida (X) per azzerare la selezione",
+            description: "Mostra il pulsante di azzeramento rapido",
         },
         PropRow {
             name: "creatable",
             r#type: "bool",
             default: "false",
-            description: "Consente all'utente di creare dinamicamente voci custom non presenti nei dati iniziali",
+            description: "Consente all'utente di creare dinamicamente voci custom premendo Invio",
+        },
+        PropRow {
+            name: "disabled",
+            r#type: "bool",
+            default: "false",
+            description: "Disabilita il controllo impedendo l'apertura e riducendo l'opacità",
+        },
+        PropRow {
+            name: "error",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Messaggio di errore con bordo scarlatto e aria-invalid='true'",
         },
         PropRow {
             name: "loading",
             r#type: "bool",
             default: "false",
-            description: "Sostituisce l'indicatore a freccia con uno spinner circolare animato",
+            description: "Sostituisce il chevron con uno spinner SVG animato",
+        },
+        PropRow {
+            name: "glow",
+            r#type: "Option<bool>",
+            default: "None",
+            description: "Bagliore ottico perimetrale sul trigger",
+        },
+        PropRow {
+            name: "on_change",
+            r#type: "Option<EventHandler<Option<String>>>",
+            default: "None",
+            description: "Callback scatenata ad ogni cambio di selezione",
+        },
+    ];
+
+    let multiselect_props = vec![
+        PropRow {
+            name: "data",
+            r#type: "Vec<SelectItem>",
+            default: "-",
+            description: "Collezione di opzioni selezionabili",
+        },
+        PropRow {
+            name: "values",
+            r#type: "Signal<Vec<String>>",
+            default: "-",
+            description: "Signal reattivo contenente il vettore dei valori selezionati",
         },
         PropRow {
             name: "max_selected_display",
             r#type: "Option<usize>",
             default: "None",
-            description: "Limite massimo di chip mostrati in MultiSelect prima di riassumere con badge +N",
+            description: "Numero massimo di chip visualizzati prima del riepilogo '+N altri'",
+        },
+        PropRow {
+            name: "creatable",
+            r#type: "bool",
+            default: "false",
+            description: "Permette di digitare e creare nuovi tag premendo Invio",
+        },
+        PropRow {
+            name: "clearable",
+            r#type: "bool",
+            default: "false",
+            description: "Pulsante per rimuovere simultaneamente tutti i tag selezionati",
         },
         PropRow {
             name: "on_change",
-            r#type: "Option<EventHandler<...>>",
+            r#type: "Option<EventHandler<Vec<String>>>",
             default: "None",
-            description: "Callback invocata reattivamente ad ogni modifica di selezione",
+            description: "Callback scatenata all'aggiunta o rimozione di tag",
+        },
+    ];
+
+    let combobox_props = vec![
+        PropRow {
+            name: "data",
+            r#type: "Vec<SelectItem>",
+            default: "-",
+            description: "Opzioni di completamento suggerite",
         },
         PropRow {
-            name: "on_create",
+            name: "value",
+            r#type: "Signal<String>",
+            default: "-",
+            description: "Signal reattivo stringa editabile direttamente nel campo di testo",
+        },
+        PropRow {
+            name: "clearable",
+            r#type: "bool",
+            default: "false",
+            description: "Pulsante per azzerare il testo digitato",
+        },
+        PropRow {
+            name: "on_change",
             r#type: "Option<EventHandler<String>>",
             default: "None",
-            description: "Callback invocata alla creazione di un nuovo valore utente",
+            description: "Callback scatenata alla digitazione o selezione suggerimento",
+        },
+    ];
+
+    let selectitem_props = vec![
+        PropRow {
+            name: "SelectItem::new(val, lbl)",
+            r#type: "fn(&str, &str) -> Self",
+            default: "-",
+            description: "Costruttore primario con valore univoco ed etichetta visibile",
+        },
+        PropRow {
+            name: ".with_description(desc)",
+            r#type: "fn(&str) -> Self",
+            default: "-",
+            description: "Aggiunge un testo descrittivo secondario sotto all'etichetta",
+        },
+        PropRow {
+            name: ".with_group(grp)",
+            r#type: "fn(&str) -> Self",
+            default: "-",
+            description: "Assegna la voce a un gruppo semantico con intestazione",
+        },
+        PropRow {
+            name: ".disabled()",
+            r#type: "fn() -> Self",
+            default: "-",
+            description: "Disabilita l'opzione impedendone la selezione",
         },
     ];
 
     let code_snippet = r#"let mut selected = use_signal(|| Some("dioxus".to_string()));
 let mut multi_selected = use_signal(|| vec!["rust".to_string(), "dioxus".to_string()]);
+let mut combo_val = use_signal(|| "Neon".to_string());
 
 let data = vec![
     SelectItem::new("dioxus", "Dioxus 0.7")
@@ -150,26 +250,33 @@ Select {
     label: Some("Framework Primario".to_string()),
     searchable: true,
     clearable: true,
-    glow: Some(true),
 }
 
-// 2. MultiSelect con chip dismissabili e limite visivo
+// 2. MultiSelect con chip e limite
 MultiSelect {
-    data: data,
+    data: data.clone(),
     values: multi_selected,
     label: Some("Competenze Tecniche".to_string()),
     searchable: true,
     clearable: true,
     creatable: true,
     max_selected_display: Some(3),
+}
+
+// 3. Combobox editabile con autocompletamento
+Combobox {
+    data: data,
+    value: combo_val,
+    label: Some("Ricerca Preset".to_string()),
+    clearable: true,
 }"#
-    .to_string();
+        .to_string();
 
     rsx! {
         div { class: "max-w-4xl space-y-8",
             div {
-                Heading { order: HeadingOrder::H2, "Select & MultiSelect" }
-                Text { dimmed: true, size: TextSize::Sm, "Selettori a discesa singoli e multipli ad alte prestazioni con ricerca live, chip dismissabili, raggruppamento opzioni, creazione dinamica di valori (creatable) e completamento automatico Combobox." }
+                Heading { order: HeadingOrder::H2, "Select, MultiSelect & Combobox" }
+                Text { dimmed: true, size: TextSize::Sm, "Selettori a discesa singoli e multipli ad alte prestazioni con ricerca live, chip dismissabili, raggruppamento opzioni, creazione dinamica di valori (creatable) e completamento automatico Combobox con piena conformità WAI-ARIA." }
             }
 
             FeatureBanner { feature_name: "select" }
@@ -262,7 +369,37 @@ MultiSelect {
                     }
                 },
                 code: code_snippet,
-                props: props,
+                props: select_props.clone(),
+            }
+
+            // Reference API Specifica Divisa per Componente (SC-10)
+            Card {
+                title: "Specifiche Parametri API per Componente".to_string(),
+                subtitle: "Tabelle dettagliate dei parametri per Select, MultiSelect, Combobox e SelectItem builder".to_string(),
+                div { class: "space-y-4 pt-2",
+                    div { class: "flex flex-wrap gap-2 border-b border-white/[0.06] pb-3",
+                        for (idx, name) in ["Select", "MultiSelect", "Combobox", "SelectItem (Builder)"].into_iter().enumerate() {
+                            button {
+                                key: "{name}",
+                                r#type: "button",
+                                class: if active_api_tab() == idx {
+                                    "px-3 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 text-xs font-mono font-bold cursor-pointer"
+                                } else {
+                                    "px-3 py-1 rounded bg-white/[0.02] hover:bg-white/[0.06] text-zinc-400 hover:text-white border border-white/[0.06] text-xs font-mono cursor-pointer transition-colors"
+                                },
+                                onclick: move |_| active_api_tab.set(idx),
+                                "{name}"
+                            }
+                        }
+                    }
+
+                    match active_api_tab() {
+                        0 => rsx! { PropsTable { rows: select_props } },
+                        1 => rsx! { PropsTable { rows: multiselect_props } },
+                        2 => rsx! { PropsTable { rows: combobox_props } },
+                        _ => rsx! { PropsTable { rows: selectitem_props } },
+                    }
+                }
             }
 
             // Sezione con Varianti ed Error States
