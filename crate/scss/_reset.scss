@@ -3,10 +3,6 @@
 // ==============================================================================
 @use 'variables' as *;
 
-// Dichiarazione universale dell'ordine dei livelli CSS:
-// reset < base < components < utilities < theme
-@layer sd-reset, sd-base, sd-components, sd-utilities, sd-theme;
-
 @layer sd-reset {
   // 1. Box Sizing Universale
   *, *::before, *::after {
@@ -19,11 +15,15 @@
   }
 
   // 3. Document & Body
-  html, body {
+  html {
+    font-size: 100%;
+  }
+
+  body {
     background-color: $color-void;
     color: $zinc-100;
     font-family: $font-sans;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -41,9 +41,12 @@
     font-size: inherit;
     color: inherit;
     cursor: pointer;
-    outline: none;
     user-select: none;
     vertical-align: middle;
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
 
     &:disabled, &[disabled] {
       cursor: not-allowed;
@@ -57,7 +60,10 @@
     font-size: inherit;
     color: inherit;
     background-color: transparent;
-    outline: none;
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
   }
 
   input[type="text"],

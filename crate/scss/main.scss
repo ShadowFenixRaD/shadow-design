@@ -1,8 +1,9 @@
 // ==============================================================================
 // Shadow Design — Library Master SCSS Entrypoint
 // ==============================================================================
-@use 'sass:math';
+@use 'layers' as *;
 @use 'variables' as *;
+@use 'fonts' as *;
 @use 'zindex' as *;
 @use 'mixins' as *;
 @use 'reset' as *;
@@ -45,21 +46,27 @@
     --color-surface-1: #{$color-surface-1};
     --color-surface-2: #{$color-surface-2};
     --color-surface-3: #{$color-surface-3};
+
+    // Standard CSS scrollbars (DS-30)
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   }
 
-  // Micro-scrollbar ultra-dark
+  // Micro-scrollbar ultra-dark con track trasparente (DS-30)
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: $color-void;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
     background: $zinc-800;
     border-radius: 3px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
