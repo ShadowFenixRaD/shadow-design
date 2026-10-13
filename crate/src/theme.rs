@@ -10,6 +10,40 @@ use crate::button::ButtonVariant;
 #[cfg(feature = "card")]
 use crate::card::CardShadow;
 
+/// Verifica se una stringa è un colore esadecimale CSS valido (#rgb, #rgba, #rrggbb, #rrggbbaa).
+pub fn is_valid_hex_color(hex: &str) -> bool {
+    let s = hex.trim();
+    if !s.starts_with('#') {
+        return false;
+    }
+    let body = &s[1..];
+    (body.len() == 3 || body.len() == 4 || body.len() == 6 || body.len() == 8)
+        && body.chars().all(|c| c.is_ascii_hexdigit())
+}
+
+/// Converte un colore hex valido in tuple (r, g, b). Se non valido, restituisce None.
+pub fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
+    if !is_valid_hex_color(hex) {
+        return None;
+    }
+    let s = hex.trim().trim_start_matches('#');
+    match s.len() {
+        3 | 4 => {
+            let r = u8::from_str_radix(&s[0..1].repeat(2), 16).ok()?;
+            let g = u8::from_str_radix(&s[1..2].repeat(2), 16).ok()?;
+            let b = u8::from_str_radix(&s[2..3].repeat(2), 16).ok()?;
+            Some((r, g, b))
+        }
+        6 | 8 => {
+            let r = u8::from_str_radix(&s[0..2], 16).ok()?;
+            let g = u8::from_str_radix(&s[2..4], 16).ok()?;
+            let b = u8::from_str_radix(&s[4..6], 16).ok()?;
+            Some((r, g, b))
+        }
+        _ => None,
+    }
+}
+
 /// Palette di colori primari in stile Mantine / Material-UI, con supporto a colori Custom estendibili.
 #[derive(Clone, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -39,9 +73,15 @@ impl PrimaryColor {
         }
     }
 
+    /// Restituisce il valore hex primario. Per Violet restituisce l'accento vivido #a855f7 (VQA-22).
     pub fn hex(&self) -> &str {
+        self.accent_hex()
+    }
+
+    /// Restituisce il colore vivido di accento per swatch e variabili CSS (VQA-22).
+    pub fn accent_hex(&self) -> &str {
         match self {
-            PrimaryColor::Violet => "#3b0764",
+            PrimaryColor::Violet => "#a855f7",
             PrimaryColor::Obsidian => "#ffffff",
             PrimaryColor::Crimson => "#ff1744",
             PrimaryColor::Cyan => "#00f0ff",
@@ -50,7 +90,20 @@ impl PrimaryColor {
         }
     }
 
-    /// Ricava automaticamente il prefisso o slug per le classi CSS (es. "cartoon", "manga-yellow").
+    /// Restituisce il colore d'ombra o tonalità profonda (VQA-22).
+    pub fn shadow_hex(&self) -> &str {
+        match self {
+            PrimaryColor::Violet => "#3b0764",
+            PrimaryColor::Obsidian => "#27272a",
+            PrimaryColor::Crimson => "#4c0519",
+            PrimaryColor::Cyan => "#083344",
+            PrimaryColor::Emerald => "#022c22",
+            PrimaryColor::Custom { hex, .. } => hex.as_str(),
+        }
+    }
+
+    /// Ricava automaticamente il prefisso o slug per le classi CSS (es. "custom", "cartoon").
+    /// Se css_prefix è None, mappa a "custom" (RS-02). Se Some(p), sanitizza a caratteri alfanumerici e trattini.
     pub fn css_prefix(&self) -> String {
         match self {
             PrimaryColor::Violet => "violet".to_string(),
@@ -58,25 +111,39 @@ impl PrimaryColor {
             PrimaryColor::Crimson => "crimson".to_string(),
             PrimaryColor::Cyan => "cyan".to_string(),
             PrimaryColor::Emerald => "emerald".to_string(),
-            PrimaryColor::Custom { name, css_prefix, .. } => {
-                if let Some(prefix) = css_prefix {
-                    prefix.clone()
-                } else {
-                    name.to_lowercase()
+            PrimaryColor::Custom { css_prefix, .. } => match css_prefix {
+                None => "custom".to_string(),
+                Some(p) => {
+                    let sanitized: String = p
+                        .to_lowercase()
                         .chars()
-                        .map(|c| if c.is_alphanumeric() { c } else { '-' })
-                        .collect::<String>()
-                        .trim_matches('-')
-                        .to_string()
+                        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+                        .collect();
+                    let trimmed = sanitized
+                        .split('-')
+                        .filter(|s| !s.is_empty())
+                        .collect::<Vec<_>>()
+                        .join("-");
+                    if trimmed.is_empty() {
+                        "custom".to_string()
+                    } else {
+                        trimmed
+                    }
                 }
-            }
+            },
         }
     }
 
     pub fn custom(name: impl Into<String>, hex: impl Into<String>) -> Self {
+        let h = hex.into();
+        let valid_hex = if is_valid_hex_color(&h) {
+            h
+        } else {
+            "#a855f7".to_string()
+        };
         Self::Custom {
             name: name.into(),
-            hex: hex.into(),
+            hex: valid_hex,
             css_prefix: None,
         }
     }
@@ -86,10 +153,32 @@ impl PrimaryColor {
         hex: impl Into<String>,
         css_prefix: impl Into<String>,
     ) -> Self {
+        let h = hex.into();
+        let valid_hex = if is_valid_hex_color(&h) {
+            h
+        } else {
+            "#a855f7".to_string()
+        };
+        let p = css_prefix.into();
+        let sanitized: String = p
+            .to_lowercase()
+            .chars()
+            .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+            .collect();
+        let trimmed = sanitized
+            .split('-')
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>()
+            .join("-");
+        let final_prefix = if trimmed.is_empty() {
+            "custom".to_string()
+        } else {
+            trimmed
+        };
         Self::Custom {
             name: name.into(),
-            hex: hex.into(),
-            css_prefix: Some(css_prefix.into()),
+            hex: valid_hex,
+            css_prefix: Some(final_prefix),
         }
     }
 }
@@ -162,6 +251,7 @@ pub enum ElevationStyle {
 /// Personalizzazione specifica per un componente (Livello 2 - Component Level).
 #[derive(Clone, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(default))]
 pub struct ComponentOverride {
     /// Classe base aggiuntiva o sostitutiva
     pub base_class: Option<String>,
@@ -211,10 +301,40 @@ impl ComponentOverride {
     }
 }
 
+#[derive(Clone, Debug, Default)]
+struct GlowTokens {
+    glow: String,
+    button: String,
+    card: String,
+    input: String,
+    badge: String,
+    modal: String,
+    alert: String,
+    dropdown: String,
+    notification: String,
+    switch: String,
+    checkbox: String,
+    select: String,
+    tooltip: String,
+    drawer: String,
+}
+
+#[derive(Clone, Debug)]
+struct ColorTokens {
+    sidebar_link_active: String,
+    border_accent: String,
+    text_accent: String,
+    text_accent_bright: String,
+    button_primary: String,
+    badge_primary: String,
+    banner: String,
+}
+
 /// Struttura centrale del tema per Shadow Design ispirata a Mantine e Material-UI.
 /// Supporta personalizzazione gerarchica su 3 livelli.
 #[derive(Clone, PartialEq, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(default))]
 pub struct Theme {
     pub name: String,
     pub primary_color: PrimaryColor,
@@ -258,6 +378,9 @@ pub struct Theme {
     pub glow_notification: String,
     pub glow_switch: String,
     pub glow_checkbox: String,
+    pub glow_select: String,
+    pub glow_tooltip: String,
+    pub glow_drawer: String,
 
     // Classi dei componenti (Livello 1 fallback)
     pub button_primary: String,
@@ -404,7 +527,7 @@ impl Theme {
                 "button" => "shadow-sm".to_string(),
                 "card" => "shadow-md".to_string(),
                 "modal" => "shadow-xl".to_string(),
-                _ => "shadow".to_string(),
+                _ => "shadow-md".to_string(),
             },
             ElevationStyle::NeonGlow => {
                 if self.is_component_glow_enabled(component, override_glow) {
@@ -416,146 +539,428 @@ impl Theme {
         }
     }
 
-    /// Genera la stringa di CSS Custom Properties da iniettare dinamicamente a runtime.
+    /// Genera la stringa di CSS Custom Properties da iniettare dinamicamente a runtime (DS-10, SC-15).
     pub fn to_css_variables(&self) -> String {
+        let safe_primary = if is_valid_hex_color(self.primary_color.hex()) {
+            self.primary_color.hex()
+        } else {
+            "#a855f7"
+        };
+        let (r, g, b) = hex_to_rgb(safe_primary).unwrap_or((168, 85, 247));
+        let safe_s0 = if is_valid_hex_color(&self.surface_0) {
+            &self.surface_0
+        } else {
+            "#030305"
+        };
+        let safe_s1 = if is_valid_hex_color(&self.surface_1) {
+            &self.surface_1
+        } else {
+            "#09090d"
+        };
+        let safe_s2 = if is_valid_hex_color(&self.surface_2) {
+            &self.surface_2
+        } else {
+            "#111118"
+        };
+        let safe_s3 = if is_valid_hex_color(&self.surface_3) {
+            &self.surface_3
+        } else {
+            "#181824"
+        };
+        let glow_strength = match self.glow_mode {
+            GlowMode::Off => "0",
+            GlowMode::Subtle => "0.7",
+            GlowMode::Expressive => "1.0",
+        };
+
         format!(
             ":root {{ \
-                --sd-primary-color: {primary}; \
-                --sd-surface-0: {s0}; \
-                --sd-surface-1: {s1}; \
-                --sd-surface-2: {s2}; \
-                --sd-surface-3: {s3}; \
-            }}",
-            primary = self.primary_color.hex(),
-            s0 = self.surface_0,
-            s1 = self.surface_1,
-            s2 = self.surface_2,
-            s3 = self.surface_3,
+                --sd-primary-color: {safe_primary}; \
+                --sd-accent: {safe_primary}; \
+                --sd-accent-rgb: {r}, {g}, {b}; \
+                --sd-surface-0: {safe_s0}; \
+                --sd-surface-1: {safe_s1}; \
+                --sd-surface-2: {safe_s2}; \
+                --sd-surface-3: {safe_s3}; \
+                --sd-glow-strength: {glow_strength}; \
+            }}"
         )
     }
 
-    /// Calcola i valori di glow per ogni componente in base al colore primario e alla modalità.
-    fn calculate_glows(
-        color: &PrimaryColor,
-        mode: GlowMode,
-    ) -> (
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-    ) {
+    /// Calcola i valori di glow per ogni componente in base al colore primario e alla modalità (DS-13, DS-12, DS-02).
+    fn calculate_glows(color: &PrimaryColor, mode: GlowMode) -> GlowTokens {
         if mode == GlowMode::Off {
-            return (
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-                String::new(),
-            );
+            return GlowTokens::default();
         }
 
+        let prefix = color.css_prefix();
+        let is_subtle = mode == GlowMode::Subtle;
+
         match color {
-            PrimaryColor::Violet => (
-                "glow-violet".to_string(),
-                "sd-btn--glow".to_string(),
-                "sd-card--hover-glow".to_string(),
-                "".to_string(),
-                "sd-badge--glow".to_string(),
-                "sd-modal-dialog--glow".to_string(),
-                "sd-alert--glow-info".to_string(),
-                "sd-dropdown-menu--glow".to_string(),
-                "sd-toast--glow-info".to_string(),
-                "sd-switch__track--glow".to_string(),
-                "sd-checkbox__box--glow".to_string(),
-            ),
-            PrimaryColor::Obsidian => (
-                "".to_string(),
-                "sd-btn--glow-obsidian".to_string(),
-                "sd-card--hover-glow".to_string(),
-                "".to_string(),
-                "sd-badge--glow".to_string(),
-                "sd-modal-dialog--glow".to_string(),
-                "sd-alert--glow-info".to_string(),
-                "sd-dropdown-menu--glow".to_string(),
-                "sd-toast--glow-info".to_string(),
-                "sd-switch__track--glow-obsidian".to_string(),
-                "sd-checkbox__box--glow".to_string(),
-            ),
-            PrimaryColor::Crimson => (
-                "glow-crimson".to_string(),
-                "sd-btn--glow-crimson".to_string(),
-                "sd-card--hover-glow".to_string(),
-                "".to_string(),
-                "sd-badge--glow".to_string(),
-                "sd-modal-dialog--glow".to_string(),
-                "sd-alert--glow-danger".to_string(),
-                "sd-dropdown-menu--glow".to_string(),
-                "sd-toast--glow-danger".to_string(),
-                "sd-switch__track--glow-crimson".to_string(),
-                "sd-checkbox__box--glow".to_string(),
-            ),
-            PrimaryColor::Cyan => (
-                "glow-cyan".to_string(),
-                "sd-btn--glow-cyan".to_string(),
-                "sd-card--hover-glow".to_string(),
-                "".to_string(),
-                "sd-badge--glow".to_string(),
-                "sd-modal-dialog--glow".to_string(),
-                "sd-alert--glow-info".to_string(),
-                "sd-dropdown-menu--glow".to_string(),
-                "sd-toast--glow-info".to_string(),
-                "sd-switch__track--glow-cyan".to_string(),
-                "sd-checkbox__box--glow".to_string(),
-            ),
-            PrimaryColor::Emerald => (
-                "glow-emerald".to_string(),
-                "sd-btn--glow-emerald".to_string(),
-                "sd-card--hover-glow".to_string(),
-                "".to_string(),
-                "sd-badge--glow".to_string(),
-                "sd-modal-dialog--glow".to_string(),
-                "sd-alert--glow-success".to_string(),
-                "sd-dropdown-menu--glow".to_string(),
-                "sd-toast--glow-success".to_string(),
-                "sd-switch__track--glow-emerald".to_string(),
-                "sd-checkbox__box--glow".to_string(),
-            ),
+            PrimaryColor::Violet => GlowTokens {
+                glow: if is_subtle {
+                    String::new()
+                } else {
+                    "glow-violet".to_string()
+                },
+                button: "sd-btn--glow".to_string(),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-card--hover-glow".to_string()
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-badge--glow".to_string()
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-modal-dialog--glow".to_string()
+                },
+                alert: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-alert--glow-info".to_string()
+                },
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-toast--glow-info".to_string()
+                },
+                switch: "sd-switch__track--glow".to_string(),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-select-trigger--glow".to_string()
+                },
+                tooltip: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-tooltip__bubble--glow".to_string()
+                },
+                drawer: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-drawer-panel--glow".to_string()
+                },
+            },
+            PrimaryColor::Obsidian => GlowTokens {
+                glow: String::new(),
+                button: "sd-btn--glow-obsidian".to_string(),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-card--hover-glow".to_string()
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-badge--glow".to_string()
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-modal-dialog--glow".to_string()
+                },
+                alert: String::new(),
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: String::new(),
+                switch: "sd-switch__track--glow-obsidian".to_string(),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: String::new(),
+                tooltip: String::new(),
+                drawer: String::new(),
+            },
+            PrimaryColor::Crimson => GlowTokens {
+                glow: if is_subtle {
+                    String::new()
+                } else {
+                    "glow-crimson".to_string()
+                },
+                button: "sd-btn--glow-crimson".to_string(),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-card--hover-glow".to_string()
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-badge--glow".to_string()
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-modal-dialog--glow".to_string()
+                },
+                alert: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-alert--glow-danger".to_string()
+                },
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-toast--glow-danger".to_string()
+                },
+                switch: "sd-switch__track--glow-crimson".to_string(),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-select-trigger--glow".to_string()
+                },
+                tooltip: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-tooltip__bubble--glow".to_string()
+                },
+                drawer: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-drawer-panel--glow".to_string()
+                },
+            },
+            PrimaryColor::Cyan => GlowTokens {
+                glow: if is_subtle {
+                    String::new()
+                } else {
+                    "glow-cyan".to_string()
+                },
+                button: "sd-btn--glow-cyan".to_string(),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-card--hover-glow".to_string()
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-badge--glow".to_string()
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-modal-dialog--glow".to_string()
+                },
+                alert: String::new(),
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: String::new(),
+                switch: "sd-switch__track--glow-cyan".to_string(),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-select-trigger--glow".to_string()
+                },
+                tooltip: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-tooltip__bubble--glow".to_string()
+                },
+                drawer: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-drawer-panel--glow".to_string()
+                },
+            },
+            PrimaryColor::Emerald => GlowTokens {
+                glow: if is_subtle {
+                    String::new()
+                } else {
+                    "glow-emerald".to_string()
+                },
+                button: "sd-btn--glow-emerald".to_string(),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-card--hover-glow".to_string()
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-badge--glow".to_string()
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-modal-dialog--glow".to_string()
+                },
+                alert: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-alert--glow-success".to_string()
+                },
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-toast--glow-success".to_string()
+                },
+                switch: "sd-switch__track--glow-emerald".to_string(),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-select-trigger--glow".to_string()
+                },
+                tooltip: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-tooltip__bubble--glow".to_string()
+                },
+                drawer: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-drawer-panel--glow".to_string()
+                },
+            },
+            PrimaryColor::Custom { .. } => GlowTokens {
+                glow: if is_subtle {
+                    String::new()
+                } else {
+                    format!("glow-{}", prefix)
+                },
+                button: format!("sd-btn--glow-{}", prefix),
+                card: if is_subtle {
+                    String::new()
+                } else {
+                    format!("sd-card--glow-{}", prefix)
+                },
+                input: String::new(),
+                badge: if is_subtle {
+                    String::new()
+                } else {
+                    format!("sd-badge--glow-{}", prefix)
+                },
+                modal: if is_subtle {
+                    String::new()
+                } else {
+                    format!("sd-modal-dialog--glow-{}", prefix)
+                },
+                alert: String::new(),
+                dropdown: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-dropdown-menu--glow".to_string()
+                },
+                notification: String::new(),
+                switch: format!("sd-switch__track--glow-{}", prefix),
+                checkbox: "sd-checkbox__box--glow".to_string(),
+                select: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-select-trigger--glow".to_string()
+                },
+                tooltip: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-tooltip__bubble--glow".to_string()
+                },
+                drawer: if is_subtle {
+                    String::new()
+                } else {
+                    "sd-drawer-panel--glow".to_string()
+                },
+            },
+        }
+    }
+
+    fn color_tokens(color: &PrimaryColor) -> ColorTokens {
+        match color {
+            PrimaryColor::Violet => ColorTokens {
+                sidebar_link_active: "sd-sidebar-link--active".to_string(),
+                border_accent: "border-purple-500/40".to_string(),
+                text_accent: "text-purple-400".to_string(),
+                text_accent_bright: "text-purple-300".to_string(),
+                button_primary: "sd-btn--primary".to_string(),
+                badge_primary: "sd-badge--primary".to_string(),
+                banner: "sd-banner".to_string(),
+            },
+            PrimaryColor::Obsidian => ColorTokens {
+                sidebar_link_active: "sd-sidebar-link--active-obsidian".to_string(),
+                border_accent: "border-zinc-500/40".to_string(),
+                text_accent: "text-zinc-300".to_string(),
+                text_accent_bright: "text-white".to_string(),
+                button_primary: "sd-btn--primary-obsidian".to_string(),
+                badge_primary: "sd-badge--default".to_string(),
+                banner: "sd-banner sd-banner--obsidian".to_string(),
+            },
+            PrimaryColor::Crimson => ColorTokens {
+                sidebar_link_active: "sd-sidebar-link--active-crimson".to_string(),
+                border_accent: "border-rose-500/40".to_string(),
+                text_accent: "text-rose-400".to_string(),
+                text_accent_bright: "text-rose-300".to_string(),
+                button_primary: "sd-btn--primary-crimson".to_string(),
+                badge_primary: "sd-badge--danger".to_string(),
+                banner: "sd-banner sd-banner--crimson".to_string(),
+            },
+            PrimaryColor::Cyan => ColorTokens {
+                sidebar_link_active: "sd-sidebar-link--active-cyan".to_string(),
+                border_accent: "border-cyan-500/40".to_string(),
+                text_accent: "text-cyan-400".to_string(),
+                text_accent_bright: "text-cyan-300".to_string(),
+                button_primary: "sd-btn--primary-cyan".to_string(),
+                badge_primary: "sd-badge--primary".to_string(),
+                banner: "sd-banner sd-banner--cyan".to_string(),
+            },
+            PrimaryColor::Emerald => ColorTokens {
+                sidebar_link_active: "sd-sidebar-link--active-emerald".to_string(),
+                border_accent: "border-emerald-500/40".to_string(),
+                text_accent: "text-emerald-400".to_string(),
+                text_accent_bright: "text-emerald-300".to_string(),
+                button_primary: "sd-btn--primary-emerald".to_string(),
+                badge_primary: "sd-badge--success".to_string(),
+                banner: "sd-banner sd-banner--emerald".to_string(),
+            },
             PrimaryColor::Custom { .. } => {
                 let prefix = color.css_prefix();
-                (
-                    format!("glow-{}", prefix),
-                    format!("sd-btn--glow-{}", prefix),
-                    format!("sd-card--glow-{}", prefix),
-                    "".to_string(),
-                    format!("sd-badge--glow-{}", prefix),
-                    format!("sd-modal-dialog--glow-{}", prefix),
-                    "sd-alert--glow-info".to_string(),
-                    "sd-dropdown-menu--glow".to_string(),
-                    "sd-toast--glow-info".to_string(),
-                    format!("sd-switch__track--glow-{}", prefix),
-                    "sd-checkbox__box--glow".to_string(),
-                )
+                ColorTokens {
+                    sidebar_link_active: "sd-sidebar-link--active".to_string(),
+                    border_accent: "border-purple-500/40".to_string(),
+                    text_accent: "text-purple-400".to_string(),
+                    text_accent_bright: "text-purple-300".to_string(),
+                    button_primary: format!("sd-btn--primary-{}", prefix),
+                    badge_primary: "sd-badge--primary".to_string(),
+                    banner: "sd-banner".to_string(),
+                }
             }
         }
     }
 
     /// Tema di default Shadow Design (Ultraviolet Obsidian: Nero profondo con accenti viola).
     pub fn shadow() -> Self {
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&PrimaryColor::Violet, GlowMode::Subtle);
+        let glows = Self::calculate_glows(&PrimaryColor::Violet, GlowMode::Subtle);
 
         Self {
             name: "Ultraviolet Shadow".to_string(),
@@ -584,18 +989,21 @@ impl Theme {
             border_accent: "border-purple-500/40".to_string(),
             text_accent: "text-purple-400".to_string(),
             text_accent_bright: "text-purple-300".to_string(),
-            glow: g,
+            glow: glows.glow,
 
-            glow_button: gb,
-            glow_card: gc,
-            glow_input: gi,
-            glow_badge: gbd,
-            glow_modal: gm,
-            glow_alert: ga,
-            glow_dropdown: gd,
-            glow_notification: gn,
-            glow_switch: gs,
-            glow_checkbox: gcb,
+            glow_button: glows.button,
+            glow_card: glows.card,
+            glow_input: glows.input,
+            glow_badge: glows.badge,
+            glow_modal: glows.modal,
+            glow_alert: glows.alert,
+            glow_dropdown: glows.dropdown,
+            glow_notification: glows.notification,
+            glow_switch: glows.switch,
+            glow_checkbox: glows.checkbox,
+            glow_select: glows.select,
+            glow_tooltip: glows.tooltip,
+            glow_drawer: glows.drawer,
 
             button_primary: "sd-btn--primary".to_string(),
             button_secondary: "sd-btn--secondary".to_string(),
@@ -614,7 +1022,7 @@ impl Theme {
             card_shadow_xl: "sd-card--shadow-xl".to_string(),
 
             input_base: "sd-input".to_string(),
-            input_normal_border: "".to_string(),
+            input_normal_border: String::new(),
             input_error_border: "sd-input--error".to_string(),
 
             badge_default: "sd-badge--default".to_string(),
@@ -649,28 +1057,7 @@ impl Theme {
     pub fn obsidian() -> Self {
         let mut t = Self::shadow();
         t.name = "Obsidian Titanium".to_string();
-        t.primary_color = PrimaryColor::Obsidian;
-        t.sidebar_link_active = "sd-sidebar-link--active-obsidian".to_string();
-        t.border_accent = "border-zinc-500/40".to_string();
-        t.text_accent = "text-zinc-300".to_string();
-        t.text_accent_bright = "text-white".to_string();
-        t.button_primary = "sd-btn--primary-obsidian".to_string();
-        t.badge_primary = "sd-badge--default".to_string();
-        t.banner = "sd-banner sd-banner--obsidian".to_string();
-
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&PrimaryColor::Obsidian, t.glow_mode);
-        t.glow = g;
-        t.glow_button = gb;
-        t.glow_card = gc;
-        t.glow_input = gi;
-        t.glow_badge = gbd;
-        t.glow_modal = gm;
-        t.glow_alert = ga;
-        t.glow_dropdown = gd;
-        t.glow_notification = gn;
-        t.glow_switch = gs;
-        t.glow_checkbox = gcb;
+        t.apply_primary_color(PrimaryColor::Obsidian);
         t
     }
 
@@ -678,28 +1065,7 @@ impl Theme {
     pub fn crimson() -> Self {
         let mut t = Self::shadow();
         t.name = "Crimson Phoenix".to_string();
-        t.primary_color = PrimaryColor::Crimson;
-        t.sidebar_link_active = "sd-sidebar-link--active-crimson".to_string();
-        t.border_accent = "border-rose-500/40".to_string();
-        t.text_accent = "text-rose-400".to_string();
-        t.text_accent_bright = "text-rose-300".to_string();
-        t.button_primary = "sd-btn--primary-crimson".to_string();
-        t.badge_primary = "sd-badge--danger".to_string();
-        t.banner = "sd-banner sd-banner--crimson".to_string();
-
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&PrimaryColor::Crimson, t.glow_mode);
-        t.glow = g;
-        t.glow_button = gb;
-        t.glow_card = gc;
-        t.glow_input = gi;
-        t.glow_badge = gbd;
-        t.glow_modal = gm;
-        t.glow_alert = ga;
-        t.glow_dropdown = gd;
-        t.glow_notification = gn;
-        t.glow_switch = gs;
-        t.glow_checkbox = gcb;
+        t.apply_primary_color(PrimaryColor::Crimson);
         t
     }
 
@@ -707,28 +1073,7 @@ impl Theme {
     pub fn cyan() -> Self {
         let mut t = Self::shadow();
         t.name = "Cyber Cyan".to_string();
-        t.primary_color = PrimaryColor::Cyan;
-        t.sidebar_link_active = "sd-sidebar-link--active-cyan".to_string();
-        t.border_accent = "border-cyan-500/40".to_string();
-        t.text_accent = "text-cyan-400".to_string();
-        t.text_accent_bright = "text-cyan-300".to_string();
-        t.button_primary = "sd-btn--primary-cyan".to_string();
-        t.badge_primary = "sd-badge--primary".to_string();
-        t.banner = "sd-banner sd-banner--cyan".to_string();
-
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&PrimaryColor::Cyan, t.glow_mode);
-        t.glow = g;
-        t.glow_button = gb;
-        t.glow_card = gc;
-        t.glow_input = gi;
-        t.glow_badge = gbd;
-        t.glow_modal = gm;
-        t.glow_alert = ga;
-        t.glow_dropdown = gd;
-        t.glow_notification = gn;
-        t.glow_switch = gs;
-        t.glow_checkbox = gcb;
+        t.apply_primary_color(PrimaryColor::Cyan);
         t
     }
 
@@ -736,32 +1081,11 @@ impl Theme {
     pub fn emerald() -> Self {
         let mut t = Self::shadow();
         t.name = "Emerald Matrix".to_string();
-        t.primary_color = PrimaryColor::Emerald;
-        t.sidebar_link_active = "sd-sidebar-link--active-emerald".to_string();
-        t.border_accent = "border-emerald-500/40".to_string();
-        t.text_accent = "text-emerald-400".to_string();
-        t.text_accent_bright = "text-emerald-300".to_string();
-        t.button_primary = "sd-btn--primary-emerald".to_string();
-        t.badge_primary = "sd-badge--success".to_string();
-        t.banner = "sd-banner sd-banner--emerald".to_string();
-
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&PrimaryColor::Emerald, t.glow_mode);
-        t.glow = g;
-        t.glow_button = gb;
-        t.glow_card = gc;
-        t.glow_input = gi;
-        t.glow_badge = gbd;
-        t.glow_modal = gm;
-        t.glow_alert = ga;
-        t.glow_dropdown = gd;
-        t.glow_notification = gn;
-        t.glow_switch = gs;
-        t.glow_checkbox = gcb;
+        t.apply_primary_color(PrimaryColor::Emerald);
         t
     }
 
-    /// Nuovo Preset Nativo: Cartoon Pop / Manga Neo-Brutalist.
+    /// Nuovo Preset Nativo: Cartoon Pop / Manga Neo-Brutalist (DS-09).
     pub fn cartoon() -> Self {
         let mut t = Self::shadow();
         t.name = "Cartoon Pop".to_string();
@@ -775,8 +1099,8 @@ impl Theme {
         t.surface_2 = "#F4F4F4".to_string();
         t.surface_3 = "#EAE6DF".to_string();
 
-        t.root = "sd-root--cartoon".to_string();
-        t.header = "sd-header--cartoon".to_string();
+        t.root = "sd-root sd-root--cartoon".to_string();
+        t.header = "sd-header sd-header--cartoon".to_string();
         t.border = "border-3 border-black".to_string();
         t.border_accent = "border-4 border-black".to_string();
         t.text_accent = "text-[#FF3333]".to_string();
@@ -806,33 +1130,23 @@ impl Theme {
         badge_override.base_class = Some("sd-badge--comic".to_string());
         t.components.insert("badge".to_string(), badge_override);
 
+        t.apply_glow_mode(GlowMode::Off);
         t
     }
 
-    /// Applica un colore primario aggiornando tutti i token cromatici associati.
+    /// Applica un colore primario aggiornando solo i token cromatici senza distruggere
+    /// nome, superfici, componenti e configurazioni esistenti (RS-06).
     pub fn apply_primary_color(&mut self, color: PrimaryColor) {
-        let current_radius = self.radius_scale;
-        let current_elevation = self.elevation_style;
-        let current_glow = self.glow_mode;
-        let mut updated = match &color {
-            PrimaryColor::Violet => Self::shadow(),
-            PrimaryColor::Obsidian => Self::obsidian(),
-            PrimaryColor::Crimson => Self::crimson(),
-            PrimaryColor::Cyan => Self::cyan(),
-            PrimaryColor::Emerald => Self::emerald(),
-            PrimaryColor::Custom { .. } => {
-                let mut custom_t = Self::shadow();
-                custom_t.name = color.name().to_string();
-                custom_t.primary_color = color.clone();
-                let prefix = color.css_prefix();
-                custom_t.button_primary = format!("sd-btn--primary-{}", prefix);
-                custom_t
-            }
-        };
-        updated.radius_scale = current_radius;
-        updated.elevation_style = current_elevation;
-        updated.apply_glow_mode(current_glow);
-        *self = updated;
+        let tokens = Self::color_tokens(&color);
+        self.primary_color = color;
+        self.sidebar_link_active = tokens.sidebar_link_active;
+        self.border_accent = tokens.border_accent;
+        self.text_accent = tokens.text_accent;
+        self.text_accent_bright = tokens.text_accent_bright;
+        self.button_primary = tokens.button_primary;
+        self.badge_primary = tokens.badge_primary;
+        self.banner = tokens.banner;
+        self.apply_glow_mode(self.glow_mode);
     }
 
     /// Applica una scala globale del raggio di curvatura.
@@ -848,22 +1162,24 @@ impl Theme {
     /// Applica una modalità di intensità per il micro-glow, ricalcolando tutti i componenti.
     pub fn apply_glow_mode(&mut self, glow: GlowMode) {
         self.glow_mode = glow;
-        let (g, gb, gc, gi, gbd, gm, ga, gd, gn, gs, gcb) =
-            Self::calculate_glows(&self.primary_color, glow);
-        self.glow = g;
-        self.glow_button = gb;
-        self.glow_card = gc;
-        self.glow_input = gi;
-        self.glow_badge = gbd;
-        self.glow_modal = gm;
-        self.glow_alert = ga;
-        self.glow_dropdown = gd;
-        self.glow_notification = gn;
-        self.glow_switch = gs;
-        self.glow_checkbox = gcb;
+        let glows = Self::calculate_glows(&self.primary_color, glow);
+        self.glow = glows.glow;
+        self.glow_button = glows.button;
+        self.glow_card = glows.card;
+        self.glow_input = glows.input;
+        self.glow_badge = glows.badge;
+        self.glow_modal = glows.modal;
+        self.glow_alert = glows.alert;
+        self.glow_dropdown = glows.dropdown;
+        self.glow_notification = glows.notification;
+        self.glow_switch = glows.switch;
+        self.glow_checkbox = glows.checkbox;
+        self.glow_select = glows.select;
+        self.glow_tooltip = glows.tooltip;
+        self.glow_drawer = glows.drawer;
     }
 
-    /// Restituisce la classe di glow configurata per un dato componente.
+    /// Restituisce la classe di glow configurata per un dato componente (DS-12).
     pub fn component_glow(&self, component: &str) -> &str {
         match component {
             "button" => &self.glow_button,
@@ -876,6 +1192,9 @@ impl Theme {
             "notification" => &self.glow_notification,
             "switch" => &self.glow_switch,
             "checkbox" => &self.glow_checkbox,
+            "select" => &self.glow_select,
+            "tooltip" => &self.glow_tooltip,
+            "drawer" => &self.glow_drawer,
             _ => &self.glow,
         }
     }
@@ -933,7 +1252,7 @@ impl Theme {
         self
     }
 
-    // Helper per componenti
+    // Helper per componenti (RS-05)
     #[cfg(feature = "button")]
     pub fn button_variant_classes(&self, variant: ButtonVariant) -> &str {
         match variant {
@@ -988,10 +1307,18 @@ impl Theme {
             AlertVariant::Danger => &self.alert_title_danger,
         }
     }
+
+    pub fn input_border_class(&self, is_error: bool) -> &str {
+        if is_error {
+            &self.input_error_border
+        } else {
+            &self.input_normal_border
+        }
+    }
 }
 
 /// Builder avanzato per costruire temi in modo fluido ed ergonomico.
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct ThemeBuilder {
     theme: Theme,
 }
@@ -1027,22 +1354,34 @@ impl ThemeBuilder {
     }
 
     pub fn surface_0(mut self, val: impl Into<String>) -> Self {
-        self.theme.surface_0 = val.into();
+        let s = val.into();
+        if is_valid_hex_color(&s) {
+            self.theme.surface_0 = s;
+        }
         self
     }
 
     pub fn surface_1(mut self, val: impl Into<String>) -> Self {
-        self.theme.surface_1 = val.into();
+        let s = val.into();
+        if is_valid_hex_color(&s) {
+            self.theme.surface_1 = s;
+        }
         self
     }
 
     pub fn surface_2(mut self, val: impl Into<String>) -> Self {
-        self.theme.surface_2 = val.into();
+        let s = val.into();
+        if is_valid_hex_color(&s) {
+            self.theme.surface_2 = s;
+        }
         self
     }
 
     pub fn surface_3(mut self, val: impl Into<String>) -> Self {
-        self.theme.surface_3 = val.into();
+        let s = val.into();
+        if is_valid_hex_color(&s) {
+            self.theme.surface_3 = s;
+        }
         self
     }
 
@@ -1076,18 +1415,153 @@ impl ThemeBuilder {
     }
 }
 
-/// Provider per iniettare il tema reattivo nel Context Dioxus.
+/// Provider per iniettare il tema reattivo nel Context Dioxus (RS-07, DS-02, DS-10).
 #[component]
 pub fn ThemeProvider(#[props(default)] theme: Option<Signal<Theme>>, children: Element) -> Element {
-    let current = theme.unwrap_or_else(|| use_signal(Theme::default));
-    use_context_provider(|| current);
-    rsx! { {children} }
+    let owned = use_signal(Theme::default);
+    let active_theme = theme.unwrap_or(owned);
+    use_context_provider(|| active_theme);
+
+    let theme_val = active_theme.read();
+    let prefix = theme_val.primary_color.css_prefix();
+    let radius_class = match theme_val.radius_scale {
+        RadiusScale::Sharp => "sd-radius-sharp",
+        RadiusScale::Medium => "sd-radius-medium",
+        RadiusScale::Soft => "sd-radius-soft",
+    };
+    let glow_class = match theme_val.glow_mode {
+        GlowMode::Off => "sd-glow-off",
+        GlowMode::Subtle => "sd-glow-subtle",
+        GlowMode::Expressive => "sd-glow-expressive",
+    };
+    let css_vars = theme_val.to_css_variables();
+
+    rsx! {
+        div {
+            class: "sd-theme-wrapper sd-theme-{prefix} {radius_class} {glow_class}",
+            "data-sd-theme": "{prefix}",
+            style: "display: contents;",
+            document::Style { "{css_vars}" }
+            {children}
+        }
+    }
 }
 
-/// Hook per accedere e modificare il tema attivo.
+/// Hook per accedere e modificare il tema attivo (RS-07).
 pub fn use_theme() -> Signal<Theme> {
     match try_use_context::<Signal<Theme>>() {
         Some(s) => s,
-        None => use_context_provider(|| Signal::new(Theme::default())),
+        None => {
+            #[cfg(debug_assertions)]
+            {
+                static WARNED: std::sync::atomic::AtomicBool =
+                    std::sync::atomic::AtomicBool::new(false);
+                if !WARNED.swap(true, std::sync::atomic::Ordering::Relaxed) {
+                    eprintln!(
+                        "Warning: `use_theme()` called without an ancestor `ThemeProvider`. Using shared root context fallback."
+                    );
+                }
+            }
+            let rt = dioxus_core::Runtime::current();
+            let sig = Signal::new_in_scope(Theme::default(), ScopeId::ROOT);
+            rt.provide_context(ScopeId::ROOT, sig)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_primary_color_custom_classes() {
+        let custom = PrimaryColor::custom("Brand", "#ff8800");
+        assert_eq!(custom.css_prefix(), "custom");
+        assert_eq!(custom.hex(), "#ff8800");
+
+        let themed = Theme::builder().primary_color(custom).build();
+        assert_eq!(themed.button_primary, "sd-btn--primary-custom");
+    }
+
+    #[test]
+    fn test_primary_color_custom_with_prefix_sanitized() {
+        let custom = PrimaryColor::custom_with_prefix("Brand", "#ff8800", "My Brand_123!");
+        assert_eq!(custom.css_prefix(), "my-brand-123");
+    }
+
+    #[test]
+    fn test_hex_color_validation() {
+        assert!(is_valid_hex_color("#fff"));
+        assert!(is_valid_hex_color("#ffffff"));
+        assert!(is_valid_hex_color("#123456aa"));
+        assert!(!is_valid_hex_color(""));
+        assert!(!is_valid_hex_color("fff"));
+        assert!(!is_valid_hex_color("#12"));
+        assert!(!is_valid_hex_color("#123456789"));
+        assert!(!is_valid_hex_color("#${alert(1)}"));
+    }
+
+    #[test]
+    fn test_builder_preserves_overrides_when_changing_color() {
+        let theme = Theme::builder()
+            .override_component("button", |o| o.with_base_class("my-btn"))
+            .primary_color(PrimaryColor::Crimson)
+            .build();
+        assert_eq!(theme.primary_color, PrimaryColor::Crimson);
+        assert_eq!(theme.resolve_component_base("button"), Some("my-btn"));
+    }
+
+    #[test]
+    fn test_cartoon_apply_primary_color_keeps_components() {
+        let mut theme = Theme::cartoon();
+        theme.apply_primary_color(PrimaryColor::Crimson);
+        assert_eq!(theme.primary_color, PrimaryColor::Crimson);
+        assert!(theme.components.contains_key("button"));
+        assert_eq!(theme.root, "sd-root sd-root--cartoon");
+    }
+
+    #[test]
+    fn test_vivid_violet_accent() {
+        assert_eq!(PrimaryColor::Violet.hex(), "#a855f7");
+        assert_eq!(PrimaryColor::Violet.accent_hex(), "#a855f7");
+        assert_eq!(PrimaryColor::Violet.shadow_hex(), "#3b0764");
+    }
+
+    #[test]
+    fn test_glow_modes_different() {
+        let mut theme = Theme::shadow();
+        theme.apply_glow_mode(GlowMode::Off);
+        assert!(theme.glow_button.is_empty());
+        assert!(theme.glow_card.is_empty());
+
+        theme.apply_glow_mode(GlowMode::Subtle);
+        assert!(!theme.glow_button.is_empty());
+        assert!(
+            theme.glow_card.is_empty(),
+            "Cards should not glow in Subtle mode"
+        );
+
+        theme.apply_glow_mode(GlowMode::Expressive);
+        assert!(!theme.glow_button.is_empty());
+        assert!(
+            !theme.glow_card.is_empty(),
+            "Cards should glow in Expressive mode"
+        );
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_theme_serde_missing_fields() {
+        let json = r#"{"name": "Saved Theme", "primary_color": "Violet"}"#;
+        let deserialized: Result<Theme, _> = serde_json::from_str(json);
+        assert!(
+            deserialized.is_ok(),
+            "Theme should deserialize with missing fields: {:?}",
+            deserialized.err()
+        );
+        let theme = deserialized.unwrap();
+        assert_eq!(theme.name, "Saved Theme");
+        assert_eq!(theme.primary_color, PrimaryColor::Violet);
+        assert_eq!(theme.radius_scale, RadiusScale::Medium);
     }
 }

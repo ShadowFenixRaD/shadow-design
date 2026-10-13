@@ -26,6 +26,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 dioxus = { workspace = true, features = ["lib"] }
 serde = { workspace = true, optional = true }
 
+[dev-dependencies]
+serde_json = { workspace = true }
+
 [features]
 default = ["all"]
 all = [
