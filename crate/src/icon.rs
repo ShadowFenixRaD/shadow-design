@@ -99,17 +99,32 @@ pub fn RenderSvgIcon(
     icon: SvgIcon,
     #[props(default = 16)] size: u32,
     #[props(default)] class: String,
+    #[props(default)] label: Option<String>,
 ) -> Element {
     match icon {
         SvgIcon::Kind(kind) => rsx! {
-            Icon { kind, size, class }
+            Icon { kind, size, class, label }
         },
-        SvgIcon::Custom(elem) => rsx! {
-            span {
-                class: "shrink-0 inline-flex items-center justify-center {class}",
-                {elem}
+        SvgIcon::Custom(elem) => {
+            if let Some(lbl) = label {
+                rsx! {
+                    span {
+                        role: "img",
+                        aria_label: "{lbl}",
+                        class: "shrink-0 inline-flex items-center justify-center {class}",
+                        {elem}
+                    }
+                }
+            } else {
+                rsx! {
+                    span {
+                        aria_hidden: "true",
+                        class: "shrink-0 inline-flex items-center justify-center {class}",
+                        {elem}
+                    }
+                }
             }
-        },
+        }
     }
 }
 
@@ -118,26 +133,58 @@ pub fn Icon(
     kind: IconKind,
     #[props(default = 16)] size: u32,
     #[props(default)] class: String,
+    #[props(default)] label: Option<String>,
 ) -> Element {
     let size_str = size.to_string();
     let spinner_class = if matches!(kind, IconKind::Spinner) { " animate-spin" } else { "" };
+    let paths = render_icon_paths(kind);
 
+    if let Some(lbl) = label {
+        rsx! {
+            svg {
+                xmlns: "http://www.w3.org/2000/svg",
+                width: "{size_str}",
+                height: "{size_str}",
+                view_box: "0 0 24 24",
+                fill: "none",
+                stroke: "currentColor",
+                stroke_width: "1.5",
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                "role": "img",
+                "aria-label": "{lbl}",
+                "focusable": "false",
+                class: "shrink-0 {class}{spinner_class}",
+                {paths}
+            }
+        }
+    } else {
+        rsx! {
+            svg {
+                xmlns: "http://www.w3.org/2000/svg",
+                width: "{size_str}",
+                height: "{size_str}",
+                view_box: "0 0 24 24",
+                fill: "none",
+                stroke: "currentColor",
+                stroke_width: "1.5",
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                "aria-hidden": "true",
+                "focusable": "false",
+                class: "shrink-0 {class}{spinner_class}",
+                {paths}
+            }
+        }
+    }
+}
+
+fn render_icon_paths(kind: IconKind) -> Element {
     rsx! {
-        svg {
-            xmlns: "http://www.w3.org/2000/svg",
-            width: "{size_str}",
-            height: "{size_str}",
-            view_box: "0 0 24 24",
-            fill: "none",
-            stroke: "currentColor",
-            stroke_width: "1.5",
-            stroke_linecap: "round",
-            stroke_linejoin: "round",
-            class: "shrink-0 {class}{spinner_class}",
-            match kind {
-                IconKind::ChevronRight => rsx! {
-                    path { d: "m9 18 6-6-6-6" }
-                },
+        match kind {
+            IconKind::ChevronRight => rsx! {
+                path { d: "m9 18 6-6-6-6" }
+            },
                 IconKind::ChevronDown => rsx! {
                     path { d: "m6 9 6 6 6-6" }
                 },
@@ -379,4 +426,3 @@ pub fn Icon(
             }
         }
     }
-}

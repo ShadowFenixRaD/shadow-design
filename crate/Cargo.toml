@@ -18,8 +18,12 @@ include = [
     "LICENSE*",
 ]
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [dependencies]
-dioxus = { workspace = true }
+dioxus = { workspace = true, features = ["lib"] }
 serde = { workspace = true, optional = true }
 
 [features]
@@ -54,7 +58,6 @@ all = [
     "divider",
     "tree",
     "skeleton",
-    "serde",
 ]
 serde = ["dep:serde"]
 button = []
