@@ -11,6 +11,7 @@ pub enum DropdownPlacement {
 }
 
 impl DropdownPlacement {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             DropdownPlacement::BottomRight => "sd-dropdown-menu--bottom-right",

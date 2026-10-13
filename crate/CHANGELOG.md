@@ -5,9 +5,25 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ---
 
+## [Unreleased]
+
+### 🚀 Nuove Funzionalità
+- **Suite di Selezione Avanzata (`select`)**:
+  - `Select`: Menu a discesa a selezione singola con supporto a descrizioni e raggruppamenti.
+  - `MultiSelect`: Selezione multipla con badge/tag rimovibili ed eliminazione rapida.
+  - `Combobox`: Campo di testo combinato con ricerca live, filtri reattivi e navigazione tastiera.
+  - `SelectItem`: Struttura dati builder con `.with_description()`, `.with_group()` e `.disabled()`.
+- **Campi di Testo Multilinea (`textarea`)**:
+  - `Textarea`: Input multilinea con dimensionamento automatico in base alle righe digitate, contatore di caratteri e stati di validazione.
+- **Accessibilità & Navigazione Tastiera**:
+  - Piena conformità W3C APG per schede orizzontali (`tabs`) con roving tabindex e tasti freccia.
+  - Search Palette globale accessibile con scorciatoia rapida `Ctrl+K`.
+
+---
+
 ## [0.2.0] — 2026-10-11
 
-Nuova versione che introduce il motore di temi multi-livello con risoluzione a cascata a 3 livelli, supporto completo a Serde e persistenza `localStorage`, lo studio interattivo **Theme Builder**, correzioni strutturali ai layer CSS Cascade, e isolamento rigoroso delle feature flags.
+Nuova versione che introduce il motore di temi multi-livello con risoluzione a cascata a 3 livelli, supporto completo a Serde (`serde`) e persistenza `localStorage`, lo studio interattivo **Theme Builder**, correzioni strutturali ai layer CSS Cascade, e isolamento rigoroso delle feature flags.
 
 ### 🚀 Nuove Funzionalità
 
@@ -20,7 +36,7 @@ Nuova versione che introduce il motore di temi multi-livello con risoluzione a c
     - `Flat`: grafica minimalista priva di ombre.
   - Supporto per `ComponentOverride` a Livello 2: personalizzazione di classi base, varianti, ombre e modificatori per singolo componente.
   - Nuovo `ThemeBuilder` fluido e chainable per comporre temi in modo programmatico:
-    `ThemeBuilder::new().primary_color(...).elevation_style(...).component_override(...).build()`.
+    `ThemeBuilder::new().primary_color(...).elevation_style(...).override_component(...).build()`.
   - Iniezione dinamica di CSS Custom Properties a runtime tramite `Theme::to_css_variables()`.
 - **Serializzazione e Deserializzazione Serde (`serde`)**:
   - Aggiunto `#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]` per `Theme`, `PrimaryColor`, `RadiusScale`, `GlowMode`, `ElevationStyle` e `ComponentOverride`.

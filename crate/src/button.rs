@@ -12,6 +12,7 @@ pub enum ButtonVariant {
 }
 
 impl ButtonVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             ButtonVariant::Primary => "sd-btn--primary",
@@ -23,6 +24,7 @@ impl ButtonVariant {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             ButtonVariant::Primary => "primary",
@@ -46,6 +48,7 @@ pub enum ButtonSize {
 }
 
 impl ButtonSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             ButtonSize::Xs => "sd-btn--xs",
@@ -56,6 +59,7 @@ impl ButtonSize {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             ButtonSize::Xs => "xs",

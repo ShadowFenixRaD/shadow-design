@@ -18,6 +18,7 @@ pub enum DrawerSize {
 }
 
 impl DrawerSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             DrawerSize::Sm => "sd-drawer-panel--sm",

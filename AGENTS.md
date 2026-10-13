@@ -28,38 +28,82 @@ shadow-design/
 ├── AGENTS.md                # Questo file d'istruzioni
 ├── crate/                   # Crate libreria: shadow-design
 │   ├── Cargo.toml           # Manifest della libreria con feature flags
+│   ├── scss/                # Sistema di stile nativo Pure SCSS
+│   │   ├── main.scss        # Entrypoint SCSS master esportato come Asset
+│   │   ├── _variables.scss  # Token e scale cromatiche
+│   │   ├── _mixins.scss     # Mixin tattili, specular, depth e ambient glow
+│   │   ├── _reset.scss      # Reset CSS preflight (@layer sd-reset)
+│   │   ├── _utilities.scss  # Utilità universali (@layer sd-utilities)
+│   │   ├── _theme_presets.scss # Stili dei 5 temi e scale di personalizzazione
+│   │   └── components/      # Moduli SCSS dedicati per ogni componente
 │   └── src/
 │       ├── lib.rs           # Entry point libreria, re-export condizionali e prelude
-│       ├── theme.rs         # Sistema reattivo del tema, Context e Preset
+│       ├── a11y.rs          # Helper di accessibilità ARIA e ID univoci
+│       ├── alert.rs         # Componente Alert con icone automatiche
+│       ├── animation.rs     # Transizioni ottiche e micro-animazioni
+│       ├── badge.rs         # Componente Badge con stili pill/rettangolari
 │       ├── button.rs        # Componente Button, varianti e dimensioni
 │       ├── card.rs          # Componente Card con header, footer e ombre
+│       ├── checkbox.rs      # Caselle di selezione tattili (Sm/Md/Lg)
+│       ├── compat.rs        # Layer di retrocompatibilità
+│       ├── drawer.rs        # Pannelli laterali a scomparsa da sx/dx
+│       ├── dropdown.rs      # Menu a tendina contestuali ancorati
+│       ├── glow.rs          # Risolutore del micro-glow
+│       ├── icon.rs          # Modulo icone native SVG (50 IconKind)
 │       ├── input.rs         # Componente TextInput collegato a Signal<String>
-│       ├── badge.rs         # Componente Badge con stili pill/rettangolari
+│       ├── modal.rs         # Finestre di dialogo in overlay con backdrop
 │       ├── navbar.rs        # Componente Navbar responsive
-│       ├── modal.rs         # Componente Modal controllato da Signal<bool>
-│       └── alert.rs         # Componente Alert con icone automatiche
+│       ├── notification.rs  # Sistema Toast globale con NotificationProvider
+│       ├── select.rs        # Select, MultiSelect e Combobox filtrabili
+│       ├── switch.rs        # Interruttori a scatto tattili ad alta precisione
+│       ├── tabs.rs          # Navigazione a schede orizzontali stile Mantine
+│       ├── textarea.rs      # Campi di testo multilinea con autosize
+│       ├── theme.rs         # Sistema reattivo del tema, Context e Preset
+│       ├── tooltip.rs       # Micro-etichette fluttuanti su hover a 4 direzioni
+│       ├── typography.rs    # Componenti tipografici basati su Geist
+│       └── util.rs          # Utility class builder cx!
 └── showcase/                # Crate applicativo: Espositore componenti
     ├── Cargo.toml           # Manifest dell'app (dipende da shadow-design { all })
     ├── Dioxus.toml          # Configurazione Dioxus CLI (dx)
     ├── assets/
+    │   ├── critical.css     # CSS critico di boot (dark background immediato)
     │   ├── header.svg       # Logo vettoriale Shadowfenix
     │   └── favicon.ico      # Icona dell'applicazione
     └── src/
         ├── main.rs          # App root, caricamento asset e Dioxus Router
         ├── components/
-        │   ├── mod.rs
-        │   ├── layout.rs    # Shell con Navbar, Sidebar e Theme Switcher live
-        │   └── banner.rs    # Banner informativo con comando Cargo feature
+        │   ├── banner.rs    # Banner informativo con comando Cargo feature
+        │   ├── clipboard.rs # Helper asincrono copy-to-clipboard con fallback
+        │   ├── code_block.rs# Visualizzatore codice con syntax highlighting
+        │   ├── highlight.rs # Tokenizer sintattico per Rust/RSX
+        │   ├── layout.rs    # Shell con Navbar, Sidebar responsive e Theme Switcher
+        │   ├── mod.rs       # Moduli componenti showcase
+        │   ├── nav.rs       # Registry componenti e SearchPalette (Ctrl+K)
+        │   ├── props_table.rs# Tabella documentazione props delle API
+        │   └── showcase_tabs.rs # Tabs Playground / Codice RSX / API Props
         └── pages/
             ├── mod.rs
-            ├── home.rs      # Panoramica, hero e test dinamico del Theme
+            ├── alerts.rs    # Showcase di Alert
+            ├── animation.rs # Playground interattivo Transition
+            ├── badges.rs    # Showcase di Badge e varianti
             ├── buttons.rs   # Showcase e playground interattivo di Button
             ├── cards.rs     # Showcase di Card e livelli di ombra
+            ├── checkbox.rs  # Showcase di Checkbox tattile
+            ├── drawer.rs    # Showcase di Drawer laterale
+            ├── dropdown.rs  # Showcase di Dropdown contestuale
+            ├── home.rs      # Panoramica, hero e test dinamico del Theme
+            ├── icons.rs     # Griglia ricercabile di tutti i 50 IconKind
             ├── inputs.rs    # Showcase di TextInput con binding reattivo
-            ├── badges.rs    # Showcase di Badge e varianti
-            ├── alerts.rs    # Showcase di Alert di sistema
             ├── modals.rs    # Showcase e test di apertura modale
-            └── navbar.rs    # Anteprima di Navbar
+            ├── navbar.rs    # Anteprima di Navbar
+            ├── notifications.rs # Showcase del Toast Provider
+            ├── select.rs    # Showcase di Select, MultiSelect e Combobox
+            ├── switch.rs    # Showcase di Switch tattile
+            ├── tabs.rs      # Showcase di Tabs orizzontali
+            ├── textarea.rs  # Showcase di Textarea autosize
+            ├── theme_builder.rs # Studio visuale Theme Builder
+            ├── tooltip.rs   # Showcase di Tooltip su hover
+            └── typography.rs# Showcase della scala tipografica Geist
 ```
 
 ---
@@ -89,7 +133,10 @@ Il file `crate/Cargo.toml` definisce feature individuali per consentire ai consu
 | `drawer` | Pannelli laterali a scomparsa da sinistra o destra con backdrop | `crate::drawer` |
 | `dropdown` | Menu a tendina contestuali ancorati al trigger con dismiss automatico | `crate::dropdown` |
 | `checkbox` | Caselle di selezione tattili (Sm/Md/Lg, indeterminate, error, glow) | `crate::checkbox` |
+| `select` | Menu a discesa Select, MultiSelect e Combobox ricercabili | `crate::select` |
+| `textarea` | Campi di testo multilinea con autosize reattivo e contatore | `crate::textarea` |
 | `animation` | Sistema di transizioni ottiche e micro-animazioni Dioxus (Fade, Slide, Scale, Pulse) | `crate::animation` |
+| `serde` | Serializzazione e deserializzazione JSON di Theme, Preset e Overrides | Dipendenza `serde` opzionale |
 
 ### Gerarchia Z-Index Standardizzata
 Per prevenire clipping e sovrapposizioni errate (es. Dropdown clippato da Card o nascosto sotto altri elementi):
@@ -102,10 +149,11 @@ Per prevenire clipping e sovrapposizioni errate (es. Dropdown clippato da Card o
   - Modal: Backdrop `z-[75]`, Dialog `z-[80]` / `z-[85]`
   - Notifications: Container `z-[90]`
   - Tooltips: Bubble `z-[100]`
+  - Select Menu: Container `z-[999]`, Menu `z-[1000]`
   - Dropdown Attivo: Container `z-[999]`, Menu `z-[1000]`
 
 ### Architettura 100% SCSS & Supporto Nativo Dioxus `asset!()` nella Crate
-TailwindCSS è stato completamente rimosso dal progetto. L'intera suite di stili è ora scritta in puro SCSS e risiede direttamente all'interno della crate libreria in `crate/scss/`, esposta nativamente tramite la macro di Dioxus in [crate/src/lib.rs](file:///c:/Users/KillerBoss/Documents/shadow-design/crate/src/lib.rs):
+TailwindCSS è stato completamente rimosso dal progetto. L'intera suite di stili è ora scritta in puro SCSS e risiede direttamente all'interno della crate libreria in `crate/scss/`, esposta nativamente tramite la macro di Dioxus in [crate/src/lib.rs](crate/src/lib.rs):
 ```rust
 pub const STYLES: Asset = asset!("/scss/main.scss");
 ```
@@ -213,4 +261,8 @@ cargo test --workspace
 # Avvio del server di sviluppo dello Showcase (con hot-reload)
 cd showcase
 dx serve
+
+# Verifica che tutte le classi RSX utilizzate esistano nel CSS compilato
+python scripts/check_classes.py
+
 ```

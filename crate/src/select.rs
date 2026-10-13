@@ -35,18 +35,21 @@ impl SelectItem {
     }
 
     /// Attaches an optional secondary description.
+    #[must_use]
     pub fn with_description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
 
     /// Assigns the item to a specific category group.
+    #[must_use]
     pub fn with_group(mut self, group: impl Into<String>) -> Self {
         self.group = Some(group.into());
         self
     }
 
     /// Marks the item as disabled.
+    #[must_use]
     pub fn disabled(mut self) -> Self {
         self.disabled = true;
         self
@@ -78,6 +81,7 @@ impl From<(String, String)> for SelectItem {
 }
 
 /// Helper to determine the display label and placeholder state for a selected value.
+#[must_use]
 pub fn display_label(data: &[SelectItem], value: Option<&str>, placeholder: &str) -> (String, bool) {
     match value {
         Some(val) => {
@@ -92,6 +96,7 @@ pub fn display_label(data: &[SelectItem], value: Option<&str>, placeholder: &str
 }
 
 /// Helper to filter items based on a query string across label, value, and description.
+#[must_use]
 pub fn filter_items(data: &[SelectItem], q: &str) -> Vec<SelectItem> {
     let q = q.trim().to_lowercase();
     if q.is_empty() {

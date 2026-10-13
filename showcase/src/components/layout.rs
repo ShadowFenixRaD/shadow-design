@@ -197,7 +197,7 @@ pub fn Layout() -> Element {
                         }
                     }
                     Badge {
-                        label: "v0.2.0 • Dioxus 0.7".to_string(),
+                        label: format!("v{} • Dioxus 0.7", env!("CARGO_PKG_VERSION")),
                         variant: BadgeVariant::Primary,
                         pill: true,
                     }

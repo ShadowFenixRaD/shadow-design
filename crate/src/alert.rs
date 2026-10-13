@@ -13,6 +13,7 @@ pub enum AlertVariant {
 }
 
 impl AlertVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             AlertVariant::Info => "sd-alert--info",
@@ -22,6 +23,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn title_class(&self) -> &'static str {
         match self {
             AlertVariant::Info => "sd-alert__title--info",
@@ -31,6 +33,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn icon_color_class(&self) -> &'static str {
         match self {
             AlertVariant::Info => "sd-alert__icon--info",
@@ -40,6 +43,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn glow_class(&self) -> &'static str {
         match self {
             AlertVariant::Info => "sd-alert--glow-info",
@@ -49,6 +53,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn icon_kind(&self) -> IconKind {
         match self {
             AlertVariant::Info => IconKind::Info,
@@ -58,6 +63,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             AlertVariant::Info => "info",
@@ -67,6 +73,7 @@ impl AlertVariant {
         }
     }
 
+    #[must_use]
     pub fn default_prefix(&self) -> &'static str {
         match self {
             AlertVariant::Info => "Info",

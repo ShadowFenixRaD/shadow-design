@@ -11,6 +11,7 @@ use crate::button::ButtonVariant;
 use crate::card::CardShadow;
 
 /// Verifica se una stringa è un colore esadecimale CSS valido (#rgb, #rgba, #rrggbb, #rrggbbaa).
+#[must_use]
 pub fn is_valid_hex_color(hex: &str) -> bool {
     let s = hex.trim();
     if !s.starts_with('#') {
@@ -22,6 +23,7 @@ pub fn is_valid_hex_color(hex: &str) -> bool {
 }
 
 /// Converte un colore hex valido in tuple (r, g, b). Se non valido, restituisce None.
+#[must_use]
 pub fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
     if !is_valid_hex_color(hex) {
         return None;
@@ -62,6 +64,7 @@ pub enum PrimaryColor {
 }
 
 impl PrimaryColor {
+    #[must_use]
     pub fn name(&self) -> &str {
         match self {
             PrimaryColor::Violet => "Violet",
@@ -74,11 +77,13 @@ impl PrimaryColor {
     }
 
     /// Restituisce il valore hex primario. Per Violet restituisce l'accento vivido #a855f7 (VQA-22).
+    #[must_use]
     pub fn hex(&self) -> &str {
         self.accent_hex()
     }
 
     /// Restituisce il colore vivido di accento per swatch e variabili CSS (VQA-22).
+    #[must_use]
     pub fn accent_hex(&self) -> &str {
         match self {
             PrimaryColor::Violet => "#a855f7",
@@ -91,6 +96,7 @@ impl PrimaryColor {
     }
 
     /// Restituisce il colore d'ombra o tonalità profonda (VQA-22).
+    #[must_use]
     pub fn shadow_hex(&self) -> &str {
         match self {
             PrimaryColor::Violet => "#3b0764",
@@ -104,6 +110,7 @@ impl PrimaryColor {
 
     /// Ricava automaticamente il prefisso o slug per le classi CSS (es. "custom", "cartoon").
     /// Se css_prefix è None, mappa a "custom" (RS-02). Se Some(p), sanitizza a caratteri alfanumerici e trattini.
+    #[must_use]
     pub fn css_prefix(&self) -> String {
         match self {
             PrimaryColor::Violet => "violet".to_string(),
@@ -194,6 +201,7 @@ pub enum RadiusScale {
 }
 
 impl RadiusScale {
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             RadiusScale::Sharp => "Sharp (2px)",
@@ -202,6 +210,7 @@ impl RadiusScale {
         }
     }
 
+    #[must_use]
     pub fn sm(&self) -> &'static str {
         match self {
             RadiusScale::Sharp => "sd-radius-sharp",
@@ -210,6 +219,7 @@ impl RadiusScale {
         }
     }
 
+    #[must_use]
     pub fn md(&self) -> &'static str {
         match self {
             RadiusScale::Sharp => "sd-radius-sharp",
@@ -218,6 +228,7 @@ impl RadiusScale {
         }
     }
 
+    #[must_use]
     pub fn lg(&self) -> &'static str {
         match self {
             RadiusScale::Sharp => "sd-radius-sharp",
@@ -266,30 +277,36 @@ pub struct ComponentOverride {
 }
 
 impl ComponentOverride {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[must_use]
     pub fn with_base_class(mut self, base: impl Into<String>) -> Self {
         self.base_class = Some(base.into());
         self
     }
 
+    #[must_use]
     pub fn with_variant(mut self, variant: impl Into<String>, class: impl Into<String>) -> Self {
         self.variant_classes.insert(variant.into(), class.into());
         self
     }
 
+    #[must_use]
     pub fn with_size(mut self, size: impl Into<String>, class: impl Into<String>) -> Self {
         self.size_classes.insert(size.into(), class.into());
         self
     }
 
+    #[must_use]
     pub fn with_shadow(mut self, shadow: impl Into<String>) -> Self {
         self.shadow_class = Some(shadow.into());
         self
     }
 
+    #[must_use]
     pub fn with_class_modifier(
         mut self,
         target_class: impl Into<String>,
@@ -439,12 +456,14 @@ impl Default for Theme {
 
 impl Theme {
     /// Inizia la costruzione di un tema personalizzato con builder fluido.
+    #[must_use]
     pub fn builder() -> ThemeBuilder {
         ThemeBuilder::default()
     }
 
     /// Risolve la classe variante tenendo conto della gerarchia:
     /// Livello 2 (Component Override) -> Livello 1 (Global Theme Fallback).
+    #[must_use]
     pub fn resolve_variant_class(
         &self,
         component: &str,
@@ -460,6 +479,7 @@ impl Theme {
     }
 
     /// Risolve la classe taglia per un componente tenendo conto di Livello 2 -> Livello 1.
+    #[must_use]
     pub fn resolve_size_class(&self, component: &str, size: &str, fallback_class: &str) -> String {
         if let Some(comp_override) = self.components.get(component) {
             if let Some(custom) = comp_override.size_classes.get(size) {
@@ -470,6 +490,7 @@ impl Theme {
     }
 
     /// Restituisce la classe base opzionale definita per il componente (Livello 2).
+    #[must_use]
     pub fn resolve_component_base(&self, component: &str) -> Option<&str> {
         self.components
             .get(component)
@@ -477,6 +498,7 @@ impl Theme {
     }
 
     /// Risolve modificatori condizionali per classi specifiche (Livello 2 per classi).
+    #[must_use]
     pub fn resolve_class_modifiers(&self, component: &str, instance_classes: &str) -> String {
         let mut modifiers = Vec::new();
 
@@ -500,6 +522,7 @@ impl Theme {
     }
 
     /// Risolve la classe di ombra / glow in base all'ElevationStyle e alla configurazione del componente.
+    #[must_use]
     pub fn resolve_elevation_class(&self, component: &str, override_glow: Option<bool>) -> String {
         if override_glow == Some(false) {
             return String::new();
@@ -540,6 +563,7 @@ impl Theme {
     }
 
     /// Genera la stringa di CSS Custom Properties da iniettare dinamicamente a runtime (DS-10, SC-15).
+    #[must_use]
     pub fn to_css_variables(&self) -> String {
         let safe_primary = if is_valid_hex_color(self.primary_color.hex()) {
             self.primary_color.hex()
@@ -959,6 +983,7 @@ impl Theme {
     }
 
     /// Tema di default Shadow Design (Ultraviolet Obsidian: Nero profondo con accenti viola).
+    #[must_use]
     pub fn shadow() -> Self {
         let glows = Self::calculate_glows(&PrimaryColor::Violet, GlowMode::Subtle);
 
@@ -1054,6 +1079,7 @@ impl Theme {
     }
 
     /// Preset Obsidian Titanium (Monocromatico con accenti grafite).
+    #[must_use]
     pub fn obsidian() -> Self {
         let mut t = Self::shadow();
         t.name = "Obsidian Titanium".to_string();
@@ -1062,6 +1088,7 @@ impl Theme {
     }
 
     /// Preset Crimson Phoenix.
+    #[must_use]
     pub fn crimson() -> Self {
         let mut t = Self::shadow();
         t.name = "Crimson Phoenix".to_string();
@@ -1070,6 +1097,7 @@ impl Theme {
     }
 
     /// Preset Cyber Cyan.
+    #[must_use]
     pub fn cyan() -> Self {
         let mut t = Self::shadow();
         t.name = "Cyber Cyan".to_string();
@@ -1078,6 +1106,7 @@ impl Theme {
     }
 
     /// Preset Emerald Matrix.
+    #[must_use]
     pub fn emerald() -> Self {
         let mut t = Self::shadow();
         t.name = "Emerald Matrix".to_string();
@@ -1086,6 +1115,7 @@ impl Theme {
     }
 
     /// Nuovo Preset Nativo: Cartoon Pop / Manga Neo-Brutalist (DS-09).
+    #[must_use]
     pub fn cartoon() -> Self {
         let mut t = Self::shadow();
         t.name = "Cartoon Pop".to_string();
@@ -1180,6 +1210,7 @@ impl Theme {
     }
 
     /// Restituisce la classe di glow configurata per un dato componente (DS-12).
+    #[must_use]
     pub fn component_glow(&self, component: &str) -> &str {
         match component {
             "button" => &self.glow_button,
@@ -1200,6 +1231,7 @@ impl Theme {
     }
 
     /// Risolve se il glow è attivo per un componente tenendo conto dell'override opzionale.
+    #[must_use]
     pub fn is_component_glow_enabled(&self, component: &str, override_glow: Option<bool>) -> bool {
         match override_glow {
             Some(enabled) => enabled,
@@ -1208,31 +1240,37 @@ impl Theme {
     }
 
     // Builder methods fluenti retrocompatibili
+    #[must_use]
     pub fn with_name(mut self, name: impl Into<String>) -> Self {
         self.name = name.into();
         self
     }
 
+    #[must_use]
     pub fn with_primary(mut self, button_primary: impl Into<String>) -> Self {
         self.button_primary = button_primary.into();
         self
     }
 
+    #[must_use]
     pub fn with_card_base(mut self, card_base: impl Into<String>) -> Self {
         self.card_base = card_base.into();
         self
     }
 
+    #[must_use]
     pub fn with_glow(mut self, glow: impl Into<String>) -> Self {
         self.glow = glow.into();
         self
     }
 
+    #[must_use]
     pub fn with_elevation(mut self, elevation: ElevationStyle) -> Self {
         self.elevation_style = elevation;
         self
     }
 
+    #[must_use]
     pub fn with_component_override(
         mut self,
         component: impl Into<String>,
@@ -1242,6 +1280,7 @@ impl Theme {
         self
     }
 
+    #[must_use]
     pub fn with_class_override(
         mut self,
         target_class: impl Into<String>,
@@ -1254,6 +1293,7 @@ impl Theme {
 
     // Helper per componenti (RS-05)
     #[cfg(feature = "button")]
+    #[must_use]
     pub fn button_variant_classes(&self, variant: ButtonVariant) -> &str {
         match variant {
             ButtonVariant::Primary => &self.button_primary,
@@ -1266,6 +1306,7 @@ impl Theme {
     }
 
     #[cfg(feature = "card")]
+    #[must_use]
     pub fn card_shadow_classes(&self, shadow: CardShadow) -> &str {
         match shadow {
             CardShadow::None => &self.card_shadow_none,
@@ -1277,6 +1318,7 @@ impl Theme {
     }
 
     #[cfg(feature = "badge")]
+    #[must_use]
     pub fn badge_variant_classes(&self, variant: BadgeVariant) -> &str {
         match variant {
             BadgeVariant::Default => &self.badge_default,
@@ -1289,6 +1331,7 @@ impl Theme {
     }
 
     #[cfg(feature = "alert")]
+    #[must_use]
     pub fn alert_variant_classes(&self, variant: AlertVariant) -> &str {
         match variant {
             AlertVariant::Info => &self.alert_info,
@@ -1299,6 +1342,7 @@ impl Theme {
     }
 
     #[cfg(feature = "alert")]
+    #[must_use]
     pub fn alert_title_classes(&self, variant: AlertVariant) -> &str {
         match variant {
             AlertVariant::Info => &self.alert_title_info,
@@ -1308,6 +1352,7 @@ impl Theme {
         }
     }
 
+    #[must_use]
     pub fn input_border_class(&self, is_error: bool) -> &str {
         if is_error {
             &self.input_error_border
@@ -1324,35 +1369,42 @@ pub struct ThemeBuilder {
 }
 
 impl ThemeBuilder {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[must_use]
     pub fn name(mut self, name: impl Into<String>) -> Self {
         self.theme.name = name.into();
         self
     }
 
+    #[must_use]
     pub fn primary_color(mut self, color: PrimaryColor) -> Self {
         self.theme.apply_primary_color(color);
         self
     }
 
+    #[must_use]
     pub fn radius_scale(mut self, radius: RadiusScale) -> Self {
         self.theme.apply_radius_scale(radius);
         self
     }
 
+    #[must_use]
     pub fn elevation_style(mut self, elevation: ElevationStyle) -> Self {
         self.theme.apply_elevation_style(elevation);
         self
     }
 
+    #[must_use]
     pub fn glow_mode(mut self, glow: GlowMode) -> Self {
         self.theme.apply_glow_mode(glow);
         self
     }
 
+    #[must_use]
     pub fn surface_0(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
         if is_valid_hex_color(&s) {
@@ -1361,6 +1413,7 @@ impl ThemeBuilder {
         self
     }
 
+    #[must_use]
     pub fn surface_1(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
         if is_valid_hex_color(&s) {
@@ -1369,6 +1422,7 @@ impl ThemeBuilder {
         self
     }
 
+    #[must_use]
     pub fn surface_2(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
         if is_valid_hex_color(&s) {
@@ -1377,6 +1431,7 @@ impl ThemeBuilder {
         self
     }
 
+    #[must_use]
     pub fn surface_3(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
         if is_valid_hex_color(&s) {
@@ -1386,6 +1441,7 @@ impl ThemeBuilder {
     }
 
     /// Personalizzazione Livello 2 per uno specifico componente.
+    #[must_use]
     pub fn override_component(
         mut self,
         component: impl Into<String>,
@@ -1399,6 +1455,7 @@ impl ThemeBuilder {
     }
 
     /// Personalizzazione Livello 2 per una specifica classe target.
+    #[must_use]
     pub fn override_class(
         mut self,
         target_class: impl Into<String>,
@@ -1410,6 +1467,7 @@ impl ThemeBuilder {
         self
     }
 
+    #[must_use]
     pub fn build(self) -> Theme {
         self.theme
     }

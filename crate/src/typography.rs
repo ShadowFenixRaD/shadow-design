@@ -12,6 +12,7 @@ pub enum HeadingOrder {
 }
 
 impl HeadingOrder {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             HeadingOrder::H1 => "sd-heading--h1",
@@ -53,6 +54,7 @@ pub enum TextSize {
 }
 
 impl TextSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             TextSize::Xs => "sd-text--xs",

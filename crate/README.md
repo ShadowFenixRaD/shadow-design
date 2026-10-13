@@ -8,8 +8,8 @@ Libreria di componenti UI modulare e ad alte prestazioni per **Dioxus 0.7**, cos
 
 ```toml
 [dependencies]
-# Importa solo ciò che ti serve:
-shadow-design = { version = "0.2.0", features = ["button", "card", "theme"] }
+# Importa solo ciò che ti serve con default-features = false (zero bloat):
+shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure l'intera suite:
 # shadow-design = { version = "0.2.0", features = ["all"] }
@@ -52,20 +52,23 @@ fn App() -> Element {
 | `card` | `Card`, `CardShadow`, `CardVariant` | Schede contenitore con varianti, ombre e footer |
 | `input` | `TextInput` | Input di testo reattivi con icone cliccabili e clear button |
 | `checkbox` | `Checkbox`, `CheckboxSize` | Caselle di spunta tattili con stati indeterminato ed errore |
+| `select` | `Select`, `MultiSelect`, `Combobox`, `SelectItem` | Menu di selezione singola, multipla e combobox con filtri |
+| `textarea` | `Textarea` | Campi di testo multilinea con autosize reattivo e contatore |
 | `badge` | `Badge`, `BadgeVariant` | Etichette, pillole di stato e dot pulsante |
 | `navbar` | `Navbar` | Barra di navigazione responsive con specular highlight |
 | `modal` | `Modal` | Finestre di dialogo in overlay con backdrop click-to-close |
 | `alert` | `Alert`, `AlertVariant` | Riquadri di notifica con icone semantiche e dismiss |
 | `notification` | `NotificationProvider`, `use_notification` | Sistema Toast globale a comparsa |
-| `tabs` | `TabList`, `Tab`, `TabPanel` | Navigazione a schede orizzontali |
+| `tabs` | `TabList`, `Tab`, `TabPanel` | Navigazione a schede orizzontali conformi ad APG |
 | `switch` | `Switch` | Interruttori a scatto tattili ad alta precisione |
 | `tooltip` | `Tooltip`, `TooltipPosition` | Micro-etichette fluttuanti su hover a 4 direzioni |
 | `drawer` | `Drawer`, `DrawerPosition`, `DrawerSize` | Pannelli laterali a scomparsa da sinistra o destra |
 | `dropdown` | `Dropdown`, `DropdownItem`, `DropdownPlacement` | Menu a tendina ancorati al trigger |
-| `icon` | Native SVG Icons | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
+| `icon` | Native SVG Icons (50 `IconKind`) | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
 | `typography` | `Heading`, `Text`, `Kbd`, `Code` | Componenti tipografici con scala Geist |
-| `animation` | Optical Transitions | Transizioni ottiche e micro-animazioni Dioxus |
-| `theme` | `ThemeProvider`, `use_theme`, `Theme` | Engine reattivo Mantine con 5 preset cromatici |
+| `animation` | `Transition`, `AnimationVariant` | Transizioni ottiche e micro-animazioni Dioxus |
+| `theme` | `ThemeProvider`, `use_theme`, `Theme`, `ThemeBuilder` | Engine reattivo Mantine con 5 preset, custom HEX e builder |
+| `serde` | `Serialize`, `Deserialize` | Serializzazione e deserializzazione JSON per Theme e Overrides |
 | `all` | *Tutti i componenti* | Abilita l'intera suite |
 
 ---

@@ -10,6 +10,7 @@ pub enum CheckboxSize {
 }
 
 impl CheckboxSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             CheckboxSize::Sm => "sd-checkbox__box--sm",
@@ -18,6 +19,7 @@ impl CheckboxSize {
         }
     }
 
+    #[must_use]
     pub fn icon_size(&self) -> u32 {
         match self {
             CheckboxSize::Sm => 11,

@@ -10,6 +10,7 @@ pub enum ProgressSize {
 }
 
 impl ProgressSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             ProgressSize::Sm => "sd-progress--sm",
@@ -30,6 +31,7 @@ pub enum ProgressVariant {
 }
 
 impl ProgressVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             ProgressVariant::Primary => "sd-progress--primary",

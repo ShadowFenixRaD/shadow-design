@@ -113,6 +113,7 @@ impl IconKind {
         IconKind::Upload,
     ];
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             IconKind::ChevronRight => "ChevronRight",
@@ -181,6 +182,7 @@ pub enum SvgIcon {
 
 impl SvgIcon {
     /// Crea un'icona dal set nativo `IconKind`.
+    #[must_use]
     pub fn kind(kind: IconKind) -> Self {
         Self::Kind(kind)
     }

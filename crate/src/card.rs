@@ -11,6 +11,7 @@ pub enum CardShadow {
 }
 
 impl CardShadow {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             CardShadow::None => "sd-card--shadow-none",
@@ -32,6 +33,7 @@ pub enum CardVariant {
 }
 
 impl CardVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             CardVariant::Default => "",

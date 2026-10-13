@@ -29,6 +29,7 @@ pub enum ControlSize {
 }
 
 impl ControlSize {
+    #[must_use]
     pub fn class_modifier(&self) -> &'static str {
         match self {
             Self::Sm => "--sm",

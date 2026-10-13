@@ -12,6 +12,7 @@ pub enum BadgeVariant {
 }
 
 impl BadgeVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             BadgeVariant::Default => "sd-badge--default",
@@ -23,6 +24,7 @@ impl BadgeVariant {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             BadgeVariant::Default => "default",
@@ -34,6 +36,7 @@ impl BadgeVariant {
         }
     }
 
+    #[must_use]
     pub fn dot_color_class(&self) -> &'static str {
         match self {
             BadgeVariant::Default => "default",

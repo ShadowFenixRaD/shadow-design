@@ -30,27 +30,32 @@ impl TreeNode {
         }
     }
 
+    #[must_use]
     pub fn with_sublabel(mut self, sublabel: impl Into<String>) -> Self {
         self.sublabel = Some(sublabel.into());
         self
     }
 
+    #[must_use]
     pub fn with_badge(mut self, badge: impl Into<String>) -> Self {
         self.badge = Some(badge.into());
         self
     }
 
     #[cfg(feature = "icon")]
+    #[must_use]
     pub fn with_icon(mut self, icon: SvgIcon) -> Self {
         self.icon = Some(icon);
         self
     }
 
+    #[must_use]
     pub fn with_children(mut self, children: Vec<TreeNode>) -> Self {
         self.children = children;
         self
     }
 
+    #[must_use]
     pub fn with_expanded(mut self, expanded: bool) -> Self {
         self.default_expanded = expanded;
         self
