@@ -7,7 +7,7 @@ mod pages;
 use components::Layout;
 use pages::{
     AlertsPage, BadgesPage, ButtonsPage, CardsPage, CheckboxPage, DrawerPage, DropdownPage, Home,
-    InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SwitchPage, TabsPage,
+    InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SelectPage, SwitchPage, TabsPage,
     ThemeBuilderPage, TooltipPage, TypographyPage,
 };
 
@@ -27,6 +27,8 @@ pub enum Route {
     CardsPage {},
     #[route("/inputs")]
     InputsPage {},
+    #[route("/select")]
+    SelectPage {},
     #[route("/checkbox")]
     CheckboxPage {},
     #[route("/badges")]

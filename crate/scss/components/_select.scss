@@ -1,0 +1,408 @@
+// ==============================================================================
+// Shadow Design — Select, MultiSelect & Combobox Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+.sd-select-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  font-family: $font-sans;
+}
+
+.sd-select-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $zinc-300;
+  user-select: none;
+}
+
+.sd-select-description {
+  font-size: 11px;
+  color: $zinc-500;
+  margin-top: -2px;
+}
+
+.sd-select-container {
+  position: relative;
+  width: 100%;
+
+  &--open {
+    z-index: z('dropdown');
+  }
+}
+
+.sd-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 14px;
+  background-color: #08080c;
+  color: $zinc-100;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: $radius-md;
+  font-family: $font-sans;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all $duration-fast ease;
+
+  &:hover:not(&--disabled) {
+    border-color: rgba(255, 255, 255, 0.28);
+    background-color: #0b0b12;
+  }
+
+  &--open {
+    border-color: rgba(168, 85, 247, 0.6);
+    background-color: $color-surface-2;
+    @include glow($violet-glow, 16px);
+  }
+
+  &--error {
+    border-color: rgba(244, 63, 94, 0.7);
+    &:hover {
+      border-color: #fb7185;
+    }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--glow {
+    box-shadow: 0 0 20px $violet-glow, inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.sd-select-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &--placeholder {
+    color: $zinc-600;
+  }
+}
+
+.sd-select-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.sd-select-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-sm;
+  background: transparent;
+  border: none;
+  color: $zinc-400;
+  cursor: pointer;
+  padding: 0;
+  transition: all $duration-fast ease;
+
+  &:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.sd-select-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $zinc-400;
+  transition: transform $duration-fast ease, color $duration-fast ease;
+
+  &--open {
+    transform: rotate(180deg);
+    color: $zinc-200;
+  }
+}
+
+.sd-select-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: z('dropdown-back');
+  background: transparent;
+  cursor: default;
+}
+
+.sd-select-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 6px;
+  z-index: z('dropdown');
+  background-color: #0d0d14;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: $radius-md;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  max-height: 280px;
+  overflow-y: auto;
+  font-family: $font-sans;
+  padding: 6px;
+  box-sizing: border-box;
+  @include specular-top(0.08);
+
+  &--glow {
+    box-shadow: 0 0 30px $violet-glow, 0 16px 36px rgba(0, 0, 0, 0.8);
+  }
+}
+
+// Search bar sticky inside menu
+.sd-select-search-container {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  background-color: #08080d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-sm;
+  z-index: 2;
+}
+
+.sd-select-search-icon {
+  color: $zinc-500;
+  flex-shrink: 0;
+}
+
+.sd-select-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: $zinc-100;
+  font-size: 13px;
+  font-family: $font-sans;
+  outline: none;
+
+  &::placeholder {
+    color: $zinc-600;
+  }
+}
+
+.sd-select-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: $zinc-500;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 2px;
+
+  &:hover {
+    color: $zinc-200;
+  }
+}
+
+// Group Header
+.sd-select-group-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $zinc-500;
+  padding: 8px 10px 4px 10px;
+  user-select: none;
+  font-family: $font-mono;
+}
+
+// Items
+.sd-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: $radius-sm;
+  font-size: 13px;
+  color: $zinc-300;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.4;
+  user-select: none;
+  box-sizing: border-box;
+  transition: all $duration-fast ease;
+
+  &:hover:not(&--disabled) {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+
+  &--selected {
+    background-color: rgba(168, 85, 247, 0.16);
+    color: #f3e8ff;
+    font-weight: 500;
+
+    &:hover {
+      background-color: rgba(168, 85, 247, 0.24);
+    }
+  }
+
+  &--disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--creatable {
+    color: #c084fc;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    margin-top: 4px;
+    padding-top: 8px;
+
+    &:hover {
+      background-color: rgba(168, 85, 247, 0.12);
+      color: #e9d5ff;
+    }
+  }
+}
+
+.sd-select-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-select-item-label {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-select-item-description {
+  font-size: 11px;
+  color: $zinc-500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-select-item-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #c084fc;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.sd-select-empty {
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: $zinc-500;
+  user-select: none;
+}
+
+// Chips / Tags for MultiSelect
+.sd-select-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-select-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background-color: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: $radius-sm;
+  color: #f3e8ff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  user-select: none;
+
+  &__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: rgba(243, 232, 255, 0.7);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 2px;
+    border-radius: 2px;
+    transition: color $duration-fast ease;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+}
+
+.sd-select-chip-counter {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: $radius-sm;
+  color: $zinc-400;
+  font-size: 11px;
+  font-family: $font-mono;
+}
+
+.sd-select-error {
+  font-size: 11px;
+  color: $color-danger;
+  font-weight: 500;
+}
+
+// Combobox Input
+.sd-combobox-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: $zinc-100;
+  font-size: 14px;
+  font-family: $font-sans;
+  outline: none;
+  padding: 0;
+
+  &::placeholder {
+    color: $zinc-600;
+  }
+}
+}
