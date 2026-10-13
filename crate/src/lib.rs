@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 //! # Shadow Design
 //!
 //! A modular, high-performance UI component library for **Dioxus 0.7** applications (Web, Desktop, and Mobile).
@@ -16,6 +18,8 @@
 //! In your root application component, link [`STYLES`] directly using `document::Link`:
 //!
 //! ```rust,no_run
+//! # #[cfg(all(feature = "button", feature = "card", feature = "notification"))]
+//! # fn doc_example() {
 //! use dioxus::prelude::*;
 //! use shadow_design::prelude::*;
 //!
@@ -51,6 +55,7 @@
 //!         }
 //!     }
 //! }
+//! # }
 //! ```
 //!
 //! Alternatively, you can alias or re-export the stylesheet constant:
@@ -81,41 +86,41 @@
 //! | Feature Flag | Module | Description |
 //! | :--- | :--- | :--- |
 //! | `all` | *All modules* | Enables the complete suite of components and theming |
-//! | `button` | [`button`] | Buttons with BEM variants, sizes, loading spinners, and tactile active states |
-//! | `card` | [`card`] | Container cards with elevated, interactive, and metric variants |
-//! | `input` | [`input`] | Reactive text inputs with clickable icons, clear buttons, and signal binding |
-//! | `select` | [`select`] | Advanced dropdown Select, MultiSelect with tags, and Combobox autocomplete |
-//! | `textarea` | [`textarea`] | Multiline text areas with dynamic auto-resize, character count, and clear button |
-//! | `checkbox` | [`checkbox`] | Tactile checkboxes with indeterminate and error states |
-//! | `badge` | [`badge`] | Status labels, pill badges, and pulsating live dots |
-//! | `navbar` | [`navbar`] | Responsive navigation bars with brand and action slots |
-//! | `modal` | [`modal`] | Overlay dialog modals with animated backdrop and signal control |
-//! | `alert` | [`alert`] | Callout banners with semantic variants and dismiss handlers |
-//! | `theme` | [`theme`] | Mantine-style reactive theme engine (`ThemeProvider`, `use_theme`) |
-//! | `icon` | [`icon`] | Zero-dependency native SVG icons (1.5px stroke) |
-//! | `typography` | [`typography`] | Typography primitives (`Heading`, `Text`, `Kbd`, `Code`) |
-//! | `notification` | [`notification`] | Global toast notification system (`NotificationProvider`, `use_notification`) |
-//! | `tabs` | [`tabs`] | Horizontal tab navigation (`TabList`, `Tab`, `TabPanel`) |
-//! | `switch` | [`switch`] | Precision tactile toggle switches |
-//! | `tooltip` | [`tooltip`] | Floating hover tooltips with 4-directional placement |
-//! | `drawer` | [`drawer`] | Slide-over side panels from left or right with backdrop |
-//! | `dropdown` | [`dropdown`] | Trigger-anchored context menus with auto-dismiss |
-//! | `animation` | [`animation`] | Optical transitions and micro-animation wrappers |
-//! | `avatar` | [`avatar`] | User avatars, presence status dot, initials fallback, and avatar groups |
-//! | `chat` | [`chat`] | P2P & messaging chat bubbles with delivery status, security badges, and rich media |
-//! | `progress` | [`progress`] | Progress bars with semantic variants and shimmer indeterminate animations |
-//! | `attachment_card` | [`attachment_card`] | Media attachments and file transfer cards with action slots |
-//! | `contact_card` | [`contact_card`] | Contact profile cards with presence indicators and quick action buttons |
-//! | `segmented_control` | [`segmented_control`] | Tactile sliding segmented selectors with theme glow |
-//! | `divider` | [`divider`] | Horizontal and vertical translucent separators with label support |
-//! | `tree` | [`tree`] | Hierarchical tree views with collapsible nodes and connection lines |
-//! | `skeleton` | [`skeleton`] | Geometric loading placeholder shimmers (circle, rect, text) |
+//! | `button` | `button` | Buttons with BEM variants, sizes, loading spinners, and tactile active states |
+//! | `card` | `card` | Container cards with elevated, interactive, and metric variants |
+//! | `input` | `input` | Reactive text inputs with clickable icons, clear buttons, and signal binding |
+//! | `select` | `select` | Advanced dropdown Select, MultiSelect with tags, and Combobox autocomplete |
+//! | `textarea` | `textarea` | Multiline text areas with dynamic auto-resize, character count, and clear button |
+//! | `checkbox` | `checkbox` | Tactile checkboxes with indeterminate and error states |
+//! | `badge` | `badge` | Status labels, pill badges, and pulsating live dots |
+//! | `navbar` | `navbar` | Responsive navigation bars with brand and action slots |
+//! | `modal` | `modal` | Overlay dialog modals with animated backdrop and signal control |
+//! | `alert` | `alert` | Callout banners with semantic variants and dismiss handlers |
+//! | `theme` | `theme` | Mantine-style reactive theme engine (`ThemeProvider`, `use_theme`) |
+//! | `icon` | `icon` | Zero-dependency native SVG icons (1.5px stroke) |
+//! | `typography` | `typography` | Typography primitives (`Heading`, `Text`, `Kbd`, `Code`) |
+//! | `notification` | `notification` | Global toast notification system (`NotificationProvider`, `use_notification`) |
+//! | `tabs` | `tabs` | Horizontal tab navigation (`TabList`, `Tab`, `TabPanel`) |
+//! | `switch` | `switch` | Precision tactile toggle switches |
+//! | `tooltip` | `tooltip` | Floating hover tooltips with 4-directional placement |
+//! | `drawer` | `drawer` | Slide-over side panels from left or right with backdrop |
+//! | `dropdown` | `dropdown` | Trigger-anchored context menus with auto-dismiss |
+//! | `animation` | `animation` | Optical transitions and micro-animation wrappers |
+//! | `avatar` | `avatar` | User avatars, presence status dot, initials fallback, and avatar groups |
+//! | `chat` | `chat` | P2P & messaging chat bubbles with delivery status, security badges, and rich media |
+//! | `progress` | `progress` | Progress bars with semantic variants and shimmer indeterminate animations |
+//! | `attachment_card` | `attachment_card` | Media attachments and file transfer cards with action slots |
+//! | `contact_card` | `contact_card` | Contact profile cards with presence indicators and quick action buttons |
+//! | `segmented_control` | `segmented_control` | Tactile sliding segmented selectors with theme glow |
+//! | `divider` | `divider` | Horizontal and vertical translucent separators with label support |
+//! | `tree` | `tree` | Hierarchical tree views with collapsible nodes and connection lines |
+//! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
 //! Shadow Design components support dual execution paths:
 //!
-//! 1. **With `theme` feature enabled**: Components reactively read the current theme from Dioxus Context via [`theme::use_theme()`]. When you switch palettes, radius scale, or glow mode at runtime, every mounted component updates immediately.
+//! 1. **With `theme` feature enabled**: Components reactively read the current theme from Dioxus Context via `theme::use_theme()`. When you switch palettes, radius scale, or glow mode at runtime, every mounted component updates immediately.
 //! 2. **Without `theme` feature enabled**: Components fall back transparently to optimized, hardcoded static classes, incurring zero context lookup or runtime overhead.
 //!
 //! Or enable the `all` feature to include the entire suite.
@@ -134,6 +139,8 @@ use dioxus::prelude::*;
 /// Include it directly in your application's root component head:
 ///
 /// ```rust,no_run
+/// # #[cfg(feature = "button")]
+/// # fn doc_example() {
 /// use dioxus::prelude::*;
 /// use shadow_design::prelude::*;
 ///
@@ -147,11 +154,16 @@ use dioxus::prelude::*;
 ///         Button { "Click me" }
 ///     }
 /// }
+/// # }
 /// ```
 ///
 /// Downstream projects do not need Node.js, npm, or Tailwind CLI; Dioxus bundles
 /// the SCSS stylesheet automatically.
 pub const STYLES: Asset = asset!("/scss/main.scss");
+
+pub mod a11y;
+pub(crate) mod glow;
+pub(crate) mod util;
 
 #[cfg(feature = "alert")]
 pub mod alert;
@@ -271,5 +283,6 @@ pub mod prelude {
     pub use crate::tree::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    pub use crate::a11y::ControlSize;
     pub use crate::STYLES;
 }
