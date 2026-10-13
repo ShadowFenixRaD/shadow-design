@@ -1,0 +1,13 @@
+// ==============================================================================
+// Shadow Design — Typography & Geist Font Definitions
+// ==============================================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+
+@layer sd-base {
+  .font-tabular,
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'ss01', 'cv11', 'tnum';
+  }
+}

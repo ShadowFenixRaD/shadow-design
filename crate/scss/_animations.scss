@@ -3,21 +3,25 @@
 // ==============================================================================
 @use 'variables' as *;
 
-// --- Keyframes Universali ---
+// --- Keyframes Universali con Namespacing sd-* (DS-24) ---
 
 // 1. Fade Animations
-@keyframes fadeIn {
+@keyframes sd-fade-in {
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
 
-@keyframes fadeOut {
+@keyframes sd-fade-out {
   0% { opacity: 1; }
   100% { opacity: 0; }
 }
 
+// Compatibilità
+@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
+
 // 2. Slide Animations
-@keyframes slideInRight {
+@keyframes sd-slide-in-right {
   0% {
     opacity: 0;
     transform: translate3d(24px, 0, 0);
@@ -28,7 +32,7 @@
   }
 }
 
-@keyframes slideInLeft {
+@keyframes sd-slide-in-left {
   0% {
     opacity: 0;
     transform: translate3d(-24px, 0, 0);
@@ -39,7 +43,7 @@
   }
 }
 
-@keyframes slideInBottom {
+@keyframes sd-slide-in-bottom {
   0% {
     opacity: 0;
     transform: translate3d(0, 20px, 0);
@@ -50,7 +54,7 @@
   }
 }
 
-@keyframes slideInTop {
+@keyframes sd-slide-in-top {
   0% {
     opacity: 0;
     transform: translate3d(0, -20px, 0);
@@ -62,7 +66,7 @@
 }
 
 // 3. Scale Animations
-@keyframes scaleIn {
+@keyframes sd-scale-in {
   0% {
     opacity: 0;
     transform: scale(0.94);
@@ -74,7 +78,7 @@
 }
 
 // 4. Modal Pop Entrance
-@keyframes modalEnter {
+@keyframes sd-modal-enter {
   0% {
     opacity: 0;
     transform: scale(0.95) translateY(10px);
@@ -86,7 +90,7 @@
 }
 
 // 5. Toast Entry & Exit
-@keyframes toastEnter {
+@keyframes sd-toast-enter {
   0% {
     opacity: 0;
     transform: translate3d(0, 16px, 0) scale(0.96);
@@ -97,7 +101,7 @@
   }
 }
 
-@keyframes toastExit {
+@keyframes sd-toast-exit {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
@@ -109,7 +113,7 @@
 }
 
 // 6. Dropdown Reveal
-@keyframes dropdownEnter {
+@keyframes sd-dropdown-enter {
   0% {
     opacity: 0;
     transform: scale(0.96) translateY(-6px);
@@ -121,18 +125,18 @@
 }
 
 // 7. Drawer Sliders
-@keyframes drawerSlideLeft {
+@keyframes sd-drawer-slide-left {
   0% { transform: translate3d(-100%, 0, 0); }
   100% { transform: translate3d(0, 0, 0); }
 }
 
-@keyframes drawerSlideRight {
+@keyframes sd-drawer-slide-right {
   0% { transform: translate3d(100%, 0, 0); }
   100% { transform: translate3d(0, 0, 0); }
 }
 
 // 8. Glow Pulses
-@keyframes pulseGlow {
+@keyframes sd-pulse-glow {
   0%, 100% {
     box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
   }
@@ -142,13 +146,13 @@
 }
 
 // 9. Spinner Rotate
-@keyframes spin {
+@keyframes sd-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 // 10. Indeterminate Progress Bar
-@keyframes indeterminateSlide {
+@keyframes sd-indeterminate-slide {
   0% {
     transform: translateX(-125%);
   }
@@ -157,32 +161,81 @@
   }
 }
 
-// --- Classi Utility di Animazione ---
-.animate-fade-in         { animation: fadeIn $duration-normal $ease-tactile forwards; }
-.animate-fade-out        { animation: fadeOut $duration-fast ease-in forwards; }
-.animate-slide-in-right  { animation: slideInRight $duration-normal $ease-tactile forwards; }
-.animate-slide-in-left   { animation: slideInLeft $duration-normal $ease-tactile forwards; }
-.animate-slide-in-bottom { animation: slideInBottom $duration-normal $ease-tactile forwards; }
-.animate-slide-in-top    { animation: slideInTop $duration-normal $ease-tactile forwards; }
-.animate-scale-in        { animation: scaleIn $duration-normal $ease-tactile forwards; }
-.animate-pulse-glow      { animation: pulseGlow 2.8s ease-in-out infinite; }
-.animate-spin            { animation: spin 0.8s linear infinite; transform-origin: center; }
+// Legacy Aliases
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 16px rgba(168, 85, 247, 0.25); } 50% { box-shadow: 0 0 34px rgba(168, 85, 247, 0.60); } }
 
-// Component Dedicated Animations
-.animate-toast-enter     { animation: toastEnter $duration-normal $ease-tactile forwards; }
-.animate-toast-exit      { animation: toastExit $duration-fast ease-in forwards; }
-.animate-modal-enter     { animation: modalEnter $duration-normal $ease-tactile forwards; }
-.animate-dropdown-enter  { animation: dropdownEnter 180ms $ease-tactile forwards; }
-.animate-drawer-left,
-.animate-drawer-slide-left  { animation: drawerSlideLeft $duration-normal $ease-tactile forwards; }
-.animate-drawer-right,
-.animate-drawer-slide-right { animation: drawerSlideRight $duration-normal $ease-tactile forwards; }
-.animate-indeterminate   { animation: indeterminateSlide 1.5s ease-in-out infinite; }
+// --- Classi Utility di Animazione racchiuse in @layer sd-utilities (DS-24) ---
+@layer sd-utilities {
+  .animate-fade-in         { animation: sd-fade-in $duration-normal $ease-tactile forwards; }
+  .animate-fade-out        { animation: sd-fade-out $duration-fast ease-in forwards; }
+  .animate-slide-in-right  { animation: sd-slide-in-right $duration-normal $ease-tactile forwards; }
+  .animate-slide-in-left   { animation: sd-slide-in-left $duration-normal $ease-tactile forwards; }
+  .animate-slide-in-bottom { animation: sd-slide-in-bottom $duration-normal $ease-tactile forwards; }
+  .animate-slide-in-top    { animation: sd-slide-in-top $duration-normal $ease-tactile forwards; }
+  .animate-scale-in        { animation: sd-scale-in $duration-normal $ease-tactile forwards; }
+  .animate-pulse-glow      { animation: sd-pulse-glow 2.8s ease-in-out infinite; }
+  .animate-spin            { animation: sd-spin 0.8s linear infinite; transform-origin: center; }
 
-// Micro-transizioni tattili
-.tactile-press {
-  transition: transform $duration-fast $ease-tactile;
-  &:active {
-    transform: scale(0.97);
+  // Component Dedicated Animations
+  .animate-toast-enter     { animation: sd-toast-enter $duration-normal $ease-tactile forwards; }
+  .animate-toast-exit      { animation: sd-toast-exit $duration-fast ease-in forwards; }
+  .animate-modal-enter     { animation: sd-modal-enter $duration-normal $ease-tactile forwards; }
+  .animate-dropdown-enter  { animation: sd-dropdown-enter 180ms $ease-tactile forwards; }
+  .animate-drawer-left,
+  .animate-drawer-slide-left  { animation: sd-drawer-slide-left $duration-normal $ease-tactile forwards; }
+  .animate-drawer-right,
+  .animate-drawer-slide-right { animation: sd-drawer-slide-right $duration-normal $ease-tactile forwards; }
+  .animate-indeterminate   { animation: sd-indeterminate-slide 1.5s ease-in-out infinite; }
+
+  // Micro-transizioni tattili
+  .tactile-press {
+    transition: transform $duration-fast $ease-tactile;
+    @media (prefers-reduced-motion: no-preference) {
+      &:active {
+        transform: scale(0.97);
+      }
+    }
+  }
+
+  // Supporto Prefers-Reduced-Motion (A11Y-15)
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-slide-in-right,
+    .animate-slide-in-left,
+    .animate-slide-in-bottom,
+    .animate-slide-in-top,
+    .animate-scale-in,
+    .animate-modal-enter,
+    .animate-toast-enter,
+    .animate-toast-exit,
+    .animate-dropdown-enter,
+    .animate-drawer-left,
+    .animate-drawer-right,
+    .animate-drawer-slide-left,
+    .animate-drawer-slide-right,
+    .sd-tab-panel {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
+    .animate-pulse-glow,
+    .sd-badge__dot-ping {
+      animation: none !important;
+    }
+
+    .animate-spin {
+      animation-duration: 1.5s !important;
+    }
+
+    .tactile-press:active,
+    .sd-card--interactive:hover {
+      transform: none !important;
+    }
+
+    * {
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

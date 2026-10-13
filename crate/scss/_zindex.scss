@@ -26,16 +26,18 @@ $z-layers: (
   @return map.get($z-layers, $layer);
 }
 
-// Classi di utilità corrispondenti
-.z-layer-base          { z-index: z('base'); }
-.z-layer-sticky        { z-index: z('sticky'); }
-.z-layer-header        { z-index: z('header'); }
-.z-layer-dropdown-back { z-index: z('dropdown-back'); }
-.z-layer-dropdown      { z-index: z('dropdown'); }
-.z-layer-drawer-back   { z-index: z('drawer-back'); }
-.z-layer-drawer        { z-index: z('drawer'); }
-.z-layer-modal-back    { z-index: z('modal-back'); }
-.z-layer-modal         { z-index: z('modal'); }
-.z-layer-modal-content { z-index: z('modal-content'); }
-.z-layer-notification  { z-index: z('notification'); }
-.z-layer-tooltip       { z-index: z('tooltip'); }
+// Classi di utilità corrispondenti (DS-24: racchiuse in @layer sd-utilities)
+@layer sd-utilities {
+  .z-layer-base          { z-index: z('base'); }
+  .z-layer-sticky        { z-index: z('sticky'); }
+  .z-layer-header        { z-index: z('header'); }
+  .z-layer-dropdown-back { z-index: z('dropdown-back'); }
+  .z-layer-dropdown      { z-index: z('dropdown'); }
+  .z-layer-drawer-back   { z-index: z('drawer-back'); }
+  .z-layer-drawer        { z-index: z('drawer'); }
+  .z-layer-modal-back    { z-index: z('modal-back'); }
+  .z-layer-modal         { z-index: z('modal'); }
+  .z-layer-modal-content { z-index: z('modal-content'); }
+  .z-layer-notification  { z-index: z('notification'); }
+  .z-layer-tooltip       { z-index: z('tooltip'); }
+}
