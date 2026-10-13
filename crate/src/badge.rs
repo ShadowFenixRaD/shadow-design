@@ -81,7 +81,22 @@ pub fn Badge(
     #[cfg(feature = "theme")]
     let variant_class = theme_val.resolve_variant_class("badge", variant.name(), default_badge_variant);
     #[cfg(feature = "theme")]
-    let glow_class = theme_val.resolve_elevation_class("badge", glow);
+    let glow_class = match glow {
+        Some(true) => match variant {
+            BadgeVariant::Success => "sd-badge--glow-success".to_string(),
+            BadgeVariant::Warning => "sd-badge--glow-warning".to_string(),
+            BadgeVariant::Danger => "sd-badge--glow-danger".to_string(),
+            _ => theme_val.resolve_elevation_class("badge", Some(true)),
+        },
+        Some(false) => String::new(),
+        None => {
+            if variant == BadgeVariant::Primary {
+                theme_val.resolve_elevation_class("badge", None)
+            } else {
+                String::new()
+            }
+        }
+    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -92,7 +107,14 @@ pub fn Badge(
     #[cfg(not(feature = "theme"))]
     let radius = "";
     #[cfg(not(feature = "theme"))]
-    let glow_class = if glow == Some(true) || (glow.is_none() && variant == BadgeVariant::Primary) {
+    let glow_class = if glow == Some(true) {
+        match variant {
+            BadgeVariant::Success => "sd-badge--glow-success".to_string(),
+            BadgeVariant::Warning => "sd-badge--glow-warning".to_string(),
+            BadgeVariant::Danger => "sd-badge--glow-danger".to_string(),
+            _ => "sd-badge--glow".to_string(),
+        }
+    } else if glow.is_none() && variant == BadgeVariant::Primary {
         "sd-badge--glow".to_string()
     } else {
         String::new()

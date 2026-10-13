@@ -207,6 +207,7 @@
   flex-direction: column;
   background-color: var(--sd-surface-0, $color-void);
   color: $zinc-100;
+  overflow-x: clip;
 }
 
 .sd-header {
