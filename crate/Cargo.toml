@@ -101,3 +101,8 @@ segmented-control = ["segmented_control"]
 divider = []
 tree = ["icon"]
 skeleton = []
+
+[lints.clippy]
+must_use_candidate = "warn"
+return_self_not_must_use = "warn"
+

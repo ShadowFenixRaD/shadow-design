@@ -27,6 +27,7 @@ impl Default for Locale {
 
 impl Locale {
     /// English default strings for shadow-design.
+    #[must_use]
     pub fn english() -> Self {
         Self {
             select_placeholder: "Select an option...".to_string(),
@@ -45,6 +46,7 @@ impl Locale {
     }
 
     /// Italian preset strings for compatibility and localized showcases.
+    #[must_use]
     pub fn italian() -> Self {
         Self {
             select_placeholder: "Seleziona un'opzione...".to_string(),
@@ -62,10 +64,12 @@ impl Locale {
         }
     }
 
+    #[must_use]
     pub fn format_create(&self, val: &str) -> String {
         format!("{} \"{}\"", self.create_label_prefix, val)
     }
 
+    #[must_use]
     pub fn format_add(&self, val: &str) -> String {
         format!("{} \"{}\"", self.add_label_prefix, val)
     }
@@ -81,6 +85,7 @@ pub fn LocaleProvider(#[props(default)] locale: Option<Signal<Locale>>, children
 }
 
 /// Hook to read the active [`Locale`], falling back to English defaults if no provider is present.
+#[must_use]
 pub fn use_locale() -> Locale {
     match try_use_context::<Signal<Locale>>() {
         Some(sig) => sig.read().clone(),

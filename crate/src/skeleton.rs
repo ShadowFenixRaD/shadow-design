@@ -10,6 +10,7 @@ pub enum SkeletonShape {
 }
 
 impl SkeletonShape {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             SkeletonShape::Circle => "sd-skeleton--circle",

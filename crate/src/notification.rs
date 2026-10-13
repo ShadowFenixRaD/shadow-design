@@ -24,6 +24,7 @@ pub enum NotificationVariant {
 }
 
 impl NotificationVariant {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             NotificationVariant::Info => "sd-toast--info",
@@ -33,6 +34,7 @@ impl NotificationVariant {
         }
     }
 
+    #[must_use]
     pub fn icon_color_class(&self) -> &'static str {
         match self {
             NotificationVariant::Info => "sd-toast__icon--info",
@@ -42,6 +44,7 @@ impl NotificationVariant {
         }
     }
 
+    #[must_use]
     pub fn glow_class(&self) -> &'static str {
         match self {
             NotificationVariant::Info => "sd-toast--glow-info",
@@ -51,6 +54,7 @@ impl NotificationVariant {
         }
     }
 
+    #[must_use]
     pub fn default_icon(&self) -> IconKind {
         match self {
             NotificationVariant::Info => IconKind::Info,
@@ -60,6 +64,7 @@ impl NotificationVariant {
         }
     }
 
+    #[must_use]
     pub fn prefix(&self) -> &'static str {
         match self {
             NotificationVariant::Info => "Info",
@@ -180,12 +185,14 @@ pub fn NotificationProvider(
 /// # Panics
 /// Panics if called without an ancestor [`NotificationProvider`].
 /// For non-panicking access, use [`try_use_notification`].
+#[must_use]
 pub fn use_notification() -> NotificationHandle {
     try_use_context::<NotificationHandle>()
         .expect("use_notification must be used within a NotificationProvider")
 }
 
 /// Non-panicking version of [`use_notification`].
+#[must_use]
 pub fn try_use_notification() -> Option<NotificationHandle> {
     try_use_context::<NotificationHandle>()
 }

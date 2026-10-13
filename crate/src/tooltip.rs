@@ -10,6 +10,7 @@ pub enum TooltipPosition {
 }
 
 impl TooltipPosition {
+    #[must_use]
     pub fn bubble_class(&self) -> &'static str {
         match self {
             TooltipPosition::Top => "sd-tooltip__bubble--top",

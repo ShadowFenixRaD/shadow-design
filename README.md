@@ -11,21 +11,13 @@ shadow-design/
 ├── Cargo.toml            # Workspace root
 ├── crate/                # Libreria UI condivisa (crate: shadow-design)
 │   ├── Cargo.toml        # Feature flags per ogni singolo componente
-│   └── src/
-│       ├── lib.rs        # Moduli e prelude
-│       ├── button.rs     # Feature "button"
-│       ├── card.rs       # Feature "card"
-│       ├── input.rs      # Feature "input"
-│       ├── badge.rs      # Feature "badge"
-│       ├── navbar.rs     # Feature "navbar"
-│       ├── modal.rs      # Feature "modal"
-│       └── alert.rs      # Feature "alert"
-└── showcase/             # Espositore Dioxus per testare i componenti
+│   ├── scss/             # Stili Pure SCSS esportati come Asset
+│   └── src/              # Componenti Rust per Dioxus 0.7
+└── showcase/             # Espositore Dioxus interattivo
     ├── Cargo.toml
     ├── Dioxus.toml
     ├── assets/
     └── src/
-        └── main.rs       # Router multi-pagina per esplorare ogni componente
 ```
 
 ---
@@ -36,11 +28,12 @@ La libreria esporta componenti isolati e controllati da singole feature Cargo.
 
 ### Includere la libreria nei tuoi siti web
 
-Aggiungi `shadow-design` nel `Cargo.toml` del tuo sito, selezionando solo le feature necessarie:
+Aggiungi `shadow-design` nel `Cargo.toml` del tuo sito, specificando `default-features = false` per includere solo i componenti necessari (zero bloat):
 
 ```toml
 [dependencies]
-shadow-design = { version = "0.2.0", features = ["button", "card", "theme"] }
+# Importa solo ciò che ti serve:
+shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure importa l'intera suite:
 # shadow-design = { version = "0.2.0", features = ["all"] }
@@ -63,6 +56,36 @@ fn App() -> Element {
 }
 ```
 
+### 🎭 Sistema Temi Mantine-Style & ThemeBuilder
+
+Shadow Design supporta la personalizzazione totale dell'interfaccia a runtime con 5 preset cromatici integrati, `ElevationStyle` multilivello e preset `Theme::cartoon()` neo-brutalista:
+
+```rust
+use dioxus::prelude::*;
+use shadow_design::prelude::*;
+
+#[component]
+fn App() -> Element {
+    let custom_theme = ThemeBuilder::new()
+        .primary_color(PrimaryColor::custom("Amber Glow", "#f59e0b"))
+        .radius_scale(RadiusScale::Medium)
+        .glow_mode(GlowMode::Subtle)
+        .elevation_style(ElevationStyle::NeonGlow)
+        .override_component("card", |c| c.with_base_class("border-amber-500/30"))
+        .build();
+
+    rsx! {
+        document::Link { rel: "stylesheet", href: STYLES }
+        ThemeProvider {
+            theme: custom_theme,
+            NotificationProvider {
+                MainContent {}
+            }
+        }
+    }
+}
+```
+
 ### Feature disponibili
 
 | Feature | Componente | Descrizione |
@@ -71,20 +94,23 @@ fn App() -> Element {
 | `card` | `Card`, `CardShadow`, `CardVariant` | Contenitori a schede con vari livelli di ombra, header e footer |
 | `input` | `TextInput` | Campi di input reattivi per testi e password con gestione errori e icone |
 | `checkbox` | `Checkbox`, `CheckboxSize` | Caselle di selezione tattili con stati indeterminato ed errore |
+| `select` | `Select`, `MultiSelect`, `Combobox`, `SelectItem` | Menu a discesa singoli/multipli e combobox con ricerca e filtri |
+| `textarea` | `Textarea` | Campi di testo multilinea con autosize reattivo e contatore |
 | `badge` | `Badge`, `BadgeVariant` | Etichette, pillole di stato e dot pulsante |
 | `navbar` | `Navbar` | Barra di navigazione responsive con brand e link |
 | `modal` | `Modal` | Finestre di dialogo con backdrop e controllate da Signal |
 | `alert` | `Alert`, `AlertVariant` | Notifiche e callout semantici con icone SVG |
 | `notification` | `NotificationProvider`, `use_notification` | Sistema Toast globale |
-| `tabs` | `TabList`, `Tab`, `TabPanel` | Navigazione a schede orizzontali |
+| `tabs` | `TabList`, `Tab`, `TabPanel` | Navigazione a schede orizzontali conformi ad APG |
 | `switch` | `Switch` | Interruttori a scatto tattili ad alta precisione |
 | `tooltip` | `Tooltip`, `TooltipPosition` | Micro-etichette fluttuanti su hover a 4 direzioni |
 | `drawer` | `Drawer`, `DrawerPosition`, `DrawerSize` | Pannelli laterali a scomparsa da sinistra o destra |
 | `dropdown` | `Dropdown`, `DropdownItem`, `DropdownPlacement` | Menu a tendina ancorati al trigger |
-| `icon` | Native SVG Icons | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
+| `icon` | Native SVG Icons (50 `IconKind`) | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
 | `typography` | `Heading`, `Text`, `Kbd`, `Code` | Componenti tipografici con scala Geist |
-| `animation` | Optical Transitions | Transizioni ottiche e micro-animazioni Dioxus |
-| `theme` | `Theme`, `ThemeProvider`, `use_theme` | Gestione centralizzata del tema, 5 preset e personalizzazione dinamica |
+| `animation` | `Transition`, `AnimationVariant` | Transizioni ottiche e micro-animazioni Dioxus |
+| `theme` | `Theme`, `ThemeProvider`, `use_theme`, `ThemeBuilder` | Engine reattivo Mantine con 5 preset cromatici, custom HEX e builder |
+| `serde` | `Serialize`, `Deserialize` | Serializzazione e deserializzazione JSON di Theme, Preset e Overrides |
 | `all` | *Tutti i componenti* | Abilita l'intera suite |
 
 ---

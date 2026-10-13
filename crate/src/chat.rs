@@ -12,6 +12,7 @@ pub enum BubbleDirection {
 }
 
 impl BubbleDirection {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             BubbleDirection::Incoming => "sd-chat-bubble--incoming",
@@ -34,6 +35,7 @@ pub enum DeliveryStatus {
 }
 
 impl DeliveryStatus {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             DeliveryStatus::Sending => "sd-chat-bubble__status--sending",
@@ -43,6 +45,7 @@ impl DeliveryStatus {
         }
     }
 
+    #[must_use]
     pub fn label(&self) -> &'static str {
         match self {
             DeliveryStatus::Sending => "In invio...",

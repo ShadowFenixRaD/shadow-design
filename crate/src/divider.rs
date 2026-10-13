@@ -9,6 +9,7 @@ pub enum Orientation {
 }
 
 impl Orientation {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             Orientation::Horizontal => "sd-divider--horizontal",

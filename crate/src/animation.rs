@@ -24,6 +24,7 @@ pub enum AnimationVariant {
 }
 
 impl AnimationVariant {
+    #[must_use]
     pub fn classes(&self) -> &'static str {
         match self {
             AnimationVariant::FadeIn => "animate-fade-in",

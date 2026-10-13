@@ -87,77 +87,67 @@
 
   // Varianti
   &--primary {
-    background-color: $violet-primary;
+    @include lit-fill(#6b21a8, #3b0764);
     color: #f3e8ff;
     border-color: rgba(168, 85, 247, 0.45);
-    box-shadow: 0 4px 18px rgba(59, 7, 100, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    @include specular-top(0.2);
 
     &:hover:not(:disabled):not([aria-disabled="true"]) {
-      background-color: color.adjust($violet-primary, $lightness: 6%);
+      background-image: linear-gradient(180deg, #7e22ce, #4c0519);
       border-color: rgba(192, 132, 252, 0.7);
       color: #ffffff;
-      box-shadow: 0 0 22px rgba(168, 85, 247, 0.4), 0 6px 22px rgba(59, 7, 100, 0.7);
+      box-shadow: 0 0 22px rgba(168, 85, 247, 0.4), 0 6px 22px rgba(59, 7, 100, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
   }
 
   &--primary-crimson {
-    background-color: #4c0519;
+    @include lit-fill(#881337, #4c0519);
     color: #ffe4e6;
     border-color: rgba(255, 23, 68, 0.45);
-    box-shadow: 0 4px 18px rgba(76, 5, 25, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    @include specular-top(0.2);
 
     &:hover {
-      background-color: color.adjust(#4c0519, $lightness: 8%);
+      background-image: linear-gradient(180deg, #9f1239, #640722);
       border-color: rgba(255, 82, 119, 0.75);
       color: #ffffff;
-      box-shadow: 0 0 22px rgba(255, 23, 68, 0.45), 0 6px 22px rgba(76, 5, 25, 0.7);
+      box-shadow: 0 0 22px rgba(255, 23, 68, 0.45), 0 6px 22px rgba(76, 5, 25, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
   }
 
   &--primary-cyan {
-    background-color: #083344;
+    @include lit-fill(#0e7490, #083344);
     color: #cffafe;
     border-color: rgba(0, 240, 255, 0.45);
-    box-shadow: 0 4px 18px rgba(8, 51, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    @include specular-top(0.2);
 
     &:hover {
-      background-color: color.adjust(#083344, $lightness: 8%);
+      background-image: linear-gradient(180deg, #155e75, #083344);
       border-color: rgba(128, 247, 255, 0.75);
       color: #ffffff;
-      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45), 0 6px 22px rgba(8, 51, 68, 0.7);
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45), 0 6px 22px rgba(8, 51, 68, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
   }
 
   &--primary-emerald {
-    background-color: #022c22;
+    @include lit-fill(#065f46, #022c22);
     color: #d1fae5;
     border-color: rgba(0, 255, 157, 0.45);
-    box-shadow: 0 4px 18px rgba(2, 44, 34, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    @include specular-top(0.2);
 
     &:hover {
-      background-color: color.adjust(#022c22, $lightness: 8%);
+      background-image: linear-gradient(180deg, #047857, #022c22);
       border-color: rgba(110, 231, 183, 0.75);
       color: #ffffff;
-      box-shadow: 0 0 22px rgba(0, 255, 157, 0.45), 0 6px 22px rgba(2, 44, 34, 0.7);
+      box-shadow: 0 0 22px rgba(0, 255, 157, 0.45), 0 6px 22px rgba(2, 44, 34, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
   }
 
   &--primary-obsidian {
-    background-color: #18181b;
+    @include lit-fill(#27272a, #18181b);
     color: #ffffff;
     border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    @include specular-top(0.2);
 
     &:hover {
-      background-color: #27272a;
+      background-image: linear-gradient(180deg, #3f3f46, #27272a);
       border-color: rgba(255, 255, 255, 0.5);
       color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 6px 22px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 6px 22px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
   }
 

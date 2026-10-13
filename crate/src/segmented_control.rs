@@ -13,6 +13,7 @@ pub enum SegmentedControlSize {
 }
 
 impl SegmentedControlSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             SegmentedControlSize::Sm => "sd-segmented-control--sm",
@@ -44,11 +45,13 @@ impl SegmentOption {
     }
 
     #[cfg(feature = "icon")]
+    #[must_use]
     pub fn with_icon(mut self, icon: SvgIcon) -> Self {
         self.icon = Some(icon);
         self
     }
 
+    #[must_use]
     pub fn with_disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self

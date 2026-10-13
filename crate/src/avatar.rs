@@ -15,6 +15,7 @@ pub enum AvatarSize {
 }
 
 impl AvatarSize {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             AvatarSize::Xs => "sd-avatar--xs",
@@ -25,6 +26,7 @@ impl AvatarSize {
         }
     }
 
+    #[must_use]
     pub fn px_size(&self) -> u32 {
         match self {
             AvatarSize::Xs => 24,
@@ -35,6 +37,7 @@ impl AvatarSize {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             AvatarSize::Xs => "xs",
@@ -60,6 +63,7 @@ pub enum PresenceStatus {
 }
 
 impl PresenceStatus {
+    #[must_use]
     pub fn scss_class(&self) -> &'static str {
         match self {
             PresenceStatus::Online => "sd-avatar__status--online",
@@ -69,6 +73,7 @@ impl PresenceStatus {
         }
     }
 
+    #[must_use]
     pub fn label(&self) -> &'static str {
         match self {
             PresenceStatus::Online => "Online",
