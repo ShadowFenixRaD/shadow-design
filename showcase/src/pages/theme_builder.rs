@@ -1,9 +1,20 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
+use crate::components::clipboard::copy_text;
 use crate::components::CodeBlock;
 
 pub const STORAGE_KEY: &str = "shadow_design_custom_theme";
+
+fn is_valid_hex(hex: &str) -> bool {
+    let s = hex.trim();
+    if !s.starts_with('#') {
+        return false;
+    }
+    let rest = &s[1..];
+    (rest.len() == 3 || rest.len() == 6 || rest.len() == 8)
+        && rest.chars().all(|c| c.is_ascii_hexdigit())
+}
 
 pub fn save_theme_to_storage(theme: &Theme) {
     if let Ok(json) = serde_json::to_string(theme) {
@@ -42,7 +53,7 @@ pub fn ThemeBuilderPage() -> Element {
 
     // Editor local controls
     let mut active_section = use_signal(|| BuilderSection::Palette);
-    let mut auto_save = use_signal(|| true);
+    let auto_save = use_signal(|| true);
     let test_input_val = use_signal(|| "Valore di test reattivo".to_string());
     let test_checkbox = use_signal(|| true);
     let test_switch = use_signal(|| true);
@@ -53,6 +64,7 @@ pub fn ThemeBuilderPage() -> Element {
     let mut custom_name_input = use_signal(|| "Custom Accent".to_string());
     let mut custom_prefix_input = use_signal(|| "custom".to_string());
     let mut json_input = use_signal(String::new);
+    let mut json_parse_error = use_signal(|| Option::<String>::None);
 
     // Funzione helper per sincronizzare le modifiche e applicare auto-save
     let apply_change = move || {
@@ -99,9 +111,32 @@ pub fn ThemeBuilderPage() -> Element {
             GlowMode::Expressive => "GlowMode::Expressive",
         };
 
-        format!(
-r#"use shadow_design::theme::{{ThemeBuilder, PrimaryColor, RadiusScale, ElevationStyle, GlowMode, ComponentOverride}};
+        let mut overrides_code = String::new();
+        for (comp_name, ovr) in &t.components {
+            let mut chained = String::new();
+            if let Some(base) = &ovr.base_class {
+                if !base.is_empty() {
+                    chained.push_str(&format!(".with_base_class(\"{base}\")"));
+                }
+            }
+            for (v_name, v_class) in &ovr.variant_classes {
+                chained.push_str(&format!(".with_variant(\"{v_name}\", \"{v_class}\")"));
+            }
+            for (s_name, s_class) in &ovr.size_classes {
+                chained.push_str(&format!(".with_size(\"{s_name}\", \"{s_class}\")"));
+            }
+            if let Some(sh) = &ovr.shadow_class {
+                chained.push_str(&format!(".with_shadow(\"{sh}\")"));
+            }
+            if !chained.is_empty() {
+                overrides_code.push_str(&format!("\n        .override_component(\"{comp_name}\", |c| c{chained})"));
+            }
+        }
 
+        format!(
+r#"use shadow_design::theme::{{ThemeBuilder, PrimaryColor, RadiusScale, ElevationStyle, GlowMode}};
+
+/// Genera il tema custom con tutte le personalizzazioni e override componenti.
 pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
     ThemeBuilder::new()
         .name("{name}")
@@ -112,9 +147,12 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
         .surface_0("{s0}")
         .surface_1("{s1}")
         .surface_2("{s2}")
-        .surface_3("{s3}")
+        .surface_3("{s3}"){overrides}
         .build()
-}}"#,
+}}
+
+// Per renderlo attivo in tutta l'applicazione Dioxus:
+// use_context_provider(|| Signal::new(build_my_custom_theme()));"#,
             name = t.name,
             primary = primary_code,
             radius = radius_code,
@@ -124,6 +162,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
             s1 = t.surface_1,
             s2 = t.surface_2,
             s3 = t.surface_3,
+            overrides = overrides_code,
         )
     };
 
@@ -168,11 +207,14 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                         size: ButtonSize::Sm,
                         left_icon: rsx! { Icon { kind: IconKind::Copy, size: 14 } },
                         onclick: move |_| {
-                            let _ = document::eval(&format!(
-                                "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
-                                rust_to_copy
-                            ));
-                            toast.info("Codice Rust (ThemeBuilder) copiato negli appunti!");
+                            let text = rust_to_copy.clone();
+                            spawn(async move {
+                                if copy_text(&text).await {
+                                    toast.info("Codice Rust (ThemeBuilder) copiato negli appunti!");
+                                } else {
+                                    toast.danger("Impossibile copiare negli appunti.");
+                                }
+                            });
                         },
                         "Copia Rust Code"
                     }
@@ -196,13 +238,10 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                 shadow: CardShadow::Sm,
                 div { class: "flex flex-wrap items-center justify-between gap-4",
                     div { class: "flex items-center gap-3",
-                        label { class: "flex items-center gap-2 cursor-pointer text-xs font-mono text-zinc-300 select-none",
-                            input {
-                                r#type: "checkbox",
-                                checked: *auto_save.read(),
-                                onchange: move |e| *auto_save.write() = e.checked(),
-                            }
-                            span { "Auto-save su modifiche (localStorage)" }
+                        Checkbox {
+                            checked: auto_save,
+                            size: CheckboxSize::Sm,
+                            label: "Auto-save su modifiche (localStorage)".to_string(),
                         }
                         span { class: "text-zinc-600", "•" }
                         span { class: "text-xs font-mono text-purple-300",
@@ -412,7 +451,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                                     oninput: move |e| {
                                                         let val = e.value();
                                                         custom_hex_input.set(val.clone());
-                                                        if val.starts_with('#') && (val.len() == 7 || val.len() == 4) {
+                                                        if is_valid_hex(&val) {
                                                             let name = custom_name_input();
                                                             let prefix = custom_prefix_input();
                                                             theme.write().apply_primary_color(PrimaryColor::custom_with_prefix(name, val, prefix));
@@ -731,11 +770,14 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                     variant: ButtonVariant::Secondary,
                                     left_icon: rsx! { Icon { kind: IconKind::Copy, size: 12 } },
                                     onclick: move |_| {
-                                        let _ = document::eval(&format!(
-                                            "try {{ if (navigator && navigator.clipboard) {{ navigator.clipboard.writeText({:?}); }} }} catch(e) {{}}",
-                                            json_to_copy
-                                        ));
-                                        toast.info("JSON del tema copiato negli appunti!");
+                                        let text = json_to_copy.clone();
+                                        spawn(async move {
+                                            if copy_text(&text).await {
+                                                toast.info("JSON del tema copiato negli appunti!");
+                                            } else {
+                                                toast.danger("Impossibile copiare negli appunti.");
+                                            }
+                                        });
                                     },
                                     "Copia JSON"
                                 }
@@ -748,13 +790,19 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                             // Importazione manuale
                             div { class: "pt-4 border-t border-white/[0.08] space-y-2",
                                 span { class: "text-xs font-mono text-zinc-400 block", "Incolla JSON per importare:" }
-                                div { class: "flex gap-2",
-                                    input {
-                                        class: "sd-input font-mono text-xs flex-1",
-                                        placeholder: "Incolla qui JSON valido...",
-                                        value: "{json_input}",
-                                        oninput: move |e| json_input.set(e.value()),
-                                    }
+                                textarea {
+                                    class: "sd-input font-mono text-xs w-full min-h-[100px]",
+                                    placeholder: "Incolla qui JSON valido...",
+                                    value: "{json_input}",
+                                    oninput: move |e| {
+                                        json_input.set(e.value());
+                                        json_parse_error.set(None);
+                                    },
+                                }
+                                if let Some(err_msg) = json_parse_error() {
+                                    p { class: "text-xs text-red-400 font-mono", "{err_msg}" }
+                                }
+                                div { class: "flex justify-end",
                                     Button {
                                         size: ButtonSize::Md,
                                         variant: ButtonVariant::Primary,
@@ -764,10 +812,13 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                                 Ok(loaded) => {
                                                     *theme.write() = loaded;
                                                     apply_change();
+                                                    json_parse_error.set(None);
                                                     toast.success("Tema importato con successo!");
                                                 }
                                                 Err(err) => {
-                                                    toast.danger(format!("Errore parsing JSON: {}", err));
+                                                    let err_msg = format!("Errore parsing JSON: {}", err);
+                                                    json_parse_error.set(Some(err_msg.clone()));
+                                                    toast.danger(err_msg);
                                                 }
                                             }
                                         },

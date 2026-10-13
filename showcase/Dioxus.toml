@@ -1,15 +1,17 @@
 [application]
+name = "showcase"
+default_platform = "web"
 
 [web.app]
-
 # HTML title tag content
-title = "Shadow Design - Espositore Componenti"
+title = "Shadow Design — UI Component Library for Dioxus"
+index_on_404 = true
 
 # include `assets` in web platform
 [web.resource]
 
 # Additional CSS style files
-style = []
+style = ["assets/critical.css"]
 
 # Additional JavaScript files
 script = []
@@ -19,3 +21,4 @@ script = []
 # Javascript code file
 # serve: [dev-server] only
 script = []
+

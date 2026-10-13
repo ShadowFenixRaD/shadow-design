@@ -8,9 +8,12 @@ pub fn ButtonsPage() -> Element {
     let mut click_count = use_signal(|| 0);
     let mut selected_variant = use_signal(|| ButtonVariant::Primary);
     let mut selected_size = use_signal(|| ButtonSize::Md);
-    let mut is_loading = use_signal(|| false);
-    let mut is_disabled = use_signal(|| false);
-    let mut show_icon = use_signal(|| true);
+    let is_loading = use_signal(|| false);
+    let is_disabled = use_signal(|| false);
+    let show_left_icon = use_signal(|| true);
+    let show_right_icon = use_signal(|| false);
+    let is_full_width = use_signal(|| false);
+    let enable_glow = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -29,13 +32,19 @@ pub fn ButtonsPage() -> Element {
             name: "loading",
             r#type: "bool",
             default: "false",
-            description: "Mostra uno spinner SVG rotante e disabilita l'interazione",
+            description: "Mostra uno spinner SVG rotante e imposta aria-busy e aria-disabled",
+        },
+        PropRow {
+            name: "loading_label",
+            r#type: "Option<String>",
+            default: "None",
+            description: "Testo opzionale per lettori di schermo durante lo stato di caricamento",
         },
         PropRow {
             name: "disabled",
             r#type: "bool",
             default: "false",
-            description: "Disabilita il pulsante e riduce l'opacità",
+            description: "Disabilita il pulsante e riduce l'opacità con aria-disabled",
         },
         PropRow {
             name: "full_width",
@@ -44,16 +53,34 @@ pub fn ButtonsPage() -> Element {
             description: "Espande il pulsante al 100% della larghezza del contenitore",
         },
         PropRow {
+            name: "glow",
+            r#type: "Option<bool>",
+            default: "None",
+            description: "Attiva o disattiva esplicitamente il micro-glow perimetrale",
+        },
+        PropRow {
             name: "left_icon",
             r#type: "Option<Element>",
             default: "None",
-            description: "Elemento icona visualizzato prima del testo",
+            description: "Elemento icona visualizzato prima del testo (con aria-hidden)",
         },
         PropRow {
             name: "right_icon",
             r#type: "Option<Element>",
             default: "None",
-            description: "Elemento icona visualizzato dopo il testo",
+            description: "Elemento icona visualizzato dopo il testo (con aria-hidden)",
+        },
+        PropRow {
+            name: "onclick",
+            r#type: "Option<EventHandler<MouseEvent>>",
+            default: "None",
+            description: "Callback scatenata al click o all'attivazione da tastiera",
+        },
+        PropRow {
+            name: "class",
+            r#type: "String",
+            default: "\"\"",
+            description: "Classi CSS aggiuntive applicate all'elemento <button>",
         },
     ];
 
@@ -70,7 +97,7 @@ pub fn ButtonsPage() -> Element {
         div { class: "max-w-4xl space-y-8",
             div {
                 Heading { order: HeadingOrder::H2, "Button" }
-                Text { dimmed: true, size: TextSize::Sm, "Pulsanti tattili con feedback ottico alla pressione, supporto a icone native, stato loading e raggio scalabile da tema." }
+                Text { dimmed: true, size: TextSize::Sm, "Pulsanti tattili con feedback ottico alla pressione, supporto a icone native, stato loading accessibile e raggio scalabile da tema." }
             }
 
             FeatureBanner { feature_name: "button" }
@@ -80,19 +107,28 @@ pub fn ButtonsPage() -> Element {
                 preview: rsx! {
                     div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
                         // Preview Box
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center min-h-[180px] shadow-inner",
-                            Button {
-                                variant: selected_variant(),
-                                size: selected_size(),
-                                loading: is_loading(),
-                                disabled: is_disabled(),
-                                left_icon: if show_icon() {
-                                    Some(rsx! { Icon { kind: IconKind::Sparkles, size: 15 } })
-                                } else {
-                                    None
-                                },
-                                onclick: move |_| *click_count.write() += 1,
-                                "Pulsante Interattivo"
+                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center min-h-[180px] shadow-inner w-full",
+                            div { class: if is_full_width() { "w-full" } else { "" },
+                                Button {
+                                    variant: selected_variant(),
+                                    size: selected_size(),
+                                    loading: is_loading(),
+                                    disabled: is_disabled(),
+                                    full_width: is_full_width(),
+                                    glow: if enable_glow() { Some(true) } else { None },
+                                    left_icon: if show_left_icon() {
+                                        Some(rsx! { Icon { kind: IconKind::Sparkles, size: 15 } })
+                                    } else {
+                                        None
+                                    },
+                                    right_icon: if show_right_icon() {
+                                        Some(rsx! { Icon { kind: IconKind::ChevronRight, size: 15 } })
+                                    } else {
+                                        None
+                                    },
+                                    onclick: move |_| *click_count.write() += 1,
+                                    "Pulsante Interattivo"
+                                }
                             }
                             span { class: "text-xs font-mono text-zinc-500 mt-4",
                                 "Click registrati: "
@@ -107,11 +143,12 @@ pub fn ButtonsPage() -> Element {
                                 div { class: "flex flex-wrap gap-1.5",
                                     for v in [ButtonVariant::Primary, ButtonVariant::Secondary, ButtonVariant::Outline, ButtonVariant::Ghost, ButtonVariant::Success, ButtonVariant::Danger] {
                                         button {
+                                            key: "{v:?}",
                                             r#type: "button",
                                             class: if selected_variant() == v {
-                                                "px-2 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
+                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
                                             } else {
-                                                "px-2 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
+                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
                                             },
                                             onclick: move |_| selected_variant.set(v),
                                             "{v:?}"
@@ -125,11 +162,12 @@ pub fn ButtonsPage() -> Element {
                                 div { class: "flex flex-wrap gap-1.5",
                                     for s in [ButtonSize::Xs, ButtonSize::Sm, ButtonSize::Md, ButtonSize::Lg, ButtonSize::Xl] {
                                         button {
+                                            key: "{s:?}",
                                             r#type: "button",
                                             class: if selected_size() == s {
-                                                "px-2 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
+                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
                                             } else {
-                                                "px-2 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
+                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
                                             },
                                             onclick: move |_| selected_size.set(s),
                                             "{s:?}"
@@ -138,30 +176,36 @@ pub fn ButtonsPage() -> Element {
                                 }
                             }
 
-                            div { class: "pt-2 border-t border-white/[0.06] flex flex-wrap gap-3",
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_loading}",
-                                        onchange: move |e| is_loading.set(e.checked()),
-                                    }
-                                    "Stato Loading"
+                            div { class: "pt-2 border-t border-white/[0.06] grid grid-cols-2 gap-2.5",
+                                Checkbox {
+                                    checked: is_loading,
+                                    label: Some("Stato Loading".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_disabled}",
-                                        onchange: move |e| is_disabled.set(e.checked()),
-                                    }
-                                    "Disabilitato"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: Some("Disabilitato".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{show_icon}",
-                                        onchange: move |e| show_icon.set(e.checked()),
-                                    }
-                                    "Mostra Icona"
+                                Checkbox {
+                                    checked: show_left_icon,
+                                    label: Some("Icona Sinistra".to_string()),
+                                    size: CheckboxSize::Sm,
+                                }
+                                Checkbox {
+                                    checked: show_right_icon,
+                                    label: Some("Icona Destra".to_string()),
+                                    size: CheckboxSize::Sm,
+                                }
+                                Checkbox {
+                                    checked: is_full_width,
+                                    label: Some("Larghezza 100%".to_string()),
+                                    size: CheckboxSize::Sm,
+                                }
+                                Checkbox {
+                                    checked: enable_glow,
+                                    label: Some("Attiva Glow".to_string()),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }
@@ -173,42 +217,23 @@ pub fn ButtonsPage() -> Element {
 
             // Visual Catalog
             Card {
-                title: "Catalogo Completo delle Varianti".to_string(),
-                subtitle: "Tutte le opzioni cromatiche predefinite con specular highlights".to_string(),
-                div { class: "flex flex-wrap items-center gap-3",
-                    Button { variant: ButtonVariant::Primary, "Primary" }
-                    Button { variant: ButtonVariant::Secondary, "Secondary" }
-                    Button { variant: ButtonVariant::Outline, "Outline" }
-                    Button { variant: ButtonVariant::Ghost, "Ghost" }
-                    Button { variant: ButtonVariant::Success, "Success" }
-                    Button { variant: ButtonVariant::Danger, "Danger" }
-                    Button { disabled: true, "Disabled" }
-                }
-            }
-
-            Card {
-                title: "Pulsanti con Icone e Loading State".to_string(),
-                subtitle: "Icone vettoriali integrate a 1.5px stroke e spinner animato".to_string(),
-                div { class: "flex flex-wrap items-center gap-4",
-                    Button {
-                        variant: ButtonVariant::Primary,
-                        left_icon: rsx! { Icon { kind: IconKind::Check, size: 15 } },
-                        "Conferma"
+                title: "Catalogo Dimensioni e Varianti".to_string(),
+                subtitle: "Tutte le scale dimensionali con feedback tattile".to_string(),
+                div { class: "space-y-6",
+                    div { class: "flex flex-wrap items-center gap-3",
+                        Button { size: ButtonSize::Xs, variant: ButtonVariant::Primary, "Extra Small" }
+                        Button { size: ButtonSize::Sm, variant: ButtonVariant::Primary, "Small" }
+                        Button { size: ButtonSize::Md, variant: ButtonVariant::Primary, "Medium" }
+                        Button { size: ButtonSize::Lg, variant: ButtonVariant::Primary, "Large" }
+                        Button { size: ButtonSize::Xl, variant: ButtonVariant::Primary, "Extra Large" }
                     }
-                    Button {
-                        variant: ButtonVariant::Secondary,
-                        right_icon: rsx! { Icon { kind: IconKind::ExternalLink, size: 14 } },
-                        "Apri Documentazione"
-                    }
-                    Button {
-                        variant: ButtonVariant::Outline,
-                        loading: true,
-                        "Salvataggio in corso..."
-                    }
-                    Button {
-                        variant: ButtonVariant::Danger,
-                        left_icon: rsx! { Icon { kind: IconKind::X, size: 14 } },
-                        "Elimina Risorsa"
+                    div { class: "flex flex-wrap items-center gap-3 pt-4 border-t border-white/[0.06]",
+                        Button { variant: ButtonVariant::Primary, "Primary" }
+                        Button { variant: ButtonVariant::Secondary, "Secondary" }
+                        Button { variant: ButtonVariant::Outline, "Outline" }
+                        Button { variant: ButtonVariant::Ghost, "Ghost" }
+                        Button { variant: ButtonVariant::Success, "Success" }
+                        Button { variant: ButtonVariant::Danger, "Danger" }
                     }
                 }
             }

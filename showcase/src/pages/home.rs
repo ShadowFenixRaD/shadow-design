@@ -6,13 +6,14 @@ use crate::components::CodeBlock;
 #[component]
 pub fn Home() -> Element {
     let mut theme = use_theme();
+    let nav = use_navigator();
 
     let install_code = r#"[dependencies]
-# Importa solo i moduli desiderati per il massimo delle performance:
-shadow-design = { path = "../shadow-design/crate", features = ["button", "card", "theme", "icon"] }
+# Importa solo i moduli desiderati con default-features = false (zero bloat):
+shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure include l'intera suite:
-# shadow-design = { path = "../shadow-design/crate", features = ["all"] }"#
+# shadow-design = { version = "0.2.0", features = ["all"] }"#
         .to_string();
 
     let rust_example = r#"use dioxus::prelude::*;
@@ -21,6 +22,9 @@ use shadow_design::prelude::*;
 #[component]
 pub fn App() -> Element {
     rsx! {
+        // Includi il foglio di stile SCSS nativo
+        document::Link { rel: "stylesheet", href: shadow_design::STYLES }
+
         Card {
             title: "Pannello Operativo".to_string(),
             variant: CardVariant::Interactive,
@@ -57,21 +61,17 @@ pub fn App() -> Element {
                         }
                     }
                     div { class: "flex flex-wrap items-center gap-3 pt-2",
-                        Link {
-                            to: crate::Route::ButtonsPage {},
-                            Button {
-                                variant: ButtonVariant::Primary,
-                                left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 15 } },
-                                "Esplora Componenti"
-                            }
+                        Button {
+                            variant: ButtonVariant::Primary,
+                            left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 15 } },
+                            onclick: move |_| { nav.push(crate::Route::ButtonsPage {}); },
+                            "Esplora Componenti"
                         }
-                        Link {
-                            to: crate::Route::TypographyPage {},
-                            Button {
-                                variant: ButtonVariant::Secondary,
-                                left_icon: rsx! { Icon { kind: IconKind::Code, size: 15 } },
-                                "Tipografia Geist"
-                            }
+                        Button {
+                            variant: ButtonVariant::Secondary,
+                            left_icon: rsx! { Icon { kind: IconKind::Code, size: 15 } },
+                            onclick: move |_| { nav.push(crate::Route::TypographyPage {}); },
+                            "Tipografia Geist"
                         }
                     }
                 }
@@ -84,7 +84,7 @@ pub fn App() -> Element {
                 shadow: CardShadow::Lg,
                 div { class: "space-y-6",
                     Text { size: TextSize::Sm,
-                        "Il nuovo motore del tema permette di commutare palette primarie ad alta leggibilità, scalare il raggio di curvatura (Sharp, Medium, Soft) e regolare l'intensità del bagliore ottico su tutti i componenti con architettura pura SCSS nativa."
+                        "Il motore del tema permette di commutare palette primarie ad alta leggibilità, scalare il raggio di curvatura (Sharp, Medium, Soft) e regolare l'intensità del bagliore ottico su tutti i componenti con architettura pura SCSS nativa."
                     }
 
                     // Selettore Rapido Preset
@@ -103,46 +103,44 @@ pub fn App() -> Element {
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Violet { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#a855f7] inline-block shadow-[0_0_6px_#a855f7]" } },
+                                left_icon: rsx! { span { style: "width: 8px; height: 8px; border-radius: 9999px; display: inline-block; background-color: #a855f7; box-shadow: 0 0 6px #a855f7;" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Violet),
                                 "Violet (Default)"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Obsidian { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#ffffff] inline-block shadow-[0_0_6px_#ffffff]" } },
+                                left_icon: rsx! { span { style: "width: 8px; height: 8px; border-radius: 9999px; display: inline-block; background-color: #ffffff; box-shadow: 0 0 6px #ffffff;" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Obsidian),
                                 "Obsidian Titanium"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Crimson { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#ff1744] inline-block shadow-[0_0_6px_#ff1744]" } },
+                                left_icon: rsx! { span { style: "width: 8px; height: 8px; border-radius: 9999px; display: inline-block; background-color: #ff1744; box-shadow: 0 0 6px #ff1744;" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Crimson),
                                 "Crimson Phoenix"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Cyan { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#00f0ff] inline-block shadow-[0_0_6px_#00f0ff]" } },
+                                left_icon: rsx! { span { style: "width: 8px; height: 8px; border-radius: 9999px; display: inline-block; background-color: #00f0ff; box-shadow: 0 0 6px #00f0ff;" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Cyan),
                                 "Cyber Cyan"
                             }
                             Button {
                                 size: ButtonSize::Sm,
                                 variant: if theme().primary_color == PrimaryColor::Emerald { ButtonVariant::Primary } else { ButtonVariant::Secondary },
-                                left_icon: rsx! { span { class: "w-2 h-2 rounded-full bg-[#00ff9d] inline-block shadow-[0_0_6px_#00ff9d]" } },
+                                left_icon: rsx! { span { style: "width: 8px; height: 8px; border-radius: 9999px; display: inline-block; background-color: #00ff9d; box-shadow: 0 0 6px #00ff9d;" } },
                                 onclick: move |_| theme.write().apply_primary_color(PrimaryColor::Emerald),
                                 "Emerald Matrix"
                             }
-                            Link {
-                                to: crate::Route::ThemeBuilderPage {},
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Outline,
-                                    left_icon: rsx! { Icon { kind: IconKind::Settings, size: 13 } },
-                                    "Theme Builder Studio"
-                                }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Outline,
+                                left_icon: rsx! { Icon { kind: IconKind::Settings, size: 13 } },
+                                onclick: move |_| { nav.push(crate::Route::ThemeBuilderPage {}); },
+                                "Theme Builder Studio"
                             }
                         }
                     }
@@ -159,16 +157,9 @@ pub fn App() -> Element {
                         "Ogni componente è racchiuso dietro una feature flag Cargo indipendente. Compila esclusivamente il codice che la tua applicazione utilizza."
                     }
                     div { class: "flex flex-wrap gap-1.5",
-                        Badge { label: "button".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "card".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "input".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "badge".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "navbar".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "modal".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "alert".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "theme".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "icon".to_string(), variant: BadgeVariant::Primary }
-                        Badge { label: "typography".to_string(), variant: BadgeVariant::Primary }
+                        for name in ["button", "card", "input", "select", "textarea", "checkbox", "badge", "navbar", "modal", "alert", "notification", "tabs", "switch", "tooltip", "drawer", "dropdown", "icon", "typography", "theme", "animation"] {
+                            Badge { key: "{name}", label: "{name}".to_string(), variant: BadgeVariant::Primary }
+                        }
                     }
                 }
 

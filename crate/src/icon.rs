@@ -59,6 +59,116 @@ pub enum IconKind {
     Upload,
 }
 
+impl IconKind {
+    pub const ALL: &'static [IconKind] = &[
+        IconKind::ChevronRight,
+        IconKind::ChevronDown,
+        IconKind::ChevronLeft,
+        IconKind::ChevronUp,
+        IconKind::Check,
+        IconKind::Copy,
+        IconKind::X,
+        IconKind::AlertTriangle,
+        IconKind::AlertCircle,
+        IconKind::Info,
+        IconKind::CheckCircle,
+        IconKind::XCircle,
+        IconKind::Search,
+        IconKind::Sparkles,
+        IconKind::Settings,
+        IconKind::Code,
+        IconKind::Layers,
+        IconKind::Terminal,
+        IconKind::Palette,
+        IconKind::Eye,
+        IconKind::EyeOff,
+        IconKind::ExternalLink,
+        IconKind::Sun,
+        IconKind::Moon,
+        IconKind::Box,
+        IconKind::Menu,
+        IconKind::Spinner,
+        IconKind::Send,
+        IconKind::MessageSquare,
+        IconKind::Paperclip,
+        IconKind::CheckCheck,
+        IconKind::Clock,
+        IconKind::Lock,
+        IconKind::Unlock,
+        IconKind::Shield,
+        IconKind::ShieldCheck,
+        IconKind::Key,
+        IconKind::QrCode,
+        IconKind::Fingerprint,
+        IconKind::Wifi,
+        IconKind::Bluetooth,
+        IconKind::Radio,
+        IconKind::Signal,
+        IconKind::SignalHigh,
+        IconKind::Server,
+        IconKind::Share2,
+        IconKind::Trash2,
+        IconKind::Flame,
+        IconKind::Download,
+        IconKind::Upload,
+    ];
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            IconKind::ChevronRight => "ChevronRight",
+            IconKind::ChevronDown => "ChevronDown",
+            IconKind::ChevronLeft => "ChevronLeft",
+            IconKind::ChevronUp => "ChevronUp",
+            IconKind::Check => "Check",
+            IconKind::Copy => "Copy",
+            IconKind::X => "X",
+            IconKind::AlertTriangle => "AlertTriangle",
+            IconKind::AlertCircle => "AlertCircle",
+            IconKind::Info => "Info",
+            IconKind::CheckCircle => "CheckCircle",
+            IconKind::XCircle => "XCircle",
+            IconKind::Search => "Search",
+            IconKind::Sparkles => "Sparkles",
+            IconKind::Settings => "Settings",
+            IconKind::Code => "Code",
+            IconKind::Layers => "Layers",
+            IconKind::Terminal => "Terminal",
+            IconKind::Palette => "Palette",
+            IconKind::Eye => "Eye",
+            IconKind::EyeOff => "EyeOff",
+            IconKind::ExternalLink => "ExternalLink",
+            IconKind::Sun => "Sun",
+            IconKind::Moon => "Moon",
+            IconKind::Box => "Box",
+            IconKind::Menu => "Menu",
+            IconKind::Spinner => "Spinner",
+            IconKind::Send => "Send",
+            IconKind::MessageSquare => "MessageSquare",
+            IconKind::Paperclip => "Paperclip",
+            IconKind::CheckCheck => "CheckCheck",
+            IconKind::Clock => "Clock",
+            IconKind::Lock => "Lock",
+            IconKind::Unlock => "Unlock",
+            IconKind::Shield => "Shield",
+            IconKind::ShieldCheck => "ShieldCheck",
+            IconKind::Key => "Key",
+            IconKind::QrCode => "QrCode",
+            IconKind::Fingerprint => "Fingerprint",
+            IconKind::Wifi => "Wifi",
+            IconKind::Bluetooth => "Bluetooth",
+            IconKind::Radio => "Radio",
+            IconKind::Signal => "Signal",
+            IconKind::SignalHigh => "SignalHigh",
+            IconKind::Server => "Server",
+            IconKind::Share2 => "Share2",
+            IconKind::Trash2 => "Trash2",
+            IconKind::Flame => "Flame",
+            IconKind::Download => "Download",
+            IconKind::Upload => "Upload",
+        }
+    }
+}
+
 /// Rappresentazione unificata e fortemente tipizzata per icone SVG in Shadow Design.
 /// Consente di passare sia icone geometriche native (`IconKind`) sia elementi SVG personalizzati.
 #[derive(Clone, PartialEq, Debug)]
@@ -426,3 +536,16 @@ fn render_icon_paths(kind: IconKind) -> Element {
             }
         }
     }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_icon_kind_all_completeness() {
+        assert_eq!(IconKind::ALL.len(), 50);
+        for icon in IconKind::ALL {
+            assert!(!icon.name().is_empty());
+        }
+    }
+}

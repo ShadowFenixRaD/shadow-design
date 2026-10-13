@@ -49,6 +49,7 @@ pub fn DropdownPage() -> Element {
     ];
 
     let code_snippet = r#"let mut is_open = use_signal(|| false);
+let mut is_top_open = use_signal(|| false);
 
 // Apertura standard verso il basso
 Dropdown {
@@ -70,7 +71,7 @@ Dropdown {
 
 // Apertura verso l'alto (quando vicino al fondo della card)
 Dropdown {
-    is_open: is_open,
+    is_open: is_top_open,
     placement: DropdownPlacement::TopRight,
     trigger: rsx! {
         Button {
@@ -79,7 +80,10 @@ Dropdown {
             "Menu Superiore"
         }
     },
-    DropdownItem { "Azione..." }
+    DropdownItem {
+        onclick: move |_| { is_top_open.set(false); },
+        "Azione..."
+    }
 }"#
     .to_string();
 

@@ -12,7 +12,7 @@ pub fn FeatureBanner(feature_name: &'static str) -> Element {
                     "Feature Cargo:"
                 }
                 code { class: "px-2 py-0.5 rounded bg-[#030305] {theme().text_accent_bright} font-mono text-xs border border-white/10",
-                    "shadow-design = {{ features = [\"{feature_name}\"] }}"
+                    "shadow-design = {{ version = \"0.2.0\", default-features = false, features = [\"{feature_name}\"] }}"
                 }
             }
             span { class: "text-xs text-zinc-500 font-mono", "Zero bloat: importa solo ciò che usi" }

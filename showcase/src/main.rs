@@ -6,8 +6,8 @@ mod pages;
 
 use components::Layout;
 use pages::{
-    AlertsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
-    CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, InputsPage, ModalsPage,
+    AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
+    CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
     NavbarDemoPage, NotificationsPage, ProgressPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
     TypographyPage,
@@ -71,6 +71,10 @@ pub enum Route {
     TreesPage {},
     #[route("/skeletons")]
     SkeletonsPage {},
+    #[route("/icons")]
+    IconsPage {},
+    #[route("/animations")]
+    AnimationsPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");
@@ -84,6 +88,7 @@ fn main() {
 #[component]
 fn App() -> Element {
     let mut theme = use_signal(Theme::default);
+    let mut is_restored = use_signal(|| false);
     use_context_provider(|| theme);
 
     // Resistenza ai riavvii e ai refresh: ripristino automatico da localStorage (eseguito solo una volta all'avvio)
@@ -109,7 +114,33 @@ fn App() -> Element {
                     }
                 }
             }
+            is_restored.set(true);
         });
+    });
+
+    // Persistenza automatica di qualsiasi modifica al tema su localStorage (SC-14)
+    use_effect(move || {
+        if !is_restored() {
+            return;
+        }
+        let current_theme = theme();
+        if let Ok(json) = serde_json::to_string(&current_theme) {
+            spawn(async move {
+                let js_str = serde_json::to_string(&json).unwrap_or_default();
+                let eval = document::eval(&format!(
+                    r#"
+                    try {{
+                        if (typeof window !== "undefined" && window.localStorage) {{
+                            window.localStorage.setItem("shadow_design_custom_theme", {js_str});
+                        }}
+                    }} catch(e) {{
+                        console.warn("Storage save error:", e);
+                    }}
+                    "#
+                ));
+                let _ = eval.await;
+            });
+        }
     });
 
     // Iniezione reattiva delle variabili CSS Custom Properties senza mutazione di document::Style
