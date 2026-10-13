@@ -1,0 +1,173 @@
+// ==============================================================================
+// Shadow Design — Avatar & AvatarGroup Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  @keyframes sd-pulse-p2p {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.7);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 14px rgba(139, 92, 246, 0.9);
+    }
+  }
+
+  .sd-avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    border: $border-hairline;
+    background-color: $color-surface-1;
+    color: #ffffff;
+    font-family: $font-sans;
+    font-weight: 600;
+    user-select: none;
+    flex-shrink: 0;
+    transition: transform $duration-fast ease, box-shadow $duration-fast ease;
+
+    &:hover {
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    &--xs {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+
+      .sd-avatar__status {
+        width: 7px;
+        height: 7px;
+        border-width: 1.5px;
+        bottom: 0;
+        right: 0;
+      }
+    }
+
+    &--sm {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+
+      .sd-avatar__status {
+        width: 9px;
+        height: 9px;
+        border-width: 1.5px;
+        bottom: 1px;
+        right: 1px;
+      }
+    }
+
+    &--md {
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
+
+      .sd-avatar__status {
+        width: 11px;
+        height: 11px;
+        border-width: 2px;
+        bottom: 1px;
+        right: 1px;
+      }
+    }
+
+    &--lg {
+      width: 48px;
+      height: 48px;
+      font-size: 16px;
+
+      .sd-avatar__status {
+        width: 13px;
+        height: 13px;
+        border-width: 2px;
+        bottom: 2px;
+        right: 2px;
+      }
+    }
+
+    &--xl {
+      width: 64px;
+      height: 64px;
+      font-size: 20px;
+
+      .sd-avatar__status {
+        width: 16px;
+        height: 16px;
+        border-width: 2.5px;
+        bottom: 3px;
+        right: 3px;
+      }
+    }
+
+    &__img {
+      width: 100%;
+      height: 100%;
+      border-radius: $radius-full;
+      object-fit: cover;
+      display: block;
+    }
+
+    &__initials {
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    &__fallback {
+      color: $zinc-400;
+    }
+
+    &__status {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border-radius: $radius-full;
+      border-style: solid;
+      border-color: $color-void;
+      z-index: 2;
+
+      &--online {
+        background-color: #10b981;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.65);
+      }
+
+      &--offline {
+        background-color: #71717a;
+      }
+
+      &--busy {
+        background-color: #f43f5e;
+        box-shadow: 0 0 8px rgba(244, 63, 94, 0.65);
+      }
+
+      &--direct-p2p {
+        background-color: #00f0ff;
+        animation: sd-pulse-p2p 2s infinite ease-in-out;
+      }
+    }
+  }
+
+  .sd-avatar-group {
+    display: inline-flex;
+    align-items: center;
+
+    .sd-avatar {
+      border-color: $color-void;
+
+      + .sd-avatar {
+        margin-left: -10px;
+        box-shadow: -2px 0 6px rgba(0, 0, 0, 0.6);
+      }
+
+      &:hover {
+        z-index: 5;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}

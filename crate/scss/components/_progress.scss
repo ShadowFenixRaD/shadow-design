@@ -1,0 +1,90 @@
+// ==============================================================================
+// Shadow Design — ProgressBar & Progress Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  @keyframes sd-indeterminate-shimmer {
+    0% {
+      transform: translateX(-125%);
+    }
+    100% {
+      transform: translateX(275%);
+    }
+  }
+
+  .sd-progress-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sd-progress__header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .sd-progress__label {
+    font-size: 11px;
+    font-family: $font-mono;
+    color: $zinc-400;
+  }
+
+  .sd-progress {
+    position: relative;
+    width: 100%;
+    background-color: $color-surface-1;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-full;
+    overflow: hidden;
+
+    &--sm {
+      height: 4px;
+    }
+
+    &--md {
+      height: 8px;
+    }
+
+    &--lg {
+      height: 12px;
+    }
+
+    &__bar {
+      height: 100%;
+      border-radius: inherit;
+      transition: width $duration-normal ease;
+    }
+
+    // Varianti Cromatiche
+    &--primary &__bar {
+      background: linear-gradient(90deg, #7e22ce, #a855f7);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.55);
+    }
+
+    &--success &__bar {
+      background: linear-gradient(90deg, #059669, #10b981);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
+    }
+
+    &--warning &__bar {
+      background: linear-gradient(90deg, #d97706, #f59e0b);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.55);
+    }
+
+    &--danger &__bar {
+      background: linear-gradient(90deg, #e11d48, #f43f5e);
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.55);
+    }
+
+    // Modalità Indeterminata
+    &--indeterminate &__bar {
+      width: 40% !important;
+      will-change: transform;
+      animation: sd-indeterminate-shimmer 1.6s infinite ease-in-out;
+    }
+  }
+}

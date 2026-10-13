@@ -6,9 +6,11 @@ mod pages;
 
 use components::Layout;
 use pages::{
-    AlertsPage, BadgesPage, ButtonsPage, CardsPage, CheckboxPage, DrawerPage, DropdownPage, Home,
-    InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, SelectPage, SwitchPage, TabsPage,
-    TextareaPage, ThemeBuilderPage, TooltipPage, TypographyPage,
+    AlertsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
+    CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, InputsPage, ModalsPage,
+    NavbarDemoPage, NotificationsPage, ProgressPage, SegmentedControlsPage, SelectPage,
+    SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
+    TypographyPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -53,6 +55,22 @@ pub enum Route {
     DrawerPage {},
     #[route("/dropdown")]
     DropdownPage {},
+    #[route("/avatars")]
+    AvatarsPage {},
+    #[route("/chat")]
+    ChatPage {},
+    #[route("/progress")]
+    ProgressPage {},
+    #[route("/attachment-cards")]
+    AttachmentCardsPage {},
+    #[route("/segmented-controls")]
+    SegmentedControlsPage {},
+    #[route("/dividers")]
+    DividersPage {},
+    #[route("/trees")]
+    TreesPage {},
+    #[route("/skeletons")]
+    SkeletonsPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

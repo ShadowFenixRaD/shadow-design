@@ -30,6 +30,33 @@ pub enum IconKind {
     Box,
     Menu,
     Spinner,
+    // Chat & Messaggi
+    Send,
+    MessageSquare,
+    Paperclip,
+    CheckCheck,
+    Clock,
+    // Sicurezza & Crittografia
+    Lock,
+    Unlock,
+    Shield,
+    ShieldCheck,
+    Key,
+    QrCode,
+    Fingerprint,
+    // Connettività & Radio
+    Wifi,
+    Bluetooth,
+    Radio,
+    Signal,
+    SignalHigh,
+    Server,
+    Share2,
+    // Azioni Chat
+    Trash2,
+    Flame,
+    Download,
+    Upload,
 }
 
 /// Rappresentazione unificata e fortemente tipizzata per icone SVG in Shadow Design.
@@ -93,6 +120,7 @@ pub fn Icon(
     #[props(default)] class: String,
 ) -> Element {
     let size_str = size.to_string();
+    let spinner_class = if matches!(kind, IconKind::Spinner) { " animate-spin" } else { "" };
 
     rsx! {
         svg {
@@ -105,7 +133,7 @@ pub fn Icon(
             stroke_width: "1.5",
             stroke_linecap: "round",
             stroke_linejoin: "round",
-            class: "shrink-0 {class}",
+            class: "shrink-0 {class}{spinner_class}",
             match kind {
                 IconKind::ChevronRight => rsx! {
                     path { d: "m9 18 6-6-6-6" }
@@ -226,9 +254,127 @@ pub fn Icon(
                 },
                 IconKind::Spinner => rsx! {
                     path {
-                        class: "animate-spin origin-center",
                         d: "M21 12a9 9 0 1 1-6.219-8.56"
                     }
+                },
+                IconKind::Send => rsx! {
+                    path { d: "m22 2-7 20-4-9-9-4Z" }
+                    path { d: "M22 2 11 13" }
+                },
+                IconKind::MessageSquare => rsx! {
+                    path { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" }
+                },
+                IconKind::Paperclip => rsx! {
+                    path { d: "m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" }
+                },
+                IconKind::CheckCheck => rsx! {
+                    path { d: "M18 6 7 17l-5-5" }
+                    path { d: "m22 10-7.5 7.5L13 16" }
+                },
+                IconKind::Clock => rsx! {
+                    circle { cx: "12", cy: "12", r: "10" }
+                    polyline { points: "12 6 12 12 16 14" }
+                },
+                IconKind::Lock => rsx! {
+                    rect { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2" }
+                    path { d: "M7 11V7a5 5 0 0 1 10 0v4" }
+                },
+                IconKind::Unlock => rsx! {
+                    rect { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2" }
+                    path { d: "M7 11V7a5 5 0 0 1 9.9-1" }
+                },
+                IconKind::Shield => rsx! {
+                    path { d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" }
+                },
+                IconKind::ShieldCheck => rsx! {
+                    path { d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" }
+                    path { d: "m9 12 2 2 4-4" }
+                },
+                IconKind::Key => rsx! {
+                    circle { cx: "7.5", cy: "15.5", r: "5.5" }
+                    path { d: "m21 2-9.6 9.6" }
+                    path { d: "m15.5 7.5 3 3L22 7l-3-3" }
+                },
+                IconKind::QrCode => rsx! {
+                    rect { width: "5", height: "5", x: "3", y: "3", rx: "1" }
+                    rect { width: "5", height: "5", x: "16", y: "3", rx: "1" }
+                    rect { width: "5", height: "5", x: "3", y: "16", rx: "1" }
+                    path { d: "M21 16h-3a2 2 0 0 0-2 2v3" }
+                    path { d: "M21 21v.01" }
+                    path { d: "M12 7v3a2 2 0 0 1-2 2H7" }
+                    path { d: "M3 12h.01" }
+                    path { d: "M12 3h.01" }
+                    path { d: "M12 16v.01" }
+                    path { d: "M16 12h1" }
+                    path { d: "M21 12v.01" }
+                    path { d: "M12 21v-1" }
+                },
+                IconKind::Fingerprint => rsx! {
+                    path { d: "M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" }
+                    path { d: "M14 13.12c0 2.38 0 6.38-1 8.88" }
+                    path { d: "M17.29 21.02c.12-.6.43-2.3.5-3.02" }
+                    path { d: "M2 12a10 10 0 0 1 18-6" }
+                    path { d: "M2 16h.01" }
+                    path { d: "M21.8 16c.2-2 .131-5.354 0-6" }
+                    path { d: "M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" }
+                    path { d: "M8.65 22c.21-.66.45-1.32.57-2" }
+                    path { d: "M9 6.8a6 6 0 0 1 9 5.2v2" }
+                },
+                IconKind::Wifi => rsx! {
+                    path { d: "M12 20h.01" }
+                    path { d: "M2 8.82a15 15 0 0 1 20 0" }
+                    path { d: "M5 12.86a10 10 0 0 1 14 0" }
+                    path { d: "M8.5 16.43a5 5 0 0 1 7 0" }
+                },
+                IconKind::Bluetooth => rsx! {
+                    path { d: "m7 7 10 10-5 5V2l5 5L7 17" }
+                },
+                IconKind::Radio => rsx! {
+                    path { d: "M4.9 19.1C1 15.2 1 8.8 4.9 4.9" }
+                    path { d: "M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" }
+                    circle { cx: "12", cy: "12", r: "2" }
+                    path { d: "M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" }
+                    path { d: "M19.1 4.9C23 8.8 23 15.2 19.1 19.1" }
+                },
+                IconKind::Signal | IconKind::SignalHigh => rsx! {
+                    path { d: "M2 20h.01" }
+                    path { d: "M7 20v-4" }
+                    path { d: "M12 20v-8" }
+                    path { d: "M17 20V8" }
+                    path { d: "M22 20V4" }
+                },
+                IconKind::Server => rsx! {
+                    rect { width: "20", height: "8", x: "2", y: "2", rx: "2", ry: "2" }
+                    rect { width: "20", height: "8", x: "2", y: "14", rx: "2", ry: "2" }
+                    line { x1: "6", x2: "6.01", y1: "6", y2: "6" }
+                    line { x1: "6", x2: "6.01", y1: "18", y2: "18" }
+                },
+                IconKind::Share2 => rsx! {
+                    circle { cx: "18", cy: "5", r: "3" }
+                    circle { cx: "6", cy: "12", r: "3" }
+                    circle { cx: "18", cy: "19", r: "3" }
+                    line { x1: "8.59", x2: "15.42", y1: "13.51", y2: "17.49" }
+                    line { x1: "15.41", x2: "8.59", y1: "6.51", y2: "10.49" }
+                },
+                IconKind::Trash2 => rsx! {
+                    path { d: "M3 6h18" }
+                    path { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" }
+                    path { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" }
+                    line { x1: "10", x2: "10", y1: "11", y2: "17" }
+                    line { x1: "14", x2: "14", y1: "11", y2: "17" }
+                },
+                IconKind::Flame => rsx! {
+                    path { d: "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" }
+                },
+                IconKind::Download => rsx! {
+                    path { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }
+                    polyline { points: "7 10 12 15 17 10" }
+                    line { x1: "12", x2: "12", y1: "15", y2: "3" }
+                },
+                IconKind::Upload => rsx! {
+                    path { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }
+                    polyline { points: "17 8 12 3 7 8" }
+                    line { x1: "12", x2: "12", y1: "3", y2: "15" }
                 },
             }
         }

@@ -150,13 +150,10 @@
 // 10. Indeterminate Progress Bar
 @keyframes indeterminateSlide {
   0% {
-    transform: scaleX(0.2) translateX(-150%);
-  }
-  50% {
-    transform: scaleX(0.8) translateX(0);
+    transform: translateX(-125%);
   }
   100% {
-    transform: scaleX(0.2) translateX(150%);
+    transform: translateX(275%);
   }
 }
 
@@ -169,7 +166,7 @@
 .animate-slide-in-top    { animation: slideInTop $duration-normal $ease-tactile forwards; }
 .animate-scale-in        { animation: scaleIn $duration-normal $ease-tactile forwards; }
 .animate-pulse-glow      { animation: pulseGlow 2.8s ease-in-out infinite; }
-.animate-spin            { animation: spin 0.8s linear infinite; }
+.animate-spin            { animation: spin 0.8s linear infinite; transform-origin: center; }
 
 // Component Dedicated Animations
 .animate-toast-enter     { animation: toastEnter $duration-normal $ease-tactile forwards; }
