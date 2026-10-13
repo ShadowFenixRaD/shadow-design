@@ -26,6 +26,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 dioxus = { workspace = true, features = ["lib"] }
 serde = { workspace = true, optional = true }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+gloo-timers = { version = "0.3", features = ["futures"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { version = "1", features = ["time", "rt"] }
+
 [dev-dependencies]
 serde_json = { workspace = true }
 

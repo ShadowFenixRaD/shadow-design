@@ -28,9 +28,8 @@
   max-width: 520px;
   background-color: #0d0d14;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: $radius-lg;
+  border-radius: var(--sd-radius-lg, $radius-lg);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
   font-family: $font-sans;
   @include specular-top(0.1);
 
@@ -45,6 +44,8 @@
     padding: 18px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     background-color: rgba(18, 18, 28, 0.8);
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
   }
 
   &__title {
@@ -72,6 +73,11 @@
       color: #ffffff;
       background-color: rgba(255, 255, 255, 0.08);
     }
+
+    &:focus-visible {
+      outline: 2px solid var(--sd-focus-ring, #c084fc);
+      outline-offset: 2px;
+    }
   }
 
   &__body {
@@ -79,6 +85,10 @@
     max-height: calc(85vh - 120px);
     overflow-y: auto;
     color: $zinc-200;
+
+    &:has(.sd-select-container--open, .sd-dropdown-container--open) {
+      overflow: visible;
+    }
   }
 }
 }

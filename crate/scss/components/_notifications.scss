@@ -8,24 +8,37 @@
 @layer sd-components {
 .sd-notification-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 12px;
+  right: 12px;
   z-index: z('notification');
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: min(380px, calc(100vw - 24px));
   max-width: 380px;
-  width: 100%;
   pointer-events: none;
+
+  @media (min-width: 640px) {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+.sd-notification-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
 
 .sd-toast {
   pointer-events: auto;
   position: relative;
-  padding: 14px 16px;
+  overflow: hidden;
+  padding: 14px 16px 14px 19px;
   background-color: #0e0e14;
   border: $border-hairline;
-  border-radius: $radius-md;
+  border-radius: var(--sd-radius-md, $radius-md);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: flex-start;
@@ -34,20 +47,33 @@
   transition: all $duration-normal ease;
   @include specular-top(0.1);
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--sd-toast-accent, currentColor);
+    box-shadow: 0 0 12px var(--sd-toast-glow, transparent);
+  }
+
   &--info {
-    border-left: 4px solid $color-info;
+    --sd-toast-accent: #{$color-info};
+    --sd-toast-glow: rgba(168, 85, 247, 0.4);
   }
 
   &--success {
-    border-left: 4px solid $color-success;
+    --sd-toast-accent: #{$color-success};
+    --sd-toast-glow: rgba(16, 185, 129, 0.4);
   }
 
   &--warning {
-    border-left: 4px solid $color-warning;
+    --sd-toast-accent: #{$color-warning};
+    --sd-toast-glow: rgba(245, 158, 11, 0.4);
   }
 
   &--danger {
-    border-left: 4px solid $color-danger;
+    --sd-toast-accent: #{$color-danger};
+    --sd-toast-glow: rgba(244, 63, 94, 0.4);
   }
 
   &--glow-info {

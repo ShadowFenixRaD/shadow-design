@@ -1,20 +1,64 @@
 use crate::icon::{Icon, IconKind};
+use crate::locale::use_locale;
 use dioxus::prelude::*;
 
+/// Modal dialog component that renders in an overlay with APG Dialog pattern accessibility.
 #[component]
 pub fn Modal(
+    /// Controls whether the modal dialog is currently visible.
     is_open: Signal<bool>,
-    #[props(default)] title: Option<String>,
-    #[props(default)] glow: Option<bool>,
-    #[props(default)] class: String,
+    /// Optional unique identifier for the modal.
+    #[props(default)]
+    id: Option<String>,
+    /// Header title for the modal dialog.
+    #[props(default)]
+    title: Option<String>,
+    /// Accessible label when no visible title is provided.
+    #[props(default)]
+    aria_label: Option<String>,
+    /// Whether pressing the Escape key dismisses the modal. Defaults to true.
+    #[props(default = true)]
+    close_on_escape: bool,
+    /// Whether clicking the backdrop dismisses the modal. Defaults to true.
+    #[props(default = true)]
+    close_on_backdrop: bool,
+    /// Accessible label for the close button.
+    #[props(default)]
+    close_label: Option<String>,
+    /// Perimetric optical glow coordinated with the active theme.
+    #[props(default)]
+    glow: Option<bool>,
+    /// Additional CSS or SCSS classes.
+    #[props(default)]
+    class: String,
+    /// Dialog contents.
     children: Element,
 ) -> Element {
-    if !*is_open.read() {
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+
+    let open = *is_open.read();
+    let locale = use_locale();
+    let modal_id = crate::a11y::use_unique_id("sd-modal", id);
+    let title_id = format!("{modal_id}-title");
+
+    use_effect(move || {
+        let is_currently_open = *is_open.read();
+        if is_currently_open {
+            let _ = document::eval("document.body.style.overflow = 'hidden'");
+        } else {
+            let _ = document::eval("document.body.style.overflow = ''");
+        }
+    });
+
+    use_drop(move || {
+        let _ = document::eval("document.body.style.overflow = ''");
+    });
+
+    if !open {
         return rsx! {};
     }
 
-    #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("modal").unwrap_or("");
     #[cfg(feature = "theme")]
@@ -38,18 +82,52 @@ pub fn Modal(
     #[cfg(not(feature = "animation"))]
     let anim_class = "animate-modal-enter";
 
+    let close_btn_label = close_label.unwrap_or_else(|| locale.close.clone());
+
     rsx! {
         div {
             class: "sd-modal-backdrop",
-            onclick: move |_| *is_open.write() = false,
+            tabindex: "-1",
+            onclick: move |_| {
+                if close_on_backdrop {
+                    *is_open.write() = false;
+                }
+            },
+            onkeydown: move |e: KeyboardEvent| {
+                if close_on_escape && e.key() == Key::Escape {
+                    e.stop_propagation();
+                    *is_open.write() = false;
+                }
+            },
             div {
+                role: "dialog",
+                id: "{modal_id}",
+                tabindex: "-1",
+                "aria-modal": "true",
+                "aria-labelledby": if title.is_some() { Some(title_id.as_str()) } else { None },
+                "aria-label": if title.is_none() { aria_label.as_deref() } else { None },
                 class: "sd-modal-dialog {base_override} {glow_class} {anim_class} {class_modifiers} {class}",
+                onmounted: move |m| {
+                    let data = m.data();
+                    spawn(async move {
+                        let _ = data.set_focus(true).await;
+                    });
+                },
                 onclick: move |e| e.stop_propagation(),
                 div {
                     class: "sd-modal-dialog__header",
-                    h3 { class: "sd-modal-dialog__title", "{title.as_deref().unwrap_or_default()}" }
+                    if let Some(t) = &title {
+                        h3 {
+                            id: "{title_id}",
+                            class: "sd-modal-dialog__title",
+                            "{t}"
+                        }
+                    }
                     button {
+                        r#type: "button",
                         class: "sd-modal-dialog__close",
+                        "aria-label": "{close_btn_label}",
+                        title: "{close_btn_label}",
                         onclick: move |_| *is_open.write() = false,
                         Icon { kind: IconKind::X, size: 16 }
                     }

@@ -10,10 +10,16 @@
   position: relative;
   display: inline-flex;
 
-  &:hover .sd-tooltip__bubble {
+  &:hover .sd-tooltip__bubble,
+  &:focus-within .sd-tooltip__bubble,
+  &--visible .sd-tooltip__bubble {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0);
+  }
+
+  &--dismissed .sd-tooltip__bubble {
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   &__bubble {
@@ -26,7 +32,7 @@
     color: $zinc-200;
     background-color: #0e0e14;
     border: $border-hairline;
-    border-radius: $radius-sm;
+    border-radius: var(--sd-radius-sm, $radius-sm);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
     white-space: nowrap;
     opacity: 0;
@@ -68,19 +74,27 @@
     }
   }
 
-  &:hover .sd-tooltip__bubble--top {
+  &:hover .sd-tooltip__bubble--top,
+  &:focus-within .sd-tooltip__bubble--top,
+  &--visible .sd-tooltip__bubble--top {
     transform: translateX(-50%) translateY(0);
   }
 
-  &:hover .sd-tooltip__bubble--bottom {
+  &:hover .sd-tooltip__bubble--bottom,
+  &:focus-within .sd-tooltip__bubble--bottom,
+  &--visible .sd-tooltip__bubble--bottom {
     transform: translateX(-50%) translateY(0);
   }
 
-  &:hover .sd-tooltip__bubble--left {
+  &:hover .sd-tooltip__bubble--left,
+  &:focus-within .sd-tooltip__bubble--left,
+  &--visible .sd-tooltip__bubble--left {
     transform: translateY(-50%) translateX(0);
   }
 
-  &:hover .sd-tooltip__bubble--right {
+  &:hover .sd-tooltip__bubble--right,
+  &:focus-within .sd-tooltip__bubble--right,
+  &--visible .sd-tooltip__bubble--right {
     transform: translateY(-50%) translateX(0);
   }
 }
