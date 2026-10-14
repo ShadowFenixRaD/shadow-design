@@ -7,7 +7,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 pub fn ChatPage() -> Element {
     let mut direction = use_signal(|| BubbleDirection::Outgoing);
     let mut status = use_signal(|| DeliveryStatus::Delivered);
-    let mut with_pq_badge = use_signal(|| true);
+    let with_pq_badge = use_signal(|| true);
     let sender_name = use_signal(|| "TheMind Peer #104".to_string());
     let mut message_text = use_signal(|| "Tunnel P2P cifrato stabilito con Kyber-1024 + Dilithium. Latenza stimata 18ms.".to_string());
 
@@ -142,13 +142,9 @@ pub fn ChatPage() -> Element {
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_pq_badge}",
-                                        onchange: move |e| with_pq_badge.set(e.checked()),
-                                    }
-                                    "Mostra Badge Cifratura Post-Quantum (PQ)"
+                                Checkbox {
+                                    checked: with_pq_badge,
+                                    label: Some("Mostra Badge Cifratura Post-Quantum (PQ)".to_string()),
                                 }
                                 div { class: "space-y-1",
                                     span { class: "text-zinc-400 block text-[10px]", "Testo del Messaggio:" }

@@ -8,8 +8,8 @@ pub fn SegmentedControlsPage() -> Element {
     let storage_val = use_signal(|| "sqlite".to_string());
     let crypto_val = use_signal(|| "pq".to_string());
     let mut selected_size = use_signal(|| SegmentedControlSize::Md);
-    let mut is_full_width = use_signal(|| false);
-    let mut is_disabled = use_signal(|| false);
+    let is_full_width = use_signal(|| false);
+    let is_disabled = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -82,8 +82,8 @@ SegmentedControl {
                 preview: rsx! {
                     div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
                         // Live Preview
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 min-h-[200px] shadow-inner",
-                            div { class: "w-full flex flex-col items-center gap-2",
+                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 min-h-[200px] shadow-inner max-w-full overflow-hidden",
+                            div { class: "w-full max-w-full flex flex-col items-center gap-2 overflow-x-auto py-1",
                                 span { class: "text-[11px] font-mono text-zinc-400", "Modalità Storage: [{storage_val}]" }
                                 SegmentedControl {
                                     options: storage_options,
@@ -94,7 +94,7 @@ SegmentedControl {
                                 }
                             }
 
-                            div { class: "w-full flex flex-col items-center gap-2 pt-2 border-t border-white/[0.06]",
+                            div { class: "w-full max-w-full flex flex-col items-center gap-2 pt-2 border-t border-white/[0.06] overflow-x-auto py-1",
                                 span { class: "text-[11px] font-mono text-zinc-400", "Suite Crittografica: [{crypto_val}]" }
                                 SegmentedControl {
                                     options: crypto_options,
@@ -131,21 +131,13 @@ SegmentedControl {
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_full_width}",
-                                        onchange: move |e| is_full_width.set(e.checked()),
-                                    }
-                                    "Larghezza Piena (Full Width)"
+                                Checkbox {
+                                    checked: is_full_width,
+                                    label: Some("Larghezza Piena (Full Width)".to_string()),
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_disabled}",
-                                        onchange: move |e| is_disabled.set(e.checked()),
-                                    }
-                                    "Disabilitato (Disabled)"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: Some("Disabilitato (Disabled)".to_string()),
                                 }
                             }
                         }

@@ -170,7 +170,7 @@ pub fn Button(
             },
             if loading {
                 svg {
-                    class: "sd-spinner mr-1.5",
+                    class: "sd-spinner",
                     xmlns: "http://www.w3.org/2000/svg",
                     fill: "none",
                     view_box: "0 0 24 24",
@@ -191,11 +191,11 @@ pub fn Button(
                     }
                 }
                 span { class: "sd-visually-hidden", "{effective_loading_label}" }
-            } else if let Some(licon) = left_icon {
-                span { class: "sd-btn__icon sd-btn__icon--left", {licon} }
-            }
-            span { class: "sd-btn__text", {children} }
-            if !loading {
+            } else {
+                if let Some(licon) = left_icon {
+                    span { class: "sd-btn__icon sd-btn__icon--left", {licon} }
+                }
+                span { class: "sd-btn__text", {children} }
                 if let Some(ricon) = right_icon {
                     span { class: "sd-btn__icon sd-btn__icon--right", {ricon} }
                 }

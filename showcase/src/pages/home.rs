@@ -2,6 +2,37 @@ use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
 use crate::components::CodeBlock;
+const CARGO_FEATURES: &[&str] = &[
+    "button",
+    "card",
+    "input",
+    "select",
+    "textarea",
+    "checkbox",
+    "badge",
+    "navbar",
+    "modal",
+    "alert",
+    "theme",
+    "icon",
+    "typography",
+    "notification",
+    "tabs",
+    "switch",
+    "tooltip",
+    "drawer",
+    "dropdown",
+    "animation",
+    "avatar",
+    "chat",
+    "progress",
+    "attachment_card",
+    "contact_card",
+    "segmented_control",
+    "divider",
+    "tree",
+    "skeleton",
+];
 
 #[component]
 pub fn Home() -> Element {
@@ -10,10 +41,10 @@ pub fn Home() -> Element {
 
     let install_code = r#"[dependencies]
 # Importa solo i moduli desiderati con default-features = false (zero bloat):
-shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
+shadow-design = { version = "0.3.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure include l'intera suite:
-# shadow-design = { version = "0.2.0", features = ["all"] }"#
+# shadow-design = { version = "0.3.0", features = ["all"] }"#
         .to_string();
 
     let rust_example = r#"use dioxus::prelude::*;
@@ -157,8 +188,8 @@ pub fn App() -> Element {
                         "Ogni componente è racchiuso dietro una feature flag Cargo indipendente. Compila esclusivamente il codice che la tua applicazione utilizza."
                     }
                     div { class: "flex flex-wrap gap-1.5",
-                        for name in ["button", "card", "input", "select", "textarea", "checkbox", "badge", "navbar", "modal", "alert", "notification", "tabs", "switch", "tooltip", "drawer", "dropdown", "icon", "typography", "theme", "animation"] {
-                            Badge { key: "{name}", label: "{name}".to_string(), variant: BadgeVariant::Primary }
+                        for feat in CARGO_FEATURES {
+                            Badge { label: (*feat).to_string(), variant: BadgeVariant::Primary }
                         }
                     }
                 }

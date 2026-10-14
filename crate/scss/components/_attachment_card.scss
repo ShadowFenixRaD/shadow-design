@@ -141,4 +141,12 @@
       }
     }
   }
+
+  .sd-attachment-card-unified {
+    .sd-card__body:empty + .sd-card__progress,
+    .sd-card__progress {
+      padding-top: 16px;
+      margin-top: 4px;
+    }
+  }
 }

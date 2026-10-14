@@ -6,10 +6,10 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 #[component]
 pub fn AttachmentCardsPage() -> Element {
     let mut is_file_mode = use_signal(|| true);
-    let mut with_progress = use_signal(|| true);
+    let with_progress = use_signal(|| true);
     let mut progress_val = use_signal(|| 74.0f32);
-    let mut with_description = use_signal(|| true);
-    let mut with_actions = use_signal(|| true);
+    let with_description = use_signal(|| true);
+    let with_actions = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -135,29 +135,17 @@ pub fn AttachmentCardsPage() -> Element {
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_description}",
-                                        onchange: move |e| with_description.set(e.checked()),
-                                    }
-                                    "Mostra Descrizione Inferiore"
+                                Checkbox {
+                                    checked: with_description,
+                                    label: Some("Mostra Descrizione Inferiore".to_string()),
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_actions}",
-                                        onchange: move |e| with_actions.set(e.checked()),
-                                    }
-                                    "Mostra Bottoni Azione (Scarica / Condividi)"
+                                Checkbox {
+                                    checked: with_actions,
+                                    label: Some("Mostra Bottoni Azione (Scarica / Condividi)".to_string()),
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_progress}",
-                                        onchange: move |e| with_progress.set(e.checked()),
-                                    }
-                                    "Integra ProgressBar di Trasferimento"
+                                Checkbox {
+                                    checked: with_progress,
+                                    label: Some("Integra ProgressBar di Trasferimento".to_string()),
                                 }
                             }
 

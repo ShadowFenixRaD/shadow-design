@@ -41,7 +41,7 @@ impl AnimationVariant {
             AnimationVariant::DrawerSlideLeft => "animate-drawer-slide-left",
             AnimationVariant::DrawerSlideRight => "animate-drawer-slide-right",
             AnimationVariant::PulseGlow => "animate-pulse-glow",
-            AnimationVariant::TactilePress => "tactile-press select-none cursor-pointer",
+            AnimationVariant::TactilePress => "animate-tactile-press tactile-press select-none cursor-pointer",
             AnimationVariant::Spin => "animate-spin",
             AnimationVariant::Indeterminate => "animate-indeterminate",
         }
@@ -58,7 +58,7 @@ pub fn Transition(
     let anim_class = variant.classes();
     rsx! {
         div {
-            class: "{anim_class} {class}",
+            class: "{anim_class} sd-motion-demo {class}",
             {children}
         }
     }

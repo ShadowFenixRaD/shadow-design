@@ -880,7 +880,6 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                             Button {
                                 variant: ButtonVariant::Primary,
                                 loading: true,
-                                "Loading..."
                             }
                         }
                     }

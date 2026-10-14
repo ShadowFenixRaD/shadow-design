@@ -260,6 +260,52 @@
   &--glow-obsidian {
     box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7) !important;
   }
+
+  // Variant-color matched glow overrides
+  &--danger[class*="--glow"],
+  &--danger.sd-btn--glow {
+    box-shadow: 0 0 22px rgba(255, 23, 68, 0.55), 0 4px 18px rgba(76, 5, 25, 0.65) !important;
+  }
+
+  &--success[class*="--glow"],
+  &--success.sd-btn--glow {
+    box-shadow: 0 0 22px rgba(0, 255, 157, 0.55), 0 4px 18px rgba(2, 44, 34, 0.65) !important;
+  }
+
+  &--primary-crimson[class*="--glow"],
+  &--primary-crimson.sd-btn--glow {
+    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6) !important;
+  }
+
+  &--primary-cyan[class*="--glow"],
+  &--primary-cyan.sd-btn--glow {
+    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6) !important;
+  }
+
+  &--primary-emerald[class*="--glow"],
+  &--primary-emerald.sd-btn--glow {
+    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6) !important;
+  }
+
+  &--primary-obsidian[class*="--glow"],
+  &--primary-obsidian.sd-btn--glow {
+    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  &--secondary[class*="--glow"],
+  &--secondary.sd-btn--glow {
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.65) !important;
+  }
+
+  &--outline[class*="--glow"],
+  &--outline.sd-btn--glow {
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  &--ghost[class*="--glow"],
+  &--ghost.sd-btn--glow {
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.15) !important;
+  }
 }
 
 // Accessible Button Loading Spinner (DS-23)

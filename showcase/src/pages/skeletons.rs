@@ -7,7 +7,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 pub fn SkeletonsPage() -> Element {
     let mut selected_shape = use_signal(|| SkeletonShape::Text);
     let mut text_count = use_signal(|| 3usize);
-    let mut is_animated = use_signal(|| true);
+    let is_animated = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -131,13 +131,9 @@ div { class: "flex items-center gap-4",
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{is_animated}",
-                                        onchange: move |e| is_animated.set(e.checked()),
-                                    }
-                                    "Attiva Shimmer Wave Animato"
+                                Checkbox {
+                                    checked: is_animated,
+                                    label: Some("Attiva Shimmer Wave Animato".to_string()),
                                 }
                             }
                         }

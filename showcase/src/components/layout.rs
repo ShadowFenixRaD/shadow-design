@@ -7,7 +7,7 @@ use crate::{Route, HEADER_SVG};
 #[component]
 pub fn Layout() -> Element {
     let mut theme = use_theme();
-    let mut is_drawer_open = use_signal(|| false);
+    let mut is_sidebar_collapsed = use_signal(|| false);
     let mut is_search_open = use_signal(|| false);
 
     let primary = theme().primary_color;
@@ -42,105 +42,6 @@ pub fn Layout() -> Element {
 
     let seg_inactive_class = "bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] transition-colors";
 
-    let sidebar_content = rsx! {
-        div { class: "flex flex-col gap-6",
-            div {
-                p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                    Icon { kind: IconKind::Terminal, size: 12 }
-                    "Generale"
-                }
-                div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica" }
-                    SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder" }
-                    SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography" }
-                }
-            }
-
-            div {
-                p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                    Icon { kind: IconKind::Box, size: 12 }
-                    "Componenti Core"
-                }
-                div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button" }
-                    SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card" }
-                    SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput" }
-                    SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select" }
-                    SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea" }
-                    SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox" }
-                    SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge" }
-                    SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert" }
-                    SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal" }
-                    SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar" }
-                }
-            }
-
-            div {
-                p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                    Icon { kind: IconKind::Sparkles, size: 12 }
-                    "Interattività & Avanzati"
-                }
-                div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications" }
-                    SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs" }
-                    SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch" }
-                    SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip" }
-                    SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer" }
-                    SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown" }
-                    SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons" }
-                    SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation" }
-                }
-            }
-
-            div {
-                p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                    Icon { kind: IconKind::MessageSquare, size: 12 }
-                    "Chat & Mesh P2P"
-                }
-                div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar" }
-                    SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble" }
-                    SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard" }
-                    SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress" }
-                    SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl" }
-                    SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider" }
-                    SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)" }
-                    SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton" }
-                }
-            }
-
-            // Telemetria Tema Attivo
-            div { class: "{theme().surface} rounded-xl p-3.5 text-xs text-zinc-400 mt-auto",
-                div { class: "flex items-center justify-between mb-2 pb-2 border-b border-white/[0.06] gap-2",
-                    div { class: "flex items-center gap-1.5 font-semibold text-zinc-200 shrink-0",
-                        Icon { kind: IconKind::Palette, size: 14 }
-                        span { "Mantine Engine" }
-                    }
-                    Link {
-                        to: Route::ThemeBuilderPage {},
-                        class: "text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-200 border border-white/[0.1] transition-colors cursor-pointer truncate max-w-[100px]",
-                        title: "Apri Theme Builder",
-                        "{theme().name}"
-                    }
-                }
-                div { class: "space-y-1 font-mono text-[10px] text-zinc-500",
-                    div { class: "flex justify-between",
-                        span { "Primary:" }
-                        span { class: "text-zinc-300 font-semibold", "{primary.name()}" }
-                    }
-                    div { class: "flex justify-between",
-                        span { "Radius:" }
-                        span { class: "text-zinc-300 font-semibold", "{radius.name()}" }
-                    }
-                    div { class: "flex justify-between",
-                        span { "Glow:" }
-                        span { class: "text-zinc-300 font-semibold", "{glow:?}" }
-                    }
-                }
-            }
-        }
-    };
-
     rsx! {
         div { class: "{theme().root}",
             // Hidden button for global Ctrl+K trigger
@@ -152,27 +53,15 @@ pub fn Layout() -> Element {
 
             SearchPalette { is_open: is_search_open }
 
-            // Mobile Drawer Sidebar (VQA-01)
-            Drawer {
-                is_open: is_drawer_open,
-                position: DrawerPosition::Left,
-                size: DrawerSize::Sm,
-                title: Some("Navigazione".to_string()),
-                div { class: "p-4 overflow-y-auto max-h-[calc(100vh-80px)]",
-                    {sidebar_content.clone()}
-                }
-            }
-
             // Header Superiore con Mantine-Style Theme Toolbar
             header { class: "{theme().header} sticky top-0 z-30 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4",
-                // Brand e Mobile Toggle
+                // Brand e Sidebar Toggle
                 div { class: "flex items-center gap-3",
-                    // Mobile Hamburger (VQA-01)
                     Button {
                         variant: ButtonVariant::Ghost,
                         size: ButtonSize::Sm,
-                        class: "lg:hidden p-1.5 text-zinc-300 hover:text-white",
-                        onclick: move |_| is_drawer_open.set(true),
+                        class: "p-1.5 text-zinc-300 hover:text-white",
+                        onclick: move |_| is_sidebar_collapsed.toggle(),
                         Icon { kind: IconKind::Menu, size: 18 }
                     }
 
@@ -310,16 +199,180 @@ pub fn Layout() -> Element {
                 }
             }
 
-            // Layout Principale con Sidebar e Contenuto (VQA-01)
+            // Layout Principale con Sidebar e Contenuto (Inline a sinistra, non overlay)
             div { class: "flex-1 flex max-w-7xl w-full mx-auto min-w-0",
-                // Sidebar Desktop (>=1024px)
-                aside { class: "{theme().sidebar} hidden lg:flex w-64 p-5 flex-col gap-6 shrink-0 sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto",
-                    {sidebar_content}
+                // Sidebar Desktop/Mobile a sinistra (non overlay, comprimibile)
+                aside {
+                    class: format!(
+                        "{} flex flex-col gap-6 shrink-0 sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto transition-all duration-200 {}",
+                        theme().sidebar,
+                        if is_sidebar_collapsed() { "w-16 p-2 items-center" } else { "w-64 p-5" }
+                    ),
+                    SidebarView {
+                        collapsed: is_sidebar_collapsed(),
+                        on_toggle: move |_| is_sidebar_collapsed.toggle(),
+                    }
                 }
 
                 // Page Content
                 main { class: "{theme().content} flex-1 min-w-0 p-4 sm:p-8 overflow-y-auto",
                     Outlet::<Route> {}
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
+    let theme = use_theme();
+    let primary = theme().primary_color;
+    let radius = theme().radius_scale;
+    let glow = theme().glow_mode;
+
+    rsx! {
+        div { class: "flex flex-col gap-5 w-full h-full",
+            // Barra superiore sidebar con bottone comprimi/espandi
+            div {
+                class: format!("flex items-center pb-2 border-b border-white/[0.06] {}", if collapsed { "justify-center" } else { "justify-between" }),
+                if !collapsed {
+                    span { class: "text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider", "Navigazione" }
+                }
+                button {
+                    r#type: "button",
+                    class: "p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer",
+                    onclick: move |_| on_toggle.call(()),
+                    title: if collapsed { "Espandi barra laterale" } else { "Comprimi barra laterale" },
+                    Icon {
+                        kind: if collapsed { IconKind::ChevronRight } else { IconKind::ChevronLeft },
+                        size: 15,
+                    }
+                }
+            }
+
+            // Sezione 1: Generale
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Terminal, size: 12 }
+                        "Generale"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica", collapsed }
+                    SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder", collapsed }
+                    SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography", collapsed }
+                }
+            }
+
+            // Sezione 2: Componenti Core
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Box, size: 12 }
+                        "Componenti Core"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
+                    SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
+                    SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
+                    SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select", collapsed }
+                    SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
+                    SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox", collapsed }
+                    SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge", collapsed }
+                    SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert", collapsed }
+                    SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
+                    SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
+                }
+            }
+
+            // Sezione 3: Interattività & Avanzati
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Sparkles, size: 12 }
+                        "Interattività & Avanzati"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
+                    SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
+                    SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
+                    SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
+                    SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer", collapsed }
+                    SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
+                    SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
+                    SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
+                }
+            }
+
+            // Sezione 4: Chat & Mesh P2P
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::MessageSquare, size: 12 }
+                        "Chat & Mesh P2P"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar", collapsed }
+                    SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble", collapsed }
+                    SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard", collapsed }
+                    SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress", collapsed }
+                    SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl", collapsed }
+                    SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }
+                    SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)", collapsed }
+                    SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton", collapsed }
+                }
+            }
+
+            // Telemetria Tema Attivo
+            if collapsed {
+                div { class: "mt-auto p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center",
+                    Link {
+                        to: Route::ThemeBuilderPage {},
+                        class: "text-zinc-400 hover:text-white transition-colors cursor-pointer p-1",
+                        title: "Tema attivo: {theme().name} ({primary.name()})",
+                        Icon { kind: IconKind::Palette, size: 16 }
+                    }
+                }
+            } else {
+                div { class: "{theme().surface} rounded-xl p-3.5 text-xs text-zinc-400 mt-auto",
+                    div { class: "flex items-center justify-between mb-2 pb-2 border-b border-white/[0.06] gap-2",
+                        div { class: "flex items-center gap-1.5 font-semibold text-zinc-200 shrink-0",
+                            Icon { kind: IconKind::Palette, size: 14 }
+                            span { "Mantine Engine" }
+                        }
+                        Link {
+                            to: Route::ThemeBuilderPage {},
+                            class: "text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-200 border border-white/[0.1] transition-colors cursor-pointer truncate max-w-[100px]",
+                            title: "Apri Theme Builder",
+                            "{theme().name}"
+                        }
+                    }
+                    div { class: "space-y-1 font-mono text-[10px] text-zinc-500",
+                        div { class: "flex justify-between",
+                            span { "Primary:" }
+                            span { class: "text-zinc-300 font-semibold", "{primary.name()}" }
+                        }
+                        div { class: "flex justify-between",
+                            span { "Radius:" }
+                            span { class: "text-zinc-300 font-semibold", "{radius.name()}" }
+                        }
+                        div { class: "flex justify-between",
+                            span { "Glow:" }
+                            span { class: "text-zinc-300 font-semibold", "{glow:?}" }
+                        }
+                    }
                 }
             }
         }
@@ -352,15 +405,24 @@ fn ColorSwatchButton(
 }
 
 #[component]
-pub fn SidebarLink(to: Route, icon: IconKind, label: &'static str) -> Element {
+pub fn SidebarLink(
+    to: Route,
+    icon: IconKind,
+    label: &'static str,
+    #[props(default = false)] collapsed: bool,
+) -> Element {
     let theme = use_theme();
+    let collapsed_class = if collapsed { "justify-center px-0 py-2 w-full" } else { "px-3 py-2" };
     rsx! {
         Link {
             to,
-            class: "{theme().sidebar_link}",
+            class: "{theme().sidebar_link} {collapsed_class}",
             active_class: "{theme().sidebar_link_active}",
-            Icon { kind: icon, size: 15 }
-            span { "{label}" }
+            title: "{label}",
+            Icon { kind: icon, size: 16 }
+            if !collapsed {
+                span { class: "truncate text-xs", "{label}" }
+            }
         }
     }
 }

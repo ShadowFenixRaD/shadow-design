@@ -165,17 +165,24 @@
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 16px rgba(168, 85, 247, 0.25); } 50% { box-shadow: 0 0 34px rgba(168, 85, 247, 0.60); } }
 
+@keyframes sd-tactile-press {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.93); }
+  100% { transform: scale(1); }
+}
+
 // --- Classi Utility di Animazione racchiuse in @layer sd-utilities (DS-24) ---
 @layer sd-utilities {
-  .animate-fade-in         { animation: sd-fade-in $duration-normal $ease-tactile forwards; }
-  .animate-fade-out        { animation: sd-fade-out $duration-fast ease-in forwards; }
-  .animate-slide-in-right  { animation: sd-slide-in-right $duration-normal $ease-tactile forwards; }
-  .animate-slide-in-left   { animation: sd-slide-in-left $duration-normal $ease-tactile forwards; }
-  .animate-slide-in-bottom { animation: sd-slide-in-bottom $duration-normal $ease-tactile forwards; }
-  .animate-slide-in-top    { animation: sd-slide-in-top $duration-normal $ease-tactile forwards; }
-  .animate-scale-in        { animation: sd-scale-in $duration-normal $ease-tactile forwards; }
-  .animate-pulse-glow      { animation: sd-pulse-glow 2.8s ease-in-out infinite; }
+  .animate-fade-in         { animation: sd-fade-in 350ms $ease-tactile forwards; }
+  .animate-fade-out        { animation: sd-fade-out 250ms ease-in forwards; }
+  .animate-slide-in-right  { animation: sd-slide-in-right 400ms $ease-tactile forwards; }
+  .animate-slide-in-left   { animation: sd-slide-in-left 400ms $ease-tactile forwards; }
+  .animate-slide-in-bottom { animation: sd-slide-in-bottom 400ms $ease-tactile forwards; }
+  .animate-slide-in-top    { animation: sd-slide-in-top 400ms $ease-tactile forwards; }
+  .animate-scale-in        { animation: sd-scale-in 350ms $ease-tactile forwards; }
+  .animate-pulse-glow      { animation: sd-pulse-glow 2.4s ease-in-out infinite; }
   .animate-spin            { animation: sd-spin 0.8s linear infinite; transform-origin: center; }
+  .animate-tactile-press   { animation: sd-tactile-press 400ms $ease-tactile forwards; }
 
   // Component Dedicated Animations
   .animate-toast-enter     { animation: sd-toast-enter $duration-normal $ease-tactile forwards; }
@@ -183,9 +190,9 @@
   .animate-modal-enter     { animation: sd-modal-enter $duration-normal $ease-tactile forwards; }
   .animate-dropdown-enter  { animation: sd-dropdown-enter 180ms $ease-tactile forwards; }
   .animate-drawer-left,
-  .animate-drawer-slide-left  { animation: sd-drawer-slide-left $duration-normal $ease-tactile forwards; }
+  .animate-drawer-slide-left  { animation: sd-drawer-slide-left 350ms $ease-tactile forwards; }
   .animate-drawer-right,
-  .animate-drawer-slide-right { animation: sd-drawer-slide-right $duration-normal $ease-tactile forwards; }
+  .animate-drawer-slide-right { animation: sd-drawer-slide-right 350ms $ease-tactile forwards; }
   .animate-indeterminate   { animation: sd-indeterminate-slide 1.5s ease-in-out infinite; }
 
   // Micro-transizioni tattili
@@ -198,38 +205,39 @@
     }
   }
 
-  // Supporto Prefers-Reduced-Motion (A11Y-15)
+  // Supporto Prefers-Reduced-Motion (A11Y-15) — le demo con .sd-motion-demo rimangono sempre attive
   @media (prefers-reduced-motion: reduce) {
-    .animate-fade-in,
-    .animate-slide-in-right,
-    .animate-slide-in-left,
-    .animate-slide-in-bottom,
-    .animate-slide-in-top,
-    .animate-scale-in,
-    .animate-modal-enter,
-    .animate-toast-enter,
-    .animate-toast-exit,
-    .animate-dropdown-enter,
-    .animate-drawer-left,
-    .animate-drawer-right,
-    .animate-drawer-slide-left,
-    .animate-drawer-slide-right,
-    .sd-tab-panel {
+    .animate-fade-in:not(.sd-motion-demo),
+    .animate-slide-in-right:not(.sd-motion-demo),
+    .animate-slide-in-left:not(.sd-motion-demo),
+    .animate-slide-in-bottom:not(.sd-motion-demo),
+    .animate-slide-in-top:not(.sd-motion-demo),
+    .animate-scale-in:not(.sd-motion-demo),
+    .animate-modal-enter:not(.sd-motion-demo),
+    .animate-toast-enter:not(.sd-motion-demo),
+    .animate-toast-exit:not(.sd-motion-demo),
+    .animate-dropdown-enter:not(.sd-motion-demo),
+    .animate-drawer-left:not(.sd-motion-demo),
+    .animate-drawer-right:not(.sd-motion-demo),
+    .animate-drawer-slide-left:not(.sd-motion-demo),
+    .animate-drawer-slide-right:not(.sd-motion-demo),
+    .animate-tactile-press:not(.sd-motion-demo),
+    .sd-tab-panel:not(.sd-motion-demo) {
       animation-duration: 1ms !important;
       animation-iteration-count: 1 !important;
     }
 
-    .animate-pulse-glow,
-    .sd-badge__dot-ping {
+    .animate-pulse-glow:not(.sd-motion-demo),
+    .sd-badge__dot-ping:not(.sd-motion-demo) {
       animation: none !important;
     }
 
-    .animate-spin {
+    .animate-spin:not(.sd-motion-demo) {
       animation-duration: 1.5s !important;
     }
 
-    .tactile-press:active,
-    .sd-card--interactive:hover {
+    .tactile-press:active:not(.sd-motion-demo),
+    .sd-card--interactive:hover:not(.sd-motion-demo) {
       transform: none !important;
     }
 

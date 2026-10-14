@@ -8,8 +8,8 @@ pub fn ProgressPage() -> Element {
     let mut progress_val = use_signal(|| 68.0f32);
     let mut selected_size = use_signal(|| ProgressSize::Md);
     let mut selected_variant = use_signal(|| ProgressVariant::Primary);
-    let mut is_indeterminate = use_signal(|| false);
-    let mut show_label = use_signal(|| true);
+    let is_indeterminate = use_signal(|| false);
+    let show_label = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -138,22 +138,14 @@ pub fn ProgressPage() -> Element {
                                     }
                                 }
 
-                                div { class: "flex gap-4 pt-1",
-                                    label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{is_indeterminate}",
-                                            onchange: move |e| is_indeterminate.set(e.checked()),
-                                        }
-                                        "Indeterminato (Scan Shimmer)"
+                                div { class: "flex flex-col gap-2 pt-1",
+                                    Checkbox {
+                                        checked: is_indeterminate,
+                                        label: Some("Indeterminato (Scan Shimmer)".to_string()),
                                     }
-                                    label { class: "flex items-center gap-1.5 cursor-pointer text-zinc-300",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: "{show_label}",
-                                            onchange: move |e| show_label.set(e.checked()),
-                                        }
-                                        "Mostra Etichetta %"
+                                    Checkbox {
+                                        checked: show_label,
+                                        label: Some("Mostra Etichetta %".to_string()),
                                     }
                                 }
                             }

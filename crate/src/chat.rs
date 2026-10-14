@@ -19,6 +19,14 @@ impl BubbleDirection {
             BubbleDirection::Outgoing => "sd-chat-bubble--outgoing",
         }
     }
+
+    #[must_use]
+    pub fn container_class(&self) -> &'static str {
+        match self {
+            BubbleDirection::Incoming => "sd-chat-bubble-container--incoming",
+            BubbleDirection::Outgoing => "sd-chat-bubble-container--outgoing",
+        }
+    }
 }
 
 /// Stato di consegna del messaggio con micro-icone di tracciamento.
@@ -76,7 +84,7 @@ pub fn MessageBubble(
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("chat_bubble", &class);
     #[cfg(feature = "theme")]
-    let radius = theme_val.radius_scale.sm();
+    let radius = theme_val.radius_scale.lg();
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -87,7 +95,7 @@ pub fn MessageBubble(
 
     rsx! {
         div {
-            class: "sd-chat-bubble-container {dir_class}",
+            class: "sd-chat-bubble-container {direction.container_class()}",
             div {
                 class: "sd-chat-bubble {dir_class} {radius} {base_override} {class_modifiers} {class}",
 

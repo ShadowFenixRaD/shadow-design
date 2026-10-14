@@ -10,12 +10,15 @@ pub fn AnimationsPage() -> Element {
 
     let variants = [
         AnimationVariant::FadeIn,
+        AnimationVariant::FadeOut,
         AnimationVariant::SlideInRight,
         AnimationVariant::SlideInLeft,
         AnimationVariant::SlideInBottom,
         AnimationVariant::SlideInTop,
         AnimationVariant::ScaleIn,
         AnimationVariant::ModalEnter,
+        AnimationVariant::ToastEnter,
+        AnimationVariant::ToastExit,
         AnimationVariant::DropdownEnter,
         AnimationVariant::DrawerSlideLeft,
         AnimationVariant::DrawerSlideRight,
@@ -89,11 +92,13 @@ pub fn AnimationsPage() -> Element {
             }
 
             // Stage
-            div { class: "flex items-center justify-center p-12 min-h-[220px] rounded-2xl border border-white/[0.06] bg-[#060608] relative overflow-hidden",
-                div { key: "{replay_counter()}",
+            div { class: "flex items-center justify-center p-12 min-h-[240px] rounded-2xl border border-white/[0.06] bg-[#060608] relative overflow-hidden",
+                div {
+                    key: "stage-{replay_counter()}-{selected_variant():?}",
                     Transition {
                         variant: selected_variant(),
-                        div { class: "p-8 rounded-2xl border border-purple-500/40 bg-purple-950/30 text-purple-200 shadow-[0_0_24px_rgba(168,85,247,0.25)] flex flex-col items-center gap-2",
+                        class: "sd-motion-demo cursor-pointer",
+                        div { class: "p-8 rounded-2xl border border-purple-500/40 bg-purple-950/30 text-purple-200 shadow-[0_0_24px_rgba(168,85,247,0.25)] flex flex-col items-center gap-2 select-none",
                             Icon { kind: IconKind::Sparkles, size: 28 }
                             span { class: "font-semibold text-sm", "Animation: {selected_variant():?}" }
                             span { class: "text-xs font-mono text-purple-400/80", "{selected_variant().classes()}" }

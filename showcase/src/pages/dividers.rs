@@ -6,7 +6,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 #[component]
 pub fn DividersPage() -> Element {
     let mut orientation = use_signal(|| Orientation::Horizontal);
-    let mut with_label = use_signal(|| true);
+    let with_label = use_signal(|| true);
     let mut label_text = use_signal(|| "Oggi • Messaggi Crittografati".to_string());
 
     let props = vec![
@@ -94,13 +94,9 @@ pub fn DividersPage() -> Element {
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_label}",
-                                        onchange: move |e| with_label.set(e.checked()),
-                                    }
-                                    "Mostra Etichetta Testuale Centrata"
+                                Checkbox {
+                                    checked: with_label,
+                                    label: Some("Mostra Etichetta Testuale Centrata".to_string()),
                                 }
 
                                 if with_label() {

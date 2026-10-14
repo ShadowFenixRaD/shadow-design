@@ -8,7 +8,7 @@ pub fn AvatarsPage() -> Element {
     let mut selected_size = use_signal(|| AvatarSize::Lg);
     let mut selected_status = use_signal(|| Some(PresenceStatus::DirectP2P));
     let mut user_name = use_signal(|| "Satoshi Nakamoto".to_string());
-    let mut with_image = use_signal(|| false);
+    let with_image = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -131,13 +131,9 @@ pub fn AvatarsPage() -> Element {
                             }
 
                             div { class: "pt-2 border-t border-white/[0.06] space-y-2",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: "{with_image}",
-                                        onchange: move |e| with_image.set(e.checked()),
-                                    }
-                                    "Simula Immagine Foto Reale"
+                                Checkbox {
+                                    checked: with_image,
+                                    label: Some("Simula Immagine Foto Reale".to_string()),
                                 }
                                 div { class: "space-y-1",
                                     span { class: "text-zinc-400 block text-[10px]", "Nome per Iniziali & Gradiente:" }
