@@ -1,6 +1,6 @@
 [package]
 name = "shadow-design"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["ShadowfenixRaD", "Christian Torbidone <killerbossoriginal@gmail.com>"]
 description = "Modular, high-performance UI component library for Dioxus 0.7 applications"
@@ -12,6 +12,7 @@ categories = ["gui", "wasm", "web-programming"]
 include = [
     "src/**/*",
     "scss/**/*",
+    "tests/**/*",
     "README.md",
     "CHANGELOG.md",
     "Cargo.toml",

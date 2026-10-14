@@ -7,17 +7,68 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ## [Unreleased]
 
-### 🚀 Nuove Funzionalità
+---
+
+## [0.3.0] — 2026-10-14
+
+Release maggiore che introduce 11 nuovi componenti UI e feature modulari, una suite completa di selezione (`select`), campi di testo multilinea con autosize (`textarea`), miglioramenti architetturali alla navigazione dello Showcase con sidebar comprimibile inline a sinistra, armonizzazione cromatica dei bagliori ottici (`glow`) per variante di bottone, e una vasta serie di rifiniture all'accessibilità, alla tipografia e al layout.
+
+### 🚀 Nuove Funzionalità & Componenti UI
+
 - **Suite di Selezione Avanzata (`select`)**:
   - `Select`: Menu a discesa a selezione singola con supporto a descrizioni e raggruppamenti.
   - `MultiSelect`: Selezione multipla con badge/tag rimovibili ed eliminazione rapida.
   - `Combobox`: Campo di testo combinato con ricerca live, filtri reattivi e navigazione tastiera.
   - `SelectItem`: Struttura dati builder con `.with_description()`, `.with_group()` e `.disabled()`.
 - **Campi di Testo Multilinea (`textarea`)**:
-  - `Textarea`: Input multilinea con dimensionamento automatico in base alle righe digitate, contatore di caratteri e stati di validazione.
+  - `Textarea`: Input multilinea con dimensionamento automatico in base alle righe digitate, contatore di caratteri reattivo e stati di validazione.
+- **Componente Avatar (`avatar`)**:
+  - Avatar per profili utente e feed P2P con 5 dimensioni (`Xs` - `Xl`), forme rotonde o squadrate, indicatore di presenza/stato e fallback automatico con iniziali.
+- **Componente Chat & MessageBubble (`chat`)**:
+  - Bolle di messaggio asimmetriche (`Incoming` / `Outgoing`) con badge crittografico (es. PQ), timestamp, tracking dello stato di consegna (`DeliveryStatus`) e design card arrotondato a 18px privo di artefatti perimetrali.
+- **Barre di Progresso (`progress`)**:
+  - Indicatori di avanzamento lineari determinati e indeterminati con supporto a percentuali, glow temizzato e varianti di colore.
+- **Schede Allegati (`attachment_card`)**:
+  - Card per file e download/upload con barra di progresso integrata, icone di tipo file e pulsanti di azione rapida.
+- **Schede Contatto (`contact_card`)**:
+  - Card per nodi e profili con avatar integrato, stato di connessione e azioni rapide.
+- **Controllo a Segmenti (`segmented_control`)**:
+  - Selettore a segmenti a scatto tattile con animazione di transizione, supporto `full_width`, icone e gestione responsive.
+- **Divisore Tipografico (`divider`)**:
+  - Separatori orizzontali e verticali con supporto per etichette centrali e bordo singolo pulito.
+- **Visualizzatore ad Albero (`tree`)**:
+  - Struttura gerarchica ad albero con nodi espandibili/collassabili, icone contestuali e gestione selezioni.
+- **Segnaposto Scheletrati (`skeleton`)**:
+  - Placeholder di caricamento per il layout (testo, cerchi per avatar, blocchi card) con animazione shimmer fluida.
 - **Accessibilità & Navigazione Tastiera**:
   - Piena conformità W3C APG per schede orizzontali (`tabs`) con roving tabindex e tasti freccia.
   - Search Palette globale accessibile con scorciatoia rapida `Ctrl+K`.
+
+### 🎨 Design System SCSS & Showcase
+
+- **Navigazione Showcase Inline Comprimibile**:
+  - Sostituito l'overlay drawer con una sidebar nativa inline a sinistra, comprimibile fluidamente da 256px (`w-64`) a 64px (`w-16`) in modalità rail iconica con tooltip informativi su hover e adattamento dinamico del viewport.
+- **Armonizzazione Ottica Glow Bottoni**:
+  - I bagliori ottici dei pulsanti (`--glow`) sono ora strettamente coordinati alla variante cromatica: rosso rubino per `Danger`, verde smeraldo per `Success`, tinta coordinata al preset attivo per `Primary`, e bagliori neutri per varianti secondarie.
+- **Showcase Feature Badges**:
+  - Visualizzazione dinamica delle 29 feature flag Cargo modulari nella home page dello showcase.
+
+### 🐛 Correzioni & Ottimizzazioni
+
+- **MessageBubble Layout**:
+  - Risolto l'artefatto per cui il wrapper esterno a tutta larghezza ereditava bordi e sfondi della bolla; il flex container esterno è ora rigorosamente non stilizzato e l'aspetto card è confinato alla sola bolla.
+- **Pulsanti di Caricamento (Loading States)**:
+  - Rimossa la stringa di testo "Loading...", mantenendo esclusivamente lo spinner SVG animato al centro del pulsante.
+- **Checkbox Visibilità Native**:
+  - Eliminata la visualizzazione concorrente del checkbox blu predefinito del browser tramite la classe `.sd-visually-hidden`.
+- **Divider Verticale**:
+  - Eliminato il raddoppio delle linee verticali tra contenitore ed elemento linea.
+- **SegmentedControl Clipping**:
+  - Risolti i problemi di traboccamento e ritaglio delle etichette/icone nelle card in modalità `full_width`.
+- **AttachmentCard Spacing**:
+  - Aggiunto padding superiore alla barra di avanzamento quando la descrizione inferiore è omessa.
+- **Animazioni Showcase**:
+  - Risolto il mancato avvio delle animazioni nello showcase garantendo l'esecuzione anche in presenza di impostazioni OS `prefers-reduced-motion` per la classe `.sd-motion-demo`.
 
 ---
 

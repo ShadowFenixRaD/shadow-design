@@ -9,10 +9,10 @@ Libreria di componenti UI modulare e ad alte prestazioni per **Dioxus 0.7**, cos
 ```toml
 [dependencies]
 # Importa solo ciò che ti serve con default-features = false (zero bloat):
-shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
+shadow-design = { version = "0.3.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure l'intera suite:
-# shadow-design = { version = "0.2.0", features = ["all"] }
+# shadow-design = { version = "0.3.0", features = ["all"] }
 ```
 
 ---
@@ -64,6 +64,15 @@ fn App() -> Element {
 | `tooltip` | `Tooltip`, `TooltipPosition` | Micro-etichette fluttuanti su hover a 4 direzioni |
 | `drawer` | `Drawer`, `DrawerPosition`, `DrawerSize` | Pannelli laterali a scomparsa da sinistra o destra |
 | `dropdown` | `Dropdown`, `DropdownItem`, `DropdownPlacement` | Menu a tendina ancorati al trigger |
+| `avatar` | `Avatar`, `AvatarSize`, `AvatarShape` | Avatar utente con indicatori di presenza e fallback |
+| `chat` | `MessageBubble`, `BubbleDirection`, `DeliveryStatus` | Bolle messaggio con timestamp, stato e badge |
+| `progress` | `ProgressBar`, `ProgressVariant`, `ProgressSize` | Barre di progresso determinate e indeterminate con glow |
+| `attachment_card` | `AttachmentCard`, `FileKind` | Card allegato con progresso e azioni rapide |
+| `contact_card` | `ContactCard` | Schede contatto con avatar e dettagli di stato |
+| `segmented_control` | `SegmentedControl`, `SegmentedOption` | Selettori a segmenti tattili fluidi |
+| `divider` | `Divider`, `DividerOrientation` | Divisori orizzontali e verticali con etichette opzionali |
+| `tree` | `TreeView`, `TreeNode` | Alberi gerarchici espandibili |
+| `skeleton` | `Skeleton`, `SkeletonShape` | Segnaposto scheletrati con animazione shimmer |
 | `icon` | Native SVG Icons (50 `IconKind`) | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
 | `typography` | `Heading`, `Text`, `Kbd`, `Code` | Componenti tipografici con scala Geist |
 | `animation` | `Transition`, `AnimationVariant` | Transizioni ottiche e micro-animazioni Dioxus |

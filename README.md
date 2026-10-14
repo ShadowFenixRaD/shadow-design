@@ -33,10 +33,10 @@ Aggiungi `shadow-design` nel `Cargo.toml` del tuo sito, specificando `default-fe
 ```toml
 [dependencies]
 # Importa solo ciò che ti serve:
-shadow-design = { version = "0.2.0", default-features = false, features = ["button", "card", "theme", "icon"] }
+shadow-design = { version = "0.3.0", default-features = false, features = ["button", "card", "theme", "icon"] }
 
 # Oppure importa l'intera suite:
-# shadow-design = { version = "0.2.0", features = ["all"] }
+# shadow-design = { version = "0.3.0", features = ["all"] }
 ```
 
 ### 🎨 Integrazione Asset SCSS (`STYLES`)
