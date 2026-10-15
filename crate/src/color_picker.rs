@@ -368,6 +368,8 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                     class: "sd-color-picker__preview",
                     style: "background-color: {current_css_color};",
                     title: "Selected color preview",
+                    role: "img",
+                    aria_label: "Selected color preview",
                 }
                 div { class: "sd-color-picker__code",
                     input {
@@ -376,6 +378,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                         value: "{current_str}",
                         disabled: props.disabled,
                         placeholder: "#000000",
+                        aria_label: "Color code",
                         oninput: move |evt: FormEvent| {
                             let text = evt.value();
                             if let Some(parsed) = parse_hex(&text).or_else(|| parse_rgb(&text)) {
@@ -403,6 +406,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                         step: "1",
                         value: "{hsla.h}",
                         disabled: props.disabled,
+                        aria_label: "Hue slider in degrees",
                         oninput: move |evt: FormEvent| {
                             if let Ok(h) = evt.value().parse::<f32>() {
                                 let mut updated = hsla;
@@ -430,6 +434,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                         step: "1",
                         value: "{hsla.s}",
                         disabled: props.disabled,
+                        aria_label: "Saturation slider in percent",
                         oninput: move |evt: FormEvent| {
                             if let Ok(s) = evt.value().parse::<f32>() {
                                 let mut updated = hsla;
@@ -457,6 +462,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                         step: "1",
                         value: "{hsla.l}",
                         disabled: props.disabled,
+                        aria_label: "Lightness slider in percent",
                         oninput: move |evt: FormEvent| {
                             if let Ok(l) = evt.value().parse::<f32>() {
                                 let mut updated = hsla;
@@ -485,6 +491,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                             step: "0.01",
                             value: "{rgba.a}",
                             disabled: props.disabled,
+                            aria_label: "Alpha opacity slider in percent",
                             oninput: move |evt: FormEvent| {
                                 if let Ok(a) = evt.value().parse::<f32>() {
                                     let mut updated = rgba;
@@ -523,6 +530,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                                     class: "sd-color-picker__swatch {active_class}",
                                     style: "background-color: {sw};",
                                     title: "{sw}",
+                                    aria_label: format!("Preset color {}", sw),
                                     disabled: props.disabled,
                                     onclick: move |_| {
                                         let mut parsed = parse_color(&sw_click);
