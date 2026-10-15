@@ -86,6 +86,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Casella di controllo tattile ad alta precisione.",
     },
     ComponentNavEntry {
+        name: "Slider & RangeSlider",
+        route: Route::SliderPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "slider rangeslider track thumb range value meter",
+        description: "Cursore graduato a trascinamento con tacche e supporto doppio range.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",
