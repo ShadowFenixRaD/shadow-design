@@ -37,6 +37,7 @@
 @use 'components/divider' as *;
 @use 'components/tree' as *;
 @use 'components/skeleton' as *;
+@use 'components/pin_input' as *;
 
 @layer sd-base {
   :root {
