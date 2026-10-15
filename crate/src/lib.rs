@@ -17,7 +17,7 @@
 //!
 //! In your root application component, link [`STYLES`] directly using `document::Link`:
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! # #[cfg(all(feature = "button", feature = "card", feature = "notification"))]
 //! # fn doc_example() {
 //! use dioxus::prelude::*;
@@ -115,6 +115,7 @@
 //! | `divider` | `divider` | Horizontal and vertical translucent separators with label support |
 //! | `tree` | `tree` | Hierarchical tree views with collapsible nodes and connection lines |
 //! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
+//! | `color_picker` | `color_picker` | ColorPicker and ColorInput with HSV/Hex/RGB formats, alpha, and swatches |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -224,6 +225,8 @@ pub mod divider;
 pub mod tree;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "color_picker")]
+pub mod color_picker;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -284,6 +287,8 @@ pub mod prelude {
     pub use crate::tree::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "color_picker")]
+    pub use crate::color_picker::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;

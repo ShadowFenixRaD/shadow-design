@@ -68,6 +68,7 @@ all = [
     "divider",
     "tree",
     "skeleton",
+    "color_picker",
 ]
 serde = ["dep:serde"]
 button = []
@@ -102,6 +103,8 @@ segmented-control = ["segmented_control"]
 divider = []
 tree = ["icon"]
 skeleton = []
+color_picker = ["icon"]
+color-picker = ["color_picker"]
 
 [lints.clippy]
 must_use_candidate = "warn"
