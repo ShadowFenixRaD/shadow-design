@@ -4,6 +4,7 @@ use dioxus::prelude::*;
 use crate::icon::{Icon, IconKind};
 
 /// Utility helper to format and clamp a numeric value according to bounds and precision.
+#[must_use]
 pub fn format_and_clamp_number(
     val: f64,
     min: Option<f64>,
@@ -26,6 +27,7 @@ pub fn format_and_clamp_number(
 }
 
 /// Format a number with given precision string representation.
+#[must_use]
 pub fn format_number_string(val: f64, precision: usize) -> String {
     if precision == 0 {
         format!("{:.0}", val.round())
@@ -114,8 +116,8 @@ pub fn NumberInput(
     let current_val = *value.read();
     let display_str = format_number_string(current_val, precision);
 
-    let can_increment = !disabled && max.map_or(true, |m| current_val + step <= m + 1e-9);
-    let can_decrement = !disabled && min.map_or(true, |m| current_val - step >= m - 1e-9);
+    let can_increment = !disabled && max.is_none_or(|m| current_val + step <= m + 1e-9);
+    let can_decrement = !disabled && min.is_none_or(|m| current_val - step >= m - 1e-9);
 
     let mut do_update = move |new_val: f64| {
         let clamped = format_and_clamp_number(new_val, min, max, precision);
