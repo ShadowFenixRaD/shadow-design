@@ -68,6 +68,7 @@ all = [
     "divider",
     "tree",
     "skeleton",
+    "rating",
 ]
 serde = ["dep:serde"]
 button = []
@@ -102,6 +103,7 @@ segmented-control = ["segmented_control"]
 divider = []
 tree = ["icon"]
 skeleton = []
+rating = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"
