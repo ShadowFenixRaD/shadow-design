@@ -266,3 +266,33 @@ pub fn NumberInput(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_and_clamp_within_bounds() {
+        let val = format_and_clamp_number(5.456, Some(0.0), Some(10.0), 2);
+        assert!((val - 5.46).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_format_and_clamp_under_min() {
+        let val = format_and_clamp_number(-5.0, Some(0.0), Some(10.0), 1);
+        assert!((val - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_format_and_clamp_over_max() {
+        let val = format_and_clamp_number(15.0, Some(0.0), Some(10.0), 0);
+        assert!((val - 10.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_format_number_string_precision() {
+        assert_eq!(format_number_string(42.0, 0), "42");
+        assert_eq!(format_number_string(42.1234, 2), "42.12");
+        assert_eq!(format_number_string(42.5, 1), "42.5");
+    }
+}
