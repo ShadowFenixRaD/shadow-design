@@ -2,6 +2,15 @@ use dioxus::prelude::*;
 
 use crate::icon::{Icon, IconKind};
 
+/// Helper per calcolare il valore clampato e arrotondato in base al conteggio e alle frazioni.
+#[must_use]
+pub fn clamp_rating_value(val: f64, count: usize, fractions: usize) -> f64 {
+    let step = if fractions == 2 { 0.5 } else { 1.0 };
+    let clamped = val.clamp(0.0, count as f64);
+    let steps = (clamped / step).round();
+    steps * step
+}
+
 /// Componente di valutazione `Rating` a stelle o icone vettoriali con supporto per
 /// mezze valutazioni (frazioni 0.5), anteprima hover dinamica e accessibilità da tastiera.
 #[component]
@@ -208,5 +217,25 @@ pub fn Rating(
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clamp_rating_whole_stars() {
+        assert_eq!(clamp_rating_value(3.2, 5, 1), 3.0);
+        assert_eq!(clamp_rating_value(3.7, 5, 1), 4.0);
+        assert_eq!(clamp_rating_value(-1.0, 5, 1), 0.0);
+        assert_eq!(clamp_rating_value(6.0, 5, 1), 5.0);
+    }
+
+    #[test]
+    fn test_clamp_rating_half_stars() {
+        assert_eq!(clamp_rating_value(3.2, 5, 2), 3.0);
+        assert_eq!(clamp_rating_value(3.4, 5, 2), 3.5);
+        assert_eq!(clamp_rating_value(3.8, 5, 2), 4.0);
     }
 }
