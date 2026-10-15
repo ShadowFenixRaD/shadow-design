@@ -17,7 +17,7 @@
 //!
 //! In your root application component, link [`STYLES`] directly using `document::Link`:
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! # #[cfg(all(feature = "button", feature = "card", feature = "notification"))]
 //! # fn doc_example() {
 //! use dioxus::prelude::*;

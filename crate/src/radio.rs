@@ -324,3 +324,19 @@ pub fn RadioCard(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_radio_orientation_classes() {
+        assert_eq!(RadioOrientation::Vertical.scss_class(), "sd-radio-group--vertical");
+        assert_eq!(RadioOrientation::Horizontal.scss_class(), "sd-radio-group--horizontal");
+    }
+
+    #[test]
+    fn test_radio_orientation_default() {
+        assert_eq!(RadioOrientation::default(), RadioOrientation::Vertical);
+    }
+}
