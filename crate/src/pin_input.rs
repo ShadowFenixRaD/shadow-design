@@ -358,3 +358,37 @@ pub fn PinInput(props: PinInputProps) -> Element {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_pin_value_numeric() {
+        assert_eq!(sanitize_pin_value("12a3#4", 4, true), "1234");
+        assert_eq!(sanitize_pin_value("987654321", 6, true), "987654");
+        assert_eq!(sanitize_pin_value("no-digits", 4, true), "");
+        assert_eq!(sanitize_pin_value("4 2", 4, true), "42");
+    }
+
+    #[test]
+    fn test_sanitize_pin_value_alphanumeric() {
+        assert_eq!(sanitize_pin_value("aB-12#c", 5, false), "aB12c");
+        assert_eq!(sanitize_pin_value("HELLO", 4, false), "HELL");
+        assert_eq!(sanitize_pin_value("!@#$%^", 4, false), "");
+    }
+
+    #[test]
+    fn test_pin_input_type_default() {
+        let default_type = PinInputType::default();
+        assert_eq!(default_type, PinInputType::Alphanumeric);
+    }
+
+    #[test]
+    fn test_control_size_class_modifiers() {
+        assert_eq!(ControlSize::Sm.class_modifier(), "--sm");
+        assert_eq!(ControlSize::Md.class_modifier(), "--md");
+        assert_eq!(ControlSize::Lg.class_modifier(), "--lg");
+    }
+}
+
