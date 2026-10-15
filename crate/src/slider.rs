@@ -132,6 +132,10 @@ pub fn Slider(
                     max: "{max}",
                     step: "{step}",
                     value: "{current_val}",
+                    "aria-label": label.as_deref().unwrap_or("Slider"),
+                    "aria-valuemin": "{min}",
+                    "aria-valuemax": "{max}",
+                    "aria-valuenow": "{current_val}",
                     disabled,
                     class: "sd-slider__native",
                     oninput: move |e| {
@@ -291,6 +295,10 @@ pub fn RangeSlider(
                     max: "{max}",
                     step: "{step}",
                     value: "{val_min}",
+                    "aria-label": label.as_deref().map(|l| format!("{l} (Min)")).unwrap_or_else(|| "Minimo".to_string()),
+                    "aria-valuemin": "{min}",
+                    "aria-valuemax": "{val_max}",
+                    "aria-valuenow": "{val_min}",
                     disabled,
                     class: "sd-slider__native sd-slider__native--range",
                     oninput: move |e| {
@@ -306,6 +314,10 @@ pub fn RangeSlider(
                     max: "{max}",
                     step: "{step}",
                     value: "{val_max}",
+                    "aria-label": label.as_deref().map(|l| format!("{l} (Max)")).unwrap_or_else(|| "Massimo".to_string()),
+                    "aria-valuemin": "{val_min}",
+                    "aria-valuemax": "{max}",
+                    "aria-valuenow": "{val_max}",
                     disabled,
                     class: "sd-slider__native sd-slider__native--range",
                     oninput: move |e| {
