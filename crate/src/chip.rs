@@ -229,11 +229,17 @@ pub fn Chip(props: ChipProps) -> Element {
         }
     };
 
+    let role = if let Some(ctx) = group_ctx {
+        if ctx.multiple { "checkbox" } else { "radio" }
+    } else {
+        "checkbox"
+    };
+
     rsx! {
         button {
             r#type: "button",
             class: "{chip_class}",
-            role: "checkbox",
+            role: "{role}",
             aria_checked: if is_checked { "true" } else { "false" },
             aria_disabled: if props.disabled { "true" } else { "false" },
             disabled: props.disabled,
