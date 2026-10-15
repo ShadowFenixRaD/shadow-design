@@ -86,6 +86,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Casella di controllo tattile ad alta precisione.",
     },
     ComponentNavEntry {
+        name: "Radio & RadioGroup",
+        route: Route::RadioPage {},
+        group: "Componenti Core",
+        icon: IconKind::Radio,
+        keywords: "radio radiogroup radiocard choice select single option",
+        description: "Selezione singola esclusiva con Radio, RadioGroup e RadioCard.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",
