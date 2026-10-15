@@ -86,6 +86,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Casella di controllo tattile ad alta precisione.",
     },
     ComponentNavEntry {
+        name: "Chip & ChipGroup",
+        route: Route::ChipPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "chip chipgroup tag filter badge toggle pill",
+        description: "Capsule interattive per filtri, tag e selezioni multiple o singole.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",

@@ -10,7 +10,7 @@ use pages::{
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
     NavbarDemoPage, NotificationsPage, ProgressPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
-    TypographyPage,
+    TypographyPage, ChipPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -75,6 +75,8 @@ pub enum Route {
     IconsPage {},
     #[route("/animations")]
     AnimationsPage {},
+    #[route("/chip")]
+    ChipPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");
