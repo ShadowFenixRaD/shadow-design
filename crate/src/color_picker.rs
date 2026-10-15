@@ -725,3 +725,87 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_hex_3_and_6_digits() {
+        let red_3 = parse_hex("#f00").expect("parsed #f00");
+        assert_eq!(red_3, Rgba { r: 255, g: 0, b: 0, a: 1.0 });
+
+        let violet_6 = parse_hex("#a855f7").expect("parsed #a855f7");
+        assert_eq!(violet_6, Rgba { r: 168, g: 85, b: 247, a: 1.0 });
+
+        let no_hash = parse_hex("00ff00").expect("parsed 00ff00");
+        assert_eq!(no_hash, Rgba { r: 0, g: 255, b: 0, a: 1.0 });
+
+        assert!(parse_hex("invalid").is_none());
+        assert!(parse_hex("#12").is_none());
+    }
+
+    #[test]
+    fn test_parse_hex_with_alpha() {
+        let alpha_4 = parse_hex("#f00f").expect("parsed #f00f");
+        assert_eq!(alpha_4.r, 255);
+        assert_eq!(alpha_4.g, 0);
+        assert_eq!(alpha_4.b, 0);
+        assert!((alpha_4.a - 1.0).abs() < 0.01);
+
+        let alpha_8 = parse_hex("#a855f780").expect("parsed #a855f780");
+        assert_eq!(alpha_8.r, 168);
+        assert_eq!(alpha_8.g, 85);
+        assert_eq!(alpha_8.b, 247);
+        assert!((alpha_8.a - 0.50).abs() < 0.02);
+    }
+
+    #[test]
+    fn test_parse_rgb_and_rgba() {
+        let rgb = parse_rgb("rgb(255, 128, 0)").expect("parsed rgb");
+        assert_eq!(rgb, Rgba { r: 255, g: 128, b: 0, a: 1.0 });
+
+        let rgba = parse_rgb("rgba(10, 20, 30, 0.75)").expect("parsed rgba");
+        assert_eq!(rgba.r, 10);
+        assert_eq!(rgba.g, 20);
+        assert_eq!(rgba.b, 30);
+        assert!((rgba.a - 0.75).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_hsl_rgb_roundtrip() {
+        let colors = [
+            Rgba { r: 255, g: 0, b: 0, a: 1.0 },
+            Rgba { r: 0, g: 255, b: 0, a: 1.0 },
+            Rgba { r: 0, g: 0, b: 255, a: 1.0 },
+            Rgba { r: 168, g: 85, b: 247, a: 0.8 },
+            Rgba { r: 128, g: 128, b: 128, a: 1.0 },
+        ];
+
+        for original in colors {
+            let hsl = rgba_to_hsl(&original);
+            let back = hsl_to_rgba(&hsl);
+            assert_eq!(original.r, back.r);
+            assert_eq!(original.g, back.g);
+            assert_eq!(original.b, back.b);
+            assert!((original.a - back.a).abs() < 0.01);
+        }
+    }
+
+    #[test]
+    fn test_format_color_output() {
+        let color = Rgba { r: 168, g: 85, b: 247, a: 0.5 };
+        assert_eq!(format_color(&color, ColorFormat::Hex, false), "#a855f7");
+        assert_eq!(format_color(&color, ColorFormat::Hex, true), "#a855f780");
+        assert_eq!(format_color(&color, ColorFormat::Rgb, false), "rgb(168, 85, 247)");
+        assert_eq!(format_color(&color, ColorFormat::Rgb, true), "rgba(168, 85, 247, 0.50)");
+    }
+
+    #[test]
+    fn test_default_color_swatches() {
+        let swatches = default_color_swatches();
+        assert!(!swatches.is_empty());
+        assert!(swatches.iter().all(|s| parse_hex(s).is_some()));
+    }
+}
+
