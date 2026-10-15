@@ -320,33 +320,29 @@ pub fn PinInput(props: PinInputProps) -> Element {
                                             }
                                         }
                                     }
-                                    Key::ArrowLeft => {
-                                        if i > 0 {
-                                            let prev_id = format!("{gid_keydown}-cell-{}", i - 1);
-                                            let _ = document::eval(&format!(
-                                                r#"
-                                                const el = document.getElementById("{prev_id}");
-                                                if (el) {{
-                                                    el.focus();
-                                                    el.select();
-                                                }}
-                                                "#
-                                            ));
-                                        }
+                                    Key::ArrowLeft if i > 0 => {
+                                        let prev_id = format!("{gid_keydown}-cell-{}", i - 1);
+                                        let _ = document::eval(&format!(
+                                            r#"
+                                            const el = document.getElementById("{prev_id}");
+                                            if (el) {{
+                                                el.focus();
+                                                el.select();
+                                            }}
+                                            "#
+                                        ));
                                     }
-                                    Key::ArrowRight => {
-                                        if i + 1 < props.length {
-                                            let next_id = format!("{gid_keydown}-cell-{}", i + 1);
-                                            let _ = document::eval(&format!(
-                                                r#"
-                                                const el = document.getElementById("{next_id}");
-                                                if (el) {{
-                                                    el.focus();
-                                                    el.select();
-                                                }}
-                                                "#
-                                            ));
-                                        }
+                                    Key::ArrowRight if i + 1 < props.length => {
+                                        let next_id = format!("{gid_keydown}-cell-{}", i + 1);
+                                        let _ = document::eval(&format!(
+                                            r#"
+                                            const el = document.getElementById("{next_id}");
+                                            if (el) {{
+                                                el.focus();
+                                                el.select();
+                                            }}
+                                            "#
+                                        ));
                                     }
                                     _ => {}
                                 }
