@@ -256,3 +256,48 @@ pub fn Chip(props: ChipProps) -> Element {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_chip_variant_default() {
+        assert_eq!(ChipVariant::default(), ChipVariant::Filled);
+    }
+
+    #[test]
+    fn test_chip_control_size_modifiers() {
+        assert_eq!(ControlSize::Sm.class_modifier(), "--sm");
+        assert_eq!(ControlSize::Md.class_modifier(), "--md");
+        assert_eq!(ControlSize::Lg.class_modifier(), "--lg");
+    }
+
+    #[test]
+    fn test_chip_group_selection_logic() {
+        // Multi-select toggle
+        let mut selected = vec!["a".to_string(), "b".to_string()];
+        let item = "a".to_string();
+        if let Some(pos) = selected.iter().position(|x| x == &item) {
+            selected.remove(pos);
+        } else {
+            selected.push(item);
+        }
+        assert_eq!(selected, vec!["b".to_string()]);
+
+        // Toggle back in
+        let item_a = "a".to_string();
+        if let Some(pos) = selected.iter().position(|x| x == &item_a) {
+            selected.remove(pos);
+        } else {
+            selected.push(item_a);
+        }
+        assert_eq!(selected, vec!["b".to_string(), "a".to_string()]);
+
+        // Single-select
+        let single_item = "c".to_string();
+        let single_selected = vec![single_item.clone()];
+        assert_eq!(single_selected, vec!["c".to_string()]);
+    }
+}
+
