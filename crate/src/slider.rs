@@ -369,3 +369,41 @@ pub fn RangeSlider(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calc_percentage_bounds() {
+        assert_eq!(calc_percentage(0.0, 0.0, 100.0), 0.0);
+        assert_eq!(calc_percentage(50.0, 0.0, 100.0), 50.0);
+        assert_eq!(calc_percentage(100.0, 0.0, 100.0), 100.0);
+        assert_eq!(calc_percentage(-10.0, 0.0, 100.0), 0.0);
+        assert_eq!(calc_percentage(150.0, 0.0, 100.0), 100.0);
+    }
+
+    #[test]
+    fn test_calc_percentage_equal_min_max() {
+        assert_eq!(calc_percentage(50.0, 50.0, 50.0), 0.0);
+    }
+
+    #[test]
+    fn test_snap_to_step() {
+        assert_eq!(snap_to_step(4.2, 0.0, 10.0, 1.0), 4.0);
+        assert_eq!(snap_to_step(4.7, 0.0, 10.0, 1.0), 5.0);
+        assert_eq!(snap_to_step(23.0, 0.0, 100.0, 5.0), 25.0);
+        assert_eq!(snap_to_step(105.0, 0.0, 100.0, 10.0), 100.0);
+    }
+
+    #[test]
+    fn test_slider_marks() {
+        let m1 = SliderMark::new(10.0, "Start");
+        assert_eq!(m1.value, 10.0);
+        assert_eq!(m1.label.as_deref(), Some("Start"));
+
+        let m2 = SliderMark::point(50.0);
+        assert_eq!(m2.value, 50.0);
+        assert_eq!(m2.label, None);
+    }
+}
