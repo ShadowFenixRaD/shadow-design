@@ -119,7 +119,7 @@ pub fn Radio(
     let group_name = name.or_else(|| ctx.and_then(|c| c.name));
 
     let radio_id = crate::a11y::use_unique_id("sd-radio", id);
-    let is_selected = active_signal.map_or(false, |s| *s.read() == value);
+    let is_selected = active_signal.is_some_and(|s| *s.read() == value);
 
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
@@ -217,7 +217,7 @@ pub fn RadioCard(
     let group_name = name.or_else(|| ctx.and_then(|c| c.name));
 
     let card_id = crate::a11y::use_unique_id("sd-radio-card", id);
-    let is_selected = active_signal.map_or(false, |s| *s.read() == value);
+    let is_selected = active_signal.is_some_and(|s| *s.read() == value);
 
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
