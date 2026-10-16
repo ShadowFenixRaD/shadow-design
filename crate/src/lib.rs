@@ -162,22 +162,34 @@ use dioxus::prelude::*;
 pub const STYLES: Asset = asset!("/scss/main.scss");
 
 pub mod a11y;
-pub mod locale;
 pub(crate) mod glow;
+pub mod locale;
 pub(crate) mod util;
 
+#[cfg(feature = "accordion")]
+pub mod accordion;
 #[cfg(feature = "alert")]
 pub mod alert;
 #[cfg(feature = "animation")]
 pub mod animation;
+#[cfg(feature = "attachment_card")]
+pub mod attachment_card;
+#[cfg(feature = "avatar")]
+pub mod avatar;
 #[cfg(feature = "badge")]
 pub mod badge;
 #[cfg(feature = "button")]
 pub mod button;
 #[cfg(feature = "card")]
 pub mod card;
+#[cfg(feature = "chat")]
+pub mod chat;
 #[cfg(feature = "checkbox")]
 pub mod checkbox;
+#[cfg(feature = "contact_card")]
+pub mod contact_card;
+#[cfg(feature = "divider")]
+pub mod divider;
 #[cfg(feature = "drawer")]
 pub mod drawer;
 #[cfg(feature = "dropdown")]
@@ -186,58 +198,61 @@ pub mod dropdown;
 pub mod icon;
 #[cfg(feature = "input")]
 pub mod input;
-#[cfg(feature = "select")]
-pub mod select;
-#[cfg(feature = "textarea")]
-pub mod textarea;
 #[cfg(feature = "modal")]
 pub mod modal;
 #[cfg(feature = "navbar")]
 pub mod navbar;
 #[cfg(feature = "notification")]
 pub mod notification;
+#[cfg(feature = "progress")]
+pub mod progress;
+#[cfg(feature = "segmented_control")]
+pub mod segmented_control;
+#[cfg(feature = "select")]
+pub mod select;
+#[cfg(feature = "skeleton")]
+pub mod skeleton;
 #[cfg(feature = "switch")]
 pub mod switch;
 #[cfg(feature = "tabs")]
 pub mod tabs;
+#[cfg(feature = "textarea")]
+pub mod textarea;
 #[cfg(feature = "theme")]
 pub mod theme;
 #[cfg(feature = "tooltip")]
 pub mod tooltip;
-#[cfg(feature = "typography")]
-pub mod typography;
-#[cfg(feature = "avatar")]
-pub mod avatar;
-#[cfg(feature = "chat")]
-pub mod chat;
-#[cfg(feature = "progress")]
-pub mod progress;
-#[cfg(feature = "attachment_card")]
-pub mod attachment_card;
-#[cfg(feature = "contact_card")]
-pub mod contact_card;
-#[cfg(feature = "segmented_control")]
-pub mod segmented_control;
-#[cfg(feature = "divider")]
-pub mod divider;
 #[cfg(feature = "tree")]
 pub mod tree;
-#[cfg(feature = "skeleton")]
-pub mod skeleton;
+#[cfg(feature = "typography")]
+pub mod typography;
 
 pub mod prelude {
+    pub use crate::a11y::ControlSize;
+    #[cfg(feature = "accordion")]
+    pub use crate::accordion::*;
     #[cfg(feature = "alert")]
     pub use crate::alert::*;
     #[cfg(feature = "animation")]
     pub use crate::animation::*;
+    #[cfg(feature = "attachment_card")]
+    pub use crate::attachment_card::*;
+    #[cfg(feature = "avatar")]
+    pub use crate::avatar::*;
     #[cfg(feature = "badge")]
     pub use crate::badge::*;
     #[cfg(feature = "button")]
     pub use crate::button::*;
     #[cfg(feature = "card")]
     pub use crate::card::*;
+    #[cfg(feature = "chat")]
+    pub use crate::chat::*;
     #[cfg(feature = "checkbox")]
     pub use crate::checkbox::*;
+    #[cfg(feature = "contact_card")]
+    pub use crate::contact_card::*;
+    #[cfg(feature = "divider")]
+    pub use crate::divider::*;
     #[cfg(feature = "drawer")]
     pub use crate::drawer::*;
     #[cfg(feature = "dropdown")]
@@ -246,45 +261,34 @@ pub mod prelude {
     pub use crate::icon::*;
     #[cfg(feature = "input")]
     pub use crate::input::*;
-    #[cfg(feature = "select")]
-    pub use crate::select::*;
-    #[cfg(feature = "textarea")]
-    pub use crate::textarea::*;
+    pub use crate::locale::*;
     #[cfg(feature = "modal")]
     pub use crate::modal::*;
     #[cfg(feature = "navbar")]
     pub use crate::navbar::*;
     #[cfg(feature = "notification")]
     pub use crate::notification::*;
+    #[cfg(feature = "progress")]
+    pub use crate::progress::*;
+    #[cfg(feature = "segmented_control")]
+    pub use crate::segmented_control::*;
+    #[cfg(feature = "select")]
+    pub use crate::select::*;
+    #[cfg(feature = "skeleton")]
+    pub use crate::skeleton::*;
     #[cfg(feature = "switch")]
     pub use crate::switch::*;
     #[cfg(feature = "tabs")]
     pub use crate::tabs::*;
+    #[cfg(feature = "textarea")]
+    pub use crate::textarea::*;
     #[cfg(feature = "theme")]
     pub use crate::theme::*;
     #[cfg(feature = "tooltip")]
     pub use crate::tooltip::*;
-    #[cfg(feature = "typography")]
-    pub use crate::typography::*;
-    #[cfg(feature = "avatar")]
-    pub use crate::avatar::*;
-    #[cfg(feature = "chat")]
-    pub use crate::chat::*;
-    #[cfg(feature = "progress")]
-    pub use crate::progress::*;
-    #[cfg(feature = "attachment_card")]
-    pub use crate::attachment_card::*;
-    #[cfg(feature = "contact_card")]
-    pub use crate::contact_card::*;
-    #[cfg(feature = "segmented_control")]
-    pub use crate::segmented_control::*;
-    #[cfg(feature = "divider")]
-    pub use crate::divider::*;
     #[cfg(feature = "tree")]
     pub use crate::tree::*;
-    #[cfg(feature = "skeleton")]
-    pub use crate::skeleton::*;
-    pub use crate::a11y::ControlSize;
-    pub use crate::locale::*;
+    #[cfg(feature = "typography")]
+    pub use crate::typography::*;
     pub use crate::STYLES;
 }
