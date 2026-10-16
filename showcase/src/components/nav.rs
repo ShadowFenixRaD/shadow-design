@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Accordion",
+        route: Route::AccordionPage {},
+        group: "Interattività & Avanzati",
+        icon: IconKind::ChevronDown,
+        keywords: "accordion collapsible collapse expand panel fold",
+        description: "Pannelli espandibili a fisarmonica con animazioni fluide e chevron.",
+    },
 ];
 
 #[component]
