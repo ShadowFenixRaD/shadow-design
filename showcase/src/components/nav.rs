@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Spoiler",
+        route: Route::SpoilerPage {},
+        group: "Interattività & Avanzati",
+        icon: IconKind::ChevronDown,
+        keywords: "spoiler hide show reveal expand collapse truncate",
+        description: "Contenitore con dissolvenza inferiore e pulsante mostra di più / mostra meno.",
+    },
 ];
 
 #[component]
