@@ -1,0 +1,175 @@
+// ==============================================================================
+// Shadow Design — Accordion & Collapsible Component Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.sd-accordion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  // Variant: Default (clean borders between items)
+  &--default {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    .sd-accordion__item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  // Variant: Contained (enclosed inside a unified rounded panel)
+  &--contained {
+    background-color: var(--color-surface-1, #0a0a0c);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+
+    .sd-accordion__item + .sd-accordion__item {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  // Variant: Separated (independent tactile cards with spacing)
+  &--separated {
+    gap: 8px;
+
+    .sd-accordion__item {
+      background-color: var(--color-surface-1, #0a0a0c);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md, 8px);
+      transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.2s ease;
+
+      &:hover:not(&--disabled) {
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+
+      &--expanded {
+        border-color: rgba(168, 85, 247, 0.45);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+      }
+    }
+  }
+
+  // Accordion Item
+  &__item {
+    width: 100%;
+    position: relative;
+
+    &--disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  // Accordion Control Button
+  &__control {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #e4e4e7;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.18s ease, color 0.18s ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.035);
+      color: #ffffff;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px rgba(168, 85, 247, 0.6);
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__control-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: #a855f7;
+    flex-shrink: 0;
+  }
+
+  &__control-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    color: #71717a;
+    flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+
+    &--expanded {
+      transform: rotate(180deg);
+      color: #e4e4e7;
+    }
+  }
+
+  // Accordion Panel (collapsible area)
+  &__panel {
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease,
+                padding 0.25s ease;
+
+    &--collapsed {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &--expanded {
+      max-height: 1200px;
+      opacity: 1;
+    }
+  }
+
+  &__content {
+    padding: 4px 16px 16px 16px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #a1a1aa;
+  }
+}
+
+// Standalone Collapsible
+.sd-collapsible {
+  width: 100%;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+
+  &--closed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &--open {
+    max-height: 2500px;
+    opacity: 1;
+  }
+
+  &__inner {
+    width: 100%;
+  }
+}
