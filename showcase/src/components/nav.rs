@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Timeline",
+        route: Route::TimelinesPage {},
+        group: "Componenti Core",
+        icon: IconKind::Clock,
+        keywords: "timeline events history steps audit tracking status",
+        description: "Linea guida temporale e cronologia eventi con bullet di stato.",
+    },
 ];
 
 #[component]

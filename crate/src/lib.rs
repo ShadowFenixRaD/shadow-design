@@ -224,6 +224,8 @@ pub mod divider;
 pub mod tree;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "timeline")]
+pub mod timeline;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -284,6 +286,8 @@ pub mod prelude {
     pub use crate::tree::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "timeline")]
+    pub use crate::timeline::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;
