@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "List",
+        route: Route::ListsPage {},
+        group: "Componenti Core",
+        icon: IconKind::Menu,
+        keywords: "list item ordered unordered ol ul marker custom spacing",
+        description: "Elenchi ordinati e non ordinati con icone custom e marcatori.",
+    },
 ];
 
 #[component]
