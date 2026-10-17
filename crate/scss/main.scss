@@ -37,7 +37,7 @@
 @use 'components/divider' as *;
 @use 'components/tree' as *;
 @use 'components/skeleton' as *;
-
+@use 'components/table' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Table",
+        route: Route::TablesPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "table datatable grid cells sorting pagination rows",
+        description: "Tabelle dati semantiche con ordinamento, paginazione e hover.",
+    },
 ];
 
 #[component]
