@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "ScrollArea",
+        route: Route::ScrollAreaPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Layers,
+        keywords: "scroll area scrollbar overflow virtual fade edges",
+        description: "Area con micro-scrollbar Shadow, fade edges e auto-hide.",
+    },
 ];
 
 #[component]
