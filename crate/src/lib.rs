@@ -115,6 +115,7 @@
 //! | `divider` | `divider` | Horizontal and vertical translucent separators with label support |
 //! | `tree` | `tree` | Hierarchical tree views with collapsible nodes and connection lines |
 //! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
+//! | `nav_link` | `nav_link` | Sidebar navigational item with active neon indicator and nested submenus |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -224,6 +225,8 @@ pub mod divider;
 pub mod tree;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "nav_link")]
+pub mod nav_link;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -284,6 +287,8 @@ pub mod prelude {
     pub use crate::tree::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "nav_link")]
+    pub use crate::nav_link::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;
