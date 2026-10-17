@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Stepper",
+        route: Route::StepperPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::CheckCircle,
+        keywords: "stepper step wizard progress multi step workflow",
+        description: "Guida procedurale a passi con orientamento orizzontale e verticale.",
+    },
 ];
 
 #[component]
