@@ -115,6 +115,7 @@
 //! | `divider` | `divider` | Horizontal and vertical translucent separators with label support |
 //! | `tree` | `tree` | Hierarchical tree views with collapsible nodes and connection lines |
 //! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
+//! | `pagination` | `pagination` | Tactile numbered pagination controls with sibling & boundary ranges |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -224,6 +225,8 @@ pub mod divider;
 pub mod tree;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "pagination")]
+pub mod pagination;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -284,6 +287,8 @@ pub mod prelude {
     pub use crate::tree::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "pagination")]
+    pub use crate::pagination::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;
