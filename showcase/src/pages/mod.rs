@@ -27,6 +27,7 @@ pub mod progress;
 pub mod segmented_controls;
 pub mod skeletons;
 pub mod trees;
+pub mod nav_link;
 
 pub use alerts::AlertsPage;
 pub use animation::AnimationsPage;
@@ -57,3 +58,4 @@ pub use progress::ProgressPage;
 pub use segmented_controls::SegmentedControlsPage;
 pub use skeletons::SkeletonsPage;
 pub use trees::TreesPage;
+pub use nav_link::NavLinkPage;
