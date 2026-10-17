@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Breadcrumbs",
+        route: Route::BreadcrumbsPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::ChevronRight,
+        keywords: "breadcrumbs nav path trail wayfinding hierarchy",
+        description: "Navigazione a briciole di pane con ellissi e separatori.",
+    },
 ];
 
 #[component]
