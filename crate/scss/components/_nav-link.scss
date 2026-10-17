@@ -1,0 +1,205 @@
+// ==============================================================================
+// Shadow Design — NavLink & SidebarMenu Component Styles (BEM)
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+    box-sizing: border-box;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.375rem 0.625rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.4);
+      user-select: none;
+
+      &--collapsible {
+        background: none;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
+        border-radius: 4px;
+        transition: color 0.15s ease, background-color 0.15s ease;
+
+        &:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.03);
+        }
+      }
+    }
+
+    &__title {
+      font-weight: 600;
+    }
+
+    &__chevron {
+      display: inline-flex;
+      align-items: center;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &--open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+  }
+
+  .sd-nav-link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+
+    &__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.65);
+      font-family: var(--font-sans, inherit);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      box-sizing: border-box;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+      &--button {
+        outline: none;
+        text-align: left;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.04);
+        color: #ffffff;
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(168, 85, 247, 0.5);
+        outline-offset: 1px;
+      }
+    }
+
+    // Indicatore Neon Attivo a sinistra
+    &__indicator {
+      position: absolute;
+      left: 0;
+      top: 22%;
+      bottom: 22%;
+      width: 3px;
+      border-radius: 0 4px 4px 0;
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    &--active > &__item {
+      background: rgba(168, 85, 247, 0.12);
+      color: #ffffff;
+      font-weight: 600;
+      border-color: rgba(168, 85, 247, 0.25);
+
+      & > .sd-nav-link__indicator {
+        background: #a855f7;
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.4);
+      }
+
+      & > .sd-nav-link__icon {
+        color: #c084fc;
+      }
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: rgba(255, 255, 255, 0.5);
+      transition: color 0.15s ease;
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1 1 auto;
+      text-align: left;
+    }
+
+    &__label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__description {
+      font-size: 0.6875rem;
+      font-family: var(--font-sans, inherit);
+      color: rgba(255, 255, 255, 0.4);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+
+    &__badge {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    &__chevron {
+      margin-left: auto;
+      flex-shrink: 0;
+      color: rgba(255, 255, 255, 0.35);
+      display: inline-flex;
+      align-items: center;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
+
+      &--open {
+        transform: rotate(90deg);
+        color: #ffffff;
+      }
+    }
+
+    // Sottomenu figli indentati con linea connettiva
+    &__children {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      margin-left: 1.25rem;
+      padding-left: 0.5rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 0.125rem;
+      margin-bottom: 0.25rem;
+    }
+
+    &--disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+  }
+}
