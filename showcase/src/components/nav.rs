@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "BottomNavigation",
+        route: Route::BottomNavigationPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Menu,
+        keywords: "bottom navigation bar mobile tab footer safe area",
+        description: "Barra di navigazione inferiore per mobile con safe area e micro-glow.",
+    },
 ];
 
 #[component]

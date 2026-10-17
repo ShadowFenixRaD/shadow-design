@@ -10,7 +10,7 @@ use pages::{
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
     NavbarDemoPage, NotificationsPage, ProgressPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
-    TypographyPage,
+    TypographyPage, BottomNavigationPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -71,6 +71,8 @@ pub enum Route {
     TreesPage {},
     #[route("/skeletons")]
     SkeletonsPage {},
+    #[route("/bottom-navigation")]
+    BottomNavigationPage {},
     #[route("/icons")]
     IconsPage {},
     #[route("/animations")]
