@@ -68,6 +68,7 @@ all = [
     "divider",
     "tree",
     "skeleton",
+    "scroll_area",
 ]
 serde = ["dep:serde"]
 button = []
@@ -102,6 +103,8 @@ segmented-control = ["segmented_control"]
 divider = []
 tree = ["icon"]
 skeleton = []
+scroll_area = []
+scroll-area = ["scroll_area"]
 
 [lints.clippy]
 must_use_candidate = "warn"
