@@ -245,6 +245,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
+    ComponentNavEntry {
+        name: "Pagination",
+        route: Route::PaginationPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Layers,
+        keywords: "pagination pages numbers table navigation pager",
+        description: "Barra di navigazione a pagine numerata con salti ellittici.",
+    },
 ];
 
 #[component]
