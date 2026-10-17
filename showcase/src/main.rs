@@ -6,11 +6,11 @@ mod pages;
 
 use components::Layout;
 use pages::{
-    AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
-    CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
-    NavbarDemoPage, NotificationsPage, ProgressPage, SegmentedControlsPage, SelectPage,
-    SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
-    TypographyPage,
+    AlertsPage, AnimationsPage, AppShellPage, AttachmentCardsPage, AvatarsPage, BadgesPage,
+    ButtonsPage, CardsPage, ChatPage, CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home,
+    IconsPage, InputsPage, ModalsPage, NavbarDemoPage, NotificationsPage, ProgressPage,
+    SegmentedControlsPage, SelectPage, SkeletonsPage, SwitchPage, TabsPage, TextareaPage,
+    ThemeBuilderPage, TooltipPage, TreesPage, TypographyPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -43,6 +43,8 @@ pub enum Route {
     ModalsPage {},
     #[route("/navbar")]
     NavbarDemoPage {},
+    #[route("/app-shell")]
+    AppShellPage {},
     #[route("/notifications")]
     NotificationsPage {},
     #[route("/tabs")]
