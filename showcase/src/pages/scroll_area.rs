@@ -168,7 +168,7 @@ pub fn ScrollAreaPage() -> Element {
                                 }
                             }
 
-                            div { class: "flex flex-col justify-center space-y-3 pt-2 md:pt-0 border-t md:border-t-0 md:border-l border-white/[0.06] md:pl-4",
+                            div { class: "flex flex-col justify-center space-y-3 pt-2 md:pt-0 border-t md:border-l border-white/[0.06] md:pl-4",
                                 Checkbox {
                                     checked: offset_scrollbars,
                                     label: Some("Offset Scrollbars".to_string()),
@@ -181,7 +181,7 @@ pub fn ScrollAreaPage() -> Element {
                         }
 
                         // Preview box
-                        div { class: "p-6 rounded-xl bg-[#030304] border border-white/[0.08] shadow-2xl relative",
+                        div { class: "p-6 rounded-xl bg-zinc-950/90 border border-white/[0.08] shadow-2xl relative",
                             div { class: "text-[11px] font-mono text-zinc-400 mb-3 flex items-center justify-between",
                                 span { "SHADOW VIRTUAL SCROLL CONTAINER • 6px MICRO-TRACK" }
                                 span { class: "text-purple-400/80", "ScrollType: {scroll_type():?}" }
@@ -195,7 +195,7 @@ pub fn ScrollAreaPage() -> Element {
                                     scroll_x: false,
                                     scroll_y: true,
                                     height: Some("260px".to_string()),
-                                    class: "border border-white/[0.06] rounded-lg bg-[#08080a] p-2",
+                                    class: "border border-white/[0.06] rounded-lg bg-zinc-950/80 p-2",
                                     div { class: "space-y-2 p-2",
                                         for i in 1..=20 {
                                             div {
@@ -224,8 +224,10 @@ pub fn ScrollAreaPage() -> Element {
                                     scroll_x: true,
                                     scroll_y: false,
                                     width: Some("100%".to_string()),
-                                    class: "border border-white/[0.06] rounded-lg bg-[#08080a] p-4",
-                                    div { class: "flex gap-4 w-max p-2",
+                                    class: "border border-white/[0.06] rounded-lg bg-zinc-950/80 p-4",
+                                    div {
+                                        class: "flex gap-4 p-2",
+                                        style: "width: max-content;",
                                         for i in 1..=12 {
                                             div {
                                                 key: "{i}",
@@ -252,12 +254,15 @@ pub fn ScrollAreaPage() -> Element {
                                     scroll_y: true,
                                     height: Some("280px".to_string()),
                                     width: Some("100%".to_string()),
-                                    class: "border border-white/[0.06] rounded-lg bg-[#08080a] p-3",
-                                    div { class: "w-[1000px] space-y-3 p-2",
+                                    class: "border border-white/[0.06] rounded-lg bg-zinc-950/80 p-3",
+                                    div {
+                                        class: "space-y-3 p-2",
+                                        style: "width: 1000px;",
                                         for row in 1..=15 {
                                             div {
                                                 key: "{row}",
-                                                class: "grid grid-cols-5 gap-4 p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-xs font-mono items-center",
+                                                class: "grid gap-4 p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-xs font-mono items-center",
+                                                style: "grid-template-columns: repeat(5, minmax(0, 1fr));",
                                                 span { class: "text-purple-400 font-bold", "TX-ROW-#{row:03}" }
                                                 span { class: "text-zinc-300", "0x{row * 4192:x}..{row * 987:x}" }
                                                 span { class: "text-emerald-400", "CONFIRMED ({row} blocks)" }
