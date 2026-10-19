@@ -118,6 +118,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Barra di navigazione superiore responsive con specular highlight.",
     },
     ComponentNavEntry {
+        name: "Accordion & Collapsible",
+        route: Route::AccordionPage {},
+        group: "Componenti Core",
+        icon: IconKind::ChevronDown,
+        keywords: "accordion collapsible fold collapse expand panel",
+        description: "Pannelli espandibili a fisarmonica conformi a WAI-ARIA.",
+    },
+    ComponentNavEntry {
         name: "Notifications",
         route: Route::NotificationsPage {},
         group: "Interattività & Avanzati",
