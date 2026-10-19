@@ -39,11 +39,51 @@
       cursor: not-allowed;
     }
 
-    // Header with color swatch preview and editable hex string
+    // 2D Saturation / Value Gradient Box
+    &__saturation {
+      position: relative;
+      width: 100%;
+      height: 130px;
+      border-radius: var(--sd-radius-sm, $radius-sm);
+      cursor: crosshair;
+      overflow: hidden;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      user-select: none;
+      touch-action: none;
+    }
+
+    &__saturation-white {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, #ffffff, transparent);
+      pointer-events: none;
+    }
+
+    &__saturation-black {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, #000000, transparent);
+      pointer-events: none;
+    }
+
+    &__saturation-thumb {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9), inset 0 0 2px rgba(0, 0, 0, 0.6);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: box-shadow $duration-fast ease;
+    }
+
+    // Header with color swatch preview, editable string and format switch
     &__header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     &__preview {
@@ -79,6 +119,29 @@
       &:focus {
         border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
         box-shadow: 0 0 12px var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
+      }
+    }
+
+    &__format-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--sd-radius-xs, $radius-xs);
+      color: $zinc-300;
+      font-family: $font-mono, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 8px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all $duration-fast ease;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.28);
       }
     }
 
@@ -180,6 +243,61 @@
       &--alpha {
         background: linear-gradient(to right, transparent, #a855f7);
       }
+
+      &--red {
+        background: linear-gradient(to right, #000000 0%, #ef4444 100%);
+      }
+
+      &--green {
+        background: linear-gradient(to right, #000000 0%, #22c55e 100%);
+      }
+
+      &--blue {
+        background: linear-gradient(to right, #000000 0%, #3b82f6 100%);
+      }
+    }
+
+    // Direct numeric channel inputs (RGB mode)
+    &__channels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    &__channel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    &__channel-input {
+      width: 100%;
+      height: 28px;
+      background-color: #08080c;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--sd-radius-xs, 4px);
+      color: $zinc-100;
+      font-family: $font-mono, monospace;
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+      padding: 0 4px;
+      box-sizing: border-box;
+      transition: all $duration-fast ease;
+
+      &:focus {
+        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
+        box-shadow: 0 0 8px var(--sd-accent-glow, rgba(168, 85, 247, 0.3));
+      }
+    }
+
+    &__channel-label {
+      font-size: 10px;
+      color: $zinc-400;
+      font-weight: 600;
+      font-family: $font-mono, monospace;
     }
 
     // Swatches grid
