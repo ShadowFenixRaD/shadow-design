@@ -163,7 +163,7 @@ pub fn ScrollAreaPage() -> Element {
                                             "px-2 py-1 text-left rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
                                         },
                                         onclick: move |_| demo_mode.set(2),
-                                        "Bidirezionale (X + Y)"
+                                        "Bidirezionale (Griglia 2D X+Y)"
                                     }
                                 }
                             }
@@ -252,22 +252,41 @@ pub fn ScrollAreaPage() -> Element {
                                     fade_edges: fade_edges(),
                                     scroll_x: true,
                                     scroll_y: true,
-                                    height: Some("280px".to_string()),
+                                    height: Some("320px".to_string()),
                                     width: Some("100%".to_string()),
                                     class: "border border-white/[0.06] rounded-lg bg-zinc-950/80 p-3",
                                     div {
-                                        class: "space-y-3 p-2",
-                                        style: "width: 1000px;",
-                                        for row in 1..=15 {
-                                            div {
-                                                key: "{row}",
-                                                class: "grid gap-4 p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-xs font-mono items-center",
-                                                style: "grid-template-columns: repeat(5, minmax(0, 1fr));",
-                                                span { class: "text-purple-400 font-bold", "TX-ROW-#{row:03}" }
-                                                span { class: "text-zinc-300", "0x{row * 4192:x}..{row * 987:x}" }
-                                                span { class: "text-emerald-400", "CONFIRMED ({row} blocks)" }
-                                                span { class: "text-zinc-400", "Gas: {row * 21000} Gwei" }
-                                                span { class: "text-zinc-500 text-right", "Timestamp: 1729170{row:03}Z" }
+                                        style: "width: max-content; padding: 8px;",
+                                        div {
+                                            style: "display: grid; grid-template-columns: repeat(8, 160px); gap: 12px;",
+                                            for row in 1..=6 {
+                                                for col in 1..=8 {
+                                                    div {
+                                                        key: "cell-{row}-{col}",
+                                                        class: "p-3 rounded-lg bg-zinc-900/60 border border-white/[0.06] flex flex-col justify-between select-none cursor-default",
+                                                        style: "width: 160px; height: 110px;",
+                                                        div { class: "flex items-center justify-between",
+                                                            span { class: "text-[11px] font-mono text-purple-400 font-bold", "NODE-[{row:02},{col:02}]" }
+                                                            span {
+                                                                class: if (row + col) % 3 == 0 {
+                                                                    "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                                                                } else if (row + col) % 3 == 1 {
+                                                                    "w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                                                                } else {
+                                                                    "w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.6)]"
+                                                                },
+                                                            }
+                                                        }
+                                                        div { class: "space-y-0.5",
+                                                            div { class: "text-[10px] text-zinc-400 font-mono", "Cluster zone #{((row - 1) * 8 + col) % 4 + 1}" }
+                                                            div { class: "text-xs font-semibold text-zinc-200", "Worker-{(row * 17 + col * 23) % 99 + 1:02}" }
+                                                        }
+                                                        div { class: "flex items-center justify-between text-[10px] font-mono pt-1 border-t border-white/[0.04]",
+                                                            span { class: "text-zinc-500", "LOAD" }
+                                                            span { class: "text-zinc-300 font-bold", "{(row * 13 + col * 7) % 75 + 15}%" }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
