@@ -7,6 +7,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 pub fn BottomNavigationPage() -> Element {
     let mut active_tab = use_signal(|| "home".to_string());
     let mut tab_count = use_signal(|| 4usize);
+    let with_safe_area = use_signal(|| true);
     let with_badges = use_signal(|| true);
     let with_border = use_signal(|| true);
     let with_blur = use_signal(|| true);
@@ -126,15 +127,29 @@ pub fn BottomNavigationPage() -> Element {
                                         onclick: move |_| active_tab.set("chat".to_string()),
                                         "Chat"
                                     }
-                                    button {
-                                        r#type: "button",
-                                        class: if active_tab() == "vault" {
-                                            "px-2 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| active_tab.set("vault".to_string()),
-                                        "Vault"
+                                    if tab_count() >= 4 {
+                                        button {
+                                            r#type: "button",
+                                            class: if active_tab() == "vault" {
+                                                "px-2 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
+                                            } else {
+                                                "px-2 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
+                                            },
+                                            onclick: move |_| active_tab.set("vault".to_string()),
+                                            "Vault"
+                                        }
+                                    }
+                                    if tab_count() >= 5 {
+                                        button {
+                                            r#type: "button",
+                                            class: if active_tab() == "setup" {
+                                                "px-2 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
+                                            } else {
+                                                "px-2 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
+                                            },
+                                            onclick: move |_| active_tab.set("setup".to_string()),
+                                            "Setup"
+                                        }
                                     }
                                 }
                             }
@@ -177,8 +192,16 @@ pub fn BottomNavigationPage() -> Element {
 
                             div { class: "flex flex-col justify-center space-y-2 pt-2 md:pt-0 border-t md:border-l border-white/[0.06] md:pl-4",
                                 Checkbox {
+                                    checked: with_safe_area,
+                                    label: Some("Safe Area Inferiore (Home Bar)".to_string()),
+                                }
+                                Checkbox {
                                     checked: with_badges,
                                     label: Some("Mostra Badge Notifiche".to_string()),
+                                }
+                                Checkbox {
+                                    checked: with_border,
+                                    label: Some("Top Specular Hairline".to_string()),
                                 }
                                 Checkbox {
                                     checked: with_blur,
@@ -195,25 +218,27 @@ pub fn BottomNavigationPage() -> Element {
                         div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
                             div { class: "flex justify-center",
                                 div {
-                                    class: "relative bg-black border border-white/10 shadow-2xl overflow-hidden flex flex-col justify-between",
-                                    style: "width: 310px; height: 520px; border-radius: 36px;",
-                                // Top Bar con Dynamic Island
-                                div { class: "relative z-10 pt-3 px-6 flex items-center justify-between text-[11px] font-mono text-zinc-400",
-                                    span { "09:41" }
-                                    div { class: "w-16 h-3.5 bg-zinc-900 rounded-full" }
-                                    div { class: "flex items-center space-x-2",
-                                        Icon { kind: IconKind::Wifi, size: 11 }
-                                        Icon { kind: IconKind::SignalHigh, size: 11 }
+                                    class: "relative bg-black border border-white/10 shadow-2xl overflow-hidden flex flex-col justify-between select-none",
+                                    style: "width: 100%; max-width: 360px; height: 600px; border-radius: 40px; box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 25px 60px -15px rgba(0,0,0,0.9), 0 0 35px rgba(168,85,247,0.12); --sd-safe-area-bottom: 22px;",
+                                    // Top Bar con Dynamic Island
+                                    div { class: "relative z-10 pt-3 px-6 flex items-center justify-between text-[11px] font-mono text-zinc-400",
+                                        span { "09:41" }
+                                        div { class: "w-16 h-3.5 bg-zinc-900 rounded-full" }
+                                        div { class: "flex items-center space-x-2",
+                                            Icon { kind: IconKind::Wifi, size: 11 }
+                                            Icon { kind: IconKind::SignalHigh, size: 11 }
+                                        }
                                     }
-                                }
 
-                                // Contenuto Schermo Centrale Reattivo
-                                div { class: "p-4 space-y-3 flex-1 overflow-y-auto font-mono text-xs",
-                                    div { class: "p-3 rounded-lg bg-white/[0.04] border border-white/[0.06]",
-                                        div { class: "text-[10px] text-purple-400 uppercase tracking-widest", "Nodo Mesh Connesso" }
-                                        div { class: "text-zinc-100 font-bold mt-0.5", "Shadowfenix Node #01" }
-                                        div { class: "text-[11px] text-zinc-500 mt-1", "Latenza: 14ms • P2P Attivo" }
-                                    }
+                                    // Contenuto Schermo Centrale Reattivo
+                                    div {
+                                        class: "p-4 space-y-3 flex-1 overflow-y-auto font-mono text-xs",
+                                        style: "padding-bottom: 7rem;",
+                                        div { class: "p-3 rounded-lg bg-white/[0.04] border border-white/[0.06]",
+                                            div { class: "text-[10px] text-purple-400 uppercase tracking-widest", "Nodo Mesh Connesso" }
+                                            div { class: "text-zinc-100 font-bold mt-0.5", "Shadowfenix Node #01" }
+                                            div { class: "text-[11px] text-zinc-500 mt-1", "Latenza: 14ms • P2P Attivo" }
+                                        }
 
                                         div { class: "p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]",
                                             div { class: "text-[10px] text-zinc-400 uppercase", "Destinazione Selezionata:" }
@@ -228,7 +253,7 @@ pub fn BottomNavigationPage() -> Element {
                                     // Barra di Navigazione Mobile Ancorata
                                     BottomNavigation {
                                         position: Some(BottomNavPosition::Absolute),
-                                        safe_area: true,
+                                        safe_area: with_safe_area(),
                                         border: with_border(),
                                         blur: with_blur(),
                                         BottomNavItem {
@@ -269,6 +294,14 @@ pub fn BottomNavigationPage() -> Element {
                                                 active: active_tab() == "setup",
                                                 on_click: move |_| active_tab.set("setup".to_string()),
                                             }
+                                        }
+                                    }
+
+                                    // iOS / Mobile Home Indicator Bar (visibile se safe_area è attiva)
+                                    if with_safe_area() {
+                                        div {
+                                            class: "absolute pointer-events-none z-40",
+                                            style: "bottom: 6px; left: 50%; transform: translateX(-50%); width: 120px; height: 4px; background: rgba(255, 255, 255, 0.35); border-radius: 9999px;",
                                         }
                                     }
                                 }

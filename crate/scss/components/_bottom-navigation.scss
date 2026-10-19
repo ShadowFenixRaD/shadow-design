@@ -7,6 +7,9 @@
 @layer sd-components {
   .sd-bottom-nav {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     box-sizing: border-box;
     background: rgba(0, 0, 0, 0.88);
@@ -43,7 +46,7 @@
     }
 
     &--safe-area {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-bottom: var(--sd-safe-area-bottom, env(safe-area-inset-bottom, 0px));
     }
 
     &__container {
@@ -52,7 +55,7 @@
       justify-content: space-around;
       width: 100%;
       height: 60px;
-      padding: 0 0.5rem;
+      padding: 0 1rem;
       box-sizing: border-box;
       max-width: 640px;
       margin: 0 auto;
@@ -61,15 +64,16 @@
 
   .sd-bottom-nav-item {
     position: relative;
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     gap: 0.25rem;
     flex: 1 1 0%;
     min-width: 0;
     height: 100%;
-    padding: 0.375rem 0.25rem;
+    padding: 0.375rem 0.125rem;
     color: rgba(255, 255, 255, 0.45);
     background: transparent;
     border: none;
@@ -98,19 +102,20 @@
 
     &__icon-container {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       width: 28px;
       height: 28px;
+      margin: 0 auto;
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     &__badge-wrapper {
       position: absolute;
       top: -4px;
-      right: -8px;
-      transform: scale(0.85);
+      right: -6px;
+      transform: scale(0.8);
       transform-origin: top right;
       pointer-events: none;
       z-index: 2;
@@ -120,6 +125,8 @@
     &__active-pill {
       position: absolute;
       bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 4px;
       height: 4px;
       border-radius: 50%;
@@ -129,15 +136,20 @@
     }
 
     &__label {
+      display: block;
+      width: 100%;
+      text-align: center;
       font-family: var(--font-sans, inherit);
       font-size: 0.6875rem;
       font-weight: 500;
-      line-height: 1;
+      line-height: 1.2;
       letter-spacing: 0.01em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+      box-sizing: border-box;
+      padding: 0 2px;
       transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1), font-weight 0.18s ease;
     }
 
@@ -154,6 +166,8 @@
       .sd-bottom-nav-item__active-pill {
         width: 12px;
         height: 3px;
+        left: 50%;
+        transform: translateX(-50%);
         border-radius: 9999px;
         background: #a855f7;
         box-shadow: 0 0 8px rgba(168, 85, 247, 0.8), 0 0 14px rgba(168, 85, 247, 0.4);
