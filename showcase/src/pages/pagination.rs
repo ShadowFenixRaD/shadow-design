@@ -197,7 +197,7 @@ Pagination {
                         }
 
                         // Preview box interattiva con Tabella Mockup collegata al segnale
-                        div { class: "p-6 rounded-xl bg-[#030304] border border-white/[0.08] shadow-2xl space-y-6",
+                        div { class: "p-6 rounded-xl bg-zinc-950 border border-white/[0.08] shadow-2xl space-y-6",
                             div { class: "flex items-center justify-between text-xs font-mono text-zinc-400 pb-3 border-b border-white/[0.06]",
                                 span { "TABELLA AUDIT PAGINATA (RECORD REAL-TIME)" }
                                 span { class: "text-purple-400 font-bold", "Pagina {page()} di {total_pages()}" }

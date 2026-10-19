@@ -6,17 +6,37 @@
 
 @layer sd-components {
   .sd-pagination {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     box-sizing: border-box;
 
     &__list {
-      display: flex;
+      display: inline-flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
       align-items: center;
       list-style: none;
       margin: 0;
       padding: 0;
       gap: 0.25rem;
+    }
+
+    &__item {
+      display: inline-flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    &__double-chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      svg + svg {
+        margin-left: -6px;
+      }
     }
 
     &__control {

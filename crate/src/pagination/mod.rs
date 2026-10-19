@@ -90,13 +90,13 @@ pub fn Pagination(props: PaginationProps) -> Element {
             ul { class: "sd-pagination__list",
                 // Pulsante Prima Pagina (se abilitato)
                 if props.show_edges {
-                    li {
+                    li { class: "sd-pagination__item",
                         PaginationControl {
                             is_disabled: props.disabled || is_first,
                             size: props.size,
                             aria_label: "Prima pagina".to_string(),
                             on_click: move |_| set_page(1),
-                            span { class: "flex items-center -space-x-1.5",
+                            span { class: "sd-pagination__double-chevron",
                                 Icon { kind: IconKind::ChevronLeft, size: 13 }
                                 Icon { kind: IconKind::ChevronLeft, size: 13 }
                             }
@@ -106,7 +106,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
 
                 // Pulsante Pagina Precedente
                 if props.show_controls {
-                    li {
+                    li { class: "sd-pagination__item",
                         PaginationControl {
                             is_disabled: props.disabled || is_first,
                             size: props.size,
@@ -123,7 +123,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         PaginationItem::Page(p) => {
                             let p_val = *p;
                             rsx! {
-                                li { key: "page-{p_val}",
+                                li { key: "page-{p_val}", class: "sd-pagination__item",
                                     PaginationControl {
                                         is_active: p_val == current_page,
                                         is_disabled: props.disabled,
@@ -137,7 +137,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         }
                         PaginationItem::Ellipsis => {
                             rsx! {
-                                li { key: "ellipsis-{idx}", class: "sd-pagination__ellipsis", "aria-hidden": "true",
+                                li { key: "ellipsis-{idx}", class: "sd-pagination__ellipsis sd-pagination__item", "aria-hidden": "true",
                                     span { "…" }
                                 }
                             }
@@ -147,7 +147,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
 
                 // Pulsante Pagina Successiva
                 if props.show_controls {
-                    li {
+                    li { class: "sd-pagination__item",
                         PaginationControl {
                             is_disabled: props.disabled || is_last,
                             size: props.size,
@@ -160,13 +160,13 @@ pub fn Pagination(props: PaginationProps) -> Element {
 
                 // Pulsante Ultima Pagina (se abilitato)
                 if props.show_edges {
-                    li {
+                    li { class: "sd-pagination__item",
                         PaginationControl {
                             is_disabled: props.disabled || is_last,
                             size: props.size,
                             aria_label: "Ultima pagina".to_string(),
                             on_click: move |_| set_page(props.total),
-                            span { class: "flex items-center -space-x-1.5",
+                            span { class: "sd-pagination__double-chevron",
                                 Icon { kind: IconKind::ChevronRight, size: 13 }
                                 Icon { kind: IconKind::ChevronRight, size: 13 }
                             }
