@@ -116,7 +116,7 @@ pub fn Timeline(
         "sd-timeline {align_class} {line_class} {base_override} {class_modifiers} {class}"
     );
 
-    use_context_provider(|| TimelineContext {
+    provide_context(TimelineContext {
         active,
         align,
         bullet_size,

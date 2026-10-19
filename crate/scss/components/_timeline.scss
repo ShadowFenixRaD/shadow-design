@@ -67,7 +67,8 @@
       z-index: 1;
     }
 
-    &.sd-timeline--line-dashed &__line {
+    &.sd-timeline--line-dashed &__line,
+    .sd-timeline--line-dashed &__line {
       background: transparent;
       border-left: 2px dashed $zinc-700;
       width: 0;
@@ -150,6 +151,12 @@
       .sd-timeline-item__line {
         background: rgba(168, 85, 247, 0.4);
       }
+
+      &.sd-timeline--line-dashed .sd-timeline-item__line,
+      .sd-timeline--line-dashed & .sd-timeline-item__line {
+        background: transparent !important;
+        border-left: 2px dashed rgba(168, 85, 247, 0.6);
+      }
     }
 
     &--state-active {
@@ -208,6 +215,12 @@
 
       .sd-timeline-item__line {
         background: rgba(255, 23, 68, 0.3);
+      }
+
+      &.sd-timeline--line-dashed .sd-timeline-item__line,
+      .sd-timeline--line-dashed & .sd-timeline-item__line {
+        background: transparent !important;
+        border-left: 2px dashed rgba(255, 23, 68, 0.6);
       }
     }
   }
