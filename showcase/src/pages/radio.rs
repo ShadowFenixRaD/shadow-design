@@ -130,7 +130,7 @@ RadioGroup {
                                 }
                                 RadioGroup {
                                     value: storage_type,
-                                    orientation: RadioOrientation::Vertical,
+                                    orientation: orientation(),
                                     disabled: is_disabled(),
 
                                     RadioCard {
@@ -184,7 +184,7 @@ RadioGroup {
                                     input {
                                         r#type: "checkbox",
                                         checked: is_disabled(),
-                                        oninput: move |e| is_disabled.set(e.value() == "true"),
+                                        onchange: move |e| is_disabled.set(e.checked()),
                                     }
                                     "Disabilitato"
                                 }
@@ -192,7 +192,7 @@ RadioGroup {
                                     input {
                                         r#type: "checkbox",
                                         checked: has_error(),
-                                        oninput: move |e| has_error.set(e.value() == "true"),
+                                        onchange: move |e| has_error.set(e.checked()),
                                     }
                                     "Stato Errore"
                                 }

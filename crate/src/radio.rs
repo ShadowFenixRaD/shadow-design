@@ -46,7 +46,7 @@ pub fn RadioGroup(
     let group_id = crate::a11y::use_unique_id("sd-radio-group", id);
     let name_str = name.clone().unwrap_or_else(|| group_id.clone());
 
-    use_context_provider(|| RadioContext {
+    provide_context(RadioContext {
         value,
         name: Some(name_str),
         disabled,

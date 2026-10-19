@@ -22,16 +22,31 @@
 
   .sd-radio-group-items {
     display: flex;
+    width: 100%;
 
     &.sd-radio-group--vertical {
       flex-direction: column;
       gap: 12px;
+
+      > .sd-radio-card {
+        width: 100%;
+      }
     }
 
     &.sd-radio-group--horizontal {
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 20px;
+      align-items: stretch;
+      gap: 16px;
+
+      > .sd-radio {
+        flex: 1 1 auto;
+      }
+
+      > .sd-radio-card {
+        flex: 1 1 calc(50% - 12px);
+        min-width: 180px;
+      }
     }
   }
 
