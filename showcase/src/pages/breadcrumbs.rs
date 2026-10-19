@@ -91,9 +91,8 @@ pub fn BreadcrumbsPage() -> Element {
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        // Toolbar di controllo interattivo
-                        div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono",
+                    div { class: "space-y-6",                        // Toolbar di controllo interattivo
+                        div { class: "p-4 rounded-xl bg-zinc-950/80 border border-white/[0.08] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono",
                             div {
                                 span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Separatore:" }
                                 div { class: "grid grid-cols-2 gap-1.5",
@@ -125,7 +124,7 @@ pub fn BreadcrumbsPage() -> Element {
                                             "px-2 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
                                         },
                                         onclick: move |_| separator_choice.set(2),
-                                        "Dot (•)"
+                                        "Punto (•)"
                                     }
                                     button {
                                         r#type: "button",
@@ -166,7 +165,7 @@ pub fn BreadcrumbsPage() -> Element {
                                 }
                             }
 
-                            div { class: "flex items-center pt-2 md:pt-0 border-t md:border-t-0 md:border-l border-white/[0.06] md:pl-4",
+                            div { class: "flex items-center pt-2 md:pt-0 border-t md:border-l border-white/[0.06] md:pl-4",
                                 Checkbox {
                                     checked: with_icons,
                                     label: Some("Includi Icone Vettoriali".to_string()),
@@ -175,7 +174,7 @@ pub fn BreadcrumbsPage() -> Element {
                         }
 
                         // Preview box principale
-                        div { class: "p-8 rounded-xl bg-[#030304] border border-white/[0.08] shadow-2xl space-y-6",
+                        div { class: "p-8 rounded-xl bg-zinc-950/90 border border-white/[0.08] shadow-2xl space-y-6",
                             div { class: "text-[11px] font-mono text-zinc-400 mb-2 flex items-center justify-between",
                                 span { "NAVIGATORE GERARCHICO REATTIVO" }
                                 span { class: "text-purple-400/80", "Sep: {separator_choice()} | Max: {max_items_choice():?}" }
@@ -198,13 +197,11 @@ pub fn BreadcrumbsPage() -> Element {
                             div { class: "pt-4 border-t border-white/[0.06] space-y-3",
                                 div { class: "text-xs font-semibold text-zinc-400 uppercase tracking-wider text-[10px]", "Composizione Diretta (RSX Manuale):" }
                                 Breadcrumbs {
-                                    ol { class: "sd-breadcrumbs__list",
-                                        BreadcrumbItem { href: "#/", "Home" }
-                                        li { class: "sd-breadcrumbs__separator", "›" }
-                                        BreadcrumbItem { href: "#/settings", "Impostazioni" }
-                                        li { class: "sd-breadcrumbs__separator", "›" }
-                                        BreadcrumbItem { is_current: true, "Crittografia & Chiavi HSM" }
-                                    }
+                                    BreadcrumbItem { href: "#/", "Home" }
+                                    li { class: "sd-breadcrumbs__separator", "›" }
+                                    BreadcrumbItem { href: "#/settings", "Impostazioni" }
+                                    li { class: "sd-breadcrumbs__separator", "›" }
+                                    BreadcrumbItem { is_current: true, "Crittografia & Chiavi HSM" }
                                 }
                             }
                         }

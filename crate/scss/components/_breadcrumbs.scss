@@ -7,11 +7,15 @@
 @layer sd-components {
   .sd-breadcrumbs {
     display: flex;
+    flex-direction: row;
     align-items: center;
     box-sizing: border-box;
 
-    &__list {
+    &__list,
+    & > ol,
+    & > ul {
       display: flex;
+      flex-direction: row;
       align-items: center;
       flex-wrap: wrap;
       list-style: none;
@@ -25,11 +29,14 @@
 
     &__separator {
       display: inline-flex;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
+      list-style: none;
       color: rgba(255, 255, 255, 0.3);
       user-select: none;
       padding: 0 0.125rem;
+      margin: 0;
 
       &--text {
         font-size: 0.75rem;
@@ -40,7 +47,11 @@
 
     &__ellipsis {
       display: inline-flex;
+      flex-direction: row;
       align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
 
       &-button {
         display: inline-flex;
@@ -73,13 +84,18 @@
 
   .sd-breadcrumb-item {
     display: inline-flex;
+    flex-direction: row;
     align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
     color: rgba(255, 255, 255, 0.55);
     transition: color 0.15s ease;
 
     &__content,
     &__link {
       display: inline-flex;
+      flex-direction: row;
       align-items: center;
       gap: 0.375rem;
       text-decoration: none;
