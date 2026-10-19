@@ -189,6 +189,7 @@ pub fn ScrollAreaPage() -> Element {
 
                             if demo_mode() == 0 {
                                 ScrollArea {
+                                    key: "demo-v-{demo_mode}",
                                     scroll_type: scroll_type(),
                                     offset_scrollbars: offset_scrollbars(),
                                     fade_edges: fade_edges(),
@@ -218,6 +219,7 @@ pub fn ScrollAreaPage() -> Element {
                                 }
                             } else if demo_mode() == 1 {
                                 ScrollArea {
+                                    key: "demo-h-{demo_mode}",
                                     scroll_type: scroll_type(),
                                     offset_scrollbars: offset_scrollbars(),
                                     fade_edges: fade_edges(),
@@ -247,6 +249,7 @@ pub fn ScrollAreaPage() -> Element {
                                 }
                             } else {
                                 ScrollArea {
+                                    key: "demo-b-{demo_mode}",
                                     scroll_type: scroll_type(),
                                     offset_scrollbars: offset_scrollbars(),
                                     fade_edges: fade_edges(),
