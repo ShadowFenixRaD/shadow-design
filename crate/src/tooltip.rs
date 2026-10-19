@@ -41,6 +41,9 @@ pub fn Tooltip(
     /// Additional CSS or SCSS classes.
     #[props(default)]
     class: String,
+    /// Explicitly control visibility of the tooltip bubble.
+    #[props(default)]
+    opened: Option<bool>,
     /// Interactive element wrapped by the tooltip.
     children: Element,
 ) -> Element {
@@ -72,7 +75,13 @@ pub fn Tooltip(
     let tip_id = crate::a11y::use_unique_id("sd-tooltip", id);
     let describedby_id = describes_id.unwrap_or_else(|| tip_id.clone());
 
-    let visible_class = if is_visible() && !is_dismissed() {
+    let should_show = if let Some(controlled) = opened {
+        controlled && !is_dismissed()
+    } else {
+        is_visible() && !is_dismissed()
+    };
+
+    let visible_class = if should_show {
         "sd-tooltip--visible"
     } else if is_dismissed() {
         "sd-tooltip--dismissed"

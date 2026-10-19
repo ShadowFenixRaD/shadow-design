@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use crate::tooltip::{Tooltip, TooltipPosition};
 
 /// Tacca o punto di riferimento graduato su uno `Slider` o `RangeSlider`.
 #[derive(Clone, PartialEq, Debug)]
@@ -178,12 +179,13 @@ pub fn Slider(
 
                 // Visual Thumb with Tooltip
                 div {
-                    class: "sd-slider__thumb",
+                    class: "sd-slider__thumb-wrapper",
                     style: "left: {percent}%;",
-                    if tooltip_visible {
-                        div { class: "sd-slider__tooltip",
-                            "{current_val:.1}"
-                        }
+                    Tooltip {
+                        content: format!("{current_val:.1}"),
+                        position: TooltipPosition::Top,
+                        opened: Some(tooltip_visible),
+                        div { class: "sd-slider__thumb" }
                     }
                 }
             }
@@ -360,21 +362,23 @@ pub fn RangeSlider(
 
                 // Thumbs
                 div {
-                    class: "sd-slider__thumb",
+                    class: "sd-slider__thumb-wrapper",
                     style: "left: {pct_min}%;",
-                    if tooltip_visible {
-                        div { class: "sd-slider__tooltip",
-                            "{val_min:.1}"
-                        }
+                    Tooltip {
+                        content: format!("{val_min:.1}"),
+                        position: TooltipPosition::Top,
+                        opened: Some(tooltip_visible),
+                        div { class: "sd-slider__thumb" }
                     }
                 }
                 div {
-                    class: "sd-slider__thumb",
+                    class: "sd-slider__thumb-wrapper",
                     style: "left: {pct_max}%;",
-                    if tooltip_visible {
-                        div { class: "sd-slider__tooltip",
-                            "{val_max:.1}"
-                        }
+                    Tooltip {
+                        content: format!("{val_max:.1}"),
+                        position: TooltipPosition::Top,
+                        opened: Some(tooltip_visible),
+                        div { class: "sd-slider__thumb" }
                     }
                 }
             }

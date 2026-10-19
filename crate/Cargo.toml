@@ -103,7 +103,7 @@ segmented-control = ["segmented_control"]
 divider = []
 tree = ["icon"]
 skeleton = []
-slider = []
+slider = ["tooltip"]
 
 [lints.clippy]
 must_use_candidate = "warn"
