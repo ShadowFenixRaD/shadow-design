@@ -250,34 +250,12 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
             }
 
-            // Sezione 1: Generale
-            div { class: "flex flex-col",
-                if collapsed {
-                    div { class: "w-full my-1 border-t border-white/[0.06]" }
-                } else {
-                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::Terminal, size: 12 }
-                        "Generale"
-                    }
-                }
-                div { class: "flex flex-col gap-1",
+            if collapsed {
+                div { class: "flex flex-col gap-1 w-full items-center",
                     SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica", collapsed }
                     SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder", collapsed }
                     SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography", collapsed }
-                }
-            }
-
-            // Sezione 2: Componenti Core
-            div { class: "flex flex-col",
-                if collapsed {
-                    div { class: "w-full my-1 border-t border-white/[0.06]" }
-                } else {
-                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::Box, size: 12 }
-                        "Componenti Core"
-                    }
-                }
-                div { class: "flex flex-col gap-1",
+                    div { class: "w-full my-2 border-t border-white/[0.06]" }
                     SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
                     SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
                     SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
@@ -289,20 +267,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
                     SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
                     SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::ChevronRight, label: "NavLink", collapsed }
-                }
-            }
-
-            // Sezione 3: Interattività & Avanzati
-            div { class: "flex flex-col",
-                if collapsed {
-                    div { class: "w-full my-1 border-t border-white/[0.06]" }
-                } else {
-                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::Sparkles, size: 12 }
-                        "Interattività & Avanzati"
-                    }
-                }
-                div { class: "flex flex-col gap-1",
+                    div { class: "w-full my-2 border-t border-white/[0.06]" }
                     SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
                     SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
                     SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
@@ -311,20 +276,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
                     SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
                     SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
-                }
-            }
-
-            // Sezione 4: Chat & Mesh P2P
-            div { class: "flex flex-col",
-                if collapsed {
-                    div { class: "w-full my-1 border-t border-white/[0.06]" }
-                } else {
-                    p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::MessageSquare, size: 12 }
-                        "Chat & Mesh P2P"
-                    }
-                }
-                div { class: "flex flex-col gap-1",
+                    div { class: "w-full my-2 border-t border-white/[0.06]" }
                     SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar", collapsed }
                     SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble", collapsed }
                     SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard", collapsed }
@@ -333,6 +285,62 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }
                     SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)", collapsed }
                     SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton", collapsed }
+                }
+            } else {
+                div { class: "flex flex-col gap-3 w-full",
+                    SidebarMenu {
+                        title: Some("Generale".to_string()),
+                        collapsible: true,
+                        default_opened: true,
+                        SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica", collapsed }
+                        SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder", collapsed }
+                        SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography", collapsed }
+                    }
+
+                    SidebarMenu {
+                        title: Some("Componenti Core".to_string()),
+                        collapsible: true,
+                        default_opened: true,
+                        SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
+                        SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
+                        SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
+                        SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select", collapsed }
+                        SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
+                        SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox", collapsed }
+                        SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge", collapsed }
+                        SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert", collapsed }
+                        SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
+                        SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
+                        SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::ChevronRight, label: "NavLink", collapsed }
+                    }
+
+                    SidebarMenu {
+                        title: Some("Interattività & Avanzati".to_string()),
+                        collapsible: true,
+                        default_opened: true,
+                        SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
+                        SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
+                        SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
+                        SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
+                        SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer", collapsed }
+                        SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
+                        SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
+                        SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
+                    }
+
+                    SidebarMenu {
+                        title: Some("Chat & Mesh P2P".to_string()),
+                        collapsible: true,
+                        default_opened: true,
+                        SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar", collapsed }
+                        SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble", collapsed }
+                        SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard", collapsed }
+                        SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress", collapsed }
+                        SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl", collapsed }
+                        SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }
+                        SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)", collapsed }
+                        SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton", collapsed }
+                    }
                 }
             }
 
