@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use super::AccordionItemContext;
+use super::{AccordionContext, AccordionItemContext};
 
 /// Content region for an [`super::AccordionItem`].
 ///
@@ -14,8 +14,12 @@ pub fn AccordionPanel(
     /// Content displayed inside the collapsible panel.
     children: Element,
 ) -> Element {
+    let acc_ctx = try_use_context::<AccordionContext>();
     let item_ctx = use_context::<AccordionItemContext>();
-    let is_expanded = item_ctx.is_expanded;
+    let is_expanded = acc_ctx
+        .as_ref()
+        .map(|ctx| ctx.is_expanded(&item_ctx.value))
+        .unwrap_or(item_ctx.is_expanded);
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();

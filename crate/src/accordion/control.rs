@@ -29,7 +29,7 @@ pub fn AccordionControl(
     let item_ctx = use_context::<AccordionItemContext>();
 
     let is_disabled = disabled || item_ctx.disabled;
-    let is_expanded = item_ctx.is_expanded;
+    let is_expanded = acc_ctx.is_expanded(&item_ctx.value);
     let value = item_ctx.value.clone();
 
     let mut acc_ctx_click = acc_ctx.clone();

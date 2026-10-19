@@ -34,7 +34,7 @@ impl AccordionVariant {
 /// Shared context propagated down from [`Accordion`] to coordinated items.
 #[derive(Clone, PartialEq)]
 pub struct AccordionContext {
-    pub multiple: bool,
+    pub multiple: Signal<bool>,
     pub value: Signal<Vec<String>>,
     pub variant: AccordionVariant,
     pub base_id: String,
@@ -50,7 +50,7 @@ impl AccordionContext {
     /// Toggles the expanded status of an item.
     pub fn toggle(&mut self, val: &str) {
         let mut list = self.value.write();
-        if self.multiple {
+        if *self.multiple.read() {
             if let Some(pos) = list.iter().position(|x| x == val) {
                 list.remove(pos);
             } else {
@@ -105,13 +105,18 @@ pub fn Accordion(
     let fallback_signal = use_signal(|| default_value.unwrap_or_default());
     let active_value = value.unwrap_or(fallback_signal);
 
+    let mut multiple_sig = use_signal(|| multiple);
+    if *multiple_sig.read() != multiple {
+        *multiple_sig.write() = multiple;
+    }
+
     let ctx = AccordionContext {
-        multiple,
+        multiple: multiple_sig,
         value: active_value,
         variant,
         base_id: base_id.clone(),
     };
-    use_context_provider(|| ctx);
+    provide_context(ctx);
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
@@ -203,8 +208,9 @@ mod tests {
     fn test_single_expansion_toggle() {
         let mut dom = VirtualDom::new(|| {
             let val = use_signal(|| vec!["item-1".to_string()]);
+            let mult = use_signal(|| false);
             let mut ctx = AccordionContext {
-                multiple: false,
+                multiple: mult,
                 value: val,
                 variant: AccordionVariant::Default,
                 base_id: "test".into(),
@@ -231,8 +237,9 @@ mod tests {
     fn test_multiple_expansion_toggle() {
         let mut dom = VirtualDom::new(|| {
             let val = use_signal(|| vec!["item-1".to_string()]);
+            let mult = use_signal(|| true);
             let mut ctx = AccordionContext {
-                multiple: true,
+                multiple: mult,
                 value: val,
                 variant: AccordionVariant::Separated,
                 base_id: "test".into(),

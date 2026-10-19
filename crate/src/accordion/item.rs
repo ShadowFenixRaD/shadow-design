@@ -33,7 +33,7 @@ pub fn AccordionItem(
         control_id,
         panel_id,
     };
-    use_context_provider(|| item_ctx);
+    provide_context(item_ctx);
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
