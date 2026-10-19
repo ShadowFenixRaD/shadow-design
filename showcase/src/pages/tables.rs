@@ -44,7 +44,8 @@ pub fn TablesPage() -> Element {
             rsx! {
                 span { class: "font-semibold text-zinc-100", "{name}" }
             }
-        }),
+        })
+        .with_sort_by(|r: &PeerRecord| r.name),
         DataTableColumn::text("region", "Regione", |r: &PeerRecord| r.region.to_string())
             .with_width("130px"),
         DataTableColumn::new("latency", "Latenza", |r: &PeerRecord| {
@@ -62,7 +63,8 @@ pub fn TablesPage() -> Element {
             }
         })
         .with_align(TableAlign::Center)
-        .with_width("120px"),
+        .with_width("120px")
+        .with_sort_by(|r: &PeerRecord| r.latency),
         DataTableColumn::new("status", "Stato", |r: &PeerRecord| {
             let st = r.status;
             let (dot_color, text_color) = match st {
@@ -77,10 +79,14 @@ pub fn TablesPage() -> Element {
                 }
             }
         })
-        .with_width("120px"),
+        .with_width("120px")
+        .with_sort_by(|r: &PeerRecord| r.status),
         DataTableColumn::text("tx_rate", "Throughput", |r: &PeerRecord| r.tx_rate.to_string())
             .with_align(TableAlign::Right)
-            .with_width("130px"),
+            .with_width("130px")
+            .with_sort_by(|r: &PeerRecord| {
+                r.tx_rate.split_whitespace().next().and_then(|v| v.parse::<u32>().ok()).unwrap_or(0)
+            }),
     ];
 
     let props = vec![
@@ -119,6 +125,24 @@ pub fn TablesPage() -> Element {
             r#type: "Option<Signal<usize>>",
             default: "None",
             description: "Signal della pagina corrente per paginazione attiva",
+        },
+        PropRow {
+            name: "sort_key",
+            r#type: "Option<Signal<Option<String>>>",
+            default: "None",
+            description: "Signal con la chiave della colonna attualmente ordinata",
+        },
+        PropRow {
+            name: "sort_direction",
+            r#type: "Option<Signal<SortDirection>>",
+            default: "None",
+            description: "Signal con la direzione attiva dell'ordinamento (None, Ascending, Descending)",
+        },
+        PropRow {
+            name: "on_sort",
+            r#type: "Option<EventHandler<(String, SortDirection)>>",
+            default: "None",
+            description: "Callback invocato al cambio di colonna o direzione di ordinamento",
         },
         PropRow {
             name: "loading",

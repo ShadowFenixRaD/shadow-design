@@ -1,3 +1,4 @@
+use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
 #[test]
@@ -43,3 +44,31 @@ fn test_table_defaults() {
     assert_eq!(TableAlign::default(), TableAlign::Left);
     assert_eq!(SortDirection::default(), SortDirection::None);
 }
+
+#[test]
+fn test_data_table_column_comparators() {
+    #[derive(Clone, PartialEq, Debug)]
+    struct Item {
+        name: &'static str,
+        score: u32,
+    }
+
+    let a = Item { name: "Beta", score: 40 };
+    let b = Item { name: "Alpha", score: 90 };
+
+    // text() generates an automatic string comparator
+    let col_text = DataTableColumn::<Item>::text("name", "Name", |i| i.name.to_string());
+    assert!(col_text.comparator.is_some());
+    let cmp_text = col_text.comparator.as_ref().unwrap();
+    assert_eq!(cmp_text(&a, &b), std::cmp::Ordering::Greater);
+    assert_eq!(cmp_text(&b, &a), std::cmp::Ordering::Less);
+
+    // with_sort_by creates custom comparator
+    let col_score = DataTableColumn::<Item>::new("score", "Score", |_| dioxus::prelude::rsx! {})
+        .with_sort_by(|i: &Item| i.score);
+    assert!(col_score.comparator.is_some());
+    let cmp_score = col_score.comparator.as_ref().unwrap();
+    assert_eq!(cmp_score(&a, &b), std::cmp::Ordering::Less);
+    assert_eq!(cmp_score(&b, &a), std::cmp::Ordering::Greater);
+}
+

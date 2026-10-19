@@ -182,10 +182,17 @@ pub fn TableCell(
     let combined_class = format!("sd-table-cell {align_class} {sortable_class} {sort_dir_class} {class}");
 
     if is_header {
+        let aria_sort = sort_direction.map(|dir| match dir {
+            SortDirection::Ascending => "ascending",
+            SortDirection::Descending => "descending",
+            SortDirection::None => "none",
+        });
+
         rsx! {
             th {
                 class: "{combined_class}",
                 style: style,
+                aria_sort: aria_sort,
                 onclick: move |_| {
                     if let Some(h) = &on_sort {
                         h.call(());
@@ -219,6 +226,12 @@ pub fn TableCell(
     }
 }
 
+/// Funzione di render per una cella della tabella.
+pub type TableCellRender<T> = Arc<dyn Fn(&T) -> Element + Send + Sync>;
+
+/// Funzione comparatore per l'ordinamento di due righe della tabella.
+pub type TableComparator<T> = Arc<dyn Fn(&T, &T) -> std::cmp::Ordering + Send + Sync>;
+
 /// Definizione di colonna per il componente `DataTable`.
 #[derive(Clone)]
 pub struct DataTableColumn<T: 'static> {
@@ -227,7 +240,8 @@ pub struct DataTableColumn<T: 'static> {
     pub sortable: bool,
     pub align: TableAlign,
     pub width: Option<String>,
-    pub render: Arc<dyn Fn(&T) -> Element + Send + Sync>,
+    pub render: TableCellRender<T>,
+    pub comparator: Option<TableComparator<T>>,
 }
 
 impl<T: 'static> PartialEq for DataTableColumn<T> {
@@ -253,6 +267,7 @@ impl<T: 'static> DataTableColumn<T> {
             align: TableAlign::Left,
             width: None,
             render: Arc::new(render),
+            comparator: None,
         }
     }
 
@@ -263,10 +278,20 @@ impl<T: 'static> DataTableColumn<T> {
     ) -> Self {
         let key_str = key.into();
         let header_str = header.into();
-        Self::new(key_str, header_str, move |item| {
-            let val = accessor(item);
-            rsx! { "{val}" }
-        })
+        let acc = Arc::new(accessor);
+        let acc_clone = acc.clone();
+        Self {
+            key: key_str,
+            header: header_str,
+            sortable: true,
+            align: TableAlign::Left,
+            width: None,
+            render: Arc::new(move |item| {
+                let val = acc(item);
+                rsx! { "{val}" }
+            }),
+            comparator: Some(Arc::new(move |a, b| acc_clone(a).cmp(&acc_clone(b)))),
+        }
     }
 
     #[must_use]
@@ -284,6 +309,27 @@ impl<T: 'static> DataTableColumn<T> {
     #[must_use]
     pub fn with_width(mut self, width: impl Into<String>) -> Self {
         self.width = Some(width.into());
+        self
+    }
+
+    #[must_use]
+    pub fn with_comparator<F>(mut self, cmp: F) -> Self
+    where
+        F: Fn(&T, &T) -> std::cmp::Ordering + Send + Sync + 'static,
+    {
+        self.comparator = Some(Arc::new(cmp));
+        self.sortable = true;
+        self
+    }
+
+    #[must_use]
+    pub fn with_sort_by<K, F>(mut self, key_extractor: F) -> Self
+    where
+        K: Ord + 'static,
+        F: Fn(&T) -> K + Send + Sync + 'static,
+    {
+        self.comparator = Some(Arc::new(move |a, b| key_extractor(a).cmp(&key_extractor(b))));
+        self.sortable = true;
         self
     }
 }
@@ -309,25 +355,63 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
     #[props(default = true)] hoverable: bool,
     #[props(default)] class: String,
 ) -> Element {
-    let current_page = page.map(|p| p()).unwrap_or(1);
-    let total = total_items.unwrap_or(data.len());
-    let total_pages = if total == 0 { 1 } else { total.div_ceil(page_size) };
+    let mut internal_sort_key = use_signal(|| None::<String>);
+    let mut internal_sort_dir = use_signal(|| SortDirection::None);
 
-    // Slice dei dati per paginazione client-side se total_items non è fornito
-    let display_items = if total_items.is_none() && data.len() > page_size {
-        let start = (current_page.saturating_sub(1)) * page_size;
-        let end = (start + page_size).min(data.len());
-        if start < data.len() {
-            data[start..end].to_vec()
+    let active_sort_key = match sort_key {
+        Some(s) => s(),
+        None => internal_sort_key(),
+    };
+    let active_sort_dir = match sort_direction {
+        Some(s) => s(),
+        None => internal_sort_dir(),
+    };
+
+    let current_page = page.map(|p| p()).unwrap_or(1);
+
+    // Ordinamento client-side se è attiva una chiave di ordinamento e la colonna fornisce un comparatore
+    let sorted_data = if let (Some(k), dir) = (&active_sort_key, active_sort_dir) {
+        if dir != SortDirection::None {
+            if let Some(col) = columns.iter().find(|c| &c.key == k) {
+                if let Some(comp) = &col.comparator {
+                    let mut items = data.clone();
+                    items.sort_by(|a, b| {
+                        let ord = comp(a, b);
+                        if dir == SortDirection::Descending {
+                            ord.reverse()
+                        } else {
+                            ord
+                        }
+                    });
+                    items
+                } else {
+                    data.clone()
+                }
+            } else {
+                data.clone()
+            }
         } else {
-            vec![]
+            data.clone()
         }
     } else {
         data.clone()
     };
 
-    let active_sort_key = sort_key.and_then(|k| k());
-    let active_sort_dir = sort_direction.map(|d| d()).unwrap_or(SortDirection::None);
+    let total = total_items.unwrap_or(sorted_data.len());
+    let total_pages = if total == 0 { 1 } else { total.div_ceil(page_size) };
+
+    // Slice dei dati per paginazione client-side se total_items non è fornito
+    let display_items = if total_items.is_none() && sorted_data.len() > page_size {
+        let start = (current_page.saturating_sub(1)) * page_size;
+        let end = (start + page_size).min(sorted_data.len());
+        if start < sorted_data.len() {
+            sorted_data[start..end].to_vec()
+        } else {
+            vec![]
+        }
+    } else {
+        sorted_data
+    };
 
     rsx! {
         div { class: "sd-data-table-wrapper {class}",
@@ -367,12 +451,28 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                                             SortDirection::Ascending
                                         };
 
+                                        let next_key = if next_dir == SortDirection::None {
+                                            None
+                                        } else {
+                                            Some(c_key.clone())
+                                        };
+
                                         if let Some(mut sk) = sort_key {
-                                            sk.set(if next_dir == SortDirection::None { None } else { Some(c_key.clone()) });
+                                            sk.set(next_key.clone());
+                                        } else {
+                                            internal_sort_key.set(next_key.clone());
                                         }
+
                                         if let Some(mut sd) = sort_direction {
                                             sd.set(next_dir);
+                                        } else {
+                                            internal_sort_dir.set(next_dir);
                                         }
+
+                                        if let Some(mut p) = page {
+                                            p.set(1);
+                                        }
+
                                         if let Some(h) = &on_sort {
                                             h.call((c_key.clone(), next_dir));
                                         }
