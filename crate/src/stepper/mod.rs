@@ -77,12 +77,22 @@ pub struct StepperProps {
 pub fn Stepper(props: StepperProps) -> Element {
     let orientation = props.orientation.unwrap_or_default();
 
-    use_context_provider(|| StepperCtx {
+    let mut ctx = use_context_provider(|| Signal::new(StepperCtx {
         active: props.active,
         orientation,
         allow_click_completed: props.allow_click_completed,
         on_change: props.on_change,
-    });
+    }));
+
+    let current = StepperCtx {
+        active: props.active,
+        orientation,
+        allow_click_completed: props.allow_click_completed,
+        on_change: props.on_change,
+    };
+    if *ctx.peek() != current {
+        *ctx.write() = current;
+    }
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();

@@ -62,10 +62,10 @@ pub struct StepperStepProps {
 /// Singolo step all'interno del componente [`Stepper`].
 #[component]
 pub fn StepperStep(props: StepperStepProps) -> Element {
-    let ctx = try_use_context::<StepperCtx>();
-    let active_idx = ctx.as_ref().map(|c| c.active).unwrap_or(0);
-    let orientation = ctx.as_ref().map(|c| c.orientation).unwrap_or(StepperOrientation::Horizontal);
-    let allow_click = ctx.as_ref().map(|c| c.allow_click_completed).unwrap_or(true);
+    let ctx_sig = try_use_context::<Signal<StepperCtx>>();
+    let active_idx = ctx_sig.as_ref().map(|c| c.read().active).unwrap_or(0);
+    let orientation = ctx_sig.as_ref().map(|c| c.read().orientation).unwrap_or(StepperOrientation::Horizontal);
+    let allow_click = ctx_sig.as_ref().map(|c| c.read().allow_click_completed).unwrap_or(true);
 
     let current_state = props.state.unwrap_or(if props.step < active_idx {
         StepState::Completed
@@ -121,8 +121,8 @@ pub fn StepperStep(props: StepperStepProps) -> Element {
     let step_idx = props.step;
     let on_click_step = move |_| {
         if is_clickable {
-            if let Some(ref c) = ctx {
-                if let Some(ref handler) = c.on_change {
+            if let Some(ref c) = ctx_sig {
+                if let Some(ref handler) = c.read().on_change {
                     handler.call(step_idx);
                 }
             }

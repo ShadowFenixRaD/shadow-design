@@ -20,8 +20,8 @@ pub struct StepperCompletedProps {
 /// Contenitore per lo stato conclusivo di uno [`Stepper`].
 #[component]
 pub fn StepperCompleted(props: StepperCompletedProps) -> Element {
-    let ctx = try_use_context::<StepperCtx>();
-    let active_idx = ctx.as_ref().map(|c| c.active).unwrap_or(0);
+    let ctx = try_use_context::<Signal<StepperCtx>>();
+    let active_idx = ctx.as_ref().map(|c| c.read().active).unwrap_or(0);
 
     let is_visible = if let Some(show) = props.show {
         show
