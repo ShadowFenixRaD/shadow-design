@@ -280,6 +280,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
                     SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
+                    SidebarLink { to: Route::ScrollAreaPage {}, icon: IconKind::Layers, label: "ScrollArea", collapsed }
                     SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
                     SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select", collapsed }
                     SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
