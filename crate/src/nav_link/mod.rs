@@ -116,6 +116,17 @@ pub fn NavLink(props: NavLinkProps) -> Element {
         rsx! {}
     };
 
+    let actions_el = if props.badge.is_some() || has_children {
+        rsx! {
+            span { class: "sd-nav-link__actions",
+                {badge_el}
+                {chevron_el}
+            }
+        }
+    } else {
+        rsx! {}
+    };
+
     let main_content = rsx! {
         span { class: "sd-nav-link__indicator", "aria-hidden": "true" }
         {icon_el}
@@ -125,8 +136,7 @@ pub fn NavLink(props: NavLinkProps) -> Element {
                 span { class: "sd-nav-link__description", "{desc}" }
             }
         }
-        {badge_el}
-        {chevron_el}
+        {actions_el}
     };
 
     let interactive_item = if let Some(ref href) = props.href {
