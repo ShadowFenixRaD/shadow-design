@@ -126,6 +126,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Barra di navigazione superiore responsive con specular highlight.",
     },
     ComponentNavEntry {
+        name: "Chip & ChipGroup",
+        route: Route::ChipPage {},
+        group: "Componenti Core",
+        icon: IconKind::Check,
+        keywords: "chip chipgroup tag badge filter pill select toggle",
+        description: "Elementi di selezione compatta interattivi con supporto a ChipGroup.",
+    },
+    ComponentNavEntry {
         name: "Notifications",
         route: Route::NotificationsPage {},
         group: "Interattività & Avanzati",
