@@ -190,7 +190,7 @@ pub fn List(
         "sd-list {marker_class} {spacing_class} {size_class} {orient_class} {padding_class} {center_class} {base_override} {class_modifiers} {class}"
     );
 
-    use_context_provider(|| ListContext {
+    provide_context(ListContext {
         list_type,
         marker: effective_marker,
         spacing,

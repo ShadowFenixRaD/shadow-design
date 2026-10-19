@@ -1,3 +1,4 @@
+use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
 #[test]
@@ -60,4 +61,18 @@ fn test_list_defaults() {
     assert_eq!(ListSpacing::default(), ListSpacing::Sm);
     assert_eq!(ListSize::default(), ListSize::Md);
     assert_eq!(ListOrientation::default(), ListOrientation::Vertical);
+}
+
+#[test]
+fn test_list_with_custom_icon() {
+    let mut dom = VirtualDom::new(|| {
+        rsx! {
+            List {
+                icon: Some(rsx! { Icon { kind: IconKind::CheckCircle } }),
+                ListItem { "Item 1" }
+                ListItem { "Item 2" }
+            }
+        }
+    });
+    dom.rebuild_in_place();
 }

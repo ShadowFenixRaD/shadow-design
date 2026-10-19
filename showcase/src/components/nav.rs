@@ -118,6 +118,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Barra di navigazione superiore responsive con specular highlight.",
     },
     ComponentNavEntry {
+        name: "List",
+        route: Route::ListsPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "list listitem ordered unordered bullet ol ul items",
+        description: "Elenchi ordinati, non ordinati e con icone personalizzate.",
+    },
+    ComponentNavEntry {
         name: "Notifications",
         route: Route::NotificationsPage {},
         group: "Interattività & Avanzati",
