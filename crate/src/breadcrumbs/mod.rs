@@ -55,6 +55,12 @@ pub struct BreadcrumbsProps {
     /// Numero di elementi mantenuti alla fine dopo l'ellissi (default: 1).
     #[props(default = 1)]
     pub items_after_collapse: usize,
+    /// Stato di espansione controllato opzionale (se fornito, sovrascrive lo stato interno).
+    #[props(default)]
+    pub expanded: Option<Signal<bool>>,
+    /// Callback invocato quando lo stato di espansione cambia (tramite click sull'ellissi o pulsante di compressione).
+    #[props(default)]
+    pub on_toggle_expand: Option<EventHandler<bool>>,
     /// Elemento visivo personalizzato per il separatore (sovrascrive il separatore di default).
     #[props(default)]
     pub separator: Option<Element>,
@@ -69,10 +75,65 @@ pub struct BreadcrumbsProps {
     pub children: Element,
 }
 
+/// Calcola se il percorso deve essere collassato e la quantità di elementi da preservare in testa (`head`) e coda (`tail`).
+/// Quando `max_items` è impostato e `items_before_collapse + items_after_collapse < max`, distribuisce gli elementi
+/// visibili in modo da mostrare esattamente `max` elementi.
+#[must_use]
+pub fn calculate_collapse_bounds(
+    total: usize,
+    max_items: Option<usize>,
+    items_before_collapse: usize,
+    items_after_collapse: usize,
+) -> (bool, usize, usize) {
+    let Some(max) = max_items else {
+        return (false, items_before_collapse, items_after_collapse);
+    };
+
+    if total <= max || max == 0 {
+        return (false, items_before_collapse, items_after_collapse);
+    }
+
+    // Se l'utente non ha impostato una somma esplicita maggiore o uguale a max,
+    // distribuiamo gli elementi visibili per raggiungere esattamente `max`.
+    let (before, after) = if items_before_collapse + items_after_collapse < max {
+        let b = items_before_collapse.max(1);
+        let a = items_after_collapse.max(max.saturating_sub(b));
+        (b, a)
+    } else {
+        (items_before_collapse, items_after_collapse)
+    };
+
+    let should_collapse = total > (before + after);
+    (should_collapse, before, after)
+}
+
 /// Componente Breadcrumbs per navigazione gerarchica, wayfinding e percorsi strutturati.
 #[component]
 pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
-    let mut is_expanded = use_signal(|| false);
+    let mut internal_expanded = use_signal(|| false);
+    let mut last_max_items = use_signal(|| props.max_items);
+
+    // Se max_items cambia da esterno, ripristiniamo la compressione interna
+    if *last_max_items.read() != props.max_items {
+        last_max_items.set(props.max_items);
+        internal_expanded.set(false);
+    }
+
+    let is_expanded = match props.expanded {
+        Some(s) => s(),
+        None => internal_expanded(),
+    };
+
+    let mut set_expanded = move |val: bool| {
+        if let Some(mut ext_sig) = props.expanded {
+            ext_sig.set(val);
+        } else {
+            internal_expanded.set(val);
+        }
+        if let Some(ref handler) = props.on_toggle_expand {
+            handler.call(val);
+        }
+    };
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
@@ -118,12 +179,16 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
                 if let Some(ref items) = props.items {
                     {
                         let total = items.len();
-                        let should_collapse = !is_expanded()
-                            && props.max_items.map(|max| total > max && total > (props.items_before_collapse + props.items_after_collapse)).unwrap_or(false);
+                        let (can_collapse, before_count, after_count) = calculate_collapse_bounds(
+                            total,
+                            props.max_items,
+                            props.items_before_collapse,
+                            props.items_after_collapse,
+                        );
 
-                        if should_collapse {
-                            let head = &items[0..props.items_before_collapse];
-                            let tail_start = total.saturating_sub(props.items_after_collapse);
+                        if can_collapse && !is_expanded {
+                            let head = &items[0..before_count.min(total)];
+                            let tail_start = total.saturating_sub(after_count).max(head.len());
                             let tail = &items[tail_start..total];
 
                             rsx! {
@@ -142,7 +207,7 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
                                         r#type: "button",
                                         class: "sd-breadcrumbs__ellipsis-button",
                                         title: "Mostra percorso completo",
-                                        onclick: move |_| is_expanded.set(true),
+                                        onclick: move |_| set_expanded(true),
                                         "..."
                                     }
                                 }
@@ -184,6 +249,18 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
                                         }
                                     }
                                 }
+                                if can_collapse && is_expanded {
+                                    li {
+                                        class: "sd-breadcrumbs__ellipsis",
+                                        button {
+                                            r#type: "button",
+                                            class: "sd-breadcrumbs__ellipsis-button",
+                                            title: "Comprimi percorso",
+                                            onclick: move |_| set_expanded(false),
+                                            "«"
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -204,5 +281,31 @@ mod tests {
         let b = BreadcrumbData::new("Home").with_href("/");
         assert_eq!(b.label, "Home");
         assert_eq!(b.href, Some("/".to_string()));
+    }
+
+    #[test]
+    fn test_collapse_bounds_with_max_3() {
+        // 5 elementi con max_items = 3: deve collassare e mostrare 1 elemento in testa e 2 in coda (totale 3 visibili)
+        let (should_collapse, before, after) = calculate_collapse_bounds(5, Some(3), 1, 1);
+        assert!(should_collapse);
+        assert_eq!(before, 1);
+        assert_eq!(after, 2);
+        assert_eq!(before + after, 3);
+    }
+
+    #[test]
+    fn test_collapse_bounds_not_exceeding_max() {
+        // 3 elementi con max_items = 3: non deve collassare
+        let (should_collapse, _, _) = calculate_collapse_bounds(3, Some(3), 1, 1);
+        assert!(!should_collapse);
+    }
+
+    #[test]
+    fn test_collapse_bounds_custom_overrides() {
+        // Utente definisce esplicitamente 2 in testa e 2 in coda con max_items = 4
+        let (should_collapse, before, after) = calculate_collapse_bounds(6, Some(4), 2, 2);
+        assert!(should_collapse);
+        assert_eq!(before, 2);
+        assert_eq!(after, 2);
     }
 }

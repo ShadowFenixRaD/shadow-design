@@ -7,6 +7,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 pub fn BreadcrumbsPage() -> Element {
     let mut separator_choice = use_signal(|| 0); // 0: Chevron, 1: Slash, 2: Dot, 3: Arrow
     let mut max_items_choice = use_signal(|| Some(3));
+    let mut is_expanded = use_signal(|| false);
     let with_icons = use_signal(|| true);
 
     let items_data = vec![
@@ -47,7 +48,19 @@ pub fn BreadcrumbsPage() -> Element {
             name: "max_items",
             r#type: "Option<usize>",
             default: "None",
-            description: "Soglia massima di elementi visibili oltre la quale il percorso viene compresso con ellissi '...'",
+            description: "Soglia massima di elementi visibili. Se superata, gli elementi intermedi vengono compressi nell'ellissi '...'",
+        },
+        PropRow {
+            name: "expanded",
+            r#type: "Option<Signal<bool>>",
+            default: "None",
+            description: "Controllo reattivo bidirezionale dello stato di espansione dell'ellissi",
+        },
+        PropRow {
+            name: "on_toggle_expand",
+            r#type: "Option<EventHandler<bool>>",
+            default: "None",
+            description: "Callback scatenato all'espansione o compressione del percorso",
         },
         PropRow {
             name: "items_before_collapse",
@@ -141,26 +154,45 @@ pub fn BreadcrumbsPage() -> Element {
 
                             div {
                                 span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Compressione Max Items:" }
-                                div { class: "flex gap-2",
+                                div { class: "flex gap-2 flex-wrap",
                                     button {
                                         r#type: "button",
-                                        class: if max_items_choice().is_none() {
+                                        class: if max_items_choice().is_none() || is_expanded() {
                                             "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
                                         } else {
                                             "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
                                         },
-                                        onclick: move |_| max_items_choice.set(None),
+                                        onclick: move |_| {
+                                            max_items_choice.set(None);
+                                            is_expanded.set(true);
+                                        },
                                         "Tutti (5)"
                                     }
                                     button {
                                         r#type: "button",
-                                        class: if max_items_choice() == Some(3) {
+                                        class: if max_items_choice() == Some(4) && !is_expanded() {
                                             "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
                                         } else {
                                             "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
                                         },
-                                        onclick: move |_| max_items_choice.set(Some(3)),
-                                        "Max 3 (con ...)"
+                                        onclick: move |_| {
+                                            max_items_choice.set(Some(4));
+                                            is_expanded.set(false);
+                                        },
+                                        "Max 4"
+                                    }
+                                    button {
+                                        r#type: "button",
+                                        class: if max_items_choice() == Some(3) && !is_expanded() {
+                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
+                                        } else {
+                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
+                                        },
+                                        onclick: move |_| {
+                                            max_items_choice.set(Some(3));
+                                            is_expanded.set(false);
+                                        },
+                                        "Max 3"
                                     }
                                 }
                             }
@@ -177,13 +209,14 @@ pub fn BreadcrumbsPage() -> Element {
                         div { class: "p-8 rounded-xl bg-zinc-950/90 border border-white/[0.08] shadow-2xl space-y-6",
                             div { class: "text-[11px] font-mono text-zinc-400 mb-2 flex items-center justify-between",
                                 span { "NAVIGATORE GERARCHICO REATTIVO" }
-                                span { class: "text-purple-400/80", "Sep: {separator_choice()} | Max: {max_items_choice():?}" }
+                                span { class: "text-purple-400/80", "Sep: {separator_choice()} | Max: {max_items_choice():?} | Espanso: {is_expanded()}" }
                             }
 
                             div { class: "p-4 rounded-lg bg-zinc-950/80 border border-white/[0.06]",
                                 Breadcrumbs {
                                     items: if with_icons() { items_data.clone() } else { items_without_icons.clone() },
                                     max_items: max_items_choice(),
+                                    expanded: is_expanded,
                                     separator_text: match separator_choice() {
                                         1 => Some("/".to_string()),
                                         2 => Some("•".to_string()),
