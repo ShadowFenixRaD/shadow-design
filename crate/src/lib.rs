@@ -118,6 +118,7 @@
 //! | `number_input` | `number_input` | Numeric inputs with stepper controls, decimal precision, prefix/suffix |
 //! | `radio` | `radio` | Radio, RadioGroup, and RadioCard with horizontal/vertical orientations |
 //! | `slider` | `slider` | Graduated sliders and dual-thumb RangeSlider with marks and tooltips |
+//! | `rating` | `rating` | Interactive star/icon ratings with half-fractions and hover preview |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -233,6 +234,8 @@ pub mod number_input;
 pub mod radio;
 #[cfg(feature = "slider")]
 pub mod slider;
+#[cfg(feature = "rating")]
+pub mod rating;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -299,6 +302,8 @@ pub mod prelude {
     pub use crate::radio::*;
     #[cfg(feature = "slider")]
     pub use crate::slider::*;
+    #[cfg(feature = "rating")]
+    pub use crate::rating::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;

@@ -30,6 +30,7 @@ pub mod trees;
 pub mod number_input;
 pub mod radio;
 pub mod slider;
+pub mod rating;
 
 pub use alerts::AlertsPage;
 pub use animation::AnimationsPage;
@@ -63,3 +64,4 @@ pub use trees::TreesPage;
 pub use number_input::NumberInputPage;
 pub use radio::RadioPage;
 pub use slider::SliderPage;
+pub use rating::RatingPage;

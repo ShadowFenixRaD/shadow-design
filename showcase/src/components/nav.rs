@@ -110,6 +110,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Cursore graduato a trascinamento con tacche e supporto doppio range.",
     },
     ComponentNavEntry {
+        name: "Rating",
+        route: Route::RatingPage {},
+        group: "Componenti Core",
+        icon: IconKind::Sparkles,
+        keywords: "rating stars score evaluation feedback half fractions review",
+        description: "Valutazione a stelle o icone con supporto per mezze valutazioni e anteprima hover.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",

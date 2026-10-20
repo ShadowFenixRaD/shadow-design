@@ -1,0 +1,150 @@
+// ==============================================================================
+// Shadow Design — Rating Component Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-rating-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: $font-sans;
+    user-select: none;
+  }
+
+  .sd-rating-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $zinc-300;
+  }
+
+  .sd-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus-visible {
+      outline: 2px solid var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
+    &--disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+
+      .sd-rating__item {
+        cursor: not-allowed;
+      }
+    }
+
+    &--readonly {
+      cursor: default;
+
+      .sd-rating__item {
+        cursor: default;
+      }
+    }
+
+    // Theme active palettes
+    &--violet {
+      .sd-rating__item--full {
+        color: #c084fc;
+        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.5));
+      }
+      .sd-rating__item--half {
+        color: #c084fc;
+      }
+    }
+
+    &--obsidian {
+      .sd-rating__item--full {
+        color: #f4f4f5;
+        filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+      }
+      .sd-rating__item--half {
+        color: #f4f4f5;
+      }
+    }
+
+    &--crimson {
+      .sd-rating__item--full {
+        color: #fb7185;
+        filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.5));
+      }
+      .sd-rating__item--half {
+        color: #fb7185;
+      }
+    }
+
+    &--cyan {
+      .sd-rating__item--full {
+        color: #22d3ee;
+        filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.5));
+      }
+      .sd-rating__item--half {
+        color: #22d3ee;
+      }
+    }
+
+    &--emerald {
+      .sd-rating__item--full {
+        color: #34d399;
+        filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
+      }
+      .sd-rating__item--half {
+        color: #34d399;
+      }
+    }
+  }
+
+  .sd-rating__item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: transform $duration-fast ease, color $duration-fast ease;
+
+    &:hover:not(.sd-rating--readonly *):not(.sd-rating--disabled *) {
+      transform: scale(1.15);
+    }
+
+    &--empty {
+      color: rgba(255, 255, 255, 0.22);
+    }
+  }
+
+  .sd-rating__hitbox {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    z-index: 10;
+
+    &--left {
+      left: 0;
+      width: 50%;
+    }
+
+    &--right {
+      right: 0;
+      width: 50%;
+    }
+
+    &--full {
+      left: 0;
+      width: 100%;
+    }
+  }
+
+  .sd-rating__star-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: all $duration-fast ease;
+  }
+}

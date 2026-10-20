@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
-    NavbarDemoPage, NotificationsPage, NumberInputPage, ProgressPage, RadioPage, SegmentedControlsPage, SelectPage,
+    NavbarDemoPage, NotificationsPage, NumberInputPage, ProgressPage, RadioPage, RatingPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
     TypographyPage,
 };
@@ -41,6 +41,8 @@ pub enum Route {
     CheckboxPage {},
     #[route("/slider")]
     SliderPage {},
+    #[route("/rating")]
+    RatingPage {},
     #[route("/badges")]
     BadgesPage {},
     #[route("/alerts")]
