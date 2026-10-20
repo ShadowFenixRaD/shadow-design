@@ -1,0 +1,162 @@
+// ==============================================================================
+// Shadow Design — NumberInput Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-number-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    font-family: $font-sans;
+  }
+
+  .sd-number-input-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $zinc-300;
+    user-select: none;
+  }
+
+  .sd-number-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 42px;
+    background-color: #08080c;
+    color: $zinc-100;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: var(--sd-radius-md, $radius-md);
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transition: all $duration-fast ease;
+
+    &:focus-within {
+      border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
+      background-color: var(--sd-surface-2, $color-surface-2);
+      box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.35));
+    }
+
+    &.sd-number-input--error {
+      border-color: rgba(244, 63, 94, 0.7);
+
+      &:focus-within {
+        border-color: #fb7185;
+        box-shadow: 0 0 16px rgba(244, 63, 94, 0.35);
+      }
+    }
+
+    &.sd-number-input--glow {
+      box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.25));
+    }
+
+    &.sd-number-input--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      .sd-number-input__field {
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .sd-number-input__prefix,
+  .sd-number-input__suffix {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 13px;
+    font-family: $font-mono;
+    color: $zinc-400;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .sd-number-input__prefix {
+    padding-right: 2px;
+  }
+
+  .sd-number-input__suffix {
+    padding-left: 2px;
+  }
+
+  .sd-number-input__field {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $zinc-100;
+    font-family: $font-mono;
+    font-size: 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #8b8b94;
+      font-family: $font-sans;
+    }
+  }
+
+  .sd-number-input__steppers {
+    display: flex;
+    flex-direction: column;
+    width: 26px;
+    height: 100%;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.02);
+    box-sizing: border-box;
+  }
+
+  .sd-number-input__stepper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    color: $zinc-400;
+    cursor: pointer;
+    transition: background-color $duration-fast ease, color $duration-fast ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: $zinc-100;
+    }
+
+    &:active:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    &--up {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    &--disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  .sd-number-input-error {
+    font-size: 11px;
+    color: #fb7185;
+    margin: 0;
+    font-family: $font-sans;
+  }
+
+  .sd-number-input-help {
+    font-size: 11px;
+    color: $zinc-400;
+    margin: 0;
+    font-family: $font-sans;
+  }
+}

@@ -62,6 +62,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Campi di testo reattivi con supporto icone e clear button.",
     },
     ComponentNavEntry {
+        name: "NumberInput",
+        route: Route::NumberInputPage {},
+        group: "Componenti Core",
+        icon: IconKind::Terminal,
+        keywords: "number input spinbutton stepper numeric counter",
+        description: "Input numerico con stepper su/giù, decimali e limiti min/max.",
+    },
+    ComponentNavEntry {
         name: "Select & Combobox",
         route: Route::SelectPage {},
         group: "Componenti Core",
