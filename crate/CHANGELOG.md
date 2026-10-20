@@ -9,6 +9,76 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ---
 
+## [0.4.0] — 2026-10-20
+
+Release monumentale che estende radicalmente la libreria introducendo **20 nuovi componenti UI e feature modulari** ad alte prestazioni per Dioxus 0.7, una suite avanzata per form, controlli continui, visualizzazione dati, layout master a 5 zone, navigazione ricca e una profonda riorganizzazione semantica dello Showcase.
+
+### 🚀 Nuove Funzionalità & Componenti UI
+
+- **AppShell (`app_shell`)**:
+  - Layout master responsive a 5 zone (`Header`, `Navbar`, `Aside`, `Main`, `Footer`) con supporto al collasso fluido, layering z-index rigoroso e specular highlight perimetrale.
+- **ColorPicker & ColorInput (`color_picker`)**:
+  - Selettore cromatico avanzato con gradiente 2D saturazione/luminosità, slider Hue e Alpha, parser/formatter Hex a 3/6/8 cifre, controlli RGB e palette di swatches predefinite.
+- **PinInput & OTP (`pin_input`)**:
+  - Caselle di inserimento sequenziale tattile per codici PIN, OTP e 2FA con auto-avanzamento su digitazione, supporto al mascheramento (password), gestione cancellazione e filtri numerico/alfanumerico.
+- **NumberInput (`number_input`)**:
+  - Input numerico con stepper tattile a bottoni su/giù, precisione decimale personalizzabile, step configurabile e rispetto dei limiti `min`/`max`.
+- **Radio & RadioGroup (`radio`)**:
+  - Selezione esclusiva con orientamento orizzontale o verticale, propagazione reattiva dello stato `disabled` tramite contesto, varianti cromatiche e supporto a `RadioCard`.
+- **Slider & RangeSlider (`slider`)**:
+  - Cursore graduato a trascinamento continuo con supporto per step/tacche (`marks`), indicatore percentuale, snap ai valori e tooltip fluttuante integrato su hover/trascinamento.
+- **Rating (`rating`)**:
+  - Componente di valutazione a stelle o icone con supporto per punteggi frazionari a mezze stelle, anteprima visiva su hover, selezione cliccabile e modalità sola lettura.
+- **Chip & ChipGroup (`chip`)**:
+  - Capsule interattive per filtri dinamici, tag e badge a selezione singola o multipla (`multiple`), con checkbox visivo integrato e stati tattili.
+- **Accordion & Collapsible (`accordion`)**:
+  - Pannelli espandibili a fisarmonica conformi alle specifiche WAI-ARIA, con supporto per espansione singola o multipla e reattività live su contesto condiviso.
+- **Spoiler (`spoiler`)**:
+  - Contenitore a comparsa progressiva con dissolvenza inferiore e pulsante tattile "Mostra di più / Mostra meno" per testi o elementi estesi.
+- **Table & DataTable (`table`)**:
+  - Tabelle dati semantiche con intestazioni personalizzate, hover di riga, paginazione nativa e comparatori di ordinamento colonne lato client (`ascending`/`descending`).
+- **Timeline (`timeline`)**:
+  - Cronologia e linea guida temporale per eventi, audit log e tracciamento stati con bullet cromatici e linee di collegamento solide o tratteggiate.
+- **List & ListItem (`list`)**:
+  - Elenchi ordinati (`Ordered`), non ordinati (`Unordered`) o con icone personalizzate (`Icon`), spaziatura variabile ed estetica uniforme.
+- **ScrollArea (`scroll_area`)**:
+  - Contenitore a scorrimento bidirezionale con micro-scrollbar custom Shadow a scomparsa automatica (`auto-hide`), fade-edges a gradiente e contenimento dell'overscroll.
+- **Breadcrumbs (`breadcrumbs`)**:
+  - Percorsi di navigazione a briciole di pane con separatori grafici configurabili, ellissi collassabile automatica (`max_items`) e reset di stile su liste semantiche.
+- **Pagination (`pagination`)**:
+  - Barra di controllo paginazione completa con calcolo automatico dei salti ellittici, frecce di navigazione e gestione dinamica della pagina corrente.
+- **NavLink & SidebarMenu (`nav_link`)**:
+  - Elementi di navigazione laterale con indicatore neon attivo, supporto ad azioni di coda (`trailing actions`), badge informativi e sottomenu gerarchici collassabili.
+- **BottomNavigation (`bottom_navigation`)**:
+  - Barra di navigazione mobile fissa inferiore con gestione della safe area per smartphone, micro-glow e pillola attiva centrata.
+- **Stepper (`stepper`)**:
+  - Guida procedurale guidata a passi (wizard) con orientamento orizzontale e verticale, nodi numerati/iconici, linee connettive e schermata finale di completamento (`StepperCompleted`).
+- **Menubar & CommandBar (`menubar`)**:
+  - Barra dei menu orizzontale in stile applicazione desktop con tendine fluttuanti ancorate, visualizzazione shortcut di tastiera e separatori.
+
+### 🎨 Riorganizzazione Showcase & Search Palette
+
+- **Allineamento Totale (47 Componenti)**: Sincronizzazione 1:1 tra router dell'applicazione, barra laterale (`SidebarView`) e tavolozza di ricerca rapida `Ctrl+K` (`SearchPalette`).
+- **7 Macro-Categorie Semantiche**:
+  1. *Generale*: Panoramica, Theme Builder, Typography, Icons, Animation.
+  2. *Layout & Struttura*: AppShell, Navbar, Card, ScrollArea, Divider, Accordion, Spoiler.
+  3. *Navigazione*: NavLink, Tabs, Breadcrumbs, Pagination, Stepper, BottomNavigation, Menubar.
+  4. *Inserimento & Form*: Button, TextInput, NumberInput, PinInput / OTP, Textarea, Select & Combobox, Checkbox, Radio & RadioGroup, Switch, Slider & RangeSlider, Rating, Chip & ChipGroup, ColorPicker & ColorInput, SegmentedControl.
+  5. *Dati & Feedback*: Table, List, Timeline, Badge, Alert, Notifications, Progress, Skeleton.
+  6. *Overlay & Finestre*: Modal, Drawer, Dropdown, Tooltip.
+  7. *Chat & P2P Mesh*: Avatar, Chat Bubble, AttachmentCard, TreeView (Mesh).
+
+### 🐛 Correzioni & Rifiniture Architetturali
+
+- **Breadcrumbs**: Risolto il calcolo dell'ellissi e forzato il layout flex orizzontale azzerando il default `list-style` del browser.
+- **Pagination**: Allineamento orizzontale nativo dei pulsanti numerici e di salto.
+- **ScrollArea**: Aggiunto contenimento `overscroll-behavior`, contrasto aumentato per la scrollbar thumb e reset dello stato di scorrimento al cambio demo.
+- **Radio & Accordion**: Risolta la propagazione reattiva dello stato `disabled` e dell'espansione dei pannelli tramite segnali contestuali.
+- **Slider**: Refactoring per riutilizzare internamente il componente nativo `Tooltip`.
+- **Packaging Crate**: Inclusione di `build.rs` all'interno della distribuzione per garantire la corretta notifica di rigenerazione SCSS (`cargo:rerun-if-changed=scss`).
+
+---
+
 ## [0.3.0] — 2026-10-14
 
 Release maggiore che introduce 11 nuovi componenti UI e feature modulari, una suite completa di selezione (`select`), campi di testo multilinea con autosize (`textarea`), miglioramenti architetturali alla navigazione dello Showcase con sidebar comprimibile inline a sinistra, armonizzazione cromatica dei bagliori ottici (`glow`) per variante di bottone, e una vasta serie di rifiniture all'accessibilità, alla tipografia e al layout.
