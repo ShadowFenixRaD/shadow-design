@@ -42,6 +42,7 @@ pub mod tables;
 pub mod scroll_area;
 pub mod breadcrumbs;
 pub mod pagination;
+pub mod nav_link;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -87,3 +88,4 @@ pub use tables::TablesPage;
 pub use scroll_area::ScrollAreaPage;
 pub use breadcrumbs::BreadcrumbsPage;
 pub use pagination::PaginationPage;
+pub use nav_link::NavLinkPage;

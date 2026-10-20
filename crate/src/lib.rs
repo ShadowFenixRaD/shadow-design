@@ -127,6 +127,7 @@
 //! | `scroll_area` | `scroll_area` | Scrollable container with micro-scrollbars, fade edges and hover types |
 //! | `breadcrumbs` | `breadcrumbs` | Hierarchical wayfinding trail with customizable separators and ellipsis |
 //! | `pagination` | `pagination` | Tactile numbered pagination controls with sibling & boundary ranges |
+//! | `nav_link` | `nav_link` | Sidebar navigational item with active neon indicator and nested submenus |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -266,6 +267,8 @@ pub mod scroll_area;
 pub mod breadcrumbs;
 #[cfg(feature = "pagination")]
 pub mod pagination;
+#[cfg(feature = "nav_link")]
+pub mod nav_link;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -358,5 +361,7 @@ pub mod prelude {
     pub use crate::breadcrumbs::*;
     #[cfg(feature = "pagination")]
     pub use crate::pagination::*;
+    #[cfg(feature = "nav_link")]
+    pub use crate::nav_link::*;
     pub use crate::STYLES;
 }

@@ -260,7 +260,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     div { class: "w-full my-1 border-t border-white/[0.06]" }
                 } else {
                     p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::Terminal, size: 12 }
+                        Icon { kind: IconKind::Layers, size: 12 }
                         "Generale"
                     }
                 }
@@ -304,6 +304,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::ListsPage {}, icon: IconKind::Layers, label: "List", collapsed }
                     SidebarLink { to: Route::TimelinesPage {}, icon: IconKind::Clock, label: "Timeline", collapsed }
                     SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
+                    SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::ChevronRight, label: "NavLink", collapsed }
                 }
             }
 

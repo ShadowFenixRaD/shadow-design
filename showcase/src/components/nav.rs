@@ -365,6 +365,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "pagination pages numbers table navigation pager",
         description: "Barra di navigazione a pagine numerata con salti ellittici.",
     },
+    ComponentNavEntry {
+        name: "NavLink",
+        route: Route::NavLinkPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Menu,
+        keywords: "nav link sidebar menu item neon active submenu",
+        description: "Voce di menu per barre laterali con neon active e sottomenu.",
+    },
 ];
 
 #[component]
