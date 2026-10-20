@@ -39,6 +39,7 @@ pub mod typography;
 pub mod spoiler;
 pub mod timelines;
 pub mod tables;
+pub mod scroll_area;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -81,3 +82,4 @@ pub use typography::TypographyPage;
 pub use spoiler::SpoilerPage;
 pub use timelines::TimelinesPage;
 pub use tables::TablesPage;
+pub use scroll_area::ScrollAreaPage;

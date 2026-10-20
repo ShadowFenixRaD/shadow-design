@@ -80,6 +80,7 @@ all = [
     "list",
     "timeline",
     "table",
+    "scroll_area",
 ]
 serde = ["dep:serde"]
 button = []
@@ -129,6 +130,8 @@ spoiler = ["button", "icon"]
 list = []
 timeline = []
 table = []
+scroll_area = []
+scroll-area = ["scroll_area"]
 
 [lints.clippy]
 must_use_candidate = "warn"

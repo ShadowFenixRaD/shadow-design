@@ -341,6 +341,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "table datatable grid cells sorting pagination rows",
         description: "Tabelle dati semantiche con ordinamento, paginazione e hover.",
     },
+    ComponentNavEntry {
+        name: "ScrollArea",
+        route: Route::ScrollAreaPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Layers,
+        keywords: "scroll area scrollbar overflow virtual fade edges",
+        description: "Area con micro-scrollbar Shadow, fade edges e auto-hide.",
+    },
 ];
 
 #[component]

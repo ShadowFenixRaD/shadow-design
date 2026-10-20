@@ -124,6 +124,7 @@
 //! | `chip` | `chip` | Compact interactive filter and selection chips with single and multi-select groups |
 //! | `accordion` | `accordion` | Collapsible accordion panels with single or multiple expansion |
 //! | `spoiler` | `spoiler` | Expandable content container with max-height truncation and fade overlay |
+//! | `scroll_area` | `scroll_area` | Scrollable container with micro-scrollbars, fade edges and hover types |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -257,6 +258,8 @@ pub mod spoiler;
 pub mod timeline;
 #[cfg(feature = "table")]
 pub mod table;
+#[cfg(feature = "scroll_area")]
+pub mod scroll_area;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -343,5 +346,7 @@ pub mod prelude {
     pub use crate::timeline::*;
     #[cfg(feature = "table")]
     pub use crate::table::*;
+    #[cfg(feature = "scroll_area")]
+    pub use crate::scroll_area::*;
     pub use crate::STYLES;
 }

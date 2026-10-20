@@ -1,0 +1,145 @@
+// ==============================================================================
+// Shadow Design — ScrollArea Component Styles (BEM)
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-scroll-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
+
+    &__viewport {
+      flex: 1 1 100%;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
+      box-sizing: border-box;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+
+      // Micro-scrollbar standard
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.28);
+        border-radius: 4px;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.55);
+        }
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+    }
+
+    &__content {
+      box-sizing: border-box;
+      min-width: 100%;
+    }
+
+    // Scroll axis controls
+    &--scroll-y > &__viewport {
+      overflow-y: auto;
+    }
+    &--no-scroll-y > &__viewport {
+      overflow-y: hidden;
+    }
+    &--scroll-x > &__viewport {
+      overflow-x: auto;
+    }
+    &--no-scroll-x > &__viewport {
+      overflow-x: hidden;
+    }
+
+    // ScrollType: Hover (scrollbar invisibile fino all'hover)
+    &--hover {
+      & > .sd-scroll-area__viewport {
+        scrollbar-color: transparent transparent;
+
+        &::-webkit-scrollbar-thumb {
+          background: transparent;
+        }
+      }
+
+      &:hover > .sd-scroll-area__viewport,
+      &:focus-within > .sd-scroll-area__viewport {
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+
+        &::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.35);
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.6);
+          }
+        }
+      }
+    }
+
+    // ScrollType: Never
+    &--never > &__viewport {
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+    }
+
+    // ScrollType: Always
+    &--always > &__viewport {
+      scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+      }
+    }
+
+    // Offset scrollbar per evitare sovrapposizioni al testo
+    &--offset > &__viewport > &__content {
+      padding-right: 8px;
+      padding-bottom: 8px;
+    }
+
+    // Fade edges con gradient mask
+    &--fade-edges.sd-scroll-area--scroll-y:not(.sd-scroll-area--scroll-x) > &__viewport {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+    }
+
+    &--fade-edges.sd-scroll-area--scroll-x:not(.sd-scroll-area--scroll-y) > &__viewport {
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+    }
+
+    &--fade-edges.sd-scroll-area--scroll-y.sd-scroll-area--scroll-x > &__viewport {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%),
+                          linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%),
+                  linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-composite: intersect;
+    }
+  }
+}

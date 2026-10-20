@@ -49,6 +49,7 @@
 @use 'components/list' as *;
 @use 'components/timeline' as *;
 @use 'components/table' as *;
+@use 'components/scroll-area' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};
@@ -108,3 +109,4 @@
   .glow-cyan { box-shadow: 0 0 25px $cyan-glow; }
   .glow-emerald { box-shadow: 0 0 25px $emerald-glow; }
 }
+
