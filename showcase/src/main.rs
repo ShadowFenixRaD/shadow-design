@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
-    NavbarDemoPage, NotificationsPage, NumberInputPage, ProgressPage, SegmentedControlsPage, SelectPage,
+    NavbarDemoPage, NotificationsPage, NumberInputPage, ProgressPage, RadioPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
     TypographyPage,
 };
@@ -31,6 +31,8 @@ pub enum Route {
     InputsPage {},
     #[route("/number-input")]
     NumberInputPage {},
+    #[route("/radio")]
+    RadioPage {},
     #[route("/select")]
     SelectPage {},
     #[route("/textarea")]

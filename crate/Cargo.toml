@@ -69,6 +69,7 @@ all = [
     "tree",
     "skeleton",
     "number_input",
+    "radio",
 ]
 serde = ["dep:serde"]
 button = []
@@ -105,6 +106,7 @@ tree = ["icon"]
 skeleton = []
 number_input = ["icon"]
 number-input = ["number_input"]
+radio = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"

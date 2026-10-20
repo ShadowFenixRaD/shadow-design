@@ -38,6 +38,7 @@
 @use 'components/tree' as *;
 @use 'components/skeleton' as *;
 @use 'components/number_input' as *;
+@use 'components/radio' as *;
 
 @layer sd-base {
   :root {

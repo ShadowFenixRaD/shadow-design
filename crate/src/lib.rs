@@ -116,6 +116,7 @@
 //! | `tree` | `tree` | Hierarchical tree views with collapsible nodes and connection lines |
 //! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
 //! | `number_input` | `number_input` | Numeric inputs with stepper controls, decimal precision, prefix/suffix |
+//! | `radio` | `radio` | Radio, RadioGroup, and RadioCard with horizontal/vertical orientations |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -227,6 +228,8 @@ pub mod tree;
 pub mod skeleton;
 #[cfg(feature = "number_input")]
 pub mod number_input;
+#[cfg(feature = "radio")]
+pub mod radio;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -289,6 +292,8 @@ pub mod prelude {
     pub use crate::skeleton::*;
     #[cfg(feature = "number_input")]
     pub use crate::number_input::*;
+    #[cfg(feature = "radio")]
+    pub use crate::radio::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;
