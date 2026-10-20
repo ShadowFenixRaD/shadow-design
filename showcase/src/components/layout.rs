@@ -268,94 +268,136 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::Home {}, icon: IconKind::Layers, label: "Panoramica", collapsed }
                     SidebarLink { to: Route::ThemeBuilderPage {}, icon: IconKind::Palette, label: "Theme Builder", collapsed }
                     SidebarLink { to: Route::TypographyPage {}, icon: IconKind::Code, label: "Typography", collapsed }
+                    SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
+                    SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
                 }
             }
 
-            // Sezione 2: Componenti Core
+            // Sezione 2: Layout & Struttura
             div { class: "flex flex-col",
                 if collapsed {
                     div { class: "w-full my-1 border-t border-white/[0.06]" }
                 } else {
                     p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
                         Icon { kind: IconKind::Box, size: 12 }
-                        "Componenti Core"
+                        "Layout & Struttura"
                     }
                 }
                 div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
-                    SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
-                    SidebarLink { to: Route::TablesPage {}, icon: IconKind::Layers, label: "Table", collapsed }
-                    SidebarLink { to: Route::ScrollAreaPage {}, icon: IconKind::Layers, label: "ScrollArea", collapsed }
-                    SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
-                    SidebarLink { to: Route::NumberInputPage {}, icon: IconKind::Terminal, label: "NumberInput", collapsed }
-                    SidebarLink { to: Route::PinInputPage {}, icon: IconKind::Terminal, label: "PinInput", collapsed }
-                    SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select", collapsed }
-                    SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
-                    SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox", collapsed }
-                    SidebarLink { to: Route::RadioPage {}, icon: IconKind::Radio, label: "Radio", collapsed }
-                    SidebarLink { to: Route::SliderPage {}, icon: IconKind::Layers, label: "Slider", collapsed }
-                    SidebarLink { to: Route::RatingPage {}, icon: IconKind::Sparkles, label: "Rating", collapsed }
-                    SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge", collapsed }
-                    SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert", collapsed }
-                    SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
-                    SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
                     SidebarLink { to: Route::AppShellPage {}, icon: IconKind::Box, label: "AppShell", collapsed }
-                    SidebarLink { to: Route::ChipPage {}, icon: IconKind::Check, label: "Chip", collapsed }
+                    SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
+                    SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
+                    SidebarLink { to: Route::ScrollAreaPage {}, icon: IconKind::Layers, label: "ScrollArea", collapsed }
+                    SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }
                     SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
-                    SidebarLink { to: Route::ListsPage {}, icon: IconKind::Layers, label: "List", collapsed }
-                    SidebarLink { to: Route::TimelinesPage {}, icon: IconKind::Clock, label: "Timeline", collapsed }
-                    SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
-                    SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::ChevronRight, label: "NavLink", collapsed }
-                    SidebarLink { to: Route::BottomNavigationPage {}, icon: IconKind::Menu, label: "BottomNavigation", collapsed }
+                    SidebarLink { to: Route::SpoilerPage {}, icon: IconKind::ChevronDown, label: "Spoiler", collapsed }
                 }
             }
 
-            // Sezione 3: Interattività & Avanzati
+            // Sezione 3: Navigazione
             div { class: "flex flex-col",
                 if collapsed {
                     div { class: "w-full my-1 border-t border-white/[0.06]" }
                 } else {
                     p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
-                        Icon { kind: IconKind::Sparkles, size: 12 }
-                        "Interattività & Avanzati"
+                        Icon { kind: IconKind::ChevronRight, size: 12 }
+                        "Navigazione"
                     }
                 }
                 div { class: "flex flex-col gap-1",
-                    SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
-                    SidebarLink { to: Route::PaginationPage {}, icon: IconKind::ChevronRight, label: "Pagination", collapsed }
+                    SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::Menu, label: "NavLink", collapsed }
                     SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
+                    SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
+                    SidebarLink { to: Route::PaginationPage {}, icon: IconKind::Layers, label: "Pagination", collapsed }
                     SidebarLink { to: Route::StepperPage {}, icon: IconKind::CheckCircle, label: "Stepper", collapsed }
-                    SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
-                    SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
-                    SidebarLink { to: Route::ColorPickerPage {}, icon: IconKind::Palette, label: "ColorPicker", collapsed }
-                    SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer", collapsed }
-                    SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
+                    SidebarLink { to: Route::BottomNavigationPage {}, icon: IconKind::Menu, label: "BottomNavigation", collapsed }
                     SidebarLink { to: Route::MenubarPage {}, icon: IconKind::Menu, label: "Menubar", collapsed }
-                    SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
-                    SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
-                    SidebarLink { to: Route::SpoilerPage {}, icon: IconKind::ChevronDown, label: "Spoiler", collapsed }
                 }
             }
 
-            // Sezione 4: Chat & Mesh P2P
+            // Sezione 4: Inserimento & Form
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Terminal, size: 12 }
+                        "Inserimento & Form"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::ButtonsPage {}, icon: IconKind::Sparkles, label: "Button", collapsed }
+                    SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
+                    SidebarLink { to: Route::NumberInputPage {}, icon: IconKind::Terminal, label: "NumberInput", collapsed }
+                    SidebarLink { to: Route::PinInputPage {}, icon: IconKind::Terminal, label: "PinInput", collapsed }
+                    SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
+                    SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select & Combobox", collapsed }
+                    SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox", collapsed }
+                    SidebarLink { to: Route::RadioPage {}, icon: IconKind::Radio, label: "Radio", collapsed }
+                    SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
+                    SidebarLink { to: Route::SliderPage {}, icon: IconKind::Layers, label: "Slider", collapsed }
+                    SidebarLink { to: Route::RatingPage {}, icon: IconKind::Sparkles, label: "Rating", collapsed }
+                    SidebarLink { to: Route::ChipPage {}, icon: IconKind::Check, label: "Chip", collapsed }
+                    SidebarLink { to: Route::ColorPickerPage {}, icon: IconKind::Palette, label: "ColorPicker", collapsed }
+                    SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl", collapsed }
+                }
+            }
+
+            // Sezione 5: Dati & Feedback
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Info, size: 12 }
+                        "Dati & Feedback"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::TablesPage {}, icon: IconKind::Layers, label: "Table", collapsed }
+                    SidebarLink { to: Route::ListsPage {}, icon: IconKind::Layers, label: "List", collapsed }
+                    SidebarLink { to: Route::TimelinesPage {}, icon: IconKind::Clock, label: "Timeline", collapsed }
+                    SidebarLink { to: Route::BadgesPage {}, icon: IconKind::CheckCircle, label: "Badge", collapsed }
+                    SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert", collapsed }
+                    SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
+                    SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress", collapsed }
+                    SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton", collapsed }
+                }
+            }
+
+            // Sezione 6: Overlay & Finestre
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Eye, size: 12 }
+                        "Overlay & Finestre"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
+                    SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer", collapsed }
+                    SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
+                    SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
+                }
+            }
+
+            // Sezione 7: Chat & P2P Mesh
             div { class: "flex flex-col",
                 if collapsed {
                     div { class: "w-full my-1 border-t border-white/[0.06]" }
                 } else {
                     p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
                         Icon { kind: IconKind::MessageSquare, size: 12 }
-                        "Chat & Mesh P2P"
+                        "Chat & P2P Mesh"
                     }
                 }
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar", collapsed }
                     SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble", collapsed }
                     SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard", collapsed }
-                    SidebarLink { to: Route::ProgressPage {}, icon: IconKind::Spinner, label: "Progress", collapsed }
-                    SidebarLink { to: Route::SegmentedControlsPage {}, icon: IconKind::Layers, label: "SegmentedControl", collapsed }
-                    SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }
                     SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)", collapsed }
-                    SidebarLink { to: Route::SkeletonsPage {}, icon: IconKind::Box, label: "Skeleton", collapsed }
                 }
             }
 
