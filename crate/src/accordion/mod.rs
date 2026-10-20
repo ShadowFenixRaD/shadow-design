@@ -1,6 +1,6 @@
-pub mod control;
-pub mod item;
-pub mod panel;
+pub(crate) mod control;
+pub(crate) mod item;
+pub(crate) mod panel;
 
 pub use control::*;
 pub use item::*;

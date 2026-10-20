@@ -50,6 +50,7 @@
 @use 'components/timeline' as *;
 @use 'components/table' as *;
 @use 'components/scroll-area' as *;
+@use 'components/breadcrumbs' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

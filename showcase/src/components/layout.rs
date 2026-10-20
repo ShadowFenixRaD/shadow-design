@@ -303,6 +303,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
                     SidebarLink { to: Route::ListsPage {}, icon: IconKind::Layers, label: "List", collapsed }
                     SidebarLink { to: Route::TimelinesPage {}, icon: IconKind::Clock, label: "Timeline", collapsed }
+                    SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
                 }
             }
 

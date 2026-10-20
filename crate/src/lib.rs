@@ -125,6 +125,7 @@
 //! | `accordion` | `accordion` | Collapsible accordion panels with single or multiple expansion |
 //! | `spoiler` | `spoiler` | Expandable content container with max-height truncation and fade overlay |
 //! | `scroll_area` | `scroll_area` | Scrollable container with micro-scrollbars, fade edges and hover types |
+//! | `breadcrumbs` | `breadcrumbs` | Hierarchical wayfinding trail with customizable separators and ellipsis |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -260,6 +261,8 @@ pub mod timeline;
 pub mod table;
 #[cfg(feature = "scroll_area")]
 pub mod scroll_area;
+#[cfg(feature = "breadcrumbs")]
+pub mod breadcrumbs;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -348,5 +351,7 @@ pub mod prelude {
     pub use crate::table::*;
     #[cfg(feature = "scroll_area")]
     pub use crate::scroll_area::*;
+    #[cfg(feature = "breadcrumbs")]
+    pub use crate::breadcrumbs::*;
     pub use crate::STYLES;
 }

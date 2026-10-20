@@ -81,6 +81,7 @@ all = [
     "timeline",
     "table",
     "scroll_area",
+    "breadcrumbs",
 ]
 serde = ["dep:serde"]
 button = []
@@ -132,6 +133,7 @@ timeline = []
 table = []
 scroll_area = []
 scroll-area = ["scroll_area"]
+breadcrumbs = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"
