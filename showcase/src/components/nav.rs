@@ -389,6 +389,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "stepper step wizard progress multi step workflow",
         description: "Guida procedurale a passi con orientamento orizzontale e verticale.",
     },
+    ComponentNavEntry {
+        name: "Menubar",
+        route: Route::MenubarPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Menu,
+        keywords: "menubar menu command bar desktop navigation shortcut",
+        description: "Barra dei menu orizzontale in stile app desktop con shortcut e tendine.",
+    },
 ];
 
 #[component]

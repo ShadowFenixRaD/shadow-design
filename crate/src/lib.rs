@@ -130,6 +130,7 @@
 //! | `nav_link` | `nav_link` | Sidebar navigational item with active neon indicator and nested submenus |
 //! | `bottom_navigation` | `bottom_navigation` | Mobile bottom navigation bar with fluid icon transitions and safe-area support |
 //! | `stepper` | `stepper` | Horizontal and vertical multi-step wizard indicators with state transitions |
+//! | `menubar` | `menubar` | Desktop application menubar with cascading menus, shortcuts, and command bar |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -275,6 +276,8 @@ pub mod nav_link;
 pub mod bottom_navigation;
 #[cfg(feature = "stepper")]
 pub mod stepper;
+#[cfg(feature = "menubar")]
+pub mod menubar;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -373,5 +376,7 @@ pub mod prelude {
     pub use crate::bottom_navigation::*;
     #[cfg(feature = "stepper")]
     pub use crate::stepper::*;
+    #[cfg(feature = "menubar")]
+    pub use crate::menubar::*;
     pub use crate::STYLES;
 }

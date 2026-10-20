@@ -86,6 +86,7 @@ all = [
     "nav_link",
     "bottom_navigation",
     "stepper",
+    "menubar",
 ]
 serde = ["dep:serde"]
 button = []
@@ -144,6 +145,7 @@ nav-link = ["nav_link"]
 bottom_navigation = ["icon", "badge"]
 bottom-navigation = ["bottom_navigation"]
 stepper = ["icon"]
+menubar = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"
