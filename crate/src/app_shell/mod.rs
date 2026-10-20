@@ -40,6 +40,9 @@ pub struct AppShellProps {
     /// Segnale reattivo per controllare il collasso del pannello laterale destro (Aside).
     #[props(default)]
     pub aside_collapsed: Option<Signal<bool>>,
+    /// Se true, impone altezza pari all'intera viewport (100vh). Default: false (adattivo al container genitore).
+    #[props(default = false)]
+    pub fullscreen: bool,
     /// Classi CSS addizionali.
     #[props(default)]
     pub class: String,
@@ -63,6 +66,12 @@ pub fn AppShell(props: AppShellProps) -> Element {
         aside_collapsed,
     });
 
+    let fullscreen_class = if props.fullscreen {
+        "sd-app-shell--fullscreen"
+    } else {
+        ""
+    };
+
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
@@ -77,7 +86,7 @@ pub fn AppShell(props: AppShellProps) -> Element {
 
     rsx! {
         div {
-            class: "sd-app-shell {base_override} {class_modifiers} {props.class}",
+            class: "sd-app-shell {fullscreen_class} {base_override} {class_modifiers} {props.class}",
             if let Some(ref hdr) = props.header {
                 {hdr}
             }
@@ -112,6 +121,7 @@ mod tests {
             footer: None,
             navbar_collapsed: None,
             aside_collapsed: None,
+            fullscreen: false,
             class: String::new(),
             children: rsx! {},
         };

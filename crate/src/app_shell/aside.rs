@@ -51,7 +51,9 @@ pub fn AppShellAside(props: AppShellAsideProps) -> Element {
             } else {
                 "width: {width_val}; min-width: {width_val};"
             },
-            div { class: "sd-app-shell__aside-inner",
+            div {
+                class: "sd-app-shell__aside-inner",
+                style: "width: {width_val}; min-width: {width_val};",
                 {props.children}
             }
         }

@@ -55,6 +55,12 @@ pub fn AppShellPage() -> Element {
             description: "Signal reattivo per pilotare programmaticamente il collasso di Aside",
         },
         PropRow {
+            name: "fullscreen",
+            r#type: "bool",
+            default: "false",
+            description: "Se true forza altezza 100vh come layout root; se false (default) si adatta fluidamente al container genitore",
+        },
+        PropRow {
             name: "class",
             r#type: "String",
             default: "\"\"",
@@ -176,7 +182,7 @@ AppShell {
                                 header: rsx! {
                                     AppShellHeader {
                                         height: "56px",
-                                        div { class: "flex items-center justify-between w-full h-full px-2",
+                                        div { class: "flex items-center justify-between w-full h-full",
                                             div { class: "flex items-center gap-3",
                                                 Button {
                                                     size: ButtonSize::Sm,
@@ -256,7 +262,7 @@ AppShell {
                                 footer: rsx! {
                                     AppShellFooter {
                                         height: "36px",
-                                        div { class: "flex items-center justify-between w-full h-full px-4 text-xs text-zinc-500 font-mono",
+                                        div { class: "flex items-center justify-between w-full h-full text-xs text-zinc-500 font-mono",
                                             div { class: "flex items-center gap-2",
                                                 span { class: "w-1.5 h-1.5 rounded-full bg-emerald-400" }
                                                 span { "Tutti i sistemi operativi" }

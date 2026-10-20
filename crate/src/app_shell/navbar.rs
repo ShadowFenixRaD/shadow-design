@@ -51,7 +51,9 @@ pub fn AppShellNavbar(props: AppShellNavbarProps) -> Element {
             } else {
                 "width: {width_val}; min-width: {width_val};"
             },
-            div { class: "sd-app-shell__navbar-inner",
+            div {
+                class: "sd-app-shell__navbar-inner",
+                style: "width: {width_val}; min-width: {width_val};",
                 {props.children}
             }
         }
