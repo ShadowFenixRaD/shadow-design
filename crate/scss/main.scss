@@ -51,6 +51,7 @@
 @use 'components/table' as *;
 @use 'components/scroll-area' as *;
 @use 'components/breadcrumbs' as *;
+@use 'components/pagination' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

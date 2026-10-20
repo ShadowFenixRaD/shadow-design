@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AccordionPage, AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, BreadcrumbsPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ListsPage, ModalsPage,
-    ChipPage, ColorPickerPage, NavbarDemoPage, NotificationsPage, NumberInputPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
+    ChipPage, ColorPickerPage, NavbarDemoPage, NotificationsPage, NumberInputPage, PaginationPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SpoilerPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
 };
@@ -89,6 +89,8 @@ pub enum Route {
     ScrollAreaPage {},
     #[route("/breadcrumbs")]
     BreadcrumbsPage {},
+    #[route("/pagination")]
+    PaginationPage {},
     #[route("/icons")]
     IconsPage {},
     #[route("/animations")]

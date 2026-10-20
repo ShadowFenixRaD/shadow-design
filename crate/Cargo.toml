@@ -82,6 +82,7 @@ all = [
     "table",
     "scroll_area",
     "breadcrumbs",
+    "pagination",
 ]
 serde = ["dep:serde"]
 button = []
@@ -134,6 +135,7 @@ table = []
 scroll_area = []
 scroll-area = ["scroll_area"]
 breadcrumbs = ["icon"]
+pagination = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"

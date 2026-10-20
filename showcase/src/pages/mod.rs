@@ -41,6 +41,7 @@ pub mod timelines;
 pub mod tables;
 pub mod scroll_area;
 pub mod breadcrumbs;
+pub mod pagination;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -85,3 +86,4 @@ pub use timelines::TimelinesPage;
 pub use tables::TablesPage;
 pub use scroll_area::ScrollAreaPage;
 pub use breadcrumbs::BreadcrumbsPage;
+pub use pagination::PaginationPage;

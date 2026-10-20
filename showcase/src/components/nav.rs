@@ -357,6 +357,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "breadcrumbs nav path trail wayfinding hierarchy",
         description: "Navigazione a briciole di pane con ellissi e separatori.",
     },
+    ComponentNavEntry {
+        name: "Pagination",
+        route: Route::PaginationPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Layers,
+        keywords: "pagination pages numbers table navigation pager",
+        description: "Barra di navigazione a pagine numerata con salti ellittici.",
+    },
 ];
 
 #[component]

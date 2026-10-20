@@ -319,6 +319,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
+                    SidebarLink { to: Route::PaginationPage {}, icon: IconKind::ChevronRight, label: "Pagination", collapsed }
                     SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
                     SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
                     SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
