@@ -305,6 +305,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::TimelinesPage {}, icon: IconKind::Clock, label: "Timeline", collapsed }
                     SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
                     SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::ChevronRight, label: "NavLink", collapsed }
+                    SidebarLink { to: Route::BottomNavigationPage {}, icon: IconKind::Menu, label: "BottomNavigation", collapsed }
                 }
             }
 

@@ -53,6 +53,7 @@
 @use 'components/breadcrumbs' as *;
 @use 'components/pagination' as *;
 @use 'components/nav-link' as *;
+@use 'components/bottom-navigation' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

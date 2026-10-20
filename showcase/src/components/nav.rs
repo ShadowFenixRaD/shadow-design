@@ -373,6 +373,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "nav link sidebar menu item neon active submenu",
         description: "Voce di menu per barre laterali con neon active e sottomenu.",
     },
+    ComponentNavEntry {
+        name: "BottomNavigation",
+        route: Route::BottomNavigationPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::Menu,
+        keywords: "bottom navigation bar mobile tab footer safe area",
+        description: "Barra di navigazione inferiore per mobile con safe area e micro-glow.",
+    },
 ];
 
 #[component]

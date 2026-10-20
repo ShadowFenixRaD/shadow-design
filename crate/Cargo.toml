@@ -84,6 +84,7 @@ all = [
     "breadcrumbs",
     "pagination",
     "nav_link",
+    "bottom_navigation",
 ]
 serde = ["dep:serde"]
 button = []
@@ -139,6 +140,8 @@ breadcrumbs = ["icon"]
 pagination = ["icon"]
 nav_link = ["icon", "badge"]
 nav-link = ["nav_link"]
+bottom_navigation = ["icon", "badge"]
+bottom-navigation = ["bottom_navigation"]
 
 [lints.clippy]
 must_use_candidate = "warn"

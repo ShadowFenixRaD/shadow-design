@@ -128,6 +128,7 @@
 //! | `breadcrumbs` | `breadcrumbs` | Hierarchical wayfinding trail with customizable separators and ellipsis |
 //! | `pagination` | `pagination` | Tactile numbered pagination controls with sibling & boundary ranges |
 //! | `nav_link` | `nav_link` | Sidebar navigational item with active neon indicator and nested submenus |
+//! | `bottom_navigation` | `bottom_navigation` | Mobile bottom navigation bar with fluid icon transitions and safe-area support |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -269,6 +270,8 @@ pub mod breadcrumbs;
 pub mod pagination;
 #[cfg(feature = "nav_link")]
 pub mod nav_link;
+#[cfg(feature = "bottom_navigation")]
+pub mod bottom_navigation;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -363,5 +366,7 @@ pub mod prelude {
     pub use crate::pagination::*;
     #[cfg(feature = "nav_link")]
     pub use crate::nav_link::*;
+    #[cfg(feature = "bottom_navigation")]
+    pub use crate::bottom_navigation::*;
     pub use crate::STYLES;
 }
