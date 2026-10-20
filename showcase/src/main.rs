@@ -6,7 +6,7 @@ mod pages;
 
 use components::Layout;
 use pages::{
-    AccordionPage, AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, BottomNavigationPage, BreadcrumbsPage, ButtonsPage, CardsPage, ChatPage,
+    AccordionPage, AlertsPage, AnimationsPage, AppShellPage, AttachmentCardsPage, AvatarsPage, BadgesPage, BottomNavigationPage, BreadcrumbsPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ListsPage, MenubarPage, ModalsPage,
     ChipPage, ColorPickerPage, NavbarDemoPage, NavLinkPage, NotificationsPage, NumberInputPage, PaginationPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SpoilerPage, StepperPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
@@ -51,6 +51,8 @@ pub enum Route {
     ModalsPage {},
     #[route("/navbar")]
     NavbarDemoPage {},
+    #[route("/app-shell")]
+    AppShellPage {},
     #[route("/notifications")]
     NotificationsPage {},
     #[route("/tabs")]

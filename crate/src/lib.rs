@@ -131,6 +131,7 @@
 //! | `bottom_navigation` | `bottom_navigation` | Mobile bottom navigation bar with fluid icon transitions and safe-area support |
 //! | `stepper` | `stepper` | Horizontal and vertical multi-step wizard indicators with state transitions |
 //! | `menubar` | `menubar` | Desktop application menubar with cascading menus, shortcuts, and command bar |
+//! | `app_shell` | `app_shell` | Responsive 5-zone master application layout (Header, Navbar, Aside, Main, Footer) |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -188,6 +189,8 @@ pub mod accordion;
 pub mod alert;
 #[cfg(feature = "animation")]
 pub mod animation;
+#[cfg(feature = "app_shell")]
+pub mod app_shell;
 #[cfg(feature = "attachment_card")]
 pub mod attachment_card;
 #[cfg(feature = "avatar")]
@@ -287,6 +290,8 @@ pub mod prelude {
     pub use crate::alert::*;
     #[cfg(feature = "animation")]
     pub use crate::animation::*;
+    #[cfg(feature = "app_shell")]
+    pub use crate::app_shell::*;
     #[cfg(feature = "attachment_card")]
     pub use crate::attachment_card::*;
     #[cfg(feature = "avatar")]

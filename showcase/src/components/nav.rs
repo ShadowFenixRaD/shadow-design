@@ -174,6 +174,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Barra di navigazione superiore responsive con specular highlight.",
     },
     ComponentNavEntry {
+        name: "AppShell",
+        route: Route::AppShellPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "appshell layout header navbar aside main footer master",
+        description: "Layout master responsive a 5 zone con collasso fluido e z-index standard.",
+    },
+    ComponentNavEntry {
         name: "Accordion & Collapsible",
         route: Route::AccordionPage {},
         group: "Componenti Core",

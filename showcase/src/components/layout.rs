@@ -299,6 +299,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::AlertsPage {}, icon: IconKind::AlertTriangle, label: "Alert", collapsed }
                     SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
                     SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
+                    SidebarLink { to: Route::AppShellPage {}, icon: IconKind::Box, label: "AppShell", collapsed }
                     SidebarLink { to: Route::ChipPage {}, icon: IconKind::Check, label: "Chip", collapsed }
                     SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
                     SidebarLink { to: Route::ListsPage {}, icon: IconKind::Layers, label: "List", collapsed }

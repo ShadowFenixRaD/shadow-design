@@ -1,6 +1,7 @@
 pub mod accordion;
 pub mod alerts;
 pub mod animation;
+pub mod app_shell;
 pub mod attachment_cards;
 pub mod avatars;
 pub mod badges;
@@ -50,6 +51,7 @@ pub mod menubar;
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
 pub use animation::AnimationsPage;
+pub use app_shell::AppShellPage;
 pub use attachment_cards::AttachmentCardsPage;
 pub use avatars::AvatarsPage;
 pub use badges::BadgesPage;
