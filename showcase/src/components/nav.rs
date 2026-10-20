@@ -174,12 +174,12 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Barra di navigazione superiore responsive con specular highlight.",
     },
     ComponentNavEntry {
-        name: "Chip & ChipGroup",
-        route: Route::ChipPage {},
+        name: "Accordion & Collapsible",
+        route: Route::AccordionPage {},
         group: "Componenti Core",
-        icon: IconKind::Check,
-        keywords: "chip chipgroup tag badge filter pill select toggle",
-        description: "Elementi di selezione compatta interattivi con supporto a ChipGroup.",
+        icon: IconKind::ChevronDown,
+        keywords: "accordion collapsible fold collapse expand panel",
+        description: "Pannelli espandibili a fisarmonica conformi a WAI-ARIA.",
     },
     ComponentNavEntry {
         name: "Notifications",
@@ -308,6 +308,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         icon: IconKind::Box,
         keywords: "skeleton placeholder loading shimmer pulse",
         description: "Segnaposto di caricamento con shimmer progressivo.",
+    },
+    ComponentNavEntry {
+        name: "Accordion",
+        route: Route::AccordionPage {},
+        group: "Interattività & Avanzati",
+        icon: IconKind::ChevronDown,
+        keywords: "accordion collapsible collapse expand panel fold",
+        description: "Pannelli espandibili a fisarmonica con animazioni fluide e chevron.",
     },
 ];
 

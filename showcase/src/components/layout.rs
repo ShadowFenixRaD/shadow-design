@@ -35,8 +35,12 @@ pub fn Layout() -> Element {
     let seg_active_class = match primary {
         PrimaryColor::Crimson => "bg-rose-950/80 text-rose-200 border border-rose-500/40 shadow-sm",
         PrimaryColor::Cyan => "bg-cyan-950/80 text-cyan-200 border border-cyan-500/40 shadow-sm",
-        PrimaryColor::Emerald => "bg-emerald-950/80 text-emerald-200 border border-emerald-500/40 shadow-sm",
-        PrimaryColor::Obsidian => "bg-zinc-800/80 text-zinc-100 border border-zinc-600/50 shadow-sm",
+        PrimaryColor::Emerald => {
+            "bg-emerald-950/80 text-emerald-200 border border-emerald-500/40 shadow-sm"
+        }
+        PrimaryColor::Obsidian => {
+            "bg-zinc-800/80 text-zinc-100 border border-zinc-600/50 shadow-sm"
+        }
         _ => "bg-purple-950/80 text-purple-200 border border-purple-500/40 shadow-sm",
     };
 
@@ -294,6 +298,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
                     SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
                     SidebarLink { to: Route::ChipPage {}, icon: IconKind::Check, label: "Chip", collapsed }
+                    SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
                 }
             }
 
@@ -317,6 +322,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
                     SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
                     SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
+                    SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
                 }
             }
 
@@ -419,7 +425,11 @@ pub fn SidebarLink(
     #[props(default = false)] collapsed: bool,
 ) -> Element {
     let theme = use_theme();
-    let collapsed_class = if collapsed { "justify-center px-0 py-2 w-full" } else { "px-3 py-2" };
+    let collapsed_class = if collapsed {
+        "justify-center px-0 py-2 w-full"
+    } else {
+        "px-3 py-2"
+    };
     rsx! {
         Link {
             to,

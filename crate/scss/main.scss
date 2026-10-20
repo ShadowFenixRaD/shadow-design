@@ -44,6 +44,7 @@
 @use 'components/pin_input' as *;
 @use 'components/color_picker' as *;
 @use 'components/chip' as *;
+@use 'components/accordion' as *;
 
 @layer sd-base {
   :root {

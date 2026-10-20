@@ -75,6 +75,7 @@ all = [
     "pin_input",
     "color_picker",
     "chip",
+    "accordion",
 ]
 serde = ["dep:serde"]
 button = []
@@ -119,6 +120,7 @@ pin-input = ["pin_input"]
 color_picker = ["icon"]
 color-picker = ["color_picker"]
 chip = ["icon"]
+accordion = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"
