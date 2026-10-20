@@ -70,6 +70,7 @@ all = [
     "skeleton",
     "number_input",
     "radio",
+    "slider",
 ]
 serde = ["dep:serde"]
 button = []
@@ -107,6 +108,7 @@ skeleton = []
 number_input = ["icon"]
 number-input = ["number_input"]
 radio = ["icon"]
+slider = ["tooltip"]
 
 [lints.clippy]
 must_use_candidate = "warn"

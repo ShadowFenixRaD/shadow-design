@@ -1,0 +1,165 @@
+// ==============================================================================
+// Shadow Design — Slider & RangeSlider Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-family: $font-sans;
+    user-select: none;
+  }
+
+  .sd-slider-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $zinc-300;
+  }
+
+  .sd-slider-value-display {
+    font-size: 12px;
+    font-family: $font-mono;
+    color: $zinc-400;
+  }
+
+  .sd-slider-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 32px;
+    box-sizing: border-box;
+
+    &.sd-slider--disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+
+      .sd-slider__native {
+        cursor: not-allowed;
+      }
+    }
+
+    &.sd-slider--glow {
+      .sd-slider__bar {
+        filter: brightness(1.2);
+      }
+    }
+  }
+
+  .sd-slider__native {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .sd-slider__track {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+  }
+
+  .sd-slider__bar {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.05s linear;
+
+    &--violet {
+      background-color: #a855f7;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    }
+
+    &--obsidian {
+      background-color: #e4e4e7;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    &--crimson {
+      background-color: #f43f5e;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+    }
+
+    &--cyan {
+      background-color: #06b6d4;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+
+    &--emerald {
+      background-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+  }
+
+  .sd-slider__marks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .sd-slider__mark {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: all $duration-fast ease;
+
+    &--active {
+      background-color: #ffffff;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .sd-slider__mark-label {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-family: $font-mono;
+    color: $zinc-500;
+    white-space: nowrap;
+  }
+
+  .sd-slider__thumb-wrapper {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sd-slider__thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 2px solid #a855f7;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    pointer-events: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+}

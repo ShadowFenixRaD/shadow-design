@@ -102,6 +102,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Selezione singola esclusiva con Radio, RadioGroup e RadioCard.",
     },
     ComponentNavEntry {
+        name: "Slider & RangeSlider",
+        route: Route::SliderPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "slider rangeslider track thumb range value meter",
+        description: "Cursore graduato a trascinamento con tacche e supporto doppio range.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",

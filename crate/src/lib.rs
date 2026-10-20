@@ -117,6 +117,7 @@
 //! | `skeleton` | `skeleton` | Geometric loading placeholder shimmers (circle, rect, text) |
 //! | `number_input` | `number_input` | Numeric inputs with stepper controls, decimal precision, prefix/suffix |
 //! | `radio` | `radio` | Radio, RadioGroup, and RadioCard with horizontal/vertical orientations |
+//! | `slider` | `slider` | Graduated sliders and dual-thumb RangeSlider with marks and tooltips |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -230,6 +231,8 @@ pub mod skeleton;
 pub mod number_input;
 #[cfg(feature = "radio")]
 pub mod radio;
+#[cfg(feature = "slider")]
+pub mod slider;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -294,6 +297,8 @@ pub mod prelude {
     pub use crate::number_input::*;
     #[cfg(feature = "radio")]
     pub use crate::radio::*;
+    #[cfg(feature = "slider")]
+    pub use crate::slider::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;

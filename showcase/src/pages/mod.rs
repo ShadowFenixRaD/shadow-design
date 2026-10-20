@@ -29,6 +29,7 @@ pub mod skeletons;
 pub mod trees;
 pub mod number_input;
 pub mod radio;
+pub mod slider;
 
 pub use alerts::AlertsPage;
 pub use animation::AnimationsPage;
@@ -61,3 +62,4 @@ pub use skeletons::SkeletonsPage;
 pub use trees::TreesPage;
 pub use number_input::NumberInputPage;
 pub use radio::RadioPage;
+pub use slider::SliderPage;
