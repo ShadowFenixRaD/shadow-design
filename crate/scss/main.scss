@@ -48,6 +48,7 @@
 @use 'components/spoiler' as *;
 @use 'components/list' as *;
 @use 'components/timeline' as *;
+@use 'components/table' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

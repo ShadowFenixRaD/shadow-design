@@ -38,6 +38,7 @@ pub mod chip;
 pub mod typography;
 pub mod spoiler;
 pub mod timelines;
+pub mod tables;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -79,3 +80,4 @@ pub use chip::ChipPage;
 pub use typography::TypographyPage;
 pub use spoiler::SpoilerPage;
 pub use timelines::TimelinesPage;
+pub use tables::TablesPage;

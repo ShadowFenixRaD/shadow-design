@@ -255,6 +255,8 @@ pub mod chip;
 pub mod spoiler;
 #[cfg(feature = "timeline")]
 pub mod timeline;
+#[cfg(feature = "table")]
+pub mod table;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -339,5 +341,7 @@ pub mod prelude {
     pub use crate::spoiler::*;
     #[cfg(feature = "timeline")]
     pub use crate::timeline::*;
+    #[cfg(feature = "table")]
+    pub use crate::table::*;
     pub use crate::STYLES;
 }

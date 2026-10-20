@@ -333,6 +333,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "timeline events history steps audit tracking status",
         description: "Linea guida temporale e cronologia eventi con bullet di stato.",
     },
+    ComponentNavEntry {
+        name: "Table",
+        route: Route::TablesPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "table datatable grid cells sorting pagination rows",
+        description: "Tabelle dati semantiche con ordinamento, paginazione e hover.",
+    },
 ];
 
 #[component]
