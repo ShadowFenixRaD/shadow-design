@@ -1,0 +1,182 @@
+// ==============================================================================
+// Shadow Design — Chip & ChipGroup Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@keyframes sd-chip-check-in {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@layer sd-components {
+  // ----------------------------------------------------------------------------
+  // ChipGroup Container
+  // ----------------------------------------------------------------------------
+  .sd-chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Chip Button Item
+  // ----------------------------------------------------------------------------
+  .sd-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: $font-sans;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 9999px;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all $duration-fast ease;
+
+    &:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
+      outline-offset: 2px;
+    }
+
+    // Size variants
+    &--sm {
+      height: 26px;
+      padding: 0 10px;
+      font-size: 12px;
+      gap: 5px;
+    }
+
+    &--md {
+      height: 32px;
+      padding: 0 14px;
+      font-size: 13px;
+      gap: 6px;
+    }
+
+    &--lg {
+      height: 38px;
+      padding: 0 18px;
+      font-size: 14px;
+      gap: 8px;
+    }
+
+    // Visual Style Variants
+    // 1. Filled (Default)
+    &--filled {
+      background-color: #0c0c12;
+      border-color: rgba(255, 255, 255, 0.14);
+      color: $zinc-300;
+
+      &:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.32);
+        background-color: #14141e;
+        color: #ffffff;
+      }
+
+      &.sd-chip--checked {
+        background-color: var(--sd-accent-primary, #7c3aed);
+        border-color: rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+        box-shadow: 0 0 14px var(--sd-accent-glow, rgba(168, 85, 247, 0.45));
+      }
+    }
+
+    // 2. Outline
+    &--outline {
+      background-color: transparent;
+      border-color: rgba(255, 255, 255, 0.18);
+      color: $zinc-400;
+
+      &:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.38);
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.03);
+      }
+
+      &.sd-chip--checked {
+        border-color: var(--sd-accent-primary, #a855f7);
+        color: #ffffff;
+        background-color: rgba(168, 85, 247, 0.12);
+        box-shadow: 0 0 12px var(--sd-accent-glow, rgba(168, 85, 247, 0.35));
+      }
+    }
+
+    // 3. Light
+    &--light {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-color: transparent;
+      color: $zinc-300;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+      }
+
+      &.sd-chip--checked {
+        background-color: rgba(168, 85, 247, 0.22);
+        border-color: rgba(168, 85, 247, 0.45);
+        color: #ffffff;
+        box-shadow: 0 0 10px var(--sd-accent-glow, rgba(168, 85, 247, 0.25));
+      }
+    }
+
+    // 4. Subtle
+    &--subtle {
+      background-color: transparent;
+      border-color: transparent;
+      color: $zinc-400;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+      }
+
+      &.sd-chip--checked {
+        background-color: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+      }
+    }
+
+    // Icons
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &--check {
+        animation: sd-chip-check-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
+
+    &__label {
+      display: inline-flex;
+      align-items: center;
+      line-height: normal;
+    }
+
+    // Disabled state
+    &--disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+}

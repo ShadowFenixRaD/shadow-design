@@ -134,6 +134,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Valutazione a stelle o icone con supporto per mezze valutazioni e anteprima hover.",
     },
     ComponentNavEntry {
+        name: "Chip & ChipGroup",
+        route: Route::ChipPage {},
+        group: "Componenti Core",
+        icon: IconKind::Layers,
+        keywords: "chip chipgroup tag filter badge toggle pill",
+        description: "Capsule interattive per filtri, tag e selezioni multiple o singole.",
+    },
+    ComponentNavEntry {
         name: "Badge",
         route: Route::BadgesPage {},
         group: "Componenti Core",
@@ -164,6 +172,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         icon: IconKind::Menu,
         keywords: "navbar navigation header brand menu",
         description: "Barra di navigazione superiore responsive con specular highlight.",
+    },
+    ComponentNavEntry {
+        name: "Chip & ChipGroup",
+        route: Route::ChipPage {},
+        group: "Componenti Core",
+        icon: IconKind::Check,
+        keywords: "chip chipgroup tag badge filter pill select toggle",
+        description: "Elementi di selezione compatta interattivi con supporto a ChipGroup.",
     },
     ComponentNavEntry {
         name: "Notifications",

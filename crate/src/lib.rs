@@ -121,6 +121,7 @@
 //! | `rating` | `rating` | Interactive star/icon ratings with half-fractions and hover preview |
 //! | `pin_input` | `pin_input` | Multi-digit PIN/OTP code inputs with auto-advance and masking |
 //! | `color_picker` | `color_picker` | ColorPicker and ColorInput with HSV/Hex/RGB formats, alpha, and swatches |
+//! | `chip` | `chip` | Compact interactive filter and selection chips with single and multi-select groups |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -242,6 +243,8 @@ pub mod rating;
 pub mod pin_input;
 #[cfg(feature = "color_picker")]
 pub mod color_picker;
+#[cfg(feature = "chip")]
+pub mod chip;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -314,6 +317,8 @@ pub mod prelude {
     pub use crate::pin_input::*;
     #[cfg(feature = "color_picker")]
     pub use crate::color_picker::*;
+    #[cfg(feature = "chip")]
+    pub use crate::chip::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;
