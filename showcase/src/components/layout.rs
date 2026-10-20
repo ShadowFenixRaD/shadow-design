@@ -282,6 +282,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
                     SidebarLink { to: Route::InputsPage {}, icon: IconKind::Terminal, label: "TextInput", collapsed }
                     SidebarLink { to: Route::NumberInputPage {}, icon: IconKind::Terminal, label: "NumberInput", collapsed }
+                    SidebarLink { to: Route::PinInputPage {}, icon: IconKind::Terminal, label: "PinInput", collapsed }
                     SidebarLink { to: Route::SelectPage {}, icon: IconKind::ChevronDown, label: "Select", collapsed }
                     SidebarLink { to: Route::TextareaPage {}, icon: IconKind::Code, label: "Textarea", collapsed }
                     SidebarLink { to: Route::CheckboxPage {}, icon: IconKind::Check, label: "Checkbox", collapsed }

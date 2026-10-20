@@ -86,6 +86,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Area di testo multilinea con autosize intelligente.",
     },
     ComponentNavEntry {
+        name: "PinInput / OTP",
+        route: Route::PinInputPage {},
+        group: "Componenti Core",
+        icon: IconKind::Terminal,
+        keywords: "pin input otp code 2fa token password mask",
+        description: "Inserimento tattile di codici PIN e token OTP a caselle.",
+    },
+    ComponentNavEntry {
         name: "Checkbox",
         route: Route::CheckboxPage {},
         group: "Componenti Core",

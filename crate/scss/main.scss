@@ -41,6 +41,7 @@
 @use 'components/radio' as *;
 @use 'components/slider' as *;
 @use 'components/rating' as *;
+@use 'components/pin_input' as *;
 
 @layer sd-base {
   :root {

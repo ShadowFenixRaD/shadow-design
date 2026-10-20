@@ -119,6 +119,7 @@
 //! | `radio` | `radio` | Radio, RadioGroup, and RadioCard with horizontal/vertical orientations |
 //! | `slider` | `slider` | Graduated sliders and dual-thumb RangeSlider with marks and tooltips |
 //! | `rating` | `rating` | Interactive star/icon ratings with half-fractions and hover preview |
+//! | `pin_input` | `pin_input` | Multi-digit PIN/OTP code inputs with auto-advance and masking |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -236,6 +237,8 @@ pub mod radio;
 pub mod slider;
 #[cfg(feature = "rating")]
 pub mod rating;
+#[cfg(feature = "pin_input")]
+pub mod pin_input;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -304,6 +307,8 @@ pub mod prelude {
     pub use crate::slider::*;
     #[cfg(feature = "rating")]
     pub use crate::rating::*;
+    #[cfg(feature = "pin_input")]
+    pub use crate::pin_input::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;

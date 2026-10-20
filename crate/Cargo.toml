@@ -72,6 +72,7 @@ all = [
     "radio",
     "slider",
     "rating",
+    "pin_input",
 ]
 serde = ["dep:serde"]
 button = []
@@ -111,6 +112,8 @@ number-input = ["number_input"]
 radio = ["icon"]
 slider = ["tooltip"]
 rating = ["icon"]
+pin_input = []
+pin-input = ["pin_input"]
 
 [lints.clippy]
 must_use_candidate = "warn"
