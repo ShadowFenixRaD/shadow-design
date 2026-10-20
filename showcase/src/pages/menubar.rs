@@ -91,148 +91,154 @@ pub fn MenubarPage() -> Element {
                                 }
                             }
 
-                            // CommandBar con Menubar e quick action
-                            CommandBar {
-                                menubar: rsx! {
-                                    Menubar {
-                                        border: false,
+                            // Barra dei menu principale al di sotto della barra del titolo e sopra la barra di ricerca comandi
+                            Menubar {
+                                border: true,
 
-                                        // Menu File
-                                        MenubarMenu {
-                                            id: Some("file".to_string()),
-                                            MenubarTrigger { "File" }
-                                            MenubarContent {
-                                                MenubarItem {
-                                                    label: Some("Nuovo Nodo Mesh".to_string()),
-                                                    shortcut: Some("Ctrl+N".to_string()),
-                                                    icon: Some(SvgIcon::Kind(IconKind::Radio)),
-                                                    on_click: move |_| last_action.set("File -> Nuovo Nodo Mesh".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Apri Vault Crittografico".to_string()),
-                                                    shortcut: Some("Ctrl+O".to_string()),
-                                                    icon: Some(SvgIcon::Kind(IconKind::Lock)),
-                                                    on_click: move |_| last_action.set("File -> Apri Vault Crittografico".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Salva Configurazione".to_string()),
-                                                    shortcut: Some("Ctrl+S".to_string()),
-                                                    on_click: move |_| last_action.set("File -> Salva Configurazione (Ctrl+S)".to_string()),
-                                                }
-                                                MenubarSeparator {}
-                                                MenubarItem {
-                                                    label: Some("Esporta Certificato X.509".to_string()),
-                                                    on_click: move |_| last_action.set("File -> Esporta Certificato".to_string()),
-                                                }
-                                                MenubarSeparator {}
-                                                MenubarItem {
-                                                    label: Some("Chiudi Sessione".to_string()),
-                                                    shortcut: Some("Alt+F4".to_string()),
-                                                    on_click: move |_| last_action.set("File -> Chiudi Sessione".to_string()),
-                                                }
-                                            }
+                                // Menu File
+                                MenubarMenu {
+                                    id: Some("file".to_string()),
+                                    MenubarTrigger { "File" }
+                                    MenubarContent {
+                                        MenubarItem {
+                                            label: Some("Nuovo Nodo Mesh".to_string()),
+                                            shortcut: Some("Ctrl+N".to_string()),
+                                            icon: Some(SvgIcon::Kind(IconKind::Radio)),
+                                            on_click: move |_| last_action.set("File -> Nuovo Nodo Mesh".to_string()),
                                         }
-
-                                        // Menu Modifica
-                                        MenubarMenu {
-                                            id: Some("edit".to_string()),
-                                            MenubarTrigger { "Modifica" }
-                                            MenubarContent {
-                                                MenubarItem {
-                                                    label: Some("Annulla".to_string()),
-                                                    shortcut: Some("Ctrl+Z".to_string()),
-                                                    on_click: move |_| last_action.set("Modifica -> Annulla".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Ripeti".to_string()),
-                                                    shortcut: Some("Ctrl+Y".to_string()),
-                                                    on_click: move |_| last_action.set("Modifica -> Ripeti".to_string()),
-                                                }
-                                                MenubarSeparator {}
-                                                MenubarItem {
-                                                    label: Some("Taglia Chiave".to_string()),
-                                                    shortcut: Some("Ctrl+X".to_string()),
-                                                    on_click: move |_| last_action.set("Modifica -> Taglia".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Copia Impronta SHA-256".to_string()),
-                                                    shortcut: Some("Ctrl+C".to_string()),
-                                                    on_click: move |_| last_action.set("Modifica -> Copia Impronta".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Incolla".to_string()),
-                                                    shortcut: Some("Ctrl+V".to_string()),
-                                                    on_click: move |_| last_action.set("Modifica -> Incolla".to_string()),
-                                                }
-                                            }
+                                        MenubarItem {
+                                            label: Some("Apri Vault Crittografico".to_string()),
+                                            shortcut: Some("Ctrl+O".to_string()),
+                                            icon: Some(SvgIcon::Kind(IconKind::Lock)),
+                                            on_click: move |_| last_action.set("File -> Apri Vault Crittografico".to_string()),
                                         }
-
-                                        // Menu Visualizza con Checkbox states
-                                        MenubarMenu {
-                                            id: Some("view".to_string()),
-                                            MenubarTrigger { "Visualizza" }
-                                            MenubarContent {
-                                                MenubarItem {
-                                                    label: Some("Terminale di Debug".to_string()),
-                                                    checked: Some(show_terminal()),
-                                                    shortcut: Some("Ctrl+`".to_string()),
-                                                    on_click: move |_| {
-                                                        let next = !show_terminal();
-                                                        show_terminal.set(next);
-                                                        last_action.set(format!("Visualizza -> Toggle Terminale ({next})"));
-                                                    },
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Metriche Latenza Rete".to_string()),
-                                                    checked: Some(show_metrics()),
-                                                    on_click: move |_| {
-                                                        let next = !show_metrics();
-                                                        show_metrics.set(next);
-                                                        last_action.set(format!("Visualizza -> Toggle Metriche ({next})"));
-                                                    },
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Minimappa Codice".to_string()),
-                                                    checked: Some(show_minimap()),
-                                                    on_click: move |_| {
-                                                        let next = !show_minimap();
-                                                        show_minimap.set(next);
-                                                        last_action.set(format!("Visualizza -> Toggle Minimappa ({next})"));
-                                                    },
-                                                }
-                                            }
+                                        MenubarItem {
+                                            label: Some("Salva Configurazione".to_string()),
+                                            shortcut: Some("Ctrl+S".to_string()),
+                                            on_click: move |_| last_action.set("File -> Salva Configurazione (Ctrl+S)".to_string()),
                                         }
-
-                                        // Menu Sicurezza
-                                        MenubarMenu {
-                                            id: Some("security".to_string()),
-                                            MenubarTrigger { "Sicurezza" }
-                                            MenubarContent {
-                                                MenubarItem {
-                                                    label: Some("Genera Coppia Chiavi ML-KEM".to_string()),
-                                                    icon: Some(SvgIcon::Kind(IconKind::Key)),
-                                                    on_click: move |_| last_action.set("Sicurezza -> Genera Chiavi ML-KEM".to_string()),
-                                                }
-                                                MenubarItem {
-                                                    label: Some("Verifica Integrità HSM".to_string()),
-                                                    icon: Some(SvgIcon::Kind(IconKind::ShieldCheck)),
-                                                    on_click: move |_| last_action.set("Sicurezza -> Verifica HSM".to_string()),
-                                                }
-                                                MenubarSeparator {}
-                                                MenubarItem {
-                                                    label: Some("Revoca Autorizzazione Peer".to_string()),
-                                                    disabled: true,
-                                                    on_click: move |_| last_action.set("Sicurezza -> Revoca".to_string()),
-                                                }
-                                            }
+                                        MenubarSeparator {}
+                                        MenubarItem {
+                                            label: Some("Esporta Certificato X.509".to_string()),
+                                            on_click: move |_| last_action.set("File -> Esporta Certificato".to_string()),
+                                        }
+                                        MenubarSeparator {}
+                                        MenubarItem {
+                                            label: Some("Chiudi Sessione".to_string()),
+                                            shortcut: Some("Alt+F4".to_string()),
+                                            on_click: move |_| last_action.set("File -> Chiudi Sessione".to_string()),
                                         }
                                     }
-                                },
-                                action: rsx! {
-                                    div { class: "px-2 py-1 rounded bg-white/[0.04] border border-white/[0.06] text-[11px] font-mono text-zinc-400 flex items-center space-x-2 cursor-pointer",
-                                        Icon { kind: IconKind::Search, size: 12 }
-                                        span { "Cerca Comandi..." }
-                                        span { class: "px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-zinc-300", "Ctrl+K" }
+                                }
+
+                                // Menu Modifica
+                                MenubarMenu {
+                                    id: Some("edit".to_string()),
+                                    MenubarTrigger { "Modifica" }
+                                    MenubarContent {
+                                        MenubarItem {
+                                            label: Some("Annulla".to_string()),
+                                            shortcut: Some("Ctrl+Z".to_string()),
+                                            on_click: move |_| last_action.set("Modifica -> Annulla".to_string()),
+                                        }
+                                        MenubarItem {
+                                            label: Some("Ripeti".to_string()),
+                                            shortcut: Some("Ctrl+Y".to_string()),
+                                            on_click: move |_| last_action.set("Modifica -> Ripeti".to_string()),
+                                        }
+                                        MenubarSeparator {}
+                                        MenubarItem {
+                                            label: Some("Taglia Chiave".to_string()),
+                                            shortcut: Some("Ctrl+X".to_string()),
+                                            on_click: move |_| last_action.set("Modifica -> Taglia".to_string()),
+                                        }
+                                        MenubarItem {
+                                            label: Some("Copia Impronta SHA-256".to_string()),
+                                            shortcut: Some("Ctrl+C".to_string()),
+                                            on_click: move |_| last_action.set("Modifica -> Copia Impronta".to_string()),
+                                        }
+                                        MenubarItem {
+                                            label: Some("Incolla".to_string()),
+                                            shortcut: Some("Ctrl+V".to_string()),
+                                            on_click: move |_| last_action.set("Modifica -> Incolla".to_string()),
+                                        }
+                                    }
+                                }
+
+                                // Menu Visualizza con Checkbox states
+                                MenubarMenu {
+                                    id: Some("view".to_string()),
+                                    MenubarTrigger { "Visualizza" }
+                                    MenubarContent {
+                                        MenubarItem {
+                                            label: Some("Terminale di Debug".to_string()),
+                                            checked: Some(show_terminal()),
+                                            shortcut: Some("Ctrl+`".to_string()),
+                                            on_click: move |_| {
+                                                let next = !show_terminal();
+                                                show_terminal.set(next);
+                                                last_action.set(format!("Visualizza -> Toggle Terminale ({next})"));
+                                            },
+                                        }
+                                        MenubarItem {
+                                            label: Some("Metriche Latenza Rete".to_string()),
+                                            checked: Some(show_metrics()),
+                                            on_click: move |_| {
+                                                let next = !show_metrics();
+                                                show_metrics.set(next);
+                                                last_action.set(format!("Visualizza -> Toggle Metriche ({next})"));
+                                            },
+                                        }
+                                        MenubarItem {
+                                            label: Some("Minimappa Codice".to_string()),
+                                            checked: Some(show_minimap()),
+                                            on_click: move |_| {
+                                                let next = !show_minimap();
+                                                show_minimap.set(next);
+                                                last_action.set(format!("Visualizza -> Toggle Minimappa ({next})"));
+                                            },
+                                        }
+                                    }
+                                }
+
+                                // Menu Sicurezza
+                                MenubarMenu {
+                                    id: Some("security".to_string()),
+                                    MenubarTrigger { "Sicurezza" }
+                                    MenubarContent {
+                                        MenubarItem {
+                                            label: Some("Genera Coppia Chiavi ML-KEM".to_string()),
+                                            icon: Some(SvgIcon::Kind(IconKind::Key)),
+                                            on_click: move |_| last_action.set("Sicurezza -> Genera Chiavi ML-KEM".to_string()),
+                                        }
+                                        MenubarItem {
+                                            label: Some("Verifica Integrità HSM".to_string()),
+                                            icon: Some(SvgIcon::Kind(IconKind::ShieldCheck)),
+                                            on_click: move |_| last_action.set("Sicurezza -> Verifica HSM".to_string()),
+                                        }
+                                        MenubarSeparator {}
+                                        MenubarItem {
+                                            label: Some("Revoca Autorizzazione Peer".to_string()),
+                                            disabled: true,
+                                            on_click: move |_| last_action.set("Sicurezza -> Revoca".to_string()),
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Barra di ricerca comandi posizionata subito al di sotto
+                            div { class: "px-4 py-2 bg-black/60 border-b border-white/[0.06] flex items-center justify-between",
+                                div { class: "px-2.5 py-1 rounded bg-white/[0.04] border border-white/[0.06] text-[11px] font-mono text-zinc-400 flex items-center space-x-2 cursor-pointer hover:bg-white/[0.06] transition-colors",
+                                    Icon { kind: IconKind::Search, size: 12 }
+                                    span { "Cerca Comandi..." }
+                                    span { class: "px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-zinc-300", "Ctrl+K" }
+                                }
+                                div { class: "flex items-center space-x-3 text-[11px] font-mono text-zinc-500",
+                                    span { "Station ID: mesh-0492" }
+                                    span { class: "text-zinc-600", "•" }
+                                    span { class: "text-emerald-400 flex items-center space-x-1",
+                                        span { class: "w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" }
+                                        span { "ONLINE" }
                                     }
                                 }
                             }
