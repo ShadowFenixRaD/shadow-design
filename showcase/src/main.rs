@@ -9,7 +9,7 @@ use pages::{
     AccordionPage, AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ListsPage, ModalsPage,
     ChipPage, ColorPickerPage, NavbarDemoPage, NotificationsPage, NumberInputPage, PinInputPage, ProgressPage, RadioPage, RatingPage, SegmentedControlsPage, SelectPage,
-    SkeletonsPage, SliderPage, SpoilerPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
+    SkeletonsPage, SliderPage, SpoilerPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
 };
 
@@ -81,6 +81,8 @@ pub enum Route {
     SkeletonsPage {},
     #[route("/lists")]
     ListsPage {},
+    #[route("/timelines")]
+    TimelinesPage {},
     #[route("/icons")]
     IconsPage {},
     #[route("/animations")]

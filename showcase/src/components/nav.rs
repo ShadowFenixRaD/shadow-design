@@ -325,6 +325,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "spoiler hide show reveal expand collapse truncate",
         description: "Contenitore con dissolvenza inferiore e pulsante mostra di più / mostra meno.",
     },
+    ComponentNavEntry {
+        name: "Timeline",
+        route: Route::TimelinesPage {},
+        group: "Componenti Core",
+        icon: IconKind::Clock,
+        keywords: "timeline events history steps audit tracking status",
+        description: "Linea guida temporale e cronologia eventi con bullet di stato.",
+    },
 ];
 
 #[component]

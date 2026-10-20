@@ -47,7 +47,7 @@
 @use 'components/accordion' as *;
 @use 'components/spoiler' as *;
 @use 'components/list' as *;
-
+@use 'components/timeline' as *;
 @layer sd-base {
   :root {
     --font-sans: #{$font-sans};

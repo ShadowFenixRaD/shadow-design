@@ -78,6 +78,7 @@ all = [
     "accordion",
     "spoiler",
     "list",
+    "timeline",
 ]
 serde = ["dep:serde"]
 button = []
@@ -125,6 +126,7 @@ chip = ["icon"]
 accordion = ["icon"]
 spoiler = ["button", "icon"]
 list = []
+timeline = []
 
 [lints.clippy]
 must_use_candidate = "warn"

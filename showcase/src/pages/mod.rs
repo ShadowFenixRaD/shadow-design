@@ -37,6 +37,7 @@ pub mod color_picker;
 pub mod chip;
 pub mod typography;
 pub mod spoiler;
+pub mod timelines;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -77,3 +78,4 @@ pub use color_picker::ColorPickerPage;
 pub use chip::ChipPage;
 pub use typography::TypographyPage;
 pub use spoiler::SpoilerPage;
+pub use timelines::TimelinesPage;
