@@ -45,6 +45,7 @@
 @use 'components/color_picker' as *;
 @use 'components/chip' as *;
 @use 'components/accordion' as *;
+@use 'components/spoiler' as *;
 
 @layer sd-base {
   :root {

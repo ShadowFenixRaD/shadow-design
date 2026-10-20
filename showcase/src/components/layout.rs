@@ -322,7 +322,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
                     SidebarLink { to: Route::IconsPage {}, icon: IconKind::Search, label: "Icons", collapsed }
                     SidebarLink { to: Route::AnimationsPage {}, icon: IconKind::Sparkles, label: "Animation", collapsed }
-                    SidebarLink { to: Route::AccordionPage {}, icon: IconKind::ChevronDown, label: "Accordion", collapsed }
+                    SidebarLink { to: Route::SpoilerPage {}, icon: IconKind::ChevronDown, label: "Spoiler", collapsed }
                 }
             }
 

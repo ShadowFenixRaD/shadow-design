@@ -35,6 +35,7 @@ pub mod pin_input;
 pub mod color_picker;
 pub mod chip;
 pub mod typography;
+pub mod spoiler;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -73,3 +74,4 @@ pub use pin_input::PinInputPage;
 pub use color_picker::ColorPickerPage;
 pub use chip::ChipPage;
 pub use typography::TypographyPage;
+pub use spoiler::SpoilerPage;

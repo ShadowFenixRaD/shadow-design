@@ -76,6 +76,7 @@ all = [
     "color_picker",
     "chip",
     "accordion",
+    "spoiler",
 ]
 serde = ["dep:serde"]
 button = []
@@ -121,6 +122,7 @@ color_picker = ["icon"]
 color-picker = ["color_picker"]
 chip = ["icon"]
 accordion = ["icon"]
+spoiler = ["button", "icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"

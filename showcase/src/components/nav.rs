@@ -310,12 +310,12 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Segnaposto di caricamento con shimmer progressivo.",
     },
     ComponentNavEntry {
-        name: "Accordion",
-        route: Route::AccordionPage {},
+        name: "Spoiler",
+        route: Route::SpoilerPage {},
         group: "Interattività & Avanzati",
         icon: IconKind::ChevronDown,
-        keywords: "accordion collapsible collapse expand panel fold",
-        description: "Pannelli espandibili a fisarmonica con animazioni fluide e chevron.",
+        keywords: "spoiler hide show reveal expand collapse truncate",
+        description: "Contenitore con dissolvenza inferiore e pulsante mostra di più / mostra meno.",
     },
 ];
 

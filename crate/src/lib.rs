@@ -123,6 +123,7 @@
 //! | `color_picker` | `color_picker` | ColorPicker and ColorInput with HSV/Hex/RGB formats, alpha, and swatches |
 //! | `chip` | `chip` | Compact interactive filter and selection chips with single and multi-select groups |
 //! | `accordion` | `accordion` | Collapsible accordion panels with single or multiple expansion |
+//! | `spoiler` | `spoiler` | Expandable content container with max-height truncation and fade overlay |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -248,6 +249,8 @@ pub mod pin_input;
 pub mod color_picker;
 #[cfg(feature = "chip")]
 pub mod chip;
+#[cfg(feature = "spoiler")]
+pub mod spoiler;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -326,5 +329,7 @@ pub mod prelude {
     pub use crate::color_picker::*;
     #[cfg(feature = "chip")]
     pub use crate::chip::*;
+    #[cfg(feature = "spoiler")]
+    pub use crate::spoiler::*;
     pub use crate::STYLES;
 }
