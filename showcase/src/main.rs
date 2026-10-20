@@ -8,7 +8,7 @@ use components::Layout;
 use pages::{
     AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ModalsPage,
-    NavbarDemoPage, NotificationsPage, NumberInputPage, PinInputPage, ProgressPage, RadioPage, RatingPage, SegmentedControlsPage, SelectPage,
+    ColorPickerPage, NavbarDemoPage, NotificationsPage, NumberInputPage, PinInputPage, ProgressPage, RadioPage, RatingPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SwitchPage, TabsPage, TextareaPage, ThemeBuilderPage, TooltipPage, TreesPage,
     TypographyPage,
 };
@@ -85,6 +85,8 @@ pub enum Route {
     AnimationsPage {},
     #[route("/pin-input")]
     PinInputPage {},
+    #[route("/color-picker")]
+    ColorPickerPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

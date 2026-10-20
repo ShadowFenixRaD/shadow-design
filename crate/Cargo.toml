@@ -73,6 +73,7 @@ all = [
     "slider",
     "rating",
     "pin_input",
+    "color_picker",
 ]
 serde = ["dep:serde"]
 button = []
@@ -114,6 +115,8 @@ slider = ["tooltip"]
 rating = ["icon"]
 pin_input = []
 pin-input = ["pin_input"]
+color_picker = ["icon"]
+color-picker = ["color_picker"]
 
 [lints.clippy]
 must_use_candidate = "warn"

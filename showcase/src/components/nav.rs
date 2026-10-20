@@ -94,6 +94,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Inserimento tattile di codici PIN e token OTP a caselle.",
     },
     ComponentNavEntry {
+        name: "ColorPicker & ColorInput",
+        route: Route::ColorPickerPage {},
+        group: "Componenti Core",
+        icon: IconKind::Sparkles,
+        keywords: "color picker input hex rgb hsl alpha swatch",
+        description: "Selettore cromatico avanzato con slider HSL, alpha e palette swatch.",
+    },
+    ComponentNavEntry {
         name: "Checkbox",
         route: Route::CheckboxPage {},
         group: "Componenti Core",

@@ -120,6 +120,7 @@
 //! | `slider` | `slider` | Graduated sliders and dual-thumb RangeSlider with marks and tooltips |
 //! | `rating` | `rating` | Interactive star/icon ratings with half-fractions and hover preview |
 //! | `pin_input` | `pin_input` | Multi-digit PIN/OTP code inputs with auto-advance and masking |
+//! | `color_picker` | `color_picker` | ColorPicker and ColorInput with HSV/Hex/RGB formats, alpha, and swatches |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -239,6 +240,8 @@ pub mod slider;
 pub mod rating;
 #[cfg(feature = "pin_input")]
 pub mod pin_input;
+#[cfg(feature = "color_picker")]
+pub mod color_picker;
 
 pub mod prelude {
     #[cfg(feature = "alert")]
@@ -309,6 +312,8 @@ pub mod prelude {
     pub use crate::rating::*;
     #[cfg(feature = "pin_input")]
     pub use crate::pin_input::*;
+    #[cfg(feature = "color_picker")]
+    pub use crate::color_picker::*;
     pub use crate::a11y::ControlSize;
     pub use crate::locale::*;
     pub use crate::STYLES;

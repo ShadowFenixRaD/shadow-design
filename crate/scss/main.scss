@@ -42,6 +42,7 @@
 @use 'components/slider' as *;
 @use 'components/rating' as *;
 @use 'components/pin_input' as *;
+@use 'components/color_picker' as *;
 
 @layer sd-base {
   :root {

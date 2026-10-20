@@ -32,6 +32,7 @@ pub mod radio;
 pub mod slider;
 pub mod rating;
 pub mod pin_input;
+pub mod color_picker;
 
 pub use alerts::AlertsPage;
 pub use animation::AnimationsPage;
@@ -67,3 +68,4 @@ pub use radio::RadioPage;
 pub use slider::SliderPage;
 pub use rating::RatingPage;
 pub use pin_input::PinInputPage;
+pub use color_picker::ColorPickerPage;

@@ -1,0 +1,1178 @@
+use dioxus::prelude::*;
+use crate::a11y::{use_unique_id, ControlSize};
+use crate::icon::{Icon, IconKind};
+use crate::util::cx;
+
+/// Supported output formatting modes for colors.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum ColorFormat {
+    /// Standard hexadecimal string (e.g. `#8b5cf6` or `#8b5cf6ff`).
+    #[default]
+    Hex,
+    /// Functional RGB/RGBA string (e.g. `rgb(139, 92, 246)` or `rgba(139, 92, 246, 0.8)`).
+    Rgb,
+    /// Functional HSL/HSLA string (e.g. `hsl(258, 90%, 66%)` or `hsla(258, 90%, 66%, 0.8)`).
+    Hsl,
+}
+
+/// Representation of an RGBA color.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Rgba {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: f32,
+}
+
+impl Default for Rgba {
+    fn default() -> Self {
+        Self {
+            r: 139,
+            g: 92,
+            b: 246,
+            a: 1.0,
+        }
+    }
+}
+
+/// Representation of an HSLA color.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Hsla {
+    /// Hue in degrees `0.0..=360.0`.
+    pub h: f32,
+    /// Saturation in percentage `0.0..=100.0`.
+    pub s: f32,
+    /// Lightness in percentage `0.0..=100.0`.
+    pub l: f32,
+    /// Alpha in fraction `0.0..=1.0`.
+    pub a: f32,
+}
+
+impl Default for Hsla {
+    fn default() -> Self {
+        Self {
+            h: 258.0,
+            s: 90.0,
+            l: 66.0,
+            a: 1.0,
+        }
+    }
+}
+
+/// Parses a hex color string with or without leading '#'.
+#[must_use]
+pub fn parse_hex(input: &str) -> Option<Rgba> {
+    let clean = input.trim().trim_start_matches('#');
+    match clean.len() {
+        3 => {
+            let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).ok()?;
+            let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).ok()?;
+            let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).ok()?;
+            Some(Rgba { r, g, b, a: 1.0 })
+        }
+        4 => {
+            let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).ok()?;
+            let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).ok()?;
+            let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).ok()?;
+            let a_val = u8::from_str_radix(&clean[3..4].repeat(2), 16).ok()?;
+            Some(Rgba {
+                r,
+                g,
+                b,
+                a: (a_val as f32) / 255.0,
+            })
+        }
+        6 => {
+            let r = u8::from_str_radix(&clean[0..2], 16).ok()?;
+            let g = u8::from_str_radix(&clean[2..4], 16).ok()?;
+            let b = u8::from_str_radix(&clean[4..6], 16).ok()?;
+            Some(Rgba { r, g, b, a: 1.0 })
+        }
+        8 => {
+            let r = u8::from_str_radix(&clean[0..2], 16).ok()?;
+            let g = u8::from_str_radix(&clean[2..4], 16).ok()?;
+            let b = u8::from_str_radix(&clean[4..6], 16).ok()?;
+            let a_val = u8::from_str_radix(&clean[6..8], 16).ok()?;
+            Some(Rgba {
+                r,
+                g,
+                b,
+                a: (a_val as f32) / 255.0,
+            })
+        }
+        _ => None,
+    }
+}
+
+/// Parses an RGB or RGBA string. Supports `rgb(...)`, `rgba(...)`, or raw `r, g, b` / `r g b`.
+#[must_use]
+pub fn parse_rgb(input: &str) -> Option<Rgba> {
+    let clean = input.trim();
+    let inner = if (clean.starts_with("rgb(") || clean.starts_with("rgba(")) && clean.ends_with(')') {
+        clean
+            .trim_start_matches("rgba(")
+            .trim_start_matches("rgb(")
+            .trim_end_matches(')')
+    } else {
+        clean
+    };
+    let parts: Vec<&str> = if inner.contains(',') {
+        inner.split(',').map(str::trim).collect()
+    } else {
+        inner.split_whitespace().collect()
+    };
+    if parts.len() < 3 {
+        return None;
+    }
+    let r = parts[0].parse::<u8>().ok()?;
+    let g = parts[1].parse::<u8>().ok()?;
+    let b = parts[2].parse::<u8>().ok()?;
+    let a = if parts.len() >= 4 {
+        parts[3].parse::<f32>().ok()?.clamp(0.0, 1.0)
+    } else {
+        1.0
+    };
+    Some(Rgba { r, g, b, a })
+}
+
+/// Flexible color parser trying Hex and RGB.
+#[must_use]
+pub fn parse_color(input: &str) -> Rgba {
+    parse_hex(input)
+        .or_else(|| parse_rgb(input))
+        .unwrap_or_default()
+}
+
+/// Converts RGBA to Hex string.
+#[must_use]
+pub fn rgba_to_hex(rgba: &Rgba, with_alpha: bool) -> String {
+    if with_alpha {
+        let alpha_byte = (rgba.a.clamp(0.0, 1.0) * 255.0).round() as u8;
+        format!("#{:02x}{:02x}{:02x}{:02x}", rgba.r, rgba.g, rgba.b, alpha_byte)
+    } else {
+        format!("#{:02x}{:02x}{:02x}", rgba.r, rgba.g, rgba.b)
+    }
+}
+
+/// Converts RGBA to HSL.
+#[must_use]
+pub fn rgba_to_hsl(rgba: &Rgba) -> Hsla {
+    let r = rgba.r as f32 / 255.0;
+    let g = rgba.g as f32 / 255.0;
+    let b = rgba.b as f32 / 255.0;
+
+    let max = r.max(g).max(b);
+    let min = r.min(g).min(b);
+    let delta = max - min;
+
+    let l = (max + min) / 2.0;
+
+    if delta == 0.0 {
+        return Hsla {
+            h: 0.0,
+            s: 0.0,
+            l: l * 100.0,
+            a: rgba.a,
+        };
+    }
+
+    let s = if l < 0.5 {
+        delta / (max + min)
+    } else {
+        delta / (2.0 - max - min)
+    };
+
+    let mut h = if (max - r).abs() < f32::EPSILON {
+        (g - b) / delta + (if g < b { 6.0 } else { 0.0 })
+    } else if (max - g).abs() < f32::EPSILON {
+        (b - r) / delta + 2.0
+    } else {
+        (r - g) / delta + 4.0
+    };
+    h *= 60.0;
+
+    Hsla {
+        h: h.clamp(0.0, 360.0),
+        s: (s * 100.0).clamp(0.0, 100.0),
+        l: (l * 100.0).clamp(0.0, 100.0),
+        a: rgba.a,
+    }
+}
+
+/// Converts HSLA to RGBA.
+#[must_use]
+pub fn hsl_to_rgba(hsla: &Hsla) -> Rgba {
+    let h = hsla.h % 360.0;
+    let s = hsla.s.clamp(0.0, 100.0) / 100.0;
+    let l = hsla.l.clamp(0.0, 100.0) / 100.0;
+
+    let c = (1.0 - (2.0 * l - 1.0).abs()) * s;
+    let x = c * (1.0 - ((h / 60.0) % 2.0 - 1.0).abs());
+    let m = l - c / 2.0;
+
+    let (r_prime, g_prime, b_prime) = if h < 60.0 {
+        (c, x, 0.0)
+    } else if h < 120.0 {
+        (x, c, 0.0)
+    } else if h < 180.0 {
+        (0.0, c, x)
+    } else if h < 240.0 {
+        (0.0, x, c)
+    } else if h < 300.0 {
+        (x, 0.0, c)
+    } else {
+        (c, 0.0, x)
+    };
+
+    Rgba {
+        r: ((r_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        g: ((g_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        b: ((b_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        a: hsla.a.clamp(0.0, 1.0),
+    }
+}
+
+/// Converts HSV to RGBA.
+#[must_use]
+pub fn hsv_to_rgb(h: f32, s: f32, v: f32, a: f32) -> Rgba {
+    let h = (h % 360.0 + 360.0) % 360.0;
+    let s = s.clamp(0.0, 100.0) / 100.0;
+    let v = v.clamp(0.0, 100.0) / 100.0;
+
+    let c = v * s;
+    let x = c * (1.0 - ((h / 60.0) % 2.0 - 1.0).abs());
+    let m = v - c;
+
+    let (r_prime, g_prime, b_prime) = if h < 60.0 {
+        (c, x, 0.0)
+    } else if h < 120.0 {
+        (x, c, 0.0)
+    } else if h < 180.0 {
+        (0.0, c, x)
+    } else if h < 240.0 {
+        (0.0, x, c)
+    } else if h < 300.0 {
+        (x, 0.0, c)
+    } else {
+        (c, 0.0, x)
+    };
+
+    Rgba {
+        r: ((r_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        g: ((g_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        b: ((b_prime + m) * 255.0).round().clamp(0.0, 255.0) as u8,
+        a: a.clamp(0.0, 1.0),
+    }
+}
+
+/// Converts RGBA to HSV/HSB (h: 0..=360, s: 0..=100, v: 0..=100).
+#[must_use]
+pub fn rgba_to_hsv(rgba: &Rgba) -> (f32, f32, f32) {
+    let r = rgba.r as f32 / 255.0;
+    let g = rgba.g as f32 / 255.0;
+    let b = rgba.b as f32 / 255.0;
+
+    let max = r.max(g).max(b);
+    let min = r.min(g).min(b);
+    let delta = max - min;
+
+    let v = max * 100.0;
+    let s = if max == 0.0 {
+        0.0
+    } else {
+        (delta / max) * 100.0
+    };
+
+    if delta == 0.0 {
+        return (0.0, 0.0, v);
+    }
+
+    let mut h = if (max - r).abs() < f32::EPSILON {
+        (g - b) / delta + (if g < b { 6.0 } else { 0.0 })
+    } else if (max - g).abs() < f32::EPSILON {
+        (b - r) / delta + 2.0
+    } else {
+        (r - g) / delta + 4.0
+    };
+    h *= 60.0;
+
+    (h.clamp(0.0, 360.0), s.clamp(0.0, 100.0), v.clamp(0.0, 100.0))
+}
+
+/// Formats a color according to the specified [`ColorFormat`].
+#[must_use]
+pub fn format_color(rgba: &Rgba, format: ColorFormat, with_alpha: bool) -> String {
+    match format {
+        ColorFormat::Hex => rgba_to_hex(rgba, with_alpha),
+        ColorFormat::Rgb => {
+            if with_alpha {
+                format!("rgba({}, {}, {}, {:.2})", rgba.r, rgba.g, rgba.b, rgba.a)
+            } else {
+                format!("rgb({}, {}, {})", rgba.r, rgba.g, rgba.b)
+            }
+        }
+        ColorFormat::Hsl => {
+            let hsl = rgba_to_hsl(rgba);
+            if with_alpha {
+                format!(
+                    "hsla({:.0}, {:.0}%, {:.0}%, {:.2})",
+                    hsl.h, hsl.s, hsl.l, hsl.a
+                )
+            } else {
+                format!("hsl({:.0}, {:.0}%, {:.0}%)", hsl.h, hsl.s, hsl.l)
+            }
+        }
+    }
+}
+
+/// Default theme swatch colors matching Shadow Design palette.
+#[must_use]
+pub fn default_color_swatches() -> Vec<String> {
+    vec![
+        "#a855f7".to_string(), // Vivid Violet (Primary)
+        "#6366f1".to_string(), // Indigo
+        "#06b6d4".to_string(), // Cyan
+        "#10b981".to_string(), // Emerald
+        "#f43f5e".to_string(), // Crimson
+        "#f59e0b".to_string(), // Amber
+        "#ec4899".to_string(), // Fuchsia
+        "#71717a".to_string(), // Obsidian Zinc
+    ]
+}
+
+/// Properties for configuring the [`ColorPicker`] component.
+#[derive(Props, Clone, PartialEq)]
+pub struct ColorPickerProps {
+    /// Reactive string signal holding the current color value.
+    pub value: Signal<String>,
+    /// Format used to write and parse the color value (Hex, Rgb, Hsl).
+    #[props(default = ColorFormat::Hex)]
+    pub format: ColorFormat,
+    /// Whether to show the alpha transparency slider and encode alpha channel.
+    #[props(default = false)]
+    pub with_alpha: bool,
+    /// List of quick color palette swatch hex values displayed below the picker.
+    #[props(default = default_color_swatches())]
+    pub swatches: Vec<String>,
+    /// Size scaling of the picker controls.
+    #[props(default = ControlSize::Md)]
+    pub size: ControlSize,
+    /// Whether the color picker is disabled and non-interactive.
+    #[props(default = false)]
+    pub disabled: bool,
+    /// Optional additional CSS class names for the container.
+    #[props(default)]
+    pub class: Option<String>,
+    /// Callback triggered whenever the color value changes.
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
+}
+
+/// Tactile ColorPicker component with 2D saturation/brightness gradient picker,
+/// format switcher (HEX, RGB, HSL), direct RGB channel controls, rainbow hue slider,
+/// alpha slider, and quick theme palette swatches.
+#[component]
+pub fn ColorPicker(props: ColorPickerProps) -> Element {
+    let current_str = props.value.read().clone();
+    let rgba = parse_color(&current_str);
+    let hsla = rgba_to_hsl(&rgba);
+    let (hsv_h, hsv_s, hsv_v) = rgba_to_hsv(&rgba);
+
+    let mut active_format = use_signal(|| props.format);
+    let mut mounted_area = use_signal(|| None::<MountedEvent>);
+    let mut current_hue = use_signal(|| hsla.h);
+
+    // Keep hue synchronized when color has sufficient saturation and brightness
+    if hsv_s > 1.0 && hsv_v > 1.0 && (*current_hue.read() - hsv_h).abs() > 0.5 {
+        current_hue.set(hsv_h);
+    }
+    let hue_val = *current_hue.read();
+
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let radius_class = theme.read().radius_scale.md();
+    #[cfg(not(feature = "theme"))]
+    let radius_class = "rounded-lg";
+
+    let size_modifier = match props.size {
+        ControlSize::Sm => "sd-color-picker--sm",
+        ControlSize::Md => "sd-color-picker--md",
+        ControlSize::Lg => "sd-color-picker--lg",
+    };
+
+    let disabled_modifier = if props.disabled { "sd-color-picker--disabled" } else { "" };
+
+    let container_class = cx([
+        "sd-color-picker",
+        size_modifier,
+        disabled_modifier,
+        radius_class,
+        props.class.as_deref().unwrap_or(""),
+    ]);
+
+    let hex_val = rgba_to_hex(&rgba, false);
+    let current_css_color = if props.with_alpha {
+        format!("rgba({}, {}, {}, {:.2})", rgba.r, rgba.g, rgba.b, rgba.a)
+    } else {
+        hex_val.clone()
+    };
+
+    let mut val_hue = props.value;
+    let on_change_hue = props.on_change;
+    let alpha_hue = props.with_alpha;
+
+    let mut val_sat = props.value;
+    let on_change_sat = props.on_change;
+    let alpha_sat = props.with_alpha;
+
+    let mut val_light = props.value;
+    let on_change_light = props.on_change;
+    let alpha_light = props.with_alpha;
+
+    let mut val_alpha = props.value;
+    let on_change_alpha = props.on_change;
+    let alpha_alpha = props.with_alpha;
+
+    let mut val_hex_input = props.value;
+    let on_change_hex = props.on_change;
+    let alpha_hex_input = props.with_alpha;
+
+    let mut val_r = props.value;
+    let on_change_r = props.on_change;
+    let mut val_g = props.value;
+    let on_change_g = props.on_change;
+    let mut val_b = props.value;
+    let on_change_b = props.on_change;
+
+    let mut val_num_r = props.value;
+    let on_change_num_r = props.on_change;
+    let mut val_num_g = props.value;
+    let on_change_num_g = props.on_change;
+    let mut val_num_b = props.value;
+    let on_change_num_b = props.on_change;
+
+    let mut val_area = props.value;
+    let on_change_area = props.on_change;
+    let cur_alpha = rgba.a;
+    let with_alpha_area = props.with_alpha;
+
+    let mut val_format_btn = props.value;
+    let on_change_format_btn = props.on_change;
+    let alpha_format_btn = props.with_alpha;
+
+    rsx! {
+        div { class: "{container_class}",
+            // 2D Saturation / Brightness Color Gradient Area
+            div {
+                class: "sd-color-picker__saturation",
+                style: "background-color: hsl({hue_val:.0}, 100%, 50%);",
+                tabindex: "0",
+                role: "slider",
+                aria_label: "Color saturation and brightness gradient picker",
+                onmounted: move |m| mounted_area.set(Some(m)),
+                onclick: move |evt: MouseEvent| {
+                    if props.disabled {
+                        return;
+                    }
+                    let coords = evt.element_coordinates();
+                    let fmt = *active_format.read();
+                    if let Some(m) = mounted_area() {
+                        spawn(async move {
+                            let (w, h) = if let Ok(rect) = m.get_client_rect().await {
+                                (rect.width().max(1.0), rect.height().max(1.0))
+                            } else {
+                                (242.0, 130.0)
+                            };
+                            let s_pct = ((coords.x / w).clamp(0.0, 1.0) * 100.0) as f32;
+                            let v_pct = ((1.0 - (coords.y / h)).clamp(0.0, 1.0) * 100.0) as f32;
+                            let new_rgba = hsv_to_rgb(hue_val, s_pct, v_pct, cur_alpha);
+                            let formatted = format_color(&new_rgba, fmt, with_alpha_area);
+                            val_area.set(formatted.clone());
+                            if let Some(handler) = on_change_area.as_ref() {
+                                handler.call(formatted);
+                            }
+                        });
+                    }
+                },
+                div { class: "sd-color-picker__saturation-white" },
+                div { class: "sd-color-picker__saturation-black" },
+                div {
+                    class: "sd-color-picker__saturation-thumb",
+                    style: "left: {hsv_s:.1}%; top: {100.0 - hsv_v:.1}%; background-color: {current_css_color};",
+                }
+            }
+
+            // Top Preview, Direct Code & Format Switcher
+            div { class: "sd-color-picker__header",
+                div {
+                    class: "sd-color-picker__preview",
+                    style: "background-color: {current_css_color};",
+                    title: "Selected color preview",
+                    role: "img",
+                    aria_label: "Selected color preview",
+                }
+                div { class: "sd-color-picker__code",
+                    input {
+                        r#type: "text",
+                        class: "sd-color-picker__hex-input",
+                        value: "{current_str}",
+                        disabled: props.disabled,
+                        placeholder: match *active_format.read() {
+                            ColorFormat::Hex => "#000000",
+                            ColorFormat::Rgb => "rgb(0, 0, 0)",
+                            ColorFormat::Hsl => "hsl(0, 0%, 0%)",
+                        },
+                        aria_label: "Color code",
+                        oninput: move |evt: FormEvent| {
+                            let text = evt.value();
+                            if let Some(parsed) = parse_hex(&text).or_else(|| parse_rgb(&text)) {
+                                let formatted = format_color(&parsed, *active_format.read(), alpha_hex_input);
+                                val_hex_input.set(formatted.clone());
+                                if let Some(handler) = on_change_hex.as_ref() {
+                                    handler.call(formatted);
+                                }
+                            }
+                        },
+                    }
+                }
+                button {
+                    r#type: "button",
+                    class: "sd-color-picker__format-btn",
+                    disabled: props.disabled,
+                    title: "Cambia formato colore (HEX, RGB, HSL)",
+                    aria_label: "Format selector",
+                    onclick: move |_| {
+                        let next = match *active_format.read() {
+                            ColorFormat::Hex => ColorFormat::Rgb,
+                            ColorFormat::Rgb => ColorFormat::Hsl,
+                            ColorFormat::Hsl => ColorFormat::Hex,
+                        };
+                        active_format.set(next);
+                        let formatted = format_color(&rgba, next, alpha_format_btn);
+                        val_format_btn.set(formatted.clone());
+                        if let Some(h) = on_change_format_btn.as_ref() {
+                            h.call(formatted);
+                        }
+                    },
+                    match *active_format.read() {
+                        ColorFormat::Hex => "HEX",
+                        ColorFormat::Rgb => "RGB",
+                        ColorFormat::Hsl => "HSL",
+                    }
+                }
+            }
+
+            // Sliders Container
+            div { class: "sd-color-picker__sliders",
+                // Rainbow Hue Slider (0 - 360)
+                div { class: "sd-color-picker__slider-row",
+                    span { class: "sd-color-picker__slider-label", "H" }
+                    input {
+                        r#type: "range",
+                        class: "sd-color-picker__range sd-color-picker__range--hue",
+                        min: "0",
+                        max: "360",
+                        step: "1",
+                        value: "{hue_val}",
+                        disabled: props.disabled,
+                        aria_label: "Hue slider in degrees",
+                        oninput: move |evt: FormEvent| {
+                            if let Ok(h) = evt.value().parse::<f32>() {
+                                current_hue.set(h);
+                                let new_rgba = hsv_to_rgb(h, hsv_s, hsv_v, rgba.a);
+                                let formatted = format_color(&new_rgba, *active_format.read(), alpha_hue);
+                                val_hue.set(formatted.clone());
+                                if let Some(handler) = on_change_hue.as_ref() {
+                                    handler.call(formatted);
+                                }
+                            }
+                        },
+                    }
+                    span { class: "sd-color-picker__slider-value", "{hue_val as u32}°" }
+                }
+
+                // If RGB mode: direct R, G, B sliders and numeric inputs
+                if *active_format.read() == ColorFormat::Rgb {
+                    // Red Slider (0 - 255)
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "R" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--red",
+                            min: "0",
+                            max: "255",
+                            step: "1",
+                            value: "{rgba.r}",
+                            disabled: props.disabled,
+                            aria_label: "Red slider (0-255)",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(r) = evt.value().parse::<u8>() {
+                                    let mut updated = rgba;
+                                    updated.r = r;
+                                    let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                    val_r.set(formatted.clone());
+                                    if let Some(handler) = on_change_r.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{rgba.r}" }
+                    }
+
+                    // Green Slider (0 - 255)
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "G" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--green",
+                            min: "0",
+                            max: "255",
+                            step: "1",
+                            value: "{rgba.g}",
+                            disabled: props.disabled,
+                            aria_label: "Green slider (0-255)",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(g) = evt.value().parse::<u8>() {
+                                    let mut updated = rgba;
+                                    updated.g = g;
+                                    let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                    val_g.set(formatted.clone());
+                                    if let Some(handler) = on_change_g.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{rgba.g}" }
+                    }
+
+                    // Blue Slider (0 - 255)
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "B" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--blue",
+                            min: "0",
+                            max: "255",
+                            step: "1",
+                            value: "{rgba.b}",
+                            disabled: props.disabled,
+                            aria_label: "Blue slider (0-255)",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(b) = evt.value().parse::<u8>() {
+                                    let mut updated = rgba;
+                                    updated.b = b;
+                                    let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                    val_b.set(formatted.clone());
+                                    if let Some(handler) = on_change_b.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{rgba.b}" }
+                    }
+
+                    // Direct Numeric Channel Inputs (R, G, B)
+                    div { class: "sd-color-picker__channels",
+                        div { class: "sd-color-picker__channel",
+                            input {
+                                r#type: "number",
+                                class: "sd-color-picker__channel-input",
+                                min: "0",
+                                max: "255",
+                                value: "{rgba.r}",
+                                disabled: props.disabled,
+                                aria_label: "Red value",
+                                oninput: move |evt: FormEvent| {
+                                    if let Ok(r) = evt.value().parse::<u8>() {
+                                        let mut updated = rgba;
+                                        updated.r = r;
+                                        let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                        val_num_r.set(formatted.clone());
+                                        if let Some(h) = on_change_num_r.as_ref() { h.call(formatted); }
+                                    }
+                                },
+                            }
+                            span { class: "sd-color-picker__channel-label", "R" }
+                        }
+                        div { class: "sd-color-picker__channel",
+                            input {
+                                r#type: "number",
+                                class: "sd-color-picker__channel-input",
+                                min: "0",
+                                max: "255",
+                                value: "{rgba.g}",
+                                disabled: props.disabled,
+                                aria_label: "Green value",
+                                oninput: move |evt: FormEvent| {
+                                    if let Ok(g) = evt.value().parse::<u8>() {
+                                        let mut updated = rgba;
+                                        updated.g = g;
+                                        let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                        val_num_g.set(formatted.clone());
+                                        if let Some(h) = on_change_num_g.as_ref() { h.call(formatted); }
+                                    }
+                                },
+                            }
+                            span { class: "sd-color-picker__channel-label", "G" }
+                        }
+                        div { class: "sd-color-picker__channel",
+                            input {
+                                r#type: "number",
+                                class: "sd-color-picker__channel-input",
+                                min: "0",
+                                max: "255",
+                                value: "{rgba.b}",
+                                disabled: props.disabled,
+                                aria_label: "Blue value",
+                                oninput: move |evt: FormEvent| {
+                                    if let Ok(b) = evt.value().parse::<u8>() {
+                                        let mut updated = rgba;
+                                        updated.b = b;
+                                        let formatted = format_color(&updated, ColorFormat::Rgb, props.with_alpha);
+                                        val_num_b.set(formatted.clone());
+                                        if let Some(h) = on_change_num_b.as_ref() { h.call(formatted); }
+                                    }
+                                },
+                            }
+                            span { class: "sd-color-picker__channel-label", "B" }
+                        }
+                    }
+                } else {
+                    // Saturation Slider (0 - 100%)
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "S" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--sat",
+                            min: "0",
+                            max: "100",
+                            step: "1",
+                            value: "{hsla.s}",
+                            disabled: props.disabled,
+                            aria_label: "Saturation slider in percent",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(s) = evt.value().parse::<f32>() {
+                                    let mut updated = hsla;
+                                    updated.s = s;
+                                    let new_rgba = hsl_to_rgba(&updated);
+                                    let formatted = format_color(&new_rgba, *active_format.read(), alpha_sat);
+                                    val_sat.set(formatted.clone());
+                                    if let Some(handler) = on_change_sat.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{hsla.s as u32}%" }
+                    }
+
+                    // Lightness Slider (0 - 100%)
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "L" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--light",
+                            min: "0",
+                            max: "100",
+                            step: "1",
+                            value: "{hsla.l}",
+                            disabled: props.disabled,
+                            aria_label: "Lightness slider in percent",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(l) = evt.value().parse::<f32>() {
+                                    let mut updated = hsla;
+                                    updated.l = l;
+                                    let new_rgba = hsl_to_rgba(&updated);
+                                    let formatted = format_color(&new_rgba, *active_format.read(), alpha_light);
+                                    val_light.set(formatted.clone());
+                                    if let Some(handler) = on_change_light.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{hsla.l as u32}%" }
+                    }
+                }
+
+                // Alpha Slider (0.0 - 1.0)
+                if props.with_alpha {
+                    div { class: "sd-color-picker__slider-row",
+                        span { class: "sd-color-picker__slider-label", "A" }
+                        input {
+                            r#type: "range",
+                            class: "sd-color-picker__range sd-color-picker__range--alpha",
+                            min: "0",
+                            max: "1",
+                            step: "0.01",
+                            value: "{rgba.a}",
+                            disabled: props.disabled,
+                            aria_label: "Alpha opacity slider in percent",
+                            oninput: move |evt: FormEvent| {
+                                if let Ok(a) = evt.value().parse::<f32>() {
+                                    let mut updated = rgba;
+                                    updated.a = a.clamp(0.0, 1.0);
+                                    let formatted = format_color(&updated, *active_format.read(), alpha_alpha);
+                                    val_alpha.set(formatted.clone());
+                                    if let Some(handler) = on_change_alpha.as_ref() {
+                                        handler.call(formatted);
+                                    }
+                                }
+                            },
+                        }
+                        span { class: "sd-color-picker__slider-value", "{(rgba.a * 100.0) as u32}%" }
+                    }
+                }
+            }
+
+            // Quick Swatches
+            if !props.swatches.is_empty() {
+                div { class: "sd-color-picker__swatches",
+                    for swatch in &props.swatches {
+                        {
+                            let sw = swatch.clone();
+                            let is_active = current_str.eq_ignore_ascii_case(&sw);
+                            let active_class = if is_active { "sd-color-picker__swatch--active" } else { "" };
+                            let mut val_sw = props.value;
+                            let on_change_sw = props.on_change;
+                            let active_fmt = *active_format.read();
+                            let alpha_sw = props.with_alpha;
+                            let sw_click = sw.clone();
+
+                            rsx! {
+                                button {
+                                    key: "{sw}",
+                                    r#type: "button",
+                                    class: "sd-color-picker__swatch {active_class}",
+                                    style: "background-color: {sw};",
+                                    title: "{sw}",
+                                    aria_label: format!("Preset color {}", sw),
+                                    disabled: props.disabled,
+                                    onclick: move |_| {
+                                        let mut parsed = parse_color(&sw_click);
+                                        if !alpha_sw {
+                                            parsed.a = 1.0;
+                                        }
+                                        let formatted = format_color(&parsed, active_fmt, alpha_sw);
+                                        val_sw.set(formatted.clone());
+                                        if let Some(handler) = on_change_sw.as_ref() {
+                                            handler.call(formatted);
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Properties for configuring the [`ColorInput`] form control.
+#[derive(Props, Clone, PartialEq)]
+pub struct ColorInputProps {
+    /// Reactive string signal holding the current color value.
+    pub value: Signal<String>,
+    /// Format used for displaying and parsing the color (Hex, Rgb, Hsl).
+    #[props(default = ColorFormat::Hex)]
+    pub format: ColorFormat,
+    /// Whether the color includes alpha transparency.
+    #[props(default = false)]
+    pub with_alpha: bool,
+    /// Quick swatches shown in the popover picker.
+    #[props(default = default_color_swatches())]
+    pub swatches: Vec<String>,
+    /// Label text displayed above the input.
+    #[props(default)]
+    pub label: Option<String>,
+    /// Helper or description text displayed below the input.
+    #[props(default)]
+    pub description: Option<String>,
+    /// Error message string. If present, highlights the input in an error state.
+    #[props(default)]
+    pub error: Option<String>,
+    /// Placeholder text for the input when empty.
+    #[props(default)]
+    pub placeholder: Option<String>,
+    /// Whether the input is disabled and non-interactive.
+    #[props(default = false)]
+    pub disabled: bool,
+    /// Whether to display a clear button when the input is not empty.
+    #[props(default = false)]
+    pub clearable: bool,
+    /// Optional additional CSS class names.
+    #[props(default)]
+    pub class: Option<String>,
+    /// Callback triggered whenever the color value changes.
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
+}
+
+/// Form input with an interactive color swatch button and an anchored
+/// popover dropdown [`ColorPicker`].
+#[component]
+pub fn ColorInput(props: ColorInputProps) -> Element {
+    let mut is_open = use_signal(|| false);
+    let input_id = use_unique_id("color-input", None);
+
+    #[cfg(feature = "theme")]
+    let theme = crate::theme::use_theme();
+    #[cfg(feature = "theme")]
+    let radius_class = theme.read().radius_scale.md();
+    #[cfg(not(feature = "theme"))]
+    let radius_class = "rounded-lg";
+
+    let current_str = props.value.read().clone();
+    let rgba = parse_color(&current_str);
+    let swatch_color = if props.with_alpha {
+        format!("rgba({}, {}, {}, {:.2})", rgba.r, rgba.g, rgba.b, rgba.a)
+    } else {
+        rgba_to_hex(&rgba, false)
+    };
+
+    let has_error = props.error.is_some();
+    let error_modifier = if has_error { "sd-color-input--error" } else { "" };
+    let disabled_modifier = if props.disabled { "sd-color-input--disabled" } else { "" };
+
+    let wrapper_class = cx([
+        "sd-color-input",
+        error_modifier,
+        disabled_modifier,
+        props.class.as_deref().unwrap_or(""),
+    ]);
+
+    let input_class = cx([
+        "sd-color-input__field",
+        radius_class,
+        if has_error { "sd-color-input__field--error" } else { "" },
+    ]);
+
+    let mut val_text = props.value;
+    let on_change_text = props.on_change;
+    let format_text = props.format;
+    let alpha_text = props.with_alpha;
+
+    let mut val_clear = props.value;
+    let on_change_clear = props.on_change;
+
+    rsx! {
+        div { class: "{wrapper_class}",
+            if let Some(lbl) = &props.label {
+                label {
+                    class: "sd-color-input__label",
+                    r#for: "{input_id}",
+                    "{lbl}"
+                }
+            }
+
+            div { class: "sd-color-input__container",
+                // Leading Color Swatch Trigger Button
+                button {
+                    r#type: "button",
+                    class: "sd-color-input__swatch-btn",
+                    style: "background-color: {swatch_color};",
+                    disabled: props.disabled,
+                    title: "Open color picker",
+                    aria_haspopup: "dialog",
+                    aria_expanded: if *is_open.read() { "true" } else { "false" },
+                    onclick: move |_| {
+                        if !props.disabled {
+                            let cur = *is_open.read();
+                            is_open.set(!cur);
+                        }
+                    },
+                }
+
+                // Text Field showing hex/rgb value
+                input {
+                    id: "{input_id}",
+                    r#type: "text",
+                    class: "{input_class}",
+                    value: "{current_str}",
+                    placeholder: props.placeholder.as_deref().unwrap_or("#a855f7"),
+                    disabled: props.disabled,
+                    oninput: move |evt: FormEvent| {
+                        let text = evt.value();
+                        if let Some(parsed) = parse_hex(&text).or_else(|| parse_rgb(&text)) {
+                            let formatted = format_color(&parsed, format_text, alpha_text);
+                            val_text.set(formatted.clone());
+                            if let Some(handler) = on_change_text.as_ref() {
+                                handler.call(formatted);
+                            }
+                        } else {
+                            val_text.set(text);
+                        }
+                    },
+                }
+
+                // Clear button
+                if props.clearable && !current_str.is_empty() && !props.disabled {
+                    button {
+                        r#type: "button",
+                        class: "sd-color-input__clear-btn",
+                        title: "Clear color",
+                        onclick: move |_| {
+                            val_clear.set(String::new());
+                            if let Some(handler) = on_change_clear.as_ref() {
+                                handler.call(String::new());
+                            }
+                        },
+                        Icon { kind: IconKind::X, size: 14 }
+                    }
+                }
+            }
+
+            // Description / Error message
+            if let Some(err) = &props.error {
+                span { class: "sd-color-input__error-text", "{err}" }
+            } else if let Some(desc) = &props.description {
+                span { class: "sd-color-input__desc-text", "{desc}" }
+            }
+
+            // Anchored Popover Dialog
+            if *is_open.read() && !props.disabled {
+                div {
+                    class: "sd-color-input__backdrop",
+                    onclick: move |_| is_open.set(false),
+                }
+                div { class: "sd-color-input__popover",
+                    ColorPicker {
+                        value: props.value,
+                        format: props.format,
+                        with_alpha: props.with_alpha,
+                        swatches: props.swatches.clone(),
+                        on_change: props.on_change,
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_hex_3_and_6_digits() {
+        let red_3 = parse_hex("#f00").expect("parsed #f00");
+        assert_eq!(red_3, Rgba { r: 255, g: 0, b: 0, a: 1.0 });
+
+        let violet_6 = parse_hex("#a855f7").expect("parsed #a855f7");
+        assert_eq!(violet_6, Rgba { r: 168, g: 85, b: 247, a: 1.0 });
+
+        let no_hash = parse_hex("00ff00").expect("parsed 00ff00");
+        assert_eq!(no_hash, Rgba { r: 0, g: 255, b: 0, a: 1.0 });
+
+        assert!(parse_hex("invalid").is_none());
+        assert!(parse_hex("#12").is_none());
+    }
+
+    #[test]
+    fn test_parse_hex_with_alpha() {
+        let alpha_4 = parse_hex("#f00f").expect("parsed #f00f");
+        assert_eq!(alpha_4.r, 255);
+        assert_eq!(alpha_4.g, 0);
+        assert_eq!(alpha_4.b, 0);
+        assert!((alpha_4.a - 1.0).abs() < 0.01);
+
+        let alpha_8 = parse_hex("#a855f780").expect("parsed #a855f780");
+        assert_eq!(alpha_8.r, 168);
+        assert_eq!(alpha_8.g, 85);
+        assert_eq!(alpha_8.b, 247);
+        assert!((alpha_8.a - 0.50).abs() < 0.02);
+    }
+
+    #[test]
+    fn test_parse_rgb_and_rgba() {
+        let rgb = parse_rgb("rgb(255, 128, 0)").expect("parsed rgb");
+        assert_eq!(rgb, Rgba { r: 255, g: 128, b: 0, a: 1.0 });
+
+        let raw_comma = parse_rgb("255, 128, 0").expect("parsed raw comma rgb");
+        assert_eq!(raw_comma, Rgba { r: 255, g: 128, b: 0, a: 1.0 });
+
+        let raw_space = parse_rgb("0 255 128").expect("parsed raw space rgb");
+        assert_eq!(raw_space, Rgba { r: 0, g: 255, b: 128, a: 1.0 });
+
+        let rgba = parse_rgb("rgba(10, 20, 30, 0.75)").expect("parsed rgba");
+        assert_eq!(rgba.r, 10);
+        assert_eq!(rgba.g, 20);
+        assert_eq!(rgba.b, 30);
+        assert!((rgba.a - 0.75).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_hsv_rgb_conversions() {
+        // Red
+        let red = Rgba { r: 255, g: 0, b: 0, a: 1.0 };
+        let (h, s, v) = rgba_to_hsv(&red);
+        assert_eq!(h as u32, 0);
+        assert_eq!(s as u32, 100);
+        assert_eq!(v as u32, 100);
+        let back_red = hsv_to_rgb(h, s, v, 1.0);
+        assert_eq!(red, back_red);
+
+        // Green
+        let green = Rgba { r: 0, g: 255, b: 0, a: 1.0 };
+        let (h, s, v) = rgba_to_hsv(&green);
+        assert_eq!(h as u32, 120);
+        assert_eq!(s as u32, 100);
+        assert_eq!(v as u32, 100);
+        let back_green = hsv_to_rgb(h, s, v, 1.0);
+        assert_eq!(green, back_green);
+
+        // White
+        let white = Rgba { r: 255, g: 255, b: 255, a: 1.0 };
+        let (_, s, v) = rgba_to_hsv(&white);
+        assert_eq!(s as u32, 0);
+        assert_eq!(v as u32, 100);
+
+        // Black
+        let black = Rgba { r: 0, g: 0, b: 0, a: 1.0 };
+        let (_, _, v) = rgba_to_hsv(&black);
+        assert_eq!(v as u32, 0);
+    }
+
+    #[test]
+    fn test_hsl_rgb_roundtrip() {
+        let colors = [
+            Rgba { r: 255, g: 0, b: 0, a: 1.0 },
+            Rgba { r: 0, g: 255, b: 0, a: 1.0 },
+            Rgba { r: 0, g: 0, b: 255, a: 1.0 },
+            Rgba { r: 168, g: 85, b: 247, a: 0.8 },
+            Rgba { r: 128, g: 128, b: 128, a: 1.0 },
+        ];
+
+        for original in colors {
+            let hsl = rgba_to_hsl(&original);
+            let back = hsl_to_rgba(&hsl);
+            assert_eq!(original.r, back.r);
+            assert_eq!(original.g, back.g);
+            assert_eq!(original.b, back.b);
+            assert!((original.a - back.a).abs() < 0.01);
+        }
+    }
+
+    #[test]
+    fn test_format_color_output() {
+        let color = Rgba { r: 168, g: 85, b: 247, a: 0.5 };
+        assert_eq!(format_color(&color, ColorFormat::Hex, false), "#a855f7");
+        assert_eq!(format_color(&color, ColorFormat::Hex, true), "#a855f780");
+        assert_eq!(format_color(&color, ColorFormat::Rgb, false), "rgb(168, 85, 247)");
+        assert_eq!(format_color(&color, ColorFormat::Rgb, true), "rgba(168, 85, 247, 0.50)");
+    }
+
+    #[test]
+    fn test_default_color_swatches() {
+        let swatches = default_color_swatches();
+        assert!(!swatches.is_empty());
+        assert!(swatches.iter().all(|s| parse_hex(s).is_some()));
+    }
+}
+

@@ -1,0 +1,463 @@
+// ==============================================================================
+// Shadow Design — ColorPicker & ColorInput Styles
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  // ----------------------------------------------------------------------------
+  // ColorPicker standalone component
+  // ----------------------------------------------------------------------------
+  .sd-color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    background-color: #0c0c12;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--sd-radius-md, $radius-md);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(168, 85, 247, 0.15);
+    box-sizing: border-box;
+    width: 270px;
+    user-select: none;
+
+    &--sm {
+      width: 240px;
+      padding: 10px;
+      gap: 10px;
+    }
+
+    &--lg {
+      width: 310px;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    &--disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    // 2D Saturation / Value Gradient Box
+    &__saturation {
+      position: relative;
+      width: 100%;
+      height: 130px;
+      border-radius: var(--sd-radius-sm, $radius-sm);
+      cursor: crosshair;
+      overflow: hidden;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      user-select: none;
+      touch-action: none;
+    }
+
+    &__saturation-white {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, #ffffff, transparent);
+      pointer-events: none;
+    }
+
+    &__saturation-black {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, #000000, transparent);
+      pointer-events: none;
+    }
+
+    &__saturation-thumb {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9), inset 0 0 2px rgba(0, 0, 0, 0.6);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: box-shadow $duration-fast ease;
+    }
+
+    // Header with color swatch preview, editable string and format switch
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    &__preview {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--sd-radius-sm, $radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    &__code {
+      flex: 1;
+    }
+
+    &__hex-input {
+      width: 100%;
+      height: 36px;
+      background-color: #08080c;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--sd-radius-sm, $radius-sm);
+      color: $zinc-100;
+      font-family: $font-mono, monospace;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 0 10px;
+      outline: none;
+      box-sizing: border-box;
+      text-align: center;
+      transition: all $duration-fast ease;
+
+      &:focus {
+        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
+        box-shadow: 0 0 12px var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
+      }
+    }
+
+    &__format-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--sd-radius-xs, $radius-xs);
+      color: $zinc-300;
+      font-family: $font-mono, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 8px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all $duration-fast ease;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.28);
+      }
+    }
+
+    // Sliders
+    &__sliders {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    &__slider-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: $zinc-400;
+      width: 14px;
+      text-align: center;
+      font-family: $font-mono, monospace;
+    }
+
+    &__slider-value {
+      font-size: 11px;
+      font-weight: 500;
+      color: $zinc-400;
+      width: 36px;
+      text-align: right;
+      font-family: $font-mono, monospace;
+    }
+
+    &__range {
+      flex: 1;
+      height: 10px;
+      border-radius: 5px;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: 2px solid #08080c;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+        cursor: grab;
+        transition: transform $duration-fast ease;
+
+        &:active {
+          cursor: grabbing;
+          transform: scale(1.2);
+        }
+      }
+
+      &::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: 2px solid #08080c;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+        cursor: grab;
+
+        &:active {
+          cursor: grabbing;
+          transform: scale(1.2);
+        }
+      }
+
+      &--hue {
+        background: linear-gradient(
+          to right,
+          #ff0000 0%,
+          #ffff00 17%,
+          #00ff00 33%,
+          #00ffff 50%,
+          #0000ff 67%,
+          #ff00ff 83%,
+          #ff0000 100%
+        );
+      }
+
+      &--sat {
+        background: linear-gradient(to right, #6b7280 0%, #a855f7 100%);
+      }
+
+      &--light {
+        background: linear-gradient(to right, #000000 0%, #a855f7 50%, #ffffff 100%);
+      }
+
+      &--alpha {
+        background: linear-gradient(to right, transparent, #a855f7);
+      }
+
+      &--red {
+        background: linear-gradient(to right, #000000 0%, #ef4444 100%);
+      }
+
+      &--green {
+        background: linear-gradient(to right, #000000 0%, #22c55e 100%);
+      }
+
+      &--blue {
+        background: linear-gradient(to right, #000000 0%, #3b82f6 100%);
+      }
+    }
+
+    // Direct numeric channel inputs (RGB mode)
+    &__channels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    &__channel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    &__channel-input {
+      width: 100%;
+      height: 28px;
+      background-color: #08080c;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--sd-radius-xs, 4px);
+      color: $zinc-100;
+      font-family: $font-mono, monospace;
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+      padding: 0 4px;
+      box-sizing: border-box;
+      transition: all $duration-fast ease;
+
+      &:focus {
+        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
+        box-shadow: 0 0 8px var(--sd-accent-glow, rgba(168, 85, 247, 0.3));
+      }
+    }
+
+    &__channel-label {
+      font-size: 10px;
+      color: $zinc-400;
+      font-weight: 600;
+      font-family: $font-mono, monospace;
+    }
+
+    // Swatches grid
+    &__swatches {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    &__swatch {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--sd-radius-xs, 4px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 0;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      transition: all $duration-fast ease;
+
+      &:hover:not(:disabled) {
+        transform: scale(1.18);
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+        z-index: 1;
+      }
+
+      &--active {
+        outline: 2px solid #ffffff;
+        outline-offset: 1px;
+        transform: scale(1.12);
+        z-index: 2;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // ColorInput form control
+  // ----------------------------------------------------------------------------
+  .sd-color-input {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    position: relative;
+    font-family: $font-sans;
+
+    &__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $zinc-300;
+      user-select: none;
+    }
+
+    &__container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    &__swatch-btn {
+      position: absolute;
+      left: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--sd-radius-sm, 5px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      padding: 0;
+      z-index: 2;
+      box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+      transition: transform $duration-fast ease, box-shadow $duration-fast ease;
+
+      &:hover:not(:disabled) {
+        transform: scale(1.08);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    &__field {
+      width: 100%;
+      height: 42px;
+      background-color: #08080c;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--sd-radius-md, $radius-md);
+      color: $zinc-100;
+      font-family: $font-mono, monospace;
+      font-size: 14px;
+      padding: 0 38px 0 44px;
+      outline: none;
+      box-sizing: border-box;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+      transition: all $duration-fast ease;
+
+      &:focus {
+        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.65));
+        background-color: var(--sd-surface-2, $color-surface-2);
+        box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
+      }
+
+      &--error {
+        border-color: rgba(244, 63, 94, 0.7);
+
+        &:focus {
+          border-color: #fb7185;
+          box-shadow: 0 0 16px rgba(244, 63, 94, 0.4);
+        }
+      }
+    }
+
+    &__clear-btn {
+      position: absolute;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: $zinc-400;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      z-index: 2;
+      transition: color $duration-fast ease;
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+
+    &__desc-text {
+      font-size: 12px;
+      color: $zinc-500;
+    }
+
+    &__error-text {
+      font-size: 12px;
+      color: #fb7185;
+    }
+
+    &__backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 995;
+      background: transparent;
+    }
+
+    &__popover {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 1000;
+    }
+
+    &--disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+  }
+}
