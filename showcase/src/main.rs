@@ -9,7 +9,7 @@ use pages::{
     AccordionPage, AlertsPage, AnimationsPage, AttachmentCardsPage, AvatarsPage, BadgesPage, BottomNavigationPage, BreadcrumbsPage, ButtonsPage, CardsPage, ChatPage,
     CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ListsPage, ModalsPage,
     ChipPage, ColorPickerPage, NavbarDemoPage, NavLinkPage, NotificationsPage, NumberInputPage, PaginationPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
-    SkeletonsPage, SliderPage, SpoilerPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
+    SkeletonsPage, SliderPage, SpoilerPage, StepperPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
 };
 
@@ -95,6 +95,8 @@ pub enum Route {
     NavLinkPage {},
     #[route("/bottom-navigation")]
     BottomNavigationPage {},
+    #[route("/stepper")]
+    StepperPage {},
     #[route("/icons")]
     IconsPage {},
     #[route("/animations")]

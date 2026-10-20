@@ -323,6 +323,7 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     SidebarLink { to: Route::NotificationsPage {}, icon: IconKind::Info, label: "Notifications", collapsed }
                     SidebarLink { to: Route::PaginationPage {}, icon: IconKind::ChevronRight, label: "Pagination", collapsed }
                     SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
+                    SidebarLink { to: Route::StepperPage {}, icon: IconKind::CheckCircle, label: "Stepper", collapsed }
                     SidebarLink { to: Route::SwitchPage {}, icon: IconKind::Settings, label: "Switch", collapsed }
                     SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
                     SidebarLink { to: Route::ColorPickerPage {}, icon: IconKind::Palette, label: "ColorPicker", collapsed }

@@ -381,6 +381,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "bottom navigation bar mobile tab footer safe area",
         description: "Barra di navigazione inferiore per mobile con safe area e micro-glow.",
     },
+    ComponentNavEntry {
+        name: "Stepper",
+        route: Route::StepperPage {},
+        group: "Layout & Navigazione",
+        icon: IconKind::CheckCircle,
+        keywords: "stepper step wizard progress multi step workflow",
+        description: "Guida procedurale a passi con orientamento orizzontale e verticale.",
+    },
 ];
 
 #[component]

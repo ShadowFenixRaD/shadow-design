@@ -44,6 +44,7 @@ pub mod breadcrumbs;
 pub mod pagination;
 pub mod nav_link;
 pub mod bottom_navigation;
+pub mod stepper;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -91,3 +92,4 @@ pub use breadcrumbs::BreadcrumbsPage;
 pub use pagination::PaginationPage;
 pub use nav_link::NavLinkPage;
 pub use bottom_navigation::BottomNavigationPage;
+pub use stepper::StepperPage;
