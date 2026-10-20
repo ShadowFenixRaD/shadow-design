@@ -207,6 +207,8 @@ pub mod dropdown;
 pub mod icon;
 #[cfg(feature = "input")]
 pub mod input;
+#[cfg(feature = "list")]
+pub mod list;
 #[cfg(feature = "modal")]
 pub mod modal;
 #[cfg(feature = "navbar")]
@@ -286,6 +288,8 @@ pub mod prelude {
     pub use crate::icon::*;
     #[cfg(feature = "input")]
     pub use crate::input::*;
+    #[cfg(feature = "list")]
+    pub use crate::list::*;
     pub use crate::locale::*;
     #[cfg(feature = "modal")]
     pub use crate::modal::*;

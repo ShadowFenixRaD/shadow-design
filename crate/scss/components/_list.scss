@@ -1,0 +1,194 @@
+// ==============================================================================
+// Shadow Design — Component: List & ListItem
+// ==============================================================================
+@use '../layers' as *;
+@use '../variables' as *;
+
+@layer sd-components {
+  .sd-list {
+    margin: 0;
+    color: $zinc-200;
+    box-sizing: border-box;
+
+    // --- Orientamento ---
+    &--vertical {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &--horizontal {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      list-style: none !important;
+      padding-left: 0 !important;
+    }
+
+    // --- Marcatori Standard ---
+    &--marker-disc {
+      list-style-type: disc;
+    }
+
+    &--marker-circle {
+      list-style-type: circle;
+    }
+
+    &--marker-square {
+      list-style-type: square;
+    }
+
+    &--marker-decimal {
+      list-style-type: decimal;
+    }
+
+    &--marker-lower-alpha {
+      list-style-type: lower-alpha;
+    }
+
+    &--marker-upper-alpha {
+      list-style-type: upper-alpha;
+    }
+
+    &--marker-lower-roman {
+      list-style-type: lower-roman;
+    }
+
+    &--marker-upper-roman {
+      list-style-type: upper-roman;
+    }
+
+    &--marker-none,
+    &--marker-custom {
+      list-style: none !important;
+    }
+
+    // --- Padding & Allineamento ---
+    &--with-padding {
+      padding-left: 1.5rem;
+    }
+
+    &--no-padding {
+      padding-left: 0;
+      margin-left: 0;
+    }
+
+    // --- Spaziatura (gap tra gli item) ---
+    &--spacing-xs {
+      gap: 0.25rem;
+    }
+
+    &--spacing-sm {
+      gap: 0.5rem;
+    }
+
+    &--spacing-md {
+      gap: 0.75rem;
+    }
+
+    &--spacing-lg {
+      gap: 1rem;
+    }
+
+    &--spacing-xl {
+      gap: 1.5rem;
+    }
+
+    // --- Scala Dimensionale ---
+    &--size-xs {
+      font-size: 0.75rem;
+      line-height: 1.3;
+
+      .sd-list-item__icon {
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+    }
+
+    &--size-sm {
+      font-size: 0.875rem;
+      line-height: 1.4;
+
+      .sd-list-item__icon {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &--size-md {
+      font-size: 1rem;
+      line-height: 1.5;
+
+      .sd-list-item__icon {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    &--size-lg {
+      font-size: 1.125rem;
+      line-height: 1.55;
+
+      .sd-list-item__icon {
+        width: 1.375rem;
+        height: 1.375rem;
+      }
+    }
+
+    &--size-xl {
+      font-size: 1.25rem;
+      line-height: 1.6;
+
+      .sd-list-item__icon {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    // --- Sub-liste annidate ---
+    .sd-list {
+      margin-top: 0.5rem;
+      margin-left: 1.25rem;
+    }
+  }
+
+  // --- Singolo Elemento ListItem ---
+  .sd-list-item {
+    color: $zinc-300;
+    box-sizing: border-box;
+
+    &--with-icon {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      list-style: none !important;
+    }
+
+    &--center {
+      align-items: center;
+
+      .sd-list-item__icon {
+        margin-top: 0;
+      }
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: $violet-accent;
+      margin-top: 0.15rem;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    &__content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+}

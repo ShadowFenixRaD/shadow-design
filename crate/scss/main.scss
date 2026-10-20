@@ -46,6 +46,7 @@
 @use 'components/chip' as *;
 @use 'components/accordion' as *;
 @use 'components/spoiler' as *;
+@use 'components/list' as *;
 
 @layer sd-base {
   :root {
