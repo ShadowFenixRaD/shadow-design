@@ -7,7 +7,7 @@ mod pages;
 use components::Layout;
 use pages::{
     AccordionPage, AlertsPage, AnimationsPage, AppShellPage, AttachmentCardsPage, AvatarsPage, BadgesPage, BottomNavigationPage, BreadcrumbsPage, ButtonsPage, CardsPage, ChatPage,
-    CheckboxPage, DividersPage, DrawerPage, DropdownPage, Home, IconsPage, InputsPage, ListsPage, MenubarPage, ModalsPage,
+    CheckboxPage, DividersPage, DrawerPage, DropdownPage, GridPage, Home, IconsPage, InputsPage, ListsPage, MenubarPage, ModalsPage,
     ChipPage, ColorPickerPage, NavbarDemoPage, NavLinkPage, NotificationsPage, NumberInputPage, PaginationPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SpoilerPage, StepperPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
@@ -77,6 +77,8 @@ pub enum Route {
     SegmentedControlsPage {},
     #[route("/dividers")]
     DividersPage {},
+    #[route("/grid")]
+    GridPage {},
     #[route("/trees")]
     TreesPage {},
     #[route("/skeletons")]
