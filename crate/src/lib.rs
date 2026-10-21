@@ -136,6 +136,7 @@
 //! | `group` | `group` | Ergonomic horizontal Flexbox layout with wrap and align |
 //! | `stack` | `stack` | Vertical Flexbox layout with tokenized spacing and align |
 //! | `aspect_ratio` | `aspect_ratio` | Container enforcing aspect ratios (16/9, 4/3, 1/1, 21/9) preventing CLS |
+//! | `center` | `center` | Utility container to center content horizontally and vertically |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -207,6 +208,8 @@ pub mod badge;
 pub mod button;
 #[cfg(feature = "card")]
 pub mod card;
+#[cfg(feature = "center")]
+pub mod center;
 #[cfg(feature = "chat")]
 pub mod chat;
 #[cfg(feature = "checkbox")]
@@ -316,6 +319,8 @@ pub mod prelude {
     pub use crate::button::*;
     #[cfg(feature = "card")]
     pub use crate::card::*;
+    #[cfg(feature = "center")]
+    pub use crate::center::*;
     #[cfg(feature = "chat")]
     pub use crate::chat::*;
     #[cfg(feature = "checkbox")]

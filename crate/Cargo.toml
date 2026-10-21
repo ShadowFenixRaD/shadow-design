@@ -94,6 +94,7 @@ all = [
     "stack",
     "layout_primitives",
     "aspect_ratio",
+    "center",
 ]
 serde = ["dep:serde"]
 button = []
@@ -162,6 +163,7 @@ layout_primitives = ["group", "stack"]
 layout-primitives = ["layout_primitives"]
 aspect_ratio = []
 aspect-ratio = ["aspect_ratio"]
+center = []
 
 [lints.clippy]
 must_use_candidate = "warn"

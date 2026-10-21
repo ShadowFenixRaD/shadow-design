@@ -61,6 +61,7 @@
 @use 'components/group' as *;
 @use 'components/stack' as *;
 @use 'components/aspect-ratio' as *;
+@use 'components/center' as *;
 
 @layer sd-base {
   :root {
