@@ -58,6 +58,7 @@
 @use 'components/menubar' as *;
 @use 'components/app-shell' as *;
 @use 'components/grid' as *;
+@use 'components/group' as *;
 
 @layer sd-base {
   :root {

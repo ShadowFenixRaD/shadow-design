@@ -90,6 +90,8 @@ all = [
     "menubar",
     "app_shell",
     "grid",
+    "group",
+    "layout_primitives",
 ]
 serde = ["dep:serde"]
 button = []
@@ -152,6 +154,9 @@ menubar = ["icon"]
 app_shell = []
 app-shell = ["app_shell"]
 grid = []
+group = []
+layout_primitives = ["group"]
+layout-primitives = ["layout_primitives"]
 
 [lints.clippy]
 must_use_candidate = "warn"

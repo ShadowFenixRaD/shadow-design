@@ -97,6 +97,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Griglia automatica a colonne di larghezza equivalente con gutter.",
     },
     ComponentNavEntry {
+        name: "Group",
+        route: Route::GroupPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Layers,
+        keywords: "group flex row wrap align justify gap flexbox layout",
+        description: "Disposizione orizzontale flessibile con wrapping, allineamento e gap.",
+    },
+    ComponentNavEntry {
         name: "ScrollArea",
         route: Route::ScrollAreaPage {},
         group: "Layout & Struttura",
