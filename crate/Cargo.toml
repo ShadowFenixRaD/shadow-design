@@ -91,6 +91,7 @@ all = [
     "app_shell",
     "grid",
     "group",
+    "stack",
     "layout_primitives",
 ]
 serde = ["dep:serde"]
@@ -155,7 +156,8 @@ app_shell = []
 app-shell = ["app_shell"]
 grid = []
 group = []
-layout_primitives = ["group"]
+stack = ["group"]
+layout_primitives = ["group", "stack"]
 layout-primitives = ["layout_primitives"]
 
 [lints.clippy]
