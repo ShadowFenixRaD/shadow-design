@@ -121,6 +121,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Contenitore per vincolare il rapporto di forma media azzerando il CLS.",
     },
     ComponentNavEntry {
+        name: "Center",
+        route: Route::CenterPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Box,
+        keywords: "center centering horizontal vertical inline flex alignment",
+        description: "Contenitore per centrare elementi in orizzontale e verticale.",
+    },
+    ComponentNavEntry {
         name: "ScrollArea",
         route: Route::ScrollAreaPage {},
         group: "Layout & Struttura",
