@@ -89,6 +89,7 @@ all = [
     "stepper",
     "menubar",
     "app_shell",
+    "grid",
 ]
 serde = ["dep:serde"]
 button = []
@@ -150,6 +151,7 @@ stepper = ["icon"]
 menubar = ["icon"]
 app_shell = []
 app-shell = ["app_shell"]
+grid = []
 
 [lints.clippy]
 must_use_candidate = "warn"

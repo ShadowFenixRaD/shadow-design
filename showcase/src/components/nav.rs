@@ -81,6 +81,22 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Schede contenitore con varianti ed elevazioni.",
     },
     ComponentNavEntry {
+        name: "Grid",
+        route: Route::GridPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Layers,
+        keywords: "grid col column 12 span responsive offset gutter layout",
+        description: "Sistema a griglia responsive a 12 colonne con span e offset.",
+    },
+    ComponentNavEntry {
+        name: "SimpleGrid",
+        route: Route::GridPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Box,
+        keywords: "simplegrid simple grid equal columns auto layout spacing",
+        description: "Griglia automatica a colonne di larghezza equivalente con gutter.",
+    },
+    ComponentNavEntry {
         name: "ScrollArea",
         route: Route::ScrollAreaPage {},
         group: "Layout & Struttura",

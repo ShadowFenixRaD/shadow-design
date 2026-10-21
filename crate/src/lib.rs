@@ -132,6 +132,7 @@
 //! | `stepper` | `stepper` | Horizontal and vertical multi-step wizard indicators with state transitions |
 //! | `menubar` | `menubar` | Desktop application menubar with cascading menus, shortcuts, and command bar |
 //! | `app_shell` | `app_shell` | Responsive 5-zone master application layout (Header, Navbar, Aside, Main, Footer) |
+//! | `grid` | `grid` | Responsive 12-column Grid and auto-layout SimpleGrid |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -213,6 +214,8 @@ pub mod divider;
 pub mod drawer;
 #[cfg(feature = "dropdown")]
 pub mod dropdown;
+#[cfg(feature = "grid")]
+pub mod grid;
 #[cfg(feature = "icon")]
 pub mod icon;
 #[cfg(feature = "input")]
@@ -314,6 +317,8 @@ pub mod prelude {
     pub use crate::drawer::*;
     #[cfg(feature = "dropdown")]
     pub use crate::dropdown::*;
+    #[cfg(feature = "grid")]
+    pub use crate::grid::*;
     #[cfg(feature = "icon")]
     pub use crate::icon::*;
     #[cfg(feature = "input")]
