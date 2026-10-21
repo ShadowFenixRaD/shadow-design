@@ -135,6 +135,7 @@
 //! | `grid` | `grid` | Responsive 12-column Grid and auto-layout SimpleGrid |
 //! | `group` | `group` | Ergonomic horizontal Flexbox layout with wrap and align |
 //! | `stack` | `stack` | Vertical Flexbox layout with tokenized spacing and align |
+//! | `aspect_ratio` | `aspect_ratio` | Container enforcing aspect ratios (16/9, 4/3, 1/1, 21/9) preventing CLS |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -194,6 +195,8 @@ pub mod alert;
 pub mod animation;
 #[cfg(feature = "app_shell")]
 pub mod app_shell;
+#[cfg(feature = "aspect_ratio")]
+pub mod aspect_ratio;
 #[cfg(feature = "attachment_card")]
 pub mod attachment_card;
 #[cfg(feature = "avatar")]
@@ -301,6 +304,8 @@ pub mod prelude {
     pub use crate::animation::*;
     #[cfg(feature = "app_shell")]
     pub use crate::app_shell::*;
+    #[cfg(feature = "aspect_ratio")]
+    pub use crate::aspect_ratio::*;
     #[cfg(feature = "attachment_card")]
     pub use crate::attachment_card::*;
     #[cfg(feature = "avatar")]

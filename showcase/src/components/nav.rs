@@ -113,6 +113,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Disposizione verticale a colonna con spaziatura tokenizzata uniforme.",
     },
     ComponentNavEntry {
+        name: "AspectRatio",
+        route: Route::AspectRatioPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Box,
+        keywords: "aspect ratio container media video canvas iframe 16:9 4:3 1:1 cls",
+        description: "Contenitore per vincolare il rapporto di forma media azzerando il CLS.",
+    },
+    ComponentNavEntry {
         name: "ScrollArea",
         route: Route::ScrollAreaPage {},
         group: "Layout & Struttura",

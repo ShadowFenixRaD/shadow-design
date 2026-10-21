@@ -1,0 +1,33 @@
+// ==============================================================================
+// Shadow Design — AspectRatio Component SCSS
+// ==============================================================================
+@use '../layers' as *;
+@use '../variables' as *;
+
+@layer sd-components {
+  // ----------------------------------------------------------------------------
+  // AspectRatio Container (Prevents Cumulative Layout Shift)
+  // ----------------------------------------------------------------------------
+  .sd-aspect-ratio {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    // Presets
+    &--16-9 { aspect-ratio: 16 / 9; }
+    &--4-3  { aspect-ratio: 4 / 3; }
+    &--1-1  { aspect-ratio: 1 / 1; }
+    &--21-9 { aspect-ratio: 21 / 9; }
+
+    // Direct children filling the aspect container
+    > * {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      object-fit: cover;
+    }
+  }
+}
