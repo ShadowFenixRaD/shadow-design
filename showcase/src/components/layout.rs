@@ -286,6 +286,12 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::AppShellPage {}, icon: IconKind::Box, label: "AppShell", collapsed }
                     SidebarLink { to: Route::NavbarDemoPage {}, icon: IconKind::Menu, label: "Navbar", collapsed }
+                    SidebarLink { to: Route::GridPage {}, icon: IconKind::Layers, label: "Grid", collapsed }
+                    SidebarLink { to: Route::GridPage {}, icon: IconKind::Box, label: "SimpleGrid", collapsed }
+                    SidebarLink { to: Route::GroupPage {}, icon: IconKind::Layers, label: "Group", collapsed }
+                    SidebarLink { to: Route::StackPage {}, icon: IconKind::Layers, label: "Stack", collapsed }
+                    SidebarLink { to: Route::AspectRatioPage {}, icon: IconKind::Box, label: "AspectRatio", collapsed }
+                    SidebarLink { to: Route::CenterPage {}, icon: IconKind::Box, label: "Center", collapsed }
                     SidebarLink { to: Route::CardsPage {}, icon: IconKind::Box, label: "Card", collapsed }
                     SidebarLink { to: Route::ScrollAreaPage {}, icon: IconKind::Layers, label: "ScrollArea", collapsed }
                     SidebarLink { to: Route::DividersPage {}, icon: IconKind::Code, label: "Divider", collapsed }

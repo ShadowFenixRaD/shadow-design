@@ -31,7 +31,14 @@
   border-radius: var(--sd-radius-lg, $radius-lg);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
   font-family: $font-sans;
+  box-sizing: border-box;
   @include specular-top(0.1);
+
+  &--sm { max-width: 400px; }
+  &--md { max-width: 520px; }
+  &--lg { max-width: 768px; }
+  &--xl { max-width: 896px; }
+  &--2xl { max-width: 1024px; }
 
   &--glow {
     box-shadow: 0 0 45px $violet-glow, 0 25px 50px -12px rgba(0, 0, 0, 0.9);
@@ -84,6 +91,8 @@
     padding: 24px;
     max-height: calc(85vh - 120px);
     overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
     color: $zinc-200;
 
     &:has(.sd-select-container--open, .sd-dropdown-container--open) {
