@@ -20,7 +20,7 @@ def main [] {
     sudo rm -rf $target_dir
     sudo mkdir -p $target_dir
     # Copia ricorsiva del contenuto di dist/ nella cartella web root
-    sudo cp -r $dist_dir $target_dir
+    sudo cp -rT $dist_dir $target_dir
 
     print $"(ansi green_bold)[4/4](ansi reset) Aggiornamento permessi cartella..."
     # Assegna la proprietà all'utente web server (tipicamente www-data o nginx)
