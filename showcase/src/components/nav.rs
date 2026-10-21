@@ -105,6 +105,14 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         description: "Disposizione orizzontale flessibile con wrapping, allineamento e gap.",
     },
     ComponentNavEntry {
+        name: "Stack",
+        route: Route::StackPage {},
+        group: "Layout & Struttura",
+        icon: IconKind::Layers,
+        keywords: "stack flex column vertical align justify gap spacing flexbox layout",
+        description: "Disposizione verticale a colonna con spaziatura tokenizzata uniforme.",
+    },
+    ComponentNavEntry {
         name: "ScrollArea",
         route: Route::ScrollAreaPage {},
         group: "Layout & Struttura",

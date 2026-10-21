@@ -134,6 +134,7 @@
 //! | `app_shell` | `app_shell` | Responsive 5-zone master application layout (Header, Navbar, Aside, Main, Footer) |
 //! | `grid` | `grid` | Responsive 12-column Grid and auto-layout SimpleGrid |
 //! | `group` | `group` | Ergonomic horizontal Flexbox layout with wrap and align |
+//! | `stack` | `stack` | Vertical Flexbox layout with tokenized spacing and align |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -239,6 +240,8 @@ pub mod segmented_control;
 pub mod select;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "stack")]
+pub mod stack;
 #[cfg(feature = "switch")]
 pub mod switch;
 #[cfg(feature = "tabs")]
@@ -345,6 +348,8 @@ pub mod prelude {
     pub use crate::select::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "stack")]
+    pub use crate::stack::*;
     #[cfg(feature = "switch")]
     pub use crate::switch::*;
     #[cfg(feature = "tabs")]
