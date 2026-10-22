@@ -1,0 +1,23 @@
+// ==============================================================================
+// Shadow Design — MarqueeSelection Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-marquee-container {
+    position: relative;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .sd-marquee-box {
+    position: absolute;
+    z-index: 40;
+    pointer-events: none;
+    background: rgba(168, 85, 247, 0.18);
+    border: 1px dashed #c084fc;
+    border-radius: 4px;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.25);
+  }
+}

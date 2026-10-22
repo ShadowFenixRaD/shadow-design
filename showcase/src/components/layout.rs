@@ -413,6 +413,29 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
             }
 
+            // Sezione 8: Micro-Interazioni & Utility
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Sparkles, size: 12 }
+                        "Micro-Interazioni & Utility"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::BurgerPage {}, icon: IconKind::Menu, label: "Burger", collapsed }
+                    SidebarLink { to: Route::CloseButtonPage {}, icon: IconKind::X, label: "CloseButton", collapsed }
+                    SidebarLink { to: Route::CopyButtonPage {}, icon: IconKind::Copy, label: "CopyButton", collapsed }
+                    SidebarLink { to: Route::IndicatorPage {}, icon: IconKind::CheckCircle, label: "Indicator", collapsed }
+                    SidebarLink { to: Route::HighlightPage {}, icon: IconKind::Sparkles, label: "Highlight", collapsed }
+                    SidebarLink { to: Route::LoadingOverlayPage {}, icon: IconKind::Spinner, label: "LoadingOverlay", collapsed }
+                    SidebarLink { to: Route::FieldsetPage {}, icon: IconKind::Box, label: "Fieldset", collapsed }
+                    SidebarLink { to: Route::MarqueeSelectionPage {}, icon: IconKind::Layers, label: "MarqueeSelection", collapsed }
+                    SidebarLink { to: Route::KeytipPage {}, icon: IconKind::Terminal, label: "Keytip", collapsed }
+                }
+            }
+
             // Telemetria Tema Attivo
             if collapsed {
                 div { class: "mt-auto p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center",

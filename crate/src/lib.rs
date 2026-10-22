@@ -317,6 +317,24 @@ pub mod coachmark;
 pub mod speed_dial;
 #[cfg(feature = "affix")]
 pub mod affix;
+#[cfg(feature = "burger")]
+pub mod burger;
+#[cfg(feature = "close_button")]
+pub mod close_button;
+#[cfg(feature = "copy_button")]
+pub mod copy_button;
+#[cfg(feature = "indicator")]
+pub mod indicator;
+#[cfg(feature = "highlight")]
+pub mod highlight;
+#[cfg(feature = "loading_overlay")]
+pub mod loading_overlay;
+#[cfg(feature = "fieldset")]
+pub mod fieldset;
+#[cfg(feature = "marquee_selection")]
+pub mod marquee_selection;
+#[cfg(feature = "keytip")]
+pub mod keytip;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -443,5 +461,23 @@ pub mod prelude {
     pub use crate::speed_dial::*;
     #[cfg(feature = "affix")]
     pub use crate::affix::*;
+    #[cfg(feature = "burger")]
+    pub use crate::burger::*;
+    #[cfg(feature = "close_button")]
+    pub use crate::close_button::*;
+    #[cfg(feature = "copy_button")]
+    pub use crate::copy_button::*;
+    #[cfg(feature = "indicator")]
+    pub use crate::indicator::*;
+    #[cfg(feature = "highlight")]
+    pub use crate::highlight::*;
+    #[cfg(feature = "loading_overlay")]
+    pub use crate::loading_overlay::*;
+    #[cfg(feature = "fieldset")]
+    pub use crate::fieldset::*;
+    #[cfg(feature = "marquee_selection")]
+    pub use crate::marquee_selection::*;
+    #[cfg(feature = "keytip")]
+    pub use crate::keytip::*;
     pub use crate::STYLES;
 }

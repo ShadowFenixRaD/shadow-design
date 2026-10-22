@@ -13,6 +13,7 @@ use pages::{
     SkeletonsPage, SliderPage, SpoilerPage, StackPage, StepperPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
     PopoverPage, HoverCardPage, ContextMenuPage, AlertDialogPage, CoachmarkPage, SpeedDialPage, AffixPage,
+    BurgerPage, CloseButtonPage, CopyButtonPage, IndicatorPage, HighlightPage, LoadingOverlayPage, FieldsetPage, MarqueeSelectionPage, KeytipPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -141,6 +142,24 @@ pub enum Route {
     SpeedDialPage {},
     #[route("/affix")]
     AffixPage {},
+    #[route("/burger")]
+    BurgerPage {},
+    #[route("/close-button")]
+    CloseButtonPage {},
+    #[route("/copy-button")]
+    CopyButtonPage {},
+    #[route("/indicator")]
+    IndicatorPage {},
+    #[route("/highlight")]
+    HighlightPage {},
+    #[route("/loading-overlay")]
+    LoadingOverlayPage {},
+    #[route("/fieldset")]
+    FieldsetPage {},
+    #[route("/marquee-selection")]
+    MarqueeSelectionPage {},
+    #[route("/keytip")]
+    KeytipPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

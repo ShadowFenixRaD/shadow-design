@@ -1,0 +1,86 @@
+// ==============================================================================
+// Shadow Design — Burger Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-burger {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    user-select: none;
+    outline: none;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
+      border-radius: 4px;
+    }
+
+    // Default sizing variables
+    --sd-burger-w: 24px;
+    --sd-burger-h: 18px;
+    --sd-burger-line-h: 2px;
+    --sd-burger-color: #f4f4f5;
+    --sd-burger-translate: 8px;
+
+    width: var(--sd-burger-w);
+    height: var(--sd-burger-h);
+
+    &--sm {
+      --sd-burger-w: 18px;
+      --sd-burger-h: 14px;
+      --sd-burger-line-h: 2px;
+      --sd-burger-translate: 6px;
+    }
+
+    &--md {
+      --sd-burger-w: 24px;
+      --sd-burger-h: 18px;
+      --sd-burger-line-h: 2.25px;
+      --sd-burger-translate: 7.875px;
+    }
+
+    &--lg {
+      --sd-burger-w: 32px;
+      --sd-burger-h: 24px;
+      --sd-burger-line-h: 3px;
+      --sd-burger-translate: 10.5px;
+    }
+  }
+
+  .sd-burger-line {
+    display: block;
+    width: 100%;
+    height: var(--sd-burger-line-h);
+    background-color: var(--sd-burger-color);
+    border-radius: 9999px;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.18s ease;
+    transform-origin: center;
+
+    .sd-burger--open &--top {
+      transform: translateY(var(--sd-burger-translate)) rotate(45deg);
+    }
+
+    .sd-burger--open &--middle {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .sd-burger--open &--bottom {
+      transform: translateY(calc(-1 * var(--sd-burger-translate))) rotate(-45deg);
+    }
+  }
+}

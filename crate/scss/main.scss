@@ -69,6 +69,15 @@
 @use 'components/coachmark' as *;
 @use 'components/speed_dial' as *;
 @use 'components/affix' as *;
+@use 'components/burger' as *;
+@use 'components/close_button' as *;
+@use 'components/copy_button' as *;
+@use 'components/indicator' as *;
+@use 'components/highlight' as *;
+@use 'components/loading_overlay' as *;
+@use 'components/fieldset' as *;
+@use 'components/marquee_selection' as *;
+@use 'components/keytip' as *;
 
 @layer sd-base {
   :root {

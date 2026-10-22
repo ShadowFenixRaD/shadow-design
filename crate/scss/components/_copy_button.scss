@@ -1,0 +1,61 @@
+// ==============================================================================
+// Shadow Design — CopyButton Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #d4d4d8;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    @include specular-top(0.06);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
+    }
+
+    &--icon-only {
+      padding: 0.375rem;
+      border-radius: 0.375rem;
+    }
+
+    &--copied {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+
+      &:hover {
+        background: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+      }
+    }
+  }
+
+  .sd-copy-btn-label {
+    white-space: nowrap;
+    line-height: 1;
+  }
+}

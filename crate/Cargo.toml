@@ -102,6 +102,15 @@ all = [
     "coachmark",
     "speed_dial",
     "affix",
+    "burger",
+    "close_button",
+    "copy_button",
+    "indicator",
+    "highlight",
+    "loading_overlay",
+    "fieldset",
+    "marquee_selection",
+    "keytip",
 ]
 serde = ["dep:serde"]
 button = []
@@ -182,6 +191,19 @@ coachmark = ["icon", "button"]
 speed_dial = ["icon"]
 speed-dial = ["speed_dial"]
 affix = ["icon"]
+burger = []
+close_button = ["icon"]
+close-button = ["close_button"]
+copy_button = ["icon"]
+copy-button = ["copy_button"]
+indicator = []
+highlight = []
+loading_overlay = ["icon"]
+loading-overlay = ["loading_overlay"]
+fieldset = []
+marquee_selection = []
+marquee-selection = ["marquee_selection"]
+keytip = []
 
 [lints.clippy]
 must_use_candidate = "warn"
