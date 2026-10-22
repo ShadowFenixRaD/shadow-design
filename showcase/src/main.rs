@@ -14,6 +14,7 @@ use pages::{
     TypographyPage,
     PopoverPage, HoverCardPage, ContextMenuPage, AlertDialogPage, CoachmarkPage, SpeedDialPage, AffixPage,
     BurgerPage, CloseButtonPage, CopyButtonPage, IndicatorPage, HighlightPage, LoadingOverlayPage, FieldsetPage, MarqueeSelectionPage, KeytipPage,
+    FormValidationPage, ReactiveHooksPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -160,6 +161,10 @@ pub enum Route {
     MarqueeSelectionPage {},
     #[route("/keytip")]
     KeytipPage {},
+    #[route("/form")]
+    FormValidationPage {},
+    #[route("/reactive-hooks")]
+    ReactiveHooksPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

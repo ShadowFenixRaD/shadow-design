@@ -436,6 +436,22 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
             }
 
+            // Sezione 9: Reactive Hooks & Form
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Terminal, size: 12 }
+                        "Reactive Hooks & Form"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::FormValidationPage {}, icon: IconKind::CheckCircle, label: "Form & Validation", collapsed }
+                    SidebarLink { to: Route::ReactiveHooksPage {}, icon: IconKind::Sparkles, label: "Reactive Hooks", collapsed }
+                }
+            }
+
             // Telemetria Tema Attivo
             if collapsed {
                 div { class: "mt-auto p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center",

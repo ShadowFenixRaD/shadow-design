@@ -112,6 +112,8 @@ all = [
     "fieldset",
     "marquee_selection",
     "keytip",
+    "form",
+    "hooks",
 ]
 serde = ["dep:serde"]
 button = []
@@ -205,6 +207,8 @@ fieldset = []
 marquee_selection = []
 marquee-selection = ["marquee_selection"]
 keytip = []
+form = []
+hooks = []
 
 [lints.clippy]
 must_use_candidate = "warn"

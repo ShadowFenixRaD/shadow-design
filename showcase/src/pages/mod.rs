@@ -68,6 +68,8 @@ pub mod loading_overlay;
 pub mod fieldset;
 pub mod marquee_selection;
 pub mod keytip;
+pub mod form;
+pub mod reactive_hooks;
 
 pub use accordion::AccordionPage;
 pub use alerts::AlertsPage;
@@ -139,3 +141,5 @@ pub use loading_overlay::LoadingOverlayPage;
 pub use fieldset::FieldsetPage;
 pub use marquee_selection::MarqueeSelectionPage;
 pub use keytip::KeytipPage;
+pub use form::FormValidationPage;
+pub use reactive_hooks::ReactiveHooksPage;

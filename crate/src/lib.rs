@@ -335,6 +335,10 @@ pub mod fieldset;
 pub mod marquee_selection;
 #[cfg(feature = "keytip")]
 pub mod keytip;
+#[cfg(feature = "form")]
+pub mod form;
+#[cfg(feature = "hooks")]
+pub mod hooks;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -479,5 +483,9 @@ pub mod prelude {
     pub use crate::marquee_selection::*;
     #[cfg(feature = "keytip")]
     pub use crate::keytip::*;
+    #[cfg(feature = "form")]
+    pub use crate::form::*;
+    #[cfg(feature = "hooks")]
+    pub use crate::hooks::*;
     pub use crate::STYLES;
 }
