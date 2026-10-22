@@ -63,11 +63,69 @@ pub fn Carousel(
     let track_transform = format!("translateX(-{}%)", idx * 100);
     let pad_class = if padded { "sd-carousel--padded" } else { "" };
 
+    let carousel_id = use_hook(|| {
+        static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        format!("sd-carousel-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+    });
+
+    use_effect(use_reactive(&carousel_id, move |cid| {
+        let js = format!(
+            r#"
+            (function() {{
+                let attempts = 0;
+                function tryInit() {{
+                    const carousel = document.getElementById("{cid}");
+                    if (!carousel) {{
+                        if (attempts++ < 30) setTimeout(tryInit, 30);
+                        return;
+                    }}
+
+                    let hideTimeout = null;
+
+                    function show() {{
+                        carousel.classList.add("sd-carousel--controls-visible");
+                        if (hideTimeout) clearTimeout(hideTimeout);
+                        hideTimeout = setTimeout(() => {{
+                            const isHovered = carousel.matches(":hover") && 
+                                (carousel.querySelector(".sd-carousel-control:hover") || 
+                                 carousel.querySelector(".sd-carousel-indicators:hover"));
+                            if (!isHovered) {{
+                                carousel.classList.remove("sd-carousel--controls-visible");
+                            }}
+                        }}, 2400);
+                    }}
+
+                    function hide() {{
+                        if (hideTimeout) clearTimeout(hideTimeout);
+                        carousel.classList.remove("sd-carousel--controls-visible");
+                    }}
+
+                    carousel.addEventListener("mouseenter", show);
+                    carousel.addEventListener("mousemove", show);
+                    carousel.addEventListener("mouseleave", hide);
+
+                    const controls = carousel.querySelectorAll(".sd-carousel-control, .sd-carousel-indicators");
+                    controls.forEach(c => {{
+                        c.addEventListener("mouseenter", () => {{
+                            if (hideTimeout) clearTimeout(hideTimeout);
+                            carousel.classList.add("sd-carousel--controls-visible");
+                        }});
+                    }});
+                }}
+                tryInit();
+            }})();
+            "#
+        );
+        let _ = document::eval(&js);
+    }));
+
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
     rsx! {
-        div { class: "sd-carousel {pad_class} {class}",
+        div {
+            id: "{carousel_id}",
+            class: "sd-carousel {pad_class} {class}",
             // Viewport con overflow nascosto
             div { class: "sd-carousel-viewport",
                 // Track delle slide con trasformazione animata

@@ -8,10 +8,6 @@ pub fn CommandPalettePage() -> Element {
     let mut opened = use_signal(|| false);
     let mut last_selected = use_signal(|| "Nessuna azione selezionata".to_string());
 
-    use_hotkey("ctrl+k", move || {
-        let cur = *opened.read();
-        opened.set(!cur);
-    });
 
     let actions = vec![
         CommandAction::new("home", "Vai alla Home")
@@ -121,10 +117,14 @@ CommandPalette {
                         }
 
                         div { class: "flex items-center gap-3",
-                            Button {
-                                variant: ButtonVariant::Primary,
-                                size: ButtonSize::Md,
-                                onclick: move |_| opened.set(true),
+                            button {
+                                id: "sd-command-palette-demo-trigger",
+                                r#type: "button",
+                                class: "sd-btn sd-btn--primary sd-btn--md flex items-center gap-2",
+                                onclick: move |_| {
+                                    let cur = *opened.read();
+                                    opened.set(!cur);
+                                },
                                 Icon { kind: IconKind::Search, size: 16 }
                                 "Apri Command Palette"
                             }

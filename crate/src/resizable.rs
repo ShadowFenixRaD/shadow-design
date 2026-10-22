@@ -40,15 +40,22 @@ pub fn ResizablePanelGroup(
         let js = format!(
             r#"
             (function() {{
-                const group = document.getElementById("{gid}");
-                if (!group) return;
+                let attempts = 0;
+                function tryInit() {{
+                    const group = document.getElementById("{gid}");
+                    if (!group) {{
+                        if (attempts++ < 30) setTimeout(tryInit, 30);
+                        return;
+                    }}
 
-                const handles = group.querySelectorAll("[data-resizable-handle]");
-                handles.forEach(handle => {{
-                    handle.onpointerdown = function(e) {{
+                    group.onpointerdown = function(e) {{
+                        const handle = e.target.closest("[data-resizable-handle]");
+                        if (!handle || handle.classList.contains("sd-resizable-handle--disabled")) return;
+
                         e.preventDefault();
                         handle.classList.add("sd-resizable-handle--active");
-                        try {{ handle.setPointerCapture(e.pointerId); }} catch(err) {{}}
+                        document.body.style.userSelect = "none";
+                        document.body.style.cursor = {is_horiz} ? "col-resize" : "row-resize";
 
                         const prevPanel = handle.previousElementSibling;
                         const nextPanel = handle.nextElementSibling;
@@ -57,7 +64,7 @@ pub fn ResizablePanelGroup(
                         const minPct = parseFloat(prevPanel.getAttribute("data-min-size") || "10");
                         const maxPct = parseFloat(prevPanel.getAttribute("data-max-size") || "90");
 
-                        function onPointerMove(ev) {{
+                        function onMove(ev) {{
                             const rect = group.getBoundingClientRect();
                             let pct = 50;
                             if ({is_horiz}) {{
@@ -71,23 +78,27 @@ pub fn ResizablePanelGroup(
                             if (pct < minPct) pct = minPct;
                             if (pct > maxPct) pct = maxPct;
 
-                            prevPanel.style.flexBasis = pct.toFixed(2) + "%";
+                            prevPanel.style.flex = "0 0 " + pct.toFixed(2) + "%";
                             if (nextPanel) {{
-                                nextPanel.style.flexBasis = (100 - pct).toFixed(2) + "%";
+                                nextPanel.style.flex = "1 1 0px";
                             }}
                         }}
 
-                        function onPointerUp(ev) {{
+                        function onUp() {{
                             handle.classList.remove("sd-resizable-handle--active");
-                            try {{ handle.releasePointerCapture(ev.pointerId); }} catch(err) {{}}
-                            window.removeEventListener("pointermove", onPointerMove);
-                            window.removeEventListener("pointerup", onPointerUp);
+                            document.body.style.userSelect = "";
+                            document.body.style.cursor = "";
+                            window.removeEventListener("pointermove", onMove);
+                            window.removeEventListener("pointerup", onUp);
+                            window.removeEventListener("pointercancel", onUp);
                         }}
 
-                        window.addEventListener("pointermove", onPointerMove);
-                        window.addEventListener("pointerup", onPointerUp);
+                        window.addEventListener("pointermove", onMove);
+                        window.addEventListener("pointerup", onUp);
+                        window.addEventListener("pointercancel", onUp);
                     }};
-                }});
+                }}
+                tryInit();
             }})();
             "#
         );
@@ -157,9 +168,6 @@ pub fn ResizableHandle(
     #[props(default)]
     class: String,
 ) -> Element {
-    let mut is_active = use_signal(|| false);
-
-    let active_class = if *is_active.read() { "sd-resizable-handle--active" } else { "" };
     let disabled_class = if disabled { "sd-resizable-handle--disabled" } else { "" };
 
     #[cfg(feature = "theme")]
@@ -167,16 +175,8 @@ pub fn ResizableHandle(
 
     rsx! {
         div {
-            class: "sd-resizable-handle {active_class} {disabled_class} {class}",
+            class: "sd-resizable-handle {disabled_class} {class}",
             "data-resizable-handle": "true",
-            onmousedown: move |_| {
-                if !disabled {
-                    is_active.set(true);
-                }
-            },
-            onmouseup: move |_| {
-                is_active.set(false);
-            },
             if with_handle {
                 div { class: "sd-resizable-handle-grip",
                     Icon { kind: IconKind::GripVertical, size: 14 }

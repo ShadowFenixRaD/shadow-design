@@ -149,6 +149,37 @@ pub fn CommandPalette(
         }
     };
 
+    use_effect(move || {
+        let is_open = *opened.read();
+        if is_open {
+            let _ = document::eval(
+                r#"
+                setTimeout(() => {
+                    const input = document.getElementById("sd-command-palette-input");
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                }, 25);
+                "#
+            );
+        }
+    });
+
+    use_effect(move || {
+        let idx = *active_index.read();
+        let _ = document::eval(&format!(
+            r#"
+            setTimeout(() => {{
+                const el = document.getElementById("sd-command-palette-item-{idx}");
+                if (el) {{
+                    el.scrollIntoView({{ block: "nearest", behavior: "smooth" }});
+                }}
+            }}, 15);
+            "#
+        ));
+    });
+
     let actions_clone = filtered_actions.clone();
     let on_select_clone = on_select;
 
@@ -163,7 +194,6 @@ pub fn CommandPalette(
             sq.set(String::new());
         }
     };
-
 
     let handle_keydown = {
         let acts = actions_clone.clone();
@@ -224,6 +254,7 @@ pub fn CommandPalette(
                 div { class: "sd-command-palette-input-wrap",
                     Icon { kind: IconKind::Search, size: 18, class: "sd-command-palette-search-icon" }
                     input {
+                        id: "sd-command-palette-input",
                         r#type: "text",
                         autofocus: true,
                         class: "sd-command-palette-input",
@@ -269,8 +300,8 @@ pub fn CommandPalette(
                                                 }
                                             }
                                             div {
+                                                id: "sd-command-palette-item-{i}",
                                                 class: "{item_class}",
-                                                onmouseenter: move |_| active_index.set(i),
                                                 onclick: {
                                                     let act = act_copy.clone();
                                                     move |_| handle_select(act.clone())

@@ -20,8 +20,13 @@ pub fn Layout() -> Element {
             let eval = document::eval(
                 r#"
                 window.addEventListener("keydown", (e) => {
-                    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
                         e.preventDefault();
+                        const demoBtn = document.getElementById("sd-command-palette-demo-trigger");
+                        if (demoBtn) {
+                            demoBtn.click();
+                            return;
+                        }
                         const btn = document.getElementById("sd-search-palette-trigger");
                         if (btn) btn.click();
                     }

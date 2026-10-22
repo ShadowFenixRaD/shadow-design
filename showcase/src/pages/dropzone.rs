@@ -20,7 +20,7 @@ pub fn DropzonePage() -> Element {
             },
         ]
     });
-    let mut is_loading = use_signal(|| false);
+    let is_loading = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -90,11 +90,9 @@ pub fn DropzonePage() -> Element {
                                 if let Some(f) = new_files.first() {
                                     last_selected_file.set(Some(f.name.clone()));
                                 }
-                                is_loading.set(true);
                                 let mut list = uploaded_files.read().clone();
                                 list.extend(new_files);
                                 uploaded_files.set(list);
-                                is_loading.set(false);
                             },
                         }
 

@@ -68,10 +68,77 @@ pub fn Dropzone(
 
     let accept_str = accept.join(", ");
 
-    let on_drop_clone = on_drop;
-
     #[cfg(feature = "theme")]
     let _theme = use_theme();
+
+    let dropzone_id = use_hook(|| {
+        static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        format!("sd-dropzone-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+    });
+
+    use_effect(use_reactive((&dropzone_id, &disabled, &loading), move |(zid, dis, load)| {
+        if dis || load {
+            return;
+        }
+
+        let on_drop_handler = on_drop;
+        spawn(async move {
+            let mut eval = document::eval(&format!(
+                r#"
+                const el = document.getElementById("{zid}");
+                const inp = document.getElementById("{zid}-input");
+                if (!el || !inp) return;
+
+                function sendFiles(fileList) {{
+                    const arr = [];
+                    for (let i = 0; i < fileList.length; i++) {{
+                        const f = fileList[i];
+                        arr.push({{
+                            name: f.name,
+                            size: f.size,
+                            type: f.type || ""
+                        }});
+                    }}
+                    if (arr.length > 0) {{
+                        dioxus.send(arr);
+                    }}
+                }}
+
+                inp.onchange = function(e) {{
+                    if (inp.files && inp.files.length > 0) {{
+                        sendFiles(inp.files);
+                    }}
+                }};
+
+                el.ondrop = function(e) {{
+                    e.preventDefault();
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {{
+                        sendFiles(e.dataTransfer.files);
+                    }}
+                }};
+                "#
+            ));
+
+            while let Ok(serde_json::Value::Array(items)) = eval.recv::<serde_json::Value>().await {
+                let mut files = Vec::new();
+                for item in items {
+                    let name = item["name"].as_str().unwrap_or("file").to_string();
+                    let size = item["size"].as_u64().unwrap_or(1024 * 256);
+                    let mime = item["type"].as_str().filter(|s| !s.is_empty()).map(String::from);
+                    files.push(FileMetadata {
+                        name,
+                        size_bytes: size,
+                        mime_type: mime,
+                    });
+                }
+                if !files.is_empty() {
+                    if let Some(ref handler) = on_drop_handler {
+                        handler.call(files);
+                    }
+                }
+            }
+        });
+    }));
 
     let mut root_class = String::from("sd-dropzone");
     if *is_dragging.read() {
@@ -93,6 +160,7 @@ pub fn Dropzone(
 
     rsx! {
         div {
+            id: "{dropzone_id}",
             class: "{root_class}",
             ondragover: move |e| {
                 e.prevent_default();
@@ -108,24 +176,11 @@ pub fn Dropzone(
             ondrop: move |e| {
                 e.prevent_default();
                 is_dragging.set(false);
-                if disabled || loading {
-                    return;
-                }
-
-                // In Dioxus Web/Desktop, gli eventi drop passano i metadati dei file
-                // attraverso le interazioni del browser
-                if let Some(ref handler) = on_drop_clone {
-                    let dummy_files = vec![FileMetadata {
-                        name: "file_caricato.png".to_string(),
-                        size_bytes: 1024 * 320,
-                        mime_type: Some("image/png".to_string()),
-                    }];
-                    handler.call(dummy_files);
-                }
             },
 
             // Input nativo invisibile per click-to-browse
             input {
+                id: "{dropzone_id}-input",
                 r#type: "file",
                 class: "sd-dropzone-input",
                 disabled: disabled || loading,
@@ -137,18 +192,24 @@ pub fn Dropzone(
                         for file_data in e.files() {
                             files.push(FileMetadata {
                                 name: file_data.name(),
-                                size_bytes: 1024 * 640,
-                                mime_type: None,
+                                size_bytes: file_data.size(),
+                                mime_type: file_data.content_type(),
                             });
                         }
                         if files.is_empty() {
-                            files.push(FileMetadata {
-                                name: "documento_selezionato.pdf".to_string(),
-                                size_bytes: 1024 * 780,
-                                mime_type: Some("application/pdf".to_string()),
-                            });
+                            let val = e.value();
+                            let clean_name = val.rsplit(['/', '\\']).next().unwrap_or("").trim().to_string();
+                            if !clean_name.is_empty() {
+                                files.push(FileMetadata {
+                                    name: clean_name,
+                                    size_bytes: 1024 * 512,
+                                    mime_type: None,
+                                });
+                            }
                         }
-                        handler.call(files);
+                        if !files.is_empty() {
+                            handler.call(files);
+                        }
                     }
                 },
             }
