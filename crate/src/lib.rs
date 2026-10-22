@@ -132,6 +132,11 @@
 //! | `stepper` | `stepper` | Horizontal and vertical multi-step wizard indicators with state transitions |
 //! | `menubar` | `menubar` | Desktop application menubar with cascading menus, shortcuts, and command bar |
 //! | `app_shell` | `app_shell` | Responsive 5-zone master application layout (Header, Navbar, Aside, Main, Footer) |
+//! | `grid` | `grid` | Responsive 12-column Grid and auto-layout SimpleGrid |
+//! | `group` | `group` | Ergonomic horizontal Flexbox layout with wrap and align |
+//! | `stack` | `stack` | Vertical Flexbox layout with tokenized spacing and align |
+//! | `aspect_ratio` | `aspect_ratio` | Container enforcing aspect ratios (16/9, 4/3, 1/1, 21/9) preventing CLS |
+//! | `center` | `center` | Utility container to center content horizontally and vertically |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -191,6 +196,8 @@ pub mod alert;
 pub mod animation;
 #[cfg(feature = "app_shell")]
 pub mod app_shell;
+#[cfg(feature = "aspect_ratio")]
+pub mod aspect_ratio;
 #[cfg(feature = "attachment_card")]
 pub mod attachment_card;
 #[cfg(feature = "avatar")]
@@ -201,6 +208,8 @@ pub mod badge;
 pub mod button;
 #[cfg(feature = "card")]
 pub mod card;
+#[cfg(feature = "center")]
+pub mod center;
 #[cfg(feature = "chat")]
 pub mod chat;
 #[cfg(feature = "checkbox")]
@@ -213,6 +222,10 @@ pub mod divider;
 pub mod drawer;
 #[cfg(feature = "dropdown")]
 pub mod dropdown;
+#[cfg(feature = "grid")]
+pub mod grid;
+#[cfg(feature = "group")]
+pub mod group;
 #[cfg(feature = "icon")]
 pub mod icon;
 #[cfg(feature = "input")]
@@ -233,6 +246,8 @@ pub mod segmented_control;
 pub mod select;
 #[cfg(feature = "skeleton")]
 pub mod skeleton;
+#[cfg(feature = "stack")]
+pub mod stack;
 #[cfg(feature = "switch")]
 pub mod switch;
 #[cfg(feature = "tabs")]
@@ -292,6 +307,8 @@ pub mod prelude {
     pub use crate::animation::*;
     #[cfg(feature = "app_shell")]
     pub use crate::app_shell::*;
+    #[cfg(feature = "aspect_ratio")]
+    pub use crate::aspect_ratio::*;
     #[cfg(feature = "attachment_card")]
     pub use crate::attachment_card::*;
     #[cfg(feature = "avatar")]
@@ -302,6 +319,8 @@ pub mod prelude {
     pub use crate::button::*;
     #[cfg(feature = "card")]
     pub use crate::card::*;
+    #[cfg(feature = "center")]
+    pub use crate::center::*;
     #[cfg(feature = "chat")]
     pub use crate::chat::*;
     #[cfg(feature = "checkbox")]
@@ -314,6 +333,10 @@ pub mod prelude {
     pub use crate::drawer::*;
     #[cfg(feature = "dropdown")]
     pub use crate::dropdown::*;
+    #[cfg(feature = "grid")]
+    pub use crate::grid::*;
+    #[cfg(feature = "group")]
+    pub use crate::group::*;
     #[cfg(feature = "icon")]
     pub use crate::icon::*;
     #[cfg(feature = "input")]
@@ -335,6 +358,8 @@ pub mod prelude {
     pub use crate::select::*;
     #[cfg(feature = "skeleton")]
     pub use crate::skeleton::*;
+    #[cfg(feature = "stack")]
+    pub use crate::stack::*;
     #[cfg(feature = "switch")]
     pub use crate::switch::*;
     #[cfg(feature = "tabs")]

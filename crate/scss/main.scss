@@ -57,6 +57,11 @@
 @use 'components/stepper' as *;
 @use 'components/menubar' as *;
 @use 'components/app-shell' as *;
+@use 'components/grid' as *;
+@use 'components/group' as *;
+@use 'components/stack' as *;
+@use 'components/aspect-ratio' as *;
+@use 'components/center' as *;
 
 @layer sd-base {
   :root {

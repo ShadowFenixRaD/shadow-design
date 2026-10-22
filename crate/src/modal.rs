@@ -2,6 +2,30 @@ use crate::icon::{Icon, IconKind};
 use crate::locale::use_locale;
 use dioxus::prelude::*;
 
+/// Preset width size for the modal dialog.
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
+pub enum ModalSize {
+    Sm,
+    #[default]
+    Md,
+    Lg,
+    Xl,
+    Xxl,
+}
+
+impl ModalSize {
+    #[must_use]
+    pub fn class_name(&self) -> &'static str {
+        match self {
+            Self::Sm => "sd-modal-dialog--sm",
+            Self::Md => "sd-modal-dialog--md",
+            Self::Lg => "sd-modal-dialog--lg",
+            Self::Xl => "sd-modal-dialog--xl",
+            Self::Xxl => "sd-modal-dialog--2xl",
+        }
+    }
+}
+
 /// Modal dialog component that renders in an overlay with APG Dialog pattern accessibility.
 #[component]
 pub fn Modal(
@@ -16,6 +40,9 @@ pub fn Modal(
     /// Accessible label when no visible title is provided.
     #[props(default)]
     aria_label: Option<String>,
+    /// Preset width size for the dialog (Sm, Md, Lg, Xl, Xxl). Defaults to Md.
+    #[props(default)]
+    size: Option<ModalSize>,
     /// Whether pressing the Escape key dismisses the modal. Defaults to true.
     #[props(default = true)]
     close_on_escape: bool,
@@ -106,7 +133,7 @@ pub fn Modal(
                 "aria-modal": "true",
                 "aria-labelledby": if title.is_some() { Some(title_id.as_str()) } else { None },
                 "aria-label": if title.is_none() { aria_label.as_deref() } else { None },
-                class: "sd-modal-dialog {base_override} {glow_class} {anim_class} {class_modifiers} {class}",
+                class: "sd-modal-dialog {size.unwrap_or_default().class_name()} {base_override} {glow_class} {anim_class} {class_modifiers} {class}",
                 onmounted: move |m| {
                     let data = m.data();
                     spawn(async move {
@@ -135,5 +162,20 @@ pub fn Modal(
                 div { class: "sd-modal-dialog__body", {children} }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_modal_size_class_names() {
+        assert_eq!(ModalSize::Sm.class_name(), "sd-modal-dialog--sm");
+        assert_eq!(ModalSize::Md.class_name(), "sd-modal-dialog--md");
+        assert_eq!(ModalSize::Lg.class_name(), "sd-modal-dialog--lg");
+        assert_eq!(ModalSize::Xl.class_name(), "sd-modal-dialog--xl");
+        assert_eq!(ModalSize::Xxl.class_name(), "sd-modal-dialog--2xl");
+        assert_eq!(ModalSize::default(), ModalSize::Md);
     }
 }
