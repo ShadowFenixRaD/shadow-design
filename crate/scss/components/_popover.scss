@@ -1,0 +1,218 @@
+// ==============================================================================
+// Shadow Design — Popover Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-popover {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .sd-popover-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: z('popover-back');
+    background: transparent;
+    cursor: default;
+  }
+
+  .sd-popover-dropdown {
+    position: absolute;
+    z-index: z('popover');
+    min-width: 14rem;
+    max-width: 24rem;
+    padding: 1rem;
+    background: $color-surface-1;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75);
+    color: #f4f4f5;
+    animation: sd-popover-enter 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    @include specular-top(0.08);
+
+    &--glow {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(168, 85, 247, 0.25);
+    }
+
+    // Posizionamenti: Bottom (Center, Start, End)
+    &--bottom {
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &--bottom-start {
+      top: calc(100% + 10px);
+      left: 0;
+    }
+
+    &--bottom-end {
+      top: calc(100% + 10px);
+      right: 0;
+    }
+
+    // Posizionamenti: Top (Center, Start, End)
+    &--top {
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &--top-start {
+      bottom: calc(100% + 10px);
+      left: 0;
+    }
+
+    &--top-end {
+      bottom: calc(100% + 10px);
+      right: 0;
+    }
+
+    // Posizionamenti: Left (Center, Start, End)
+    &--left {
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &--left-start {
+      right: calc(100% + 10px);
+      top: 0;
+    }
+
+    &--left-end {
+      right: calc(100% + 10px);
+      bottom: 0;
+    }
+
+    // Posizionamenti: Right (Center, Start, End)
+    &--right {
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &--right-start {
+      left: calc(100% + 10px);
+      top: 0;
+    }
+
+    &--right-end {
+      left: calc(100% + 10px);
+      bottom: 0;
+    }
+  }
+
+  .sd-popover-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: $color-surface-1;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    transform: rotate(45deg);
+    pointer-events: none;
+
+    // Arrow positioning based on dropdown placement
+    .sd-popover-dropdown--bottom & {
+      top: -5px;
+      left: 50%;
+      margin-left: -5px;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+    }
+
+    .sd-popover-dropdown--bottom-start & {
+      top: -5px;
+      left: 16px;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+    }
+
+    .sd-popover-dropdown--bottom-end & {
+      top: -5px;
+      right: 16px;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+    }
+
+    .sd-popover-dropdown--top & {
+      bottom: -5px;
+      left: 50%;
+      margin-left: -5px;
+      border-top-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--top-start & {
+      bottom: -5px;
+      left: 16px;
+      border-top-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--top-end & {
+      bottom: -5px;
+      right: 16px;
+      border-top-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--left & {
+      right: -5px;
+      top: 50%;
+      margin-top: -5px;
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--left-start & {
+      right: -5px;
+      top: 16px;
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--left-end & {
+      right: -5px;
+      bottom: 16px;
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+    }
+
+    .sd-popover-dropdown--right & {
+      left: -5px;
+      top: 50%;
+      margin-top: -5px;
+      border-top-color: transparent;
+      border-right-color: transparent;
+    }
+
+    .sd-popover-dropdown--right-start & {
+      left: -5px;
+      top: 16px;
+      border-top-color: transparent;
+      border-right-color: transparent;
+    }
+
+    .sd-popover-dropdown--right-end & {
+      left: -5px;
+      bottom: 16px;
+      border-top-color: transparent;
+      border-right-color: transparent;
+    }
+  }
+}
+
+@keyframes sd-popover-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

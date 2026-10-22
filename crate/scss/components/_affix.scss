@@ -1,0 +1,82 @@
+// ==============================================================================
+// Shadow Design — Affix & BackToTop Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-affix {
+    position: fixed;
+    z-index: z('affix');
+    display: inline-flex;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+    &--bottom-right {
+      bottom: 1.5rem;
+      right: 1.5rem;
+    }
+
+    &--bottom-left {
+      bottom: 1.5rem;
+      left: 1.5rem;
+    }
+
+    &--top-right {
+      top: 1.5rem;
+      right: 1.5rem;
+    }
+
+    &--top-left {
+      top: 1.5rem;
+      left: 1.5rem;
+    }
+
+    &--hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.95);
+    }
+
+    &--visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .sd-back-to-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 9999px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(168, 85, 247, 0.2);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    @include specular-top(0.08);
+
+    &:hover {
+      background: #27272a;
+      border-color: rgba(168, 85, 247, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 24px rgba(168, 85, 247, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &--icon-only {
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+    }
+  }
+}

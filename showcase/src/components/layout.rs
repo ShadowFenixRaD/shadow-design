@@ -382,9 +382,16 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::ModalsPage {}, icon: IconKind::Eye, label: "Modal", collapsed }
+                    SidebarLink { to: Route::AlertDialogPage {}, icon: IconKind::AlertTriangle, label: "AlertDialog", collapsed }
+                    SidebarLink { to: Route::PopoverPage {}, icon: IconKind::Layers, label: "Popover", collapsed }
+                    SidebarLink { to: Route::HoverCardPage {}, icon: IconKind::Eye, label: "HoverCard", collapsed }
+                    SidebarLink { to: Route::ContextMenuPage {}, icon: IconKind::Terminal, label: "ContextMenu", collapsed }
                     SidebarLink { to: Route::DrawerPage {}, icon: IconKind::ChevronRight, label: "Drawer", collapsed }
                     SidebarLink { to: Route::DropdownPage {}, icon: IconKind::ChevronDown, label: "Dropdown", collapsed }
                     SidebarLink { to: Route::TooltipPage {}, icon: IconKind::Sparkles, label: "Tooltip", collapsed }
+                    SidebarLink { to: Route::CoachmarkPage {}, icon: IconKind::Sparkles, label: "Coachmark", collapsed }
+                    SidebarLink { to: Route::SpeedDialPage {}, icon: IconKind::Plus, label: "SpeedDial", collapsed }
+                    SidebarLink { to: Route::AffixPage {}, icon: IconKind::ChevronUp, label: "Affix", collapsed }
                 }
             }
 

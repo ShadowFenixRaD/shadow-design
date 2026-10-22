@@ -137,6 +137,13 @@
 //! | `stack` | `stack` | Vertical Flexbox layout with tokenized spacing and align |
 //! | `aspect_ratio` | `aspect_ratio` | Container enforcing aspect ratios (16/9, 4/3, 1/1, 21/9) preventing CLS |
 //! | `center` | `center` | Utility container to center content horizontally and vertically |
+//! | `popover` | `popover` | Anchored floating overlay panels with 12 alignments and arrow |
+//! | `hover_card` | `hover_card` | Rich contextual preview cards triggered on hover with configurable delays |
+//! | `context_menu` | `context_menu` | Pointer-anchored right-click context menu with keyboard shortcuts |
+//! | `alert_dialog` | `alert_dialog` | Blocking overlay confirmation dialogs for destructive actions |
+//! | `coachmark` | `coachmark` | Step-by-step user onboarding guide bubble with step indicators |
+//! | `speed_dial` | `speed_dial` | Floating action button (FAB) with radial/linear expandable action items |
+//! | `affix` | `affix` | Fixed screen-coordinate overlay containers and BackToTop scroll trigger |
 //!
 //! ## 🎨 Reactive Theming vs. Zero-Cost Static Fallback
 //!
@@ -296,6 +303,20 @@ pub mod bottom_navigation;
 pub mod stepper;
 #[cfg(feature = "menubar")]
 pub mod menubar;
+#[cfg(feature = "popover")]
+pub mod popover;
+#[cfg(feature = "hover_card")]
+pub mod hover_card;
+#[cfg(feature = "context_menu")]
+pub mod context_menu;
+#[cfg(feature = "alert_dialog")]
+pub mod alert_dialog;
+#[cfg(feature = "coachmark")]
+pub mod coachmark;
+#[cfg(feature = "speed_dial")]
+pub mod speed_dial;
+#[cfg(feature = "affix")]
+pub mod affix;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -408,5 +429,19 @@ pub mod prelude {
     pub use crate::stepper::*;
     #[cfg(feature = "menubar")]
     pub use crate::menubar::*;
+    #[cfg(feature = "popover")]
+    pub use crate::popover::*;
+    #[cfg(feature = "hover_card")]
+    pub use crate::hover_card::*;
+    #[cfg(feature = "context_menu")]
+    pub use crate::context_menu::*;
+    #[cfg(feature = "alert_dialog")]
+    pub use crate::alert_dialog::*;
+    #[cfg(feature = "coachmark")]
+    pub use crate::coachmark::*;
+    #[cfg(feature = "speed_dial")]
+    pub use crate::speed_dial::*;
+    #[cfg(feature = "affix")]
+    pub use crate::affix::*;
     pub use crate::STYLES;
 }

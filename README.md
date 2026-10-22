@@ -106,7 +106,14 @@ fn App() -> Element {
 | `tooltip` | `Tooltip`, `TooltipPosition` | Micro-etichette fluttuanti su hover a 4 direzioni |
 | `drawer` | `Drawer`, `DrawerPosition`, `DrawerSize` | Pannelli laterali a scomparsa da sinistra o destra |
 | `dropdown` | `Dropdown`, `DropdownItem`, `DropdownPlacement` | Menu a tendina ancorati al trigger |
-| `icon` | Native SVG Icons (50 `IconKind`) | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
+| `popover` | `Popover`, `PopoverTrigger`, `PopoverDropdown` | Pannello fluttuante ancorato con 12 allineamenti e freccia |
+| `hover_card` | `HoverCard`, `HoverCardTrigger`, `HoverCardDropdown` | Scheda di preview contestuale ricca attivata su hover |
+| `context_menu` | `ContextMenu`, `ContextMenuTrigger`, `ContextMenuContent` | Menu a tendina richiamato da click destro del mouse |
+| `alert_dialog` | `AlertDialog`, `ConfirmDialog` | Finestra di dialogo bloccante per conferme critiche e distruttive |
+| `coachmark` | `Coachmark`, `TeachingBubble` | Bolla di guida onboarding passo-passo |
+| `speed_dial` | `SpeedDial`, `SpeedDialAction`, `Fab` | Pulsante circolare FAB primario con espansione radiale/lineare |
+| `affix` | `Affix`, `BackToTop`, `AffixPosition` | Contenitore fisso in overlay e trigger scroll BackToTop |
+| `icon` | Native SVG Icons (51 `IconKind`) | Icone vettoriali ad alta nitidezza senza dipendenze esterne |
 | `typography` | `Heading`, `Text`, `Kbd`, `Code` | Componenti tipografici con scala Geist |
 | `animation` | `Transition`, `AnimationVariant` | Transizioni ottiche e micro-animazioni Dioxus |
 | `theme` | `Theme`, `ThemeProvider`, `use_theme`, `ThemeBuilder` | Engine reattivo Mantine con 5 preset cromatici, custom HEX e builder |

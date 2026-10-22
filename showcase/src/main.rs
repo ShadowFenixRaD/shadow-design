@@ -12,6 +12,7 @@ use pages::{
     ChipPage, ColorPickerPage, NavbarDemoPage, NavLinkPage, NotificationsPage, NumberInputPage, PaginationPage, PinInputPage, ProgressPage, RadioPage, RatingPage, ScrollAreaPage, SegmentedControlsPage, SelectPage,
     SkeletonsPage, SliderPage, SpoilerPage, StackPage, StepperPage, SwitchPage, TablesPage, TabsPage, TextareaPage, ThemeBuilderPage, TimelinesPage, TooltipPage, TreesPage,
     TypographyPage,
+    PopoverPage, HoverCardPage, ContextMenuPage, AlertDialogPage, CoachmarkPage, SpeedDialPage, AffixPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -126,6 +127,20 @@ pub enum Route {
     AccordionPage {},
     #[route("/spoiler")]
     SpoilerPage {},
+    #[route("/popover")]
+    PopoverPage {},
+    #[route("/hover-card")]
+    HoverCardPage {},
+    #[route("/context-menu")]
+    ContextMenuPage {},
+    #[route("/alert-dialog")]
+    AlertDialogPage {},
+    #[route("/coachmark")]
+    CoachmarkPage {},
+    #[route("/speed-dial")]
+    SpeedDialPage {},
+    #[route("/affix")]
+    AffixPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

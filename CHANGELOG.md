@@ -7,6 +7,34 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ## [Unreleased]
 
+### 🚀 Nuove Funzionalità & Componenti UI (Epic #7 — Floating Overlays & Menu Contestuali)
+
+- **Popover (`popover`)**:
+  - Pannello fluttuante ancorato a qualsiasi elemento trigger con 12 allineamenti geometrici (Top/Bottom/Left/Right con Start/Center/End), freccia indicatrice coordinata, dismiss su click esterno e chiusura su tasto Escape.
+  - Subcomponenti: `Popover`, `PopoverTrigger`, `PopoverDropdown`.
+- **HoverCard (`hover_card`, `hover-card`)**:
+  - Scheda di preview contestuale ricca attivata al passaggio del cursore con ritardo di apertura/chiusura configurabile (`open_delay`, `close_delay`), larghezza custom e persistenza su hover del card.
+  - Subcomponenti: `HoverCard`, `HoverCardTrigger`, `HoverCardDropdown`.
+- **ContextMenu (`context_menu`, `context-menu`)**:
+  - Menu a tendina richiamato dal click destro del mouse alle coordinate precise del puntatore, con supporto per scorciatoie da tastiera, checkbox items, radio items e azioni distruttive.
+  - Subcomponenti: `ContextMenu`, `ContextMenuTrigger`, `ContextMenuContent`, `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuCheckboxItem`.
+- **AlertDialog & ConfirmDialog (`alert_dialog`, `alert-dialog`)**:
+  - Finestra di dialogo bloccante con focus trapping e backdrop per conferme critiche e distruttive (Danger) o prompt decisionali irreversibili.
+- **Coachmark & TeachingBubble (`coachmark`)**:
+  - Bolla di guida passo-passo ancorata a elementi specifici per onboarding utenti con indicatori di avanzamento ("Passo X di Y"), pulsanti Avanti/Indietro e chiusura rapida.
+- **SpeedDial & FAB (`speed_dial`, `speed-dial`)**:
+  - Pulsante circolare di azione primario fisso (o in-line) con animazione di espansione radiale/lineare a 4 direzioni (Up, Down, Left, Right) per azioni secondarie correlate.
+  - Subcomponenti: `SpeedDial`, `SpeedDialAction`, `Fab`.
+- **Affix & BackToTop (`affix`)**:
+  - Contenitore fisso in overlay a coordinate assolute dello schermo con attivazione condizionale alla soglia di scroll verticale e componente dedicato `BackToTop` con scroll fluido.
+- **Integrazione SCSS & Design System**:
+  - Nuovi moduli SCSS BEM in `crate/scss/components/` (`_popover.scss`, `_hover_card.scss`, `_context_menu.scss`, `_alert_dialog.scss`, `_coachmark.scss`, `_speed_dial.scss`, `_affix.scss`).
+  - Scala Z-index universale aggiornata in `_zindex.scss` (`popover` a 990, `context-menu` a 1000, `speed-dial` e `affix` a 60, `coachmark` a 95).
+  - Nuova icona vettoriale nativa `IconKind::Plus`.
+- **Showcase & Navigazione**:
+  - Nuove pagine interattive di collaudo e documentazione props per tutti i 7 componenti in `showcase/src/pages/`.
+  - Integrazione completa nella barra laterale sinistra di navigazione dello showcase sotto "Overlay & Finestre" e nella palette di ricerca globale Ctrl+K (`COMPONENTS`).
+
 ---
 
 ## [0.4.0] — 2026-10-20

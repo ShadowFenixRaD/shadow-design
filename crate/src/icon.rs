@@ -57,6 +57,8 @@ pub enum IconKind {
     Flame,
     Download,
     Upload,
+    // Azioni Generali & Floating Overlays
+    Plus,
 }
 
 impl IconKind {
@@ -111,6 +113,7 @@ impl IconKind {
         IconKind::Flame,
         IconKind::Download,
         IconKind::Upload,
+        IconKind::Plus,
     ];
 
     #[must_use]
@@ -166,6 +169,7 @@ impl IconKind {
             IconKind::Flame => "Flame",
             IconKind::Download => "Download",
             IconKind::Upload => "Upload",
+            IconKind::Plus => "Plus",
         }
     }
 }
@@ -535,6 +539,10 @@ fn render_icon_paths(kind: IconKind) -> Element {
                     polyline { points: "17 8 12 3 7 8" }
                     line { x1: "12", x2: "12", y1: "3", y2: "15" }
                 },
+                IconKind::Plus => rsx! {
+                    line { x1: "12", x2: "12", y1: "5", y2: "19" }
+                    line { x1: "5", x2: "19", y1: "12", y2: "12" }
+                },
             }
         }
     }
@@ -545,7 +553,7 @@ mod tests {
 
     #[test]
     fn test_icon_kind_all_completeness() {
-        assert_eq!(IconKind::ALL.len(), 50);
+        assert_eq!(IconKind::ALL.len(), 51);
         for icon in IconKind::ALL {
             assert!(!icon.name().is_empty());
         }

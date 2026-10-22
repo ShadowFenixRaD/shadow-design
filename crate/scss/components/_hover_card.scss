@@ -1,0 +1,61 @@
+// ==============================================================================
+// Shadow Design — HoverCard Component
+// ==============================================================================
+@use '../variables' as *;
+@use '../zindex' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-hovercard {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .sd-hovercard-dropdown {
+    position: absolute;
+    z-index: z('tooltip');
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 16rem;
+    max-width: 26rem;
+    padding: 1rem;
+    background: $color-surface-1;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75);
+    color: #f4f4f5;
+    animation: sd-hovercard-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    @include specular-top(0.08);
+
+    &--glow {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(168, 85, 247, 0.25);
+    }
+
+    &--top {
+      bottom: calc(100% + 8px);
+      top: auto;
+    }
+
+    &--right {
+      left: calc(100% + 8px);
+      top: 0;
+    }
+
+    &--left {
+      right: calc(100% + 8px);
+      left: auto;
+      top: 0;
+    }
+  }
+}
+
+@keyframes sd-hovercard-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

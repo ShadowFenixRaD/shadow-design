@@ -577,9 +577,16 @@ $spacers: (
 .max-h-\[calc\(100vh-80px\)\] { max-height: calc(100vh - 80px); }
 .h-\[calc\(100vh-64px\)\] { height: calc(100vh - 64px); }
 .top-\[64px\] { top: 64px; }
-.text-red-400 { color: #f87171; }
-.text-orange-300 { color: #fdba74; }
-.text-purple-400\/80 { color: rgba(192, 132, 252, 0.8); }
 .shadow-\[0_0_24px_rgba\(168\,85\,247\,0\.25\)\] { box-shadow: 0 0 24px rgba(168, 85, 247, 0.25); }
+.cursor-context-menu { cursor: context-menu; }
+.border-dashed { border-style: dashed; }
+.border-2 { border-width: 2px; }
+.underline { text-decoration-line: underline; }
+.underline-offset-4 { text-underline-offset: 4px; }
+.min-h-\[360px\] { min-height: 360px; }
+.min-w-\[280px\] { min-width: 280px; }
+.bg-white\/\[0\.01\] { background-color: rgba(255, 255, 255, 0.01); }
+.border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.12); }
+.decoration-purple-500\/50 { text-decoration-color: rgba(168, 85, 247, 0.5); }
 
 }

@@ -62,6 +62,13 @@
 @use 'components/stack' as *;
 @use 'components/aspect-ratio' as *;
 @use 'components/center' as *;
+@use 'components/popover' as *;
+@use 'components/hover_card' as *;
+@use 'components/context_menu' as *;
+@use 'components/alert_dialog' as *;
+@use 'components/coachmark' as *;
+@use 'components/speed_dial' as *;
+@use 'components/affix' as *;
 
 @layer sd-base {
   :root {

@@ -95,6 +95,13 @@ all = [
     "layout_primitives",
     "aspect_ratio",
     "center",
+    "popover",
+    "hover_card",
+    "context_menu",
+    "alert_dialog",
+    "coachmark",
+    "speed_dial",
+    "affix",
 ]
 serde = ["dep:serde"]
 button = []
@@ -164,6 +171,17 @@ layout-primitives = ["layout_primitives"]
 aspect_ratio = []
 aspect-ratio = ["aspect_ratio"]
 center = []
+popover = []
+hover_card = []
+hover-card = ["hover_card"]
+context_menu = ["icon"]
+context-menu = ["context_menu"]
+alert_dialog = ["icon", "button"]
+alert-dialog = ["alert_dialog"]
+coachmark = ["icon", "button"]
+speed_dial = ["icon"]
+speed-dial = ["speed_dial"]
+affix = ["icon"]
 
 [lints.clippy]
 must_use_candidate = "warn"
