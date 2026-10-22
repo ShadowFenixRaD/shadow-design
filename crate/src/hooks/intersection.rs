@@ -8,7 +8,7 @@ pub fn use_intersection_observer(
     let mut is_intersecting = use_signal(|| false);
     let th = threshold.unwrap_or(0.0);
 
-    use_effect(move || {
+    use_hook(|| {
         let js = format!(
             r#"
             (function() {{

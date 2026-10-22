@@ -29,13 +29,33 @@ impl UseWindowScroll {
 pub fn use_window_scroll() -> UseWindowScroll {
     let mut position = use_signal(|| (0.0, 0.0));
 
-    use_effect(move || {
+    use_hook(|| {
         let js = r#"
         (function() {
+            let ticking = false;
+            let lastY = -1;
+            let lastX = -1;
+
             function update() {
-                dioxus.send([window.scrollX || 0, window.scrollY || 0]);
+                const y = Math.round(window.scrollY || window.pageYOffset || 0);
+                const x = Math.round(window.scrollX || window.pageXOffset || 0);
+                if (Math.abs(y - lastY) >= 2 || Math.abs(x - lastX) >= 2) {
+                    lastY = y;
+                    lastX = x;
+                    dioxus.send([x, y]);
+                }
             }
-            window.addEventListener("scroll", update, { passive: true });
+
+            window.addEventListener("scroll", () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        update();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+
             update();
         })();
         "#;

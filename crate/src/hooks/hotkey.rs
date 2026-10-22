@@ -8,26 +8,26 @@ pub fn use_hotkey(
     shortcut: &'static str,
     on_trigger: impl FnMut() + 'static,
 ) {
-    let parts: Vec<&str> = shortcut.split('+').map(|s| s.trim()).collect();
-    let mut ctrl = false;
-    let mut shift = false;
-    let mut alt = false;
-    let mut meta = false;
-    let mut key_name = String::new();
+    let cb = use_hook(|| Rc::new(RefCell::new(on_trigger)));
 
-    for part in parts {
-        match part.to_lowercase().as_str() {
-            "ctrl" | "control" => ctrl = true,
-            "shift" => shift = true,
-            "alt" => alt = true,
-            "cmd" | "meta" | "win" => meta = true,
-            k => key_name = k.to_string(),
+    use_hook(|| {
+        let parts: Vec<&str> = shortcut.split('+').map(|s| s.trim()).collect();
+        let mut ctrl = false;
+        let mut shift = false;
+        let mut alt = false;
+        let mut meta = false;
+        let mut key_name = String::new();
+
+        for part in parts {
+            match part.to_lowercase().as_str() {
+                "ctrl" | "control" => ctrl = true,
+                "shift" => shift = true,
+                "alt" => alt = true,
+                "cmd" | "meta" | "win" => meta = true,
+                k => key_name = k.to_string(),
+            }
         }
-    }
 
-    let cb = Rc::new(RefCell::new(on_trigger));
-
-    use_effect(move || {
         let js = format!(
             r#"
             (function() {{

@@ -4,18 +4,25 @@ use dioxus::prelude::*;
 pub fn use_idle(timeout_ms: u64) -> Signal<bool> {
     let mut is_idle = use_signal(|| false);
 
-    use_effect(move || {
+    use_hook(|| {
         let js = format!(
             r#"
             (function() {{
+                let isIdle = false;
                 let timer = null;
+
                 function reset() {{
-                    dioxus.send(false);
+                    if (isIdle) {{
+                        isIdle = false;
+                        dioxus.send(false);
+                    }}
                     if (timer) clearTimeout(timer);
                     timer = setTimeout(() => {{
+                        isIdle = true;
                         dioxus.send(true);
                     }}, {timeout_ms});
                 }}
+
                 const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "wheel"];
                 events.forEach(ev => window.addEventListener(ev, reset, {{ passive: true }}));
                 reset();

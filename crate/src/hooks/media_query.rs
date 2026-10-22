@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 pub fn use_media_query(query: &'static str) -> Signal<bool> {
     let mut matches = use_signal(|| false);
 
-    use_effect(move || {
+    use_hook(|| {
         let js = format!(
             r#"
             (function() {{

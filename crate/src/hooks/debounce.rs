@@ -1,4 +1,6 @@
 use dioxus::prelude::*;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::Arc;
 use std::time::Duration;
 
 async fn sleep_ms(ms: u64) {
@@ -19,16 +21,17 @@ pub fn use_debounced_signal<T: Clone + PartialEq + 'static>(
 ) -> Signal<T> {
     let initial = source.read().clone();
     let mut debounced = use_signal(|| initial);
-    let mut version = use_signal(|| 0u64);
+    let version = use_hook(|| Arc::new(AtomicU64::new(0)));
 
+    let ver_clone = Arc::clone(&version);
     use_effect(move || {
         let val = source.read().clone();
-        let curr_ver = *version.read() + 1;
-        version.set(curr_ver);
+        let curr_ver = ver_clone.fetch_add(1, Ordering::Relaxed) + 1;
+        let ver_check = Arc::clone(&ver_clone);
 
         spawn(async move {
             sleep_ms(delay_ms).await;
-            if *version.read() == curr_ver {
+            if ver_check.load(Ordering::Relaxed) == curr_ver {
                 debounced.set(val);
             }
         });
@@ -44,16 +47,17 @@ pub fn use_throttle<T: Clone + PartialEq + 'static>(
 ) -> Signal<T> {
     let initial = source.read().clone();
     let mut throttled = use_signal(|| initial);
-    let mut is_cooling_down = use_signal(|| false);
+    let is_cooling_down = use_hook(|| Arc::new(AtomicBool::new(false)));
 
+    let cooldown_clone = Arc::clone(&is_cooling_down);
     use_effect(move || {
         let val = source.read().clone();
-        if !*is_cooling_down.read() {
+        if !cooldown_clone.swap(true, Ordering::Relaxed) {
             throttled.set(val);
-            is_cooling_down.set(true);
+            let cd = Arc::clone(&cooldown_clone);
             spawn(async move {
                 sleep_ms(interval_ms).await;
-                is_cooling_down.set(false);
+                cd.store(false, Ordering::Relaxed);
             });
         }
     });

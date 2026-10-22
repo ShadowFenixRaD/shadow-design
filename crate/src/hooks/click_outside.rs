@@ -7,9 +7,9 @@ pub fn use_click_outside(
     element_id: &'static str,
     on_click_outside: impl FnMut() + 'static,
 ) {
-    let cb = Rc::new(RefCell::new(on_click_outside));
+    let cb = use_hook(|| Rc::new(RefCell::new(on_click_outside)));
 
-    use_effect(move || {
+    use_hook(|| {
         let js = format!(
             r#"
             (function() {{
