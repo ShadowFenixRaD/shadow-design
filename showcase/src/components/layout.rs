@@ -452,6 +452,27 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
             }
 
+            // Sezione 9: Estensioni & Tooling
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Terminal, size: 12 }
+                        "Estensioni & Tooling"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::CommandPalettePage {}, icon: IconKind::Search, label: "Command Palette", collapsed }
+                    SidebarLink { to: Route::DatePickerPage {}, icon: IconKind::Calendar, label: "Date Picker", collapsed }
+                    SidebarLink { to: Route::DropzonePage {}, icon: IconKind::Upload, label: "Dropzone", collapsed }
+                    SidebarLink { to: Route::ResizablePage {}, icon: IconKind::GripVertical, label: "Resizable", collapsed }
+                    SidebarLink { to: Route::CarouselPage {}, icon: IconKind::ChevronRight, label: "Carousel", collapsed }
+                    SidebarLink { to: Route::VirtualListPage {}, icon: IconKind::Layers, label: "Virtual List", collapsed }
+                    SidebarLink { to: Route::CodeHighlightPage {}, icon: IconKind::Code, label: "Code Highlight", collapsed }
+                }
+            }
+
             // Telemetria Tema Attivo
             if collapsed {
                 div { class: "mt-auto p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center",

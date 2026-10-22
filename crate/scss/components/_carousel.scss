@@ -1,0 +1,105 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Carousel interactive slider
+.sd-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #000000;
+  user-select: none;
+
+  &-viewport {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  &-track {
+    display: flex;
+    width: 100%;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+
+  &-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(9, 9, 11, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(4px);
+    color: #f4f4f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: rgba(168, 85, 247, 0.3);
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+    }
+
+    &--prev {
+      left: 12px;
+    }
+
+    &--next {
+      right: 12px;
+    }
+
+    &--disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+
+  &-indicators {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+  }
+
+  &-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    &--active {
+      width: 20px;
+      border-radius: 4px;
+      background-color: #a855f7;
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
+    }
+  }
+}

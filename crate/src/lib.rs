@@ -339,6 +339,20 @@ pub mod keytip;
 pub mod form;
 #[cfg(feature = "hooks")]
 pub mod hooks;
+#[cfg(feature = "command_palette")]
+pub mod command_palette;
+#[cfg(feature = "date_picker")]
+pub mod date_picker;
+#[cfg(feature = "dropzone")]
+pub mod dropzone;
+#[cfg(feature = "resizable")]
+pub mod resizable;
+#[cfg(feature = "carousel")]
+pub mod carousel;
+#[cfg(feature = "virtual_list")]
+pub mod virtual_list;
+#[cfg(feature = "code_highlight")]
+pub mod code_highlight;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -487,5 +501,19 @@ pub mod prelude {
     pub use crate::form::*;
     #[cfg(feature = "hooks")]
     pub use crate::hooks::*;
+    #[cfg(feature = "command_palette")]
+    pub use crate::command_palette::*;
+    #[cfg(feature = "date_picker")]
+    pub use crate::date_picker::*;
+    #[cfg(feature = "dropzone")]
+    pub use crate::dropzone::*;
+    #[cfg(feature = "resizable")]
+    pub use crate::resizable::*;
+    #[cfg(feature = "carousel")]
+    pub use crate::carousel::*;
+    #[cfg(feature = "virtual_list")]
+    pub use crate::virtual_list::*;
+    #[cfg(feature = "code_highlight")]
+    pub use crate::code_highlight::*;
     pub use crate::STYLES;
 }

@@ -35,7 +35,7 @@ pub fn MarqueeSelectionPage() -> Element {
         },
     ];
 
-    let items = vec![
+    let items = [
         "mesh_router.rs",
         "peer_protocol.proto",
         "crypto_vault.bin",

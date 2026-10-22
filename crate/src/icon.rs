@@ -59,6 +59,9 @@ pub enum IconKind {
     Upload,
     // Azioni Generali & Floating Overlays
     Plus,
+    // Tooling & Estensioni
+    Calendar,
+    GripVertical,
 }
 
 impl IconKind {
@@ -114,6 +117,8 @@ impl IconKind {
         IconKind::Download,
         IconKind::Upload,
         IconKind::Plus,
+        IconKind::Calendar,
+        IconKind::GripVertical,
     ];
 
     #[must_use]
@@ -170,6 +175,8 @@ impl IconKind {
             IconKind::Download => "Download",
             IconKind::Upload => "Upload",
             IconKind::Plus => "Plus",
+            IconKind::Calendar => "Calendar",
+            IconKind::GripVertical => "GripVertical",
         }
     }
 }
@@ -543,6 +550,20 @@ fn render_icon_paths(kind: IconKind) -> Element {
                     line { x1: "12", x2: "12", y1: "5", y2: "19" }
                     line { x1: "5", x2: "19", y1: "12", y2: "12" }
                 },
+                IconKind::Calendar => rsx! {
+                    rect { width: "18", height: "18", x: "3", y: "4", rx: "2" }
+                    line { x1: "16", x2: "16", y1: "2", y2: "6" }
+                    line { x1: "8", x2: "8", y1: "2", y2: "6" }
+                    line { x1: "3", x2: "21", y1: "10", y2: "10" }
+                },
+                IconKind::GripVertical => rsx! {
+                    circle { cx: "9", cy: "12", r: "1" }
+                    circle { cx: "9", cy: "5", r: "1" }
+                    circle { cx: "9", cy: "19", r: "1" }
+                    circle { cx: "15", cy: "12", r: "1" }
+                    circle { cx: "15", cy: "5", r: "1" }
+                    circle { cx: "15", cy: "19", r: "1" }
+                },
             }
         }
     }
@@ -553,7 +574,7 @@ mod tests {
 
     #[test]
     fn test_icon_kind_all_completeness() {
-        assert_eq!(IconKind::ALL.len(), 51);
+        assert_eq!(IconKind::ALL.len(), 53);
         for icon in IconKind::ALL {
             assert!(!icon.name().is_empty());
         }

@@ -78,6 +78,13 @@
 @use 'components/fieldset' as *;
 @use 'components/marquee_selection' as *;
 @use 'components/keytip' as *;
+@use 'components/command_palette' as *;
+@use 'components/date_picker' as *;
+@use 'components/dropzone' as *;
+@use 'components/resizable' as *;
+@use 'components/carousel' as *;
+@use 'components/virtual_list' as *;
+@use 'components/code_highlight' as *;
 
 @layer sd-base {
   :root {

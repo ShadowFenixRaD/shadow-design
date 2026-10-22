@@ -1,0 +1,75 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Resizable panel groups and handles
+.sd-resizable-group {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  &--horizontal {
+    flex-direction: row;
+  }
+
+  &--vertical {
+    flex-direction: column;
+  }
+}
+
+.sd-resizable-panel {
+  position: relative;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.sd-resizable-handle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  flex-shrink: 0;
+  z-index: 10;
+
+  .sd-resizable-group--horizontal > & {
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+  }
+
+  .sd-resizable-group--vertical > & {
+    height: 6px;
+    width: 100%;
+    cursor: row-resize;
+  }
+
+  &:hover,
+  &--active {
+    background-color: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  &-grip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 24px;
+    border-radius: 4px;
+    background-color: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #a1a1aa;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}

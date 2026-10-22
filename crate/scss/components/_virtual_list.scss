@@ -1,0 +1,33 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// VirtualList virtualized scroller
+.sd-virtual-list {
+  width: 100%;
+  background-color: #050507;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-sizing: border-box;
+
+  &-spacer {
+    display: block;
+    visibility: hidden;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+  }
+}

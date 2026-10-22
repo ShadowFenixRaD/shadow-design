@@ -1,0 +1,129 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// CodeBlock & CodeHighlight syntax highlighting
+.sd-code-block {
+  width: 100%;
+  border-radius: 12px;
+  background-color: #050508;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  &-lang-badge {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #a1a1aa;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  &-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &-body {
+    padding: 14px 0;
+    overflow-x: auto;
+  }
+
+  .sd-code-pre {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    line-height: 1.6;
+    background: transparent;
+  }
+
+  .sd-code-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+  }
+
+  .sd-code-line {
+    display: flex;
+    align-items: flex-start;
+    padding: 0 16px;
+    transition: background-color 0.12s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    &--highlighted {
+      background-color: rgba(168, 85, 247, 0.12);
+      border-left: 3px solid #a855f7;
+      padding-left: 13px;
+    }
+
+    &-number {
+      width: 32px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-right: 16px;
+      color: #52525b;
+      user-select: none;
+    }
+
+    &-text {
+      flex: 1;
+      white-space: pre;
+      color: #e4e4e7;
+    }
+  }
+}
+
+// Token color categories
+.sd-token {
+  &-keyword {
+    color: #c084fc;
+    font-weight: 500;
+  }
+
+  &-fn {
+    color: #60a5fa;
+  }
+
+  &-type {
+    color: #38bdf8;
+  }
+
+  &-string {
+    color: #34d399;
+  }
+
+  &-comment {
+    color: #71717a;
+    font-style: italic;
+  }
+
+  &-number {
+    color: #fb923c;
+  }
+
+  &-operator {
+    color: #e4e4e7;
+  }
+
+  &-plain {
+    color: #f4f4f5;
+  }
+}

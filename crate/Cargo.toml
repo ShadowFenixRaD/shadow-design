@@ -114,6 +114,13 @@ all = [
     "keytip",
     "form",
     "hooks",
+    "command_palette",
+    "date_picker",
+    "dropzone",
+    "resizable",
+    "carousel",
+    "virtual_list",
+    "code_highlight",
 ]
 serde = ["dep:serde"]
 button = []
@@ -209,6 +216,17 @@ marquee-selection = ["marquee_selection"]
 keytip = []
 form = []
 hooks = []
+command_palette = ["icon", "typography"]
+command-palette = ["command_palette"]
+date_picker = ["icon", "button"]
+date-picker = ["date_picker"]
+dropzone = ["icon"]
+resizable = ["icon"]
+carousel = ["icon"]
+virtual_list = []
+virtual-list = ["virtual_list"]
+code_highlight = ["icon", "copy_button"]
+code-highlight = ["code_highlight"]
 
 [lints.clippy]
 must_use_candidate = "warn"

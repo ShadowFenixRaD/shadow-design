@@ -15,6 +15,7 @@ use pages::{
     PopoverPage, HoverCardPage, ContextMenuPage, AlertDialogPage, CoachmarkPage, SpeedDialPage, AffixPage,
     BurgerPage, CloseButtonPage, CopyButtonPage, IndicatorPage, HighlightPage, LoadingOverlayPage, FieldsetPage, MarqueeSelectionPage, KeytipPage,
     FormValidationPage, ReactiveHooksPage,
+    CommandPalettePage, DatePickerPage, DropzonePage, ResizablePage, CarouselPage, VirtualListPage, CodeHighlightPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -165,6 +166,20 @@ pub enum Route {
     FormValidationPage {},
     #[route("/reactive-hooks")]
     ReactiveHooksPage {},
+    #[route("/command-palette")]
+    CommandPalettePage {},
+    #[route("/date-picker")]
+    DatePickerPage {},
+    #[route("/dropzone")]
+    DropzonePage {},
+    #[route("/resizable")]
+    ResizablePage {},
+    #[route("/carousel")]
+    CarouselPage {},
+    #[route("/virtual-list")]
+    VirtualListPage {},
+    #[route("/code-highlight")]
+    CodeHighlightPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");
