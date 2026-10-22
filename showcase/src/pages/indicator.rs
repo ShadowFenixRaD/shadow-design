@@ -86,6 +86,12 @@ pub fn IndicatorPage() -> Element {
                                     onclick: move |_| selected_pos.set(IndicatorPosition::BottomEnd),
                                     "BottomEnd"
                                 }
+                                button {
+                                    r#type: "button",
+                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == IndicatorPosition::BottomStart { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                    onclick: move |_| selected_pos.set(IndicatorPosition::BottomStart),
+                                    "BottomStart"
+                                }
                             }
 
                             div { class: "flex items-center gap-2",
