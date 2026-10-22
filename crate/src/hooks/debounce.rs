@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
+#[cfg(not(target_arch = "wasm32"))]
 use std::time::Duration;
 
 async fn sleep_ms(ms: u64) {

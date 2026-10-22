@@ -24,64 +24,60 @@ impl UseClipboard {
         let current_ver = ver_arc.fetch_add(1, Ordering::Relaxed) + 1;
 
         spawn(async move {
-            let json_text = serde_json::to_string(&text_str).unwrap_or_default();
-            let js = format!(
+            let mut eval = document::eval(
                 r#"
-                (async function() {{
-                    let ok = false;
-                    try {{
-                        if (navigator.clipboard && navigator.clipboard.writeText) {{
-                            await navigator.clipboard.writeText({json_text});
-                            ok = true;
-                        }} else {{
-                            const ta = document.createElement("textarea");
-                            ta.value = {json_text};
-                            ta.style.position = "fixed";
-                            ta.style.left = "-9999px";
-                            document.body.appendChild(ta);
-                            ta.select();
-                            ok = document.execCommand("copy");
-                            document.body.removeChild(ta);
-                        }}
-                    }} catch (e) {{
-                        ok = false;
-                    }}
-
-                    if (ok) {{
-                        dioxus.send({{ "status": "copied", "ver": {current_ver} }});
-                        setTimeout(() => {{
-                            dioxus.send({{ "status": "reset", "ver": {current_ver} }});
-                        }}, {timeout});
-                    }} else {{
-                        dioxus.send({{ "status": "error", "ver": {current_ver} }});
-                    }}
-                }})();
-                "#
+                const text = await dioxus.recv();
+                let ok = false;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        ok = true;
+                    } else {
+                        const ta = document.createElement("textarea");
+                        ta.value = text;
+                        ta.style.position = "fixed";
+                        ta.style.left = "-9999px";
+                        document.body.appendChild(ta);
+                        ta.select();
+                        ok = document.execCommand("copy");
+                        document.body.removeChild(ta);
+                    }
+                } catch (e) {
+                    ok = false;
+                }
+                dioxus.send(ok);
+                "#,
             );
 
-            let mut eval = document::eval(&js);
-            while let Ok(msg) = eval.recv::<serde_json::Value>().await {
-                if let Some(obj) = msg.as_object() {
-                    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("");
-                    let ver = obj.get("ver").and_then(|v| v.as_u64()).unwrap_or(0);
+            let _ = eval.send(serde_json::Value::String(text_str));
+            let ok = eval.recv::<bool>().await.unwrap_or(false);
 
-                    match status {
-                        "copied" => {
-                            copied.set(true);
-                            error.set(false);
-                        }
-                        "reset" => {
-                            if ver == ver_arc.load(Ordering::Relaxed) {
-                                copied.set(false);
-                            }
-                        }
-                        "error" => {
-                            error.set(true);
+            if ok {
+                copied.set(true);
+                error.set(false);
+
+                #[cfg(target_arch = "wasm32")]
+                {
+                    let ver_check = ver_arc.clone();
+                    gloo_timers::callback::Timeout::new(timeout, move || {
+                        if current_ver == ver_check.load(Ordering::Relaxed) {
                             copied.set(false);
                         }
-                        _ => {}
+                    })
+                    .forget();
+                }
+
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    let ver_check = ver_arc.clone();
+                    tokio::time::sleep(std::time::Duration::from_millis(timeout as u64)).await;
+                    if current_ver == ver_check.load(Ordering::Relaxed) {
+                        copied.set(false);
                     }
                 }
+            } else {
+                error.set(true);
+                copied.set(false);
             }
         });
     }
@@ -96,6 +92,7 @@ impl UseClipboard {
 }
 
 /// Reactive hook for system clipboard operations with automatic status feedback timeout.
+#[must_use]
 pub fn use_clipboard(timeout_ms: Option<u32>) -> UseClipboard {
     let copied = use_signal(|| false);
     let error = use_signal(|| false);

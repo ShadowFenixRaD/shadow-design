@@ -170,11 +170,11 @@ let is_desktop = use_media_query("(min-width: 1024px)");"#
                                 p { class: "text-xs text-zinc-400", "Copia istantaneamente una stringa negli appunti con feedback visivo temporizzato." }
                                 button {
                                     r#type: "button",
-                                    class: format!("w-full py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if *clipboard.copied.read() { "bg-emerald-950/80 text-emerald-200 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]" } else { "bg-white/[0.04] text-zinc-300 border-white/[0.08] hover:bg-white/[0.08]" }),
+                                    class: format!("w-full py-2 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if *clipboard.copied.read() { "bg-emerald-950/80 text-emerald-200 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]" } else { "bg-white/[0.04] text-zinc-300 border-white/[0.08] hover:bg-white/[0.08]" }),
                                     onclick: move |_| {
                                         clipboard.copy("Token Segreto: shadow-token-9988");
                                     },
-                                    if *clipboard.copied.read() { "Copiato negli Appunti!" } else { "Copia Token di Prova" }
+                                    if *clipboard.copied.read() { "✓ Copiato negli Appunti!" } else { "Copia Token di Prova" }
                                 }
                             }
 
