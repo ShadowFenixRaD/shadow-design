@@ -44,13 +44,13 @@
   .sd-speed-dial-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 55;
+    z-index: 1;
     background: transparent;
   }
 
   .sd-fab {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -93,7 +93,7 @@
 
   .sd-speed-dial-actions {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     display: flex;
     align-items: center;
     gap: 0.625rem;
@@ -118,6 +118,7 @@
 
   .sd-speed-dial-action-item {
     position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,6 +127,8 @@
   }
 
   .sd-speed-dial-btn {
+    position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;

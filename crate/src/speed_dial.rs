@@ -77,7 +77,8 @@ pub fn SpeedDialAction(
 ) -> Element {
     let ctx = try_use_context::<SpeedDialContext>();
 
-    let handle_click = move |_| {
+    let handle_click = move |e: MouseEvent| {
+        e.stop_propagation();
         if let Some(h) = onclick {
             h.call(());
         }
@@ -169,7 +170,10 @@ pub fn SpeedDial(
             if is_open && close_on_click_outside {
                 div {
                     class: "sd-speed-dial-backdrop",
-                    onclick: move |_| effective_sig.set(false),
+                    onclick: move |e: MouseEvent| {
+                        e.stop_propagation();
+                        effective_sig.set(false);
+                    },
                 }
             }
 
