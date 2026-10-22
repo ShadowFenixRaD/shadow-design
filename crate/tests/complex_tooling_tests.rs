@@ -122,3 +122,10 @@ fn test_code_highlight_tokenizer() {
 fn test_resizable_direction_default() {
     assert_eq!(ResizableDirection::default(), ResizableDirection::Horizontal);
 }
+
+#[test]
+fn test_calendar_view_mode_defaults() {
+    use shadow_design::date_picker::CalendarViewMode;
+    assert_eq!(CalendarViewMode::default(), CalendarViewMode::Day);
+    assert_ne!(CalendarViewMode::Month, CalendarViewMode::Year);
+}

@@ -8,6 +8,11 @@ pub fn CommandPalettePage() -> Element {
     let mut opened = use_signal(|| false);
     let mut last_selected = use_signal(|| "Nessuna azione selezionata".to_string());
 
+    use_hotkey("ctrl+k", move || {
+        let cur = *opened.read();
+        opened.set(!cur);
+    });
+
     let actions = vec![
         CommandAction::new("home", "Vai alla Home")
             .with_description("Ritorna alla schermata principale di Shadow Design")
@@ -112,15 +117,22 @@ CommandPalette {
                 preview: rsx! {
                     div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner",
                         p { class: "text-xs text-zinc-400 font-mono text-center max-w-md",
-                            "Clicca sul pulsante per aprire la palette o premi Esc per uscire. Puoi usare le frecce su/giù e Invio per selezionare i comandi."
+                            "Premi Ctrl+K da tastiera o clicca sul pulsante. Naviga con frecce ↑/↓, premi Invio per confermare ed Esc per chiudere."
                         }
 
-                        Button {
-                            variant: ButtonVariant::Primary,
-                            size: ButtonSize::Md,
-                            onclick: move |_| opened.set(true),
-                            Icon { kind: IconKind::Search, size: 16 }
-                            "Apri Command Palette (Spotlight)"
+                        div { class: "flex items-center gap-3",
+                            Button {
+                                variant: ButtonVariant::Primary,
+                                size: ButtonSize::Md,
+                                onclick: move |_| opened.set(true),
+                                Icon { kind: IconKind::Search, size: 16 }
+                                "Apri Command Palette"
+                            }
+                            div { class: "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-zinc-950/80 text-xs font-mono",
+                                Kbd { "Ctrl" }
+                                span { class: "text-zinc-500", "+" }
+                                Kbd { "K" }
+                            }
                         }
 
                         div { class: "p-3 rounded-lg border border-white/[0.06] bg-zinc-950/60 text-xs font-mono flex items-center gap-3",

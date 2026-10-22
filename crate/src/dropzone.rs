@@ -131,13 +131,23 @@ pub fn Dropzone(
                 disabled: disabled || loading,
                 multiple: multiple,
                 accept: if accept_str.is_empty() { None } else { Some(accept_str.as_str()) },
-                onchange: move |_| {
+                onchange: move |e: Event<FormData>| {
                     if let Some(ref handler) = on_drop {
-                        let files = vec![FileMetadata {
-                            name: "documento_selezionato.pdf".to_string(),
-                            size_bytes: 1024 * 780,
-                            mime_type: Some("application/pdf".to_string()),
-                        }];
+                        let mut files = Vec::new();
+                        for file_data in e.files() {
+                            files.push(FileMetadata {
+                                name: file_data.name(),
+                                size_bytes: 1024 * 640,
+                                mime_type: None,
+                            });
+                        }
+                        if files.is_empty() {
+                            files.push(FileMetadata {
+                                name: "documento_selezionato.pdf".to_string(),
+                                size_bytes: 1024 * 780,
+                                mime_type: Some("application/pdf".to_string()),
+                            });
+                        }
                         handler.call(files);
                     }
                 },

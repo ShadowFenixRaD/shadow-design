@@ -164,41 +164,41 @@ pub fn CommandPalette(
         }
     };
 
-    let select_current = {
-        let acts = actions_clone.clone();
-        move || {
-            if let Some(action) = acts.get(current_idx) {
-                handle_select(action.clone());
-            }
-        }
-    };
 
-    let handle_keydown = move |e: KeyboardEvent| {
-        match e.key() {
-            Key::ArrowDown => {
-                e.prevent_default();
-                if count > 0 {
-                    active_index.set((current_idx + 1) % count);
+    let handle_keydown = {
+        let acts = actions_clone.clone();
+        move |e: KeyboardEvent| {
+            match e.key() {
+                Key::ArrowDown => {
+                    e.prevent_default();
+                    if count > 0 {
+                        let cur = *active_index.read();
+                        active_index.set((cur + 1) % count);
+                    }
                 }
-            }
-            Key::ArrowUp => {
-                e.prevent_default();
-                if count > 0 {
-                    active_index.set(if current_idx == 0 { count - 1 } else { current_idx - 1 });
+                Key::ArrowUp => {
+                    e.prevent_default();
+                    if count > 0 {
+                        let cur = *active_index.read();
+                        active_index.set(if cur == 0 { count - 1 } else { cur - 1 });
+                    }
                 }
+                Key::Enter => {
+                    e.prevent_default();
+                    let cur = *active_index.read();
+                    if let Some(action) = acts.get(cur) {
+                        handle_select(action.clone());
+                    }
+                }
+                Key::Escape => {
+                    e.prevent_default();
+                    let mut op = opened;
+                    let mut sq = search_query;
+                    op.set(false);
+                    sq.set(String::new());
+                }
+                _ => {}
             }
-            Key::Enter => {
-                e.prevent_default();
-                select_current();
-            }
-            Key::Escape => {
-                e.prevent_default();
-                let mut op = opened;
-                let mut sq = search_query;
-                op.set(false);
-                sq.set(String::new());
-            }
-            _ => {}
         }
     };
 
@@ -216,8 +216,9 @@ pub fn CommandPalette(
             },
             div {
                 class: "sd-command-palette-dialog {class}",
+                tabindex: "-1",
                 onclick: move |e| e.stop_propagation(),
-                onkeydown: handle_keydown,
+                onkeydown: handle_keydown.clone(),
 
                 // Input bar superiore
                 div { class: "sd-command-palette-input-wrap",
@@ -228,6 +229,7 @@ pub fn CommandPalette(
                         class: "sd-command-palette-input",
                         placeholder: "{placeholder}",
                         value: "{search_query()}",
+                        onkeydown: handle_keydown.clone(),
                         oninput: move |e| {
                             let mut sq = search_query;
                             sq.set(e.value());

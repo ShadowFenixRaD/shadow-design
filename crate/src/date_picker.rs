@@ -132,6 +132,18 @@ impl Date {
     }
 }
 
+/// Modalità di navigazione della vista del calendario.
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
+pub enum CalendarViewMode {
+    /// Visualizzazione dei giorni del mese (predefinita).
+    #[default]
+    Day,
+    /// Visualizzazione e selezione dei 12 mesi dell'anno.
+    Month,
+    /// Visualizzazione e selezione dell'anno in finestre da 12 anni.
+    Year,
+}
+
 /// Griglia calendario mensile interattiva con navigazione e selezione data o range.
 #[component]
 pub fn Calendar(
@@ -175,14 +187,41 @@ pub fn Calendar(
     let prev = view.prev_month();
     let days_in_prev_month = Date::days_in_month(prev.year, prev.month);
 
+    let mut view_mode = use_signal(|| CalendarViewMode::Day);
+    let mut year_range_start = use_signal(|| (year / 12) * 12);
+
     let handle_prev = move |_| {
-        let prev_val = current_view.read().prev_month();
-        current_view.set(prev_val);
+        match *view_mode.read() {
+            CalendarViewMode::Day => {
+                let prev_val = current_view.read().prev_month();
+                current_view.set(prev_val);
+            }
+            CalendarViewMode::Month => {
+                let cur = *current_view.read();
+                current_view.set(Date::new(cur.year.saturating_sub(1), cur.month, 1.min(cur.day)));
+            }
+            CalendarViewMode::Year => {
+                let start = *year_range_start.read();
+                year_range_start.set(start.saturating_sub(12));
+            }
+        }
     };
 
     let handle_next = move |_| {
-        let next_val = current_view.read().next_month();
-        current_view.set(next_val);
+        match *view_mode.read() {
+            CalendarViewMode::Day => {
+                let next_val = current_view.read().next_month();
+                current_view.set(next_val);
+            }
+            CalendarViewMode::Month => {
+                let cur = *current_view.read();
+                current_view.set(Date::new(cur.year + 1, cur.month, 1.min(cur.day)));
+            }
+            CalendarViewMode::Year => {
+                let start = *year_range_start.read();
+                year_range_start.set(start + 12);
+            }
+        }
     };
 
     let is_disabled = move |d: Date| -> bool {
@@ -229,84 +268,171 @@ pub fn Calendar(
 
     rsx! {
         div { class: "sd-calendar {class}",
-            // Header del calendario (Mese Anno e controlli avanti/indietro)
+            // Header del calendario (controlli e titoli condizionali in base a view_mode)
             div { class: "sd-calendar-header",
                 button {
                     r#type: "button",
                     class: "sd-calendar-nav-btn",
                     onclick: handle_prev,
-                    "aria-label": "Mese precedente",
+                    "aria-label": "Precedente",
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
                 }
-                span { class: "sd-calendar-title",
-                    "{Date::month_name_it(month)} {year}"
+
+                match *view_mode.read() {
+                    CalendarViewMode::Day => rsx! {
+                        div { class: "sd-calendar-title-buttons",
+                            button {
+                                r#type: "button",
+                                class: "sd-calendar-title-btn",
+                                onclick: move |_| view_mode.set(CalendarViewMode::Month),
+                                "{Date::month_name_it(month)}"
+                            }
+                            button {
+                                r#type: "button",
+                                class: "sd-calendar-title-btn",
+                                onclick: move |_| {
+                                    year_range_start.set((year / 12) * 12);
+                                    view_mode.set(CalendarViewMode::Year);
+                                },
+                                "{year}"
+                            }
+                        }
+                    },
+                    CalendarViewMode::Month => rsx! {
+                        button {
+                            r#type: "button",
+                            class: "sd-calendar-title-btn",
+                            onclick: move |_| {
+                                year_range_start.set((year / 12) * 12);
+                                view_mode.set(CalendarViewMode::Year);
+                            },
+                            "{year}"
+                        }
+                    },
+                    CalendarViewMode::Year => rsx! {
+                        span { class: "sd-calendar-title",
+                            "{*year_range_start.read()} - {*year_range_start.read() + 11}"
+                        }
+                    },
                 }
+
                 button {
                     r#type: "button",
                     class: "sd-calendar-nav-btn",
                     onclick: handle_next,
-                    "aria-label": "Mese successivo",
+                    "aria-label": "Successivo",
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
             }
 
-            // Intestazione giorni della settimana
-            div { class: "sd-calendar-weekdays",
-                for dow in &["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"] {
-                    div { class: "sd-calendar-weekday", "{dow}" }
-                }
-            }
-
-            // Griglia dei giorni
-            div { class: "sd-calendar-grid",
-                // Giorni del mese precedente (per allineamento)
-                for i in 0..start_dow {
-                    {
-                        let day_num = days_in_prev_month - start_dow + i + 1;
-                        rsx! {
-                            div { class: "sd-calendar-day sd-calendar-day--outside", "{day_num}" }
+            // Corpo del calendario condizionale
+            match *view_mode.read() {
+                CalendarViewMode::Day => rsx! {
+                    // Intestazione giorni della settimana
+                    div { class: "sd-calendar-weekdays",
+                        for dow in &["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"] {
+                            div { class: "sd-calendar-weekday", "{dow}" }
                         }
                     }
-                }
 
-                // Giorni del mese corrente
-                for day_num in 1..=days_in_cur_month {
-                    {
-                        let cell_date = Date::new(year, month, day_num);
-                        let disabled = is_disabled(cell_date);
-                        let is_sel = selected == Some(cell_date);
-                        let in_rng = is_in_range(cell_date);
-                        let rng_start = is_range_start(cell_date);
-                        let rng_end = is_range_end(cell_date);
-
-                        let mut day_class = String::from("sd-calendar-day");
-                        if disabled {
-                            day_class.push_str(" sd-calendar-day--disabled");
-                        }
-                        if is_sel || rng_start || rng_end {
-                            day_class.push_str(" sd-calendar-day--selected");
-                        } else if in_rng {
-                            day_class.push_str(" sd-calendar-day--in-range");
+                    // Griglia dei giorni
+                    div { class: "sd-calendar-grid",
+                        // Giorni del mese precedente (per allineamento)
+                        for i in 0..start_dow {
+                            {
+                                let day_num = days_in_prev_month - start_dow + i + 1;
+                                rsx! {
+                                    div { class: "sd-calendar-day sd-calendar-day--outside", "{day_num}" }
+                                }
+                            }
                         }
 
-                        rsx! {
-                            button {
-                                key: "{day_num}",
-                                r#type: "button",
-                                disabled: disabled,
-                                class: "{day_class}",
-                                onclick: move |_| {
-                                    if !disabled {
-                                        if let Some(ref handler) = on_select {
-                                            handler.call(cell_date);
-                                        }
+                        // Giorni del mese corrente
+                        for day_num in 1..=days_in_cur_month {
+                            {
+                                let cell_date = Date::new(year, month, day_num);
+                                let disabled = is_disabled(cell_date);
+                                let is_sel = selected == Some(cell_date);
+                                let in_rng = is_in_range(cell_date);
+                                let rng_start = is_range_start(cell_date);
+                                let rng_end = is_range_end(cell_date);
+
+                                let mut day_class = String::from("sd-calendar-day");
+                                if disabled {
+                                    day_class.push_str(" sd-calendar-day--disabled");
+                                }
+                                if is_sel || rng_start || rng_end {
+                                    day_class.push_str(" sd-calendar-day--selected");
+                                } else if in_rng {
+                                    day_class.push_str(" sd-calendar-day--in-range");
+                                }
+
+                                rsx! {
+                                    button {
+                                        key: "{day_num}",
+                                        r#type: "button",
+                                        disabled: disabled,
+                                        class: "{day_class}",
+                                        onclick: move |_| {
+                                            if !disabled {
+                                                if let Some(ref handler) = on_select {
+                                                    handler.call(cell_date);
+                                                }
+                                            }
+                                        },
+                                        "{day_num}"
                                     }
-                                },
-                                "{day_num}"
+                                }
                             }
                         }
                     }
-                }
+                },
+                CalendarViewMode::Month => rsx! {
+                    div { class: "sd-calendar-grid--items",
+                        for m in 1..=12 {
+                            {
+                                let is_cur_month = m == month;
+                                let btn_cls = if is_cur_month { "sd-calendar-item-btn sd-calendar-item-btn--selected" } else { "sd-calendar-item-btn" };
+                                rsx! {
+                                    button {
+                                        key: "{m}",
+                                        r#type: "button",
+                                        class: "{btn_cls}",
+                                        onclick: move |_| {
+                                            let cur = *current_view.read();
+                                            current_view.set(Date::new(cur.year, m, 1.min(cur.day)));
+                                            view_mode.set(CalendarViewMode::Day);
+                                        },
+                                        "{Date::month_name_it(m)}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                CalendarViewMode::Year => rsx! {
+                    div { class: "sd-calendar-grid--items",
+                        for y in *year_range_start.read()..=(*year_range_start.read() + 11) {
+                            {
+                                let is_cur_year = y == year;
+                                let btn_cls = if is_cur_year { "sd-calendar-item-btn sd-calendar-item-btn--selected" } else { "sd-calendar-item-btn" };
+                                rsx! {
+                                    button {
+                                        key: "{y}",
+                                        r#type: "button",
+                                        class: "{btn_cls}",
+                                        onclick: move |_| {
+                                            let cur = *current_view.read();
+                                            current_view.set(Date::new(y, cur.month, 1.min(cur.day)));
+                                            view_mode.set(CalendarViewMode::Month);
+                                        },
+                                        "{y}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
             }
         }
     }

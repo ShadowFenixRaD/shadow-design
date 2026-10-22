@@ -20,6 +20,9 @@ pub fn Carousel(
     /// Se mostrare gli indicatori a punto (*dots*) in basso. Defaults to true.
     #[props(default = true)]
     with_indicators: bool,
+    /// Se applicare una spaziatura interna protetta tra il contenuto e i bordi/controlli del carosello. Defaults to false.
+    #[props(default = false)]
+    padded: bool,
     /// Elementi figli (istanze di [`CarouselSlide`]).
     children: Element,
     /// Classi CSS aggiuntive.
@@ -58,12 +61,13 @@ pub fn Carousel(
     };
 
     let track_transform = format!("translateX(-{}%)", idx * 100);
+    let pad_class = if padded { "sd-carousel--padded" } else { "" };
 
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
     rsx! {
-        div { class: "sd-carousel {class}",
+        div { class: "sd-carousel {pad_class} {class}",
             // Viewport con overflow nascosto
             div { class: "sd-carousel-viewport",
                 // Track delle slide con trasformazione animata
