@@ -53,6 +53,13 @@ pub fn Fab(
     }
 }
 
+/// Context passed to children of [`SpeedDial`].
+#[derive(Clone, Copy, PartialEq)]
+pub struct SpeedDialContext {
+    pub is_open: Signal<bool>,
+    pub close_on_action: bool,
+}
+
 /// Secondary action button inside a [`SpeedDial`].
 #[component]
 pub fn SpeedDialAction(
@@ -68,19 +75,32 @@ pub fn SpeedDialAction(
     #[props(default)]
     class: String,
 ) -> Element {
+    let ctx = try_use_context::<SpeedDialContext>();
+
+    let handle_click = move |_| {
+        if let Some(h) = onclick {
+            h.call(());
+        }
+        if let Some(mut c) = ctx {
+            if c.close_on_action {
+                c.is_open.set(false);
+            }
+        }
+    };
+
     rsx! {
         div { class: "sd-speed-dial-action-item",
             if let Some(l) = label {
-                span { class: "sd-speed-dial-label", "{l}" }
+                span {
+                    class: "sd-speed-dial-label",
+                    onclick: handle_click,
+                    "{l}"
+                }
             }
             button {
                 r#type: "button",
                 class: "sd-speed-dial-btn {class}",
-                onclick: move |_| {
-                    if let Some(h) = onclick {
-                        h.call(());
-                    }
-                },
+                onclick: handle_click,
                 Icon { kind: icon, size: 18 }
             }
         }
@@ -102,6 +122,12 @@ pub fn SpeedDial(
     /// Optional external signal controlling open/closed state.
     #[props(default)]
     opened: Option<Signal<bool>>,
+    /// Whether clicking an action closes the speed dial. Defaults to true.
+    #[props(default = true)]
+    close_on_action: bool,
+    /// Whether clicking outside the speed dial closes it. Defaults to true.
+    #[props(default = true)]
+    close_on_click_outside: bool,
     /// Whether the speed dial is fixed to the viewport corner. Defaults to false.
     #[props(default = false)]
     fixed: bool,
@@ -111,28 +137,42 @@ pub fn SpeedDial(
     /// Secondary action items (e.g. [`SpeedDialAction`]).
     children: Element,
 ) -> Element {
-    let mut internal_open = use_signal(|| false);
-    let is_open = if let Some(sig) = opened {
-        *sig.read()
-    } else {
-        *internal_open.read()
-    };
+    let internal_open = use_signal(|| false);
+    let mut effective_sig = opened.unwrap_or(internal_open);
+    let is_open = *effective_sig.read();
+
+    use_context_provider(|| SpeedDialContext {
+        is_open: effective_sig,
+        close_on_action,
+    });
 
     let dir_class = direction.class_name();
     let fixed_class = if fixed { "sd-speed-dial--fixed" } else { "" };
-    let open_class = if is_open { "sd-fab--open" } else { "" };
+    let open_container_class = if is_open { "sd-speed-dial--open" } else { "" };
+    let open_class = if is_open {
+        if active_icon.is_some() {
+            "sd-fab--open-custom"
+        } else {
+            "sd-fab--open"
+        }
+    } else {
+        ""
+    };
 
     let toggle = move |_| {
-        if let Some(mut sig) = opened {
-            let next = !*sig.read();
-            sig.set(next);
-        } else {
-            internal_open.toggle();
-        }
+        let next = !*effective_sig.read();
+        effective_sig.set(next);
     };
 
     rsx! {
-        div { class: "sd-speed-dial {dir_class} {fixed_class} {class}",
+        div { class: "sd-speed-dial {dir_class} {fixed_class} {open_container_class} {class}",
+            if is_open && close_on_click_outside {
+                div {
+                    class: "sd-speed-dial-backdrop",
+                    onclick: move |_| effective_sig.set(false),
+                }
+            }
+
             button {
                 r#type: "button",
                 class: "sd-fab {open_class}",

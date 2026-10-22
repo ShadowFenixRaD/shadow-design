@@ -42,8 +42,8 @@ impl PopoverPosition {
 #[derive(Clone, Copy, PartialEq)]
 pub struct PopoverContext {
     pub opened: Signal<bool>,
-    pub position: PopoverPosition,
-    pub with_arrow: bool,
+    pub position: Signal<PopoverPosition>,
+    pub with_arrow: Signal<bool>,
     pub close_on_click_outside: bool,
 }
 
@@ -76,10 +76,19 @@ pub fn Popover(
     /// Children: should contain [`PopoverTrigger`] and [`PopoverDropdown`].
     children: Element,
 ) -> Element {
+    let mut position_sig = use_signal(|| position);
+    if *position_sig.read() != position {
+        position_sig.set(position);
+    }
+    let mut arrow_sig = use_signal(|| with_arrow);
+    if *arrow_sig.read() != with_arrow {
+        arrow_sig.set(with_arrow);
+    }
+
     use_context_provider(|| PopoverContext {
         opened,
-        position,
-        with_arrow,
+        position: position_sig,
+        with_arrow: arrow_sig,
         close_on_click_outside,
     });
 
@@ -144,7 +153,7 @@ pub fn PopoverDropdown(
         return rsx! {};
     }
 
-    let pos_class = ctx.position.class_name();
+    let pos_class = ctx.position.read().class_name();
     let glow_class = if glow == Some(true) {
         "sd-popover-dropdown--glow"
     } else {
@@ -172,7 +181,7 @@ pub fn PopoverDropdown(
             role: "dialog",
             class: "sd-popover-dropdown {pos_class} {glow_class} {base_override} {class}",
             onclick: move |e| e.stop_propagation(),
-            if ctx.with_arrow {
+            if *ctx.with_arrow.read() {
                 div { class: "sd-popover-arrow" }
             }
             {children}

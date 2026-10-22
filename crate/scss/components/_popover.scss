@@ -23,14 +23,18 @@
     position: absolute;
     z-index: z('popover');
     min-width: 14rem;
-    max-width: 24rem;
+    max-width: min(90vw, 24rem);
+    max-height: min(75vh, 28rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     padding: 1rem;
     background: $color-surface-1;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 0.75rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75);
     color: #f4f4f5;
-    animation: sd-popover-enter 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: sd-popover-enter 0.16s ease-out;
     @include specular-top(0.08);
 
     &--glow {
@@ -40,69 +44,101 @@
     // Posizionamenti: Bottom (Center, Start, End)
     &--bottom {
       top: calc(100% + 10px);
+      bottom: auto;
       left: 50%;
+      right: auto;
       transform: translateX(-50%);
     }
 
     &--bottom-start {
       top: calc(100% + 10px);
+      bottom: auto;
       left: 0;
+      right: auto;
+      transform: none;
     }
 
     &--bottom-end {
       top: calc(100% + 10px);
+      bottom: auto;
       right: 0;
+      left: auto;
+      transform: none;
     }
 
     // Posizionamenti: Top (Center, Start, End)
     &--top {
       bottom: calc(100% + 10px);
+      top: auto;
       left: 50%;
+      right: auto;
       transform: translateX(-50%);
     }
 
     &--top-start {
       bottom: calc(100% + 10px);
+      top: auto;
       left: 0;
+      right: auto;
+      transform: none;
     }
 
     &--top-end {
       bottom: calc(100% + 10px);
+      top: auto;
       right: 0;
+      left: auto;
+      transform: none;
     }
 
     // Posizionamenti: Left (Center, Start, End)
     &--left {
       right: calc(100% + 10px);
+      left: auto;
       top: 50%;
+      bottom: auto;
       transform: translateY(-50%);
     }
 
     &--left-start {
       right: calc(100% + 10px);
+      left: auto;
       top: 0;
+      bottom: auto;
+      transform: none;
     }
 
     &--left-end {
       right: calc(100% + 10px);
+      left: auto;
       bottom: 0;
+      top: auto;
+      transform: none;
     }
 
     // Posizionamenti: Right (Center, Start, End)
     &--right {
       left: calc(100% + 10px);
+      right: auto;
       top: 50%;
+      bottom: auto;
       transform: translateY(-50%);
     }
 
     &--right-start {
       left: calc(100% + 10px);
+      right: auto;
       top: 0;
+      bottom: auto;
+      transform: none;
     }
 
     &--right-end {
       left: calc(100% + 10px);
+      right: auto;
       bottom: 0;
+      top: auto;
+      transform: none;
     }
   }
 
@@ -209,10 +245,8 @@
 @keyframes sd-popover-enter {
   0% {
     opacity: 0;
-    transform: scale(0.96) translateY(4px);
   }
   100% {
     opacity: 1;
-    transform: none;
   }
 }

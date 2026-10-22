@@ -1,5 +1,16 @@
 use dioxus::prelude::*;
 
+async fn sleep_ms(ms: u64) {
+    #[cfg(target_arch = "wasm32")]
+    {
+        gloo_timers::future::TimeoutFuture::new(ms as u32).await;
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
+    }
+}
+
 /// Position placement for [`HoverCard`].
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
 pub enum HoverCardPosition {
@@ -26,8 +37,12 @@ impl HoverCardPosition {
 #[derive(Clone, Copy, PartialEq)]
 pub struct HoverCardContext {
     pub is_open: Signal<bool>,
-    pub position: HoverCardPosition,
-    pub width: Option<u32>,
+    pub position: Signal<HoverCardPosition>,
+    pub width: Signal<Option<u32>>,
+    pub is_over_trigger: Signal<bool>,
+    pub is_over_dropdown: Signal<bool>,
+    pub open_delay: u32,
+    pub close_delay: u32,
 }
 
 /// Rich contextual preview card triggered on hover.
@@ -52,11 +67,24 @@ pub fn HoverCard(
     children: Element,
 ) -> Element {
     let is_open = use_signal(|| false);
+    let mut pos_sig = use_signal(|| position);
+    let mut width_sig = use_signal(|| width);
+    let is_over_trigger = use_signal(|| false);
+    let is_over_dropdown = use_signal(|| false);
+
+    use_effect(move || {
+        pos_sig.set(position);
+        width_sig.set(width);
+    });
 
     use_context_provider(|| HoverCardContext {
         is_open,
-        position,
-        width,
+        position: pos_sig,
+        width: width_sig,
+        is_over_trigger,
+        is_over_dropdown,
+        open_delay,
+        close_delay,
     });
 
     rsx! {
@@ -82,10 +110,26 @@ pub fn HoverCardTrigger(
         div {
             class: "sd-hovercard-trigger inline-flex cursor-pointer {class}",
             onmouseenter: move |_| {
-                ctx.is_open.set(true);
+                ctx.is_over_trigger.set(true);
+                let open_delay = ctx.open_delay;
+                spawn(async move {
+                    if open_delay > 0 {
+                        sleep_ms(open_delay as u64).await;
+                    }
+                    if *ctx.is_over_trigger.read() {
+                        ctx.is_open.set(true);
+                    }
+                });
             },
             onmouseleave: move |_| {
-                ctx.is_open.set(false);
+                ctx.is_over_trigger.set(false);
+                let close_delay = ctx.close_delay;
+                spawn(async move {
+                    sleep_ms(close_delay as u64).await;
+                    if !*ctx.is_over_trigger.read() && !*ctx.is_over_dropdown.read() {
+                        ctx.is_open.set(false);
+                    }
+                });
             },
             {children}
         }
@@ -111,14 +155,14 @@ pub fn HoverCardDropdown(
         return rsx! {};
     }
 
-    let pos_class = ctx.position.class_name();
+    let pos_class = ctx.position.read().class_name();
     let glow_class = if glow == Some(true) {
         "sd-hovercard-dropdown--glow"
     } else {
         ""
     };
 
-    let style = if let Some(w) = ctx.width {
+    let style = if let Some(w) = *ctx.width.read() {
         format!("width: {w}px;")
     } else {
         String::new()
@@ -137,10 +181,17 @@ pub fn HoverCardDropdown(
             class: "sd-hovercard-dropdown {pos_class} {glow_class} {base_override} {class}",
             style: "{style}",
             onmouseenter: move |_| {
-                ctx.is_open.set(true);
+                ctx.is_over_dropdown.set(true);
             },
             onmouseleave: move |_| {
-                ctx.is_open.set(false);
+                ctx.is_over_dropdown.set(false);
+                let close_delay = ctx.close_delay;
+                spawn(async move {
+                    sleep_ms(close_delay as u64).await;
+                    if !*ctx.is_over_trigger.read() && !*ctx.is_over_dropdown.read() {
+                        ctx.is_open.set(false);
+                    }
+                });
             },
             {children}
         }

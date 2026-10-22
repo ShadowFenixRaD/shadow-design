@@ -15,9 +15,15 @@
     position: absolute;
     z-index: z('tooltip');
     top: calc(100% + 8px);
+    bottom: auto;
     left: 0;
+    right: auto;
     min-width: 16rem;
-    max-width: 26rem;
+    max-width: min(90vw, 26rem);
+    max-height: min(75vh, 28rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     padding: 1rem;
     background: $color-surface-1;
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -27,24 +33,45 @@
     animation: sd-hovercard-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     @include specular-top(0.08);
 
+    // Hitbox bridge to prevent closing when crossing the gap
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -14px -10px;
+      z-index: -1;
+      background: transparent;
+    }
+
     &--glow {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(168, 85, 247, 0.25);
+    }
+
+    &--bottom {
+      top: calc(100% + 8px);
+      bottom: auto;
+      left: 0;
+      right: auto;
     }
 
     &--top {
       bottom: calc(100% + 8px);
       top: auto;
+      left: 0;
+      right: auto;
     }
 
     &--right {
       left: calc(100% + 8px);
+      right: auto;
       top: 0;
+      bottom: auto;
     }
 
     &--left {
       right: calc(100% + 8px);
       left: auto;
       top: 0;
+      bottom: auto;
     }
   }
 }
@@ -52,10 +79,8 @@
 @keyframes sd-hovercard-enter {
   0% {
     opacity: 0;
-    transform: scale(0.97) translateY(4px);
   }
   100% {
     opacity: 1;
-    transform: none;
   }
 }
