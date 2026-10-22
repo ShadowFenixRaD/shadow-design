@@ -1,4 +1,6 @@
 use dioxus::prelude::*;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 
 /// Clipboard controller returned by [`use_clipboard`].
 #[derive(Clone, Copy)]
@@ -8,6 +10,7 @@ pub struct UseClipboard {
     /// Whether the last copy operation failed.
     pub error: Signal<bool>,
     timeout_ms: u32,
+    version: Signal<Arc<AtomicU64>>,
 }
 
 impl UseClipboard {
@@ -17,53 +20,68 @@ impl UseClipboard {
         let mut error = self.error;
         let timeout = self.timeout_ms;
         let text_str = text.into();
+        let ver_arc = self.version.read().clone();
+        let current_ver = ver_arc.fetch_add(1, Ordering::Relaxed) + 1;
 
         spawn(async move {
             let json_text = serde_json::to_string(&text_str).unwrap_or_default();
             let js = format!(
                 r#"
                 (async function() {{
+                    let ok = false;
                     try {{
                         if (navigator.clipboard && navigator.clipboard.writeText) {{
                             await navigator.clipboard.writeText({json_text});
-                            return true;
+                            ok = true;
+                        }} else {{
+                            const ta = document.createElement("textarea");
+                            ta.value = {json_text};
+                            ta.style.position = "fixed";
+                            ta.style.left = "-9999px";
+                            document.body.appendChild(ta);
+                            ta.select();
+                            ok = document.execCommand("copy");
+                            document.body.removeChild(ta);
                         }}
-                        const ta = document.createElement("textarea");
-                        ta.value = {json_text};
-                        ta.style.position = "fixed";
-                        ta.style.left = "-9999px";
-                        document.body.appendChild(ta);
-                        ta.select();
-                        const ok = document.execCommand("copy");
-                        document.body.removeChild(ta);
-                        return ok;
                     }} catch (e) {{
-                        return false;
+                        ok = false;
                     }}
-                }})()
+
+                    if (ok) {{
+                        dioxus.send({{ "status": "copied", "ver": {current_ver} }});
+                        setTimeout(() => {{
+                            dioxus.send({{ "status": "reset", "ver": {current_ver} }});
+                        }}, {timeout});
+                    }} else {{
+                        dioxus.send({{ "status": "error", "ver": {current_ver} }});
+                    }}
+                }})();
                 "#
             );
 
-            let eval = document::eval(&js);
-            if let Ok(res) = eval.await {
-                if res.as_bool().unwrap_or(false) {
-                    copied.set(true);
-                    error.set(false);
+            let mut eval = document::eval(&js);
+            while let Ok(msg) = eval.recv::<serde_json::Value>().await {
+                if let Some(obj) = msg.as_object() {
+                    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("");
+                    let ver = obj.get("ver").and_then(|v| v.as_u64()).unwrap_or(0);
 
-                    #[cfg(target_arch = "wasm32")]
-                    {
-                        gloo_timers::future::TimeoutFuture::new(timeout).await;
+                    match status {
+                        "copied" => {
+                            copied.set(true);
+                            error.set(false);
+                        }
+                        "reset" => {
+                            if ver == ver_arc.load(Ordering::Relaxed) {
+                                copied.set(false);
+                            }
+                        }
+                        "error" => {
+                            error.set(true);
+                            copied.set(false);
+                        }
+                        _ => {}
                     }
-                    #[cfg(not(target_arch = "wasm32"))]
-                    {
-                        tokio::time::sleep(std::time::Duration::from_millis(timeout as u64)).await;
-                    }
-                    copied.set(false);
-                } else {
-                    error.set(true);
                 }
-            } else {
-                error.set(true);
             }
         });
     }
@@ -81,10 +99,12 @@ impl UseClipboard {
 pub fn use_clipboard(timeout_ms: Option<u32>) -> UseClipboard {
     let copied = use_signal(|| false);
     let error = use_signal(|| false);
+    let version = use_signal(|| Arc::new(AtomicU64::new(0)));
 
     UseClipboard {
         copied,
         error,
         timeout_ms: timeout_ms.unwrap_or(2000),
+        version,
     }
 }
