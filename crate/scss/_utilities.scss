@@ -237,6 +237,10 @@
 .min-h-\[200px\] { min-height: 200px; }
 .min-h-\[220px\] { min-height: 220px; }
 .min-h-\[300px\] { min-height: 300px; }
+.min-h-\[360px\] { min-height: 360px; }
+.min-h-\[380px\] { min-height: 380px; }
+.min-h-\[400px\] { min-height: 400px; }
+.min-h-\[460px\] { min-height: 460px; }
 
 .object-cover { object-fit: cover; }
 .accent-purple-500 { accent-color: #a855f7; }
@@ -281,7 +285,9 @@ $spacers: (
   8: 32px,
   10: 40px,
   12: 48px,
-  16: 64px
+  16: 64px,
+  20: 80px,
+  24: 96px
 );
 
 @each $key, $val in $spacers {

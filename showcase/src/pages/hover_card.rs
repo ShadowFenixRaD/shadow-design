@@ -69,7 +69,7 @@ pub fn HoverCardPage() -> Element {
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-16 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 text-center shadow-inner",
+                    div { class: "p-8 py-20 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 text-center shadow-inner min-h-[400px]",
                         p { class: "text-xs text-zinc-400 max-w-md",
                             "Passa il cursore sulla menzione sottostante per visualizzare l'anteprima del profilo. Il card rimane interattivo consentendo di cliccare pulsanti o link al suo interno."
                         }

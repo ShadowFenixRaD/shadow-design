@@ -24,10 +24,6 @@
     z-index: z('popover');
     min-width: 14rem;
     max-width: min(90vw, 24rem);
-    max-height: min(75vh, 28rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
     padding: 1rem;
     background: $color-surface-1;
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -36,6 +32,15 @@
     color: #f4f4f5;
     animation: sd-popover-enter 0.16s ease-out;
     @include specular-top(0.08);
+    overflow: visible;
+
+    // Optional scrollable inner container for extra large content
+    .sd-popover-body,
+    &--scrollable {
+      max-height: min(70vh, 24rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
 
     &--glow {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(168, 85, 247, 0.25);

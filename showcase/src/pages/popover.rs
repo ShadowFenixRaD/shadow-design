@@ -80,7 +80,7 @@ Popover {
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner",
+                    div { class: "p-8 py-24 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner min-h-[460px]",
                         div { class: "flex items-center gap-2 flex-wrap justify-center",
                             span { class: "text-xs text-zinc-400 mr-2 font-mono", "Posizione:" }
                             button {

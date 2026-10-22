@@ -140,6 +140,28 @@ pub fn SpeedDialPage() -> Element {
                 code: code_snippet,
                 props: props,
             }
+
+            // SpeedDial fluttuante fisso di prova posizionato in basso a destra nello schermo
+            SpeedDial {
+                fixed: true,
+                direction: SpeedDialDirection::Up,
+                icon: IconKind::Plus,
+                SpeedDialAction {
+                    icon: IconKind::Send,
+                    label: Some("Invia messaggio".to_string()),
+                    onclick: move |_| last_action.set("FAB Fluttuante: Invia messaggio".to_string()),
+                }
+                SpeedDialAction {
+                    icon: IconKind::Paperclip,
+                    label: Some("Allega documento".to_string()),
+                    onclick: move |_| last_action.set("FAB Fluttuante: Allega documento".to_string()),
+                }
+                SpeedDialAction {
+                    icon: IconKind::Share2,
+                    label: Some("Condividi risorsa".to_string()),
+                    onclick: move |_| last_action.set("FAB Fluttuante: Condividi risorsa".to_string()),
+                }
+            }
         }
     }
 }
