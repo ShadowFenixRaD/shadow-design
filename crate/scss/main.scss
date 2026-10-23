@@ -85,6 +85,16 @@
 @use 'components/carousel' as *;
 @use 'components/virtual_list' as *;
 @use 'components/code_highlight' as *;
+@use 'components/charts' as *;
+@use 'components/rich_text' as *;
+@use 'components/document_card' as *;
+@use 'components/masonry' as *;
+@use 'components/media_card' as *;
+@use 'components/navigation_menu' as *;
+@use 'components/overflow_set' as *;
+@use 'components/transfer_list' as *;
+@use 'components/facepile' as *;
+@use 'components/activity_feed' as *;
 
 @layer sd-base {
   :root {

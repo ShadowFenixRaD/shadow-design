@@ -121,6 +121,16 @@ all = [
     "carousel",
     "virtual_list",
     "code_highlight",
+    "charts",
+    "rich_text",
+    "document_card",
+    "masonry",
+    "media_card",
+    "navigation_menu",
+    "overflow_set",
+    "transfer_list",
+    "facepile",
+    "activity_feed",
 ]
 serde = ["dep:serde"]
 button = []
@@ -227,6 +237,62 @@ virtual_list = []
 virtual-list = ["virtual_list"]
 code_highlight = ["icon", "copy_button"]
 code-highlight = ["code_highlight"]
+
+
+# Epic #10: Charts & Data Visualization
+charts = [
+    "chart_primitives",
+    "chart_area",
+    "chart_bar",
+    "chart_line",
+    "chart_pie",
+    "chart_radar",
+    "chart_scatter",
+    "chart_sparkline",
+    "chart_gauge",
+    "chart_heatmap",
+]
+chart_primitives = []
+chart-primitives = ["chart_primitives"]
+chart_area = ["chart_primitives"]
+chart-area = ["chart_area"]
+chart_bar = ["chart_primitives"]
+chart-bar = ["chart_bar"]
+chart_line = ["chart_primitives"]
+chart-line = ["chart_line"]
+chart_pie = ["chart_primitives"]
+chart-pie = ["chart_pie"]
+chart_radar = ["chart_primitives"]
+chart-radar = ["chart_radar"]
+chart_scatter = ["chart_primitives"]
+chart-scatter = ["chart_scatter"]
+chart_sparkline = ["chart_primitives"]
+chart-sparkline = ["chart_sparkline"]
+chart_gauge = ["chart_primitives"]
+chart-gauge = ["chart_gauge"]
+chart_heatmap = ["chart_primitives"]
+chart-heatmap = ["chart_heatmap"]
+
+# Epic #11: Rich Content, Media & Document Cards
+rich_text = ["icon"]
+rich-text = ["rich_text"]
+rich-text-editor = ["rich_text"]
+document_card = ["avatar", "icon"]
+document-card = ["document_card"]
+masonry = ["icon"]
+media_card = ["card", "aspect_ratio"]
+media-card = ["media_card"]
+
+# Epic #12: Advanced Navigation & Collaborative Toolbars
+navigation_menu = ["icon"]
+navigation-menu = ["navigation_menu"]
+overflow_set = ["icon", "dropdown"]
+overflow-set = ["overflow_set"]
+transfer_list = ["icon", "checkbox"]
+transfer-list = ["transfer_list"]
+facepile = ["avatar", "icon"]
+activity_feed = ["avatar", "icon"]
+activity-feed = ["activity_feed"]
 
 [lints.clippy]
 must_use_candidate = "warn"

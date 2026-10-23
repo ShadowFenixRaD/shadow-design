@@ -1,0 +1,246 @@
+use dioxus::prelude::*;
+use std::collections::BTreeSet;
+
+use super::primitives::{
+    compute_min_max, generate_svg_path, get_series_color, ChartContainer, ChartDataPoint,
+    ChartGrid, ChartLegend, ChartSeries, ChartTooltip, CurveType,
+};
+
+/// Grafico a linee vettoriale SVG multi-serie con snodi interattivi e curve bezier continue.
+#[allow(clippy::type_complexity)]
+#[component]
+pub fn LineChart(
+    data: Vec<ChartDataPoint>,
+    series: Vec<ChartSeries>,
+    #[props(default)] curve_type: CurveType,
+    #[props(default = true)] with_dots: bool,
+    #[props(default = true)] with_grid: bool,
+    #[props(default = 2.5)] stroke_width: f64,
+    #[props(default = true)] connect_nulls: bool,
+    #[props(default = true)] with_tooltip: bool,
+    #[props(default = true)] with_legend: bool,
+    #[props(default = 300)] height: u32,
+    #[props(default)] class: String,
+) -> Element {
+    let hidden_series = use_signal(BTreeSet::<String>::new);
+    let mut hover_index = use_signal(|| None::<usize>);
+
+    let svg_w = 600.0;
+    let svg_h = 260.0;
+    let padding_left = 50.0;
+    let padding_right = 20.0;
+    let padding_top = 20.0;
+    let padding_bottom = 40.0;
+
+    let plot_w = svg_w - padding_left - padding_right;
+    let plot_h = svg_h - padding_top - padding_bottom;
+
+    let active_series: Vec<(usize, &ChartSeries)> = series
+        .iter()
+        .enumerate()
+        .filter(|(_, s)| !hidden_series().contains(&s.name))
+        .collect();
+
+    let (min_val, max_val) = compute_min_max(&data, &series);
+    let range = if (max_val - min_val).abs() < f64::EPSILON {
+        1.0
+    } else {
+        max_val - min_val
+    };
+
+    let n = data.len();
+    let x_step = if n > 1 {
+        plot_w / (n - 1) as f64
+    } else {
+        plot_w
+    };
+
+    let baseline_y = padding_top + plot_h;
+
+    // Segmenti di coordinate per ogni serie
+    let series_lines: Vec<(usize, String, String, bool, Vec<Vec<(f64, f64)>>)> = active_series
+        .iter()
+        .map(|&(orig_idx, s)| {
+            let color = get_series_color(orig_idx, s.color.as_deref());
+            let is_dashed = s.dashed;
+            let mut segments: Vec<Vec<(f64, f64)>> = Vec::new();
+            let mut current_segment: Vec<(f64, f64)> = Vec::new();
+
+            for (i, pt) in data.iter().enumerate() {
+                let cx = padding_left + i as f64 * x_step;
+                if let Some(v) = pt.get(&s.name) {
+                    let cy = padding_top + plot_h - ((v - min_val) / range) * plot_h;
+                    current_segment.push((cx, cy));
+                } else if !connect_nulls && !current_segment.is_empty() {
+                    segments.push(std::mem::take(&mut current_segment));
+                }
+            }
+            if !current_segment.is_empty() {
+                segments.push(current_segment);
+            }
+
+            (orig_idx, s.name.clone(), color, is_dashed, segments)
+        })
+        .collect();
+
+    let current_tooltip_data = hover_index().and_then(|idx| {
+        if idx >= data.len() {
+            return None;
+        }
+        let pt = &data[idx];
+        let mut entries = Vec::new();
+        for &(orig_idx, ref name, ref color, _, _) in &series_lines {
+            if let Some(v) = pt.get(name) {
+                let s_label = series[orig_idx].display_label().to_string();
+                entries.push((s_label, format!("{v:.1}"), color.clone()));
+            }
+        }
+        let cx = padding_left + idx as f64 * x_step;
+        Some((pt.label.clone(), entries, cx, padding_top + 20.0))
+    });
+
+    rsx! {
+        div { class: "w-full flex flex-col {class}",
+            div { class: "relative w-full",
+                ChartContainer {
+                    view_box: "0 0 {svg_w} {svg_h}",
+                    height: height,
+                    if with_grid {
+                        ChartGrid {
+                            x: padding_left,
+                            y: padding_top,
+                            width: plot_w,
+                            height: plot_h,
+                            y_ticks: 4,
+                            horizontal: true,
+                        }
+                    }
+
+                    // Render linee
+                    for (orig_idx, _, color, dashed, segments) in &series_lines {
+                        for (seg_idx, seg) in segments.iter().enumerate() {
+                            {
+                                let path_d = generate_svg_path(seg, curve_type);
+                                rsx! {
+                                    path {
+                                        key: "line-{orig_idx}-{seg_idx}",
+                                        d: "{path_d}",
+                                        fill: "none",
+                                        stroke: "{color}",
+                                        stroke_width: "{stroke_width}",
+                                        stroke_linecap: "round",
+                                        stroke_linejoin: "round",
+                                        stroke_dasharray: if *dashed { "6 4" } else { "none" },
+                                        style: "filter: drop-shadow(0 0 6px {color}88);",
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Render dots
+                    if with_dots {
+                        for (orig_idx, _, color, _, segments) in &series_lines {
+                            for seg in segments {
+                                for (pt_idx, (cx, cy)) in seg.iter().enumerate() {
+                                    {
+                                        let is_hovered = hover_index() == Some(pt_idx);
+                                        rsx! {
+                                            circle {
+                                                key: "dot-{orig_idx}-{pt_idx}",
+                                                cx: "{cx}",
+                                                cy: "{cy}",
+                                                r: if is_hovered { "5.5" } else { "3.5" },
+                                                fill: "#09090b",
+                                                stroke: "{color}",
+                                                stroke_width: "2",
+                                                class: "transition-all duration-150",
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Linea verticale cursore hover
+                    if let Some(idx) = hover_index() {
+                        {
+                            let cx = padding_left + idx as f64 * x_step;
+                            rsx! {
+                                line {
+                                    x1: "{cx}",
+                                    y1: "{padding_top}",
+                                    x2: "{cx}",
+                                    y2: "{baseline_y}",
+                                    stroke: "rgba(255, 255, 255, 0.25)",
+                                    stroke_width: "1.5",
+                                    stroke_dasharray: "3 3",
+                                }
+                            }
+                        }
+                    }
+
+                    // Etichette asse X
+                    for (i, pt) in data.iter().enumerate() {
+                        {
+                            let cx = padding_left + i as f64 * x_step;
+                            rsx! {
+                                text {
+                                    key: "lbl-{i}",
+                                    x: "{cx}",
+                                    y: "{baseline_y + 20.0}",
+                                    text_anchor: "middle",
+                                    fill: "rgba(255, 255, 255, 0.45)",
+                                    font_size: "11",
+                                    font_family: "monospace",
+                                    "{pt.label}"
+                                }
+                            }
+                        }
+                    }
+
+                    // Hover zone
+                    for i in 0..n {
+                        {
+                            let col_w = if n > 1 { plot_w / n as f64 } else { plot_w };
+                            let col_x = padding_left + i as f64 * x_step - (col_w / 2.0);
+                            rsx! {
+                                rect {
+                                    key: "hover-zone-{i}",
+                                    x: "{col_x.max(padding_left)}",
+                                    y: "{padding_top}",
+                                    width: "{col_w}",
+                                    height: "{plot_h}",
+                                    fill: "transparent",
+                                    class: "cursor-pointer",
+                                    onmouseenter: move |_| hover_index.set(Some(i)),
+                                    onmouseleave: move |_| hover_index.set(None),
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if with_tooltip {
+                    if let Some((title, entries, x_pos, y_pos)) = current_tooltip_data {
+                        ChartTooltip {
+                            title: title,
+                            entries: entries,
+                            x: x_pos,
+                            y: y_pos,
+                            visible: true,
+                        }
+                    }
+                }
+            }
+
+            if with_legend {
+                ChartLegend {
+                    series: series.clone(),
+                    hidden_series: hidden_series,
+                }
+            }
+        }
+    }
+}

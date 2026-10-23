@@ -353,6 +353,26 @@ pub mod carousel;
 pub mod virtual_list;
 #[cfg(feature = "code_highlight")]
 pub mod code_highlight;
+#[cfg(feature = "charts")]
+pub mod chart;
+#[cfg(feature = "rich_text")]
+pub mod rich_text;
+#[cfg(feature = "document_card")]
+pub mod document_card;
+#[cfg(feature = "masonry")]
+pub mod masonry;
+#[cfg(feature = "media_card")]
+pub mod media_card;
+#[cfg(feature = "navigation_menu")]
+pub mod navigation_menu;
+#[cfg(feature = "overflow_set")]
+pub mod overflow_set;
+#[cfg(feature = "transfer_list")]
+pub mod transfer_list;
+#[cfg(feature = "facepile")]
+pub mod facepile;
+#[cfg(feature = "activity_feed")]
+pub mod activity_feed;
 
 pub mod prelude {
     pub use crate::a11y::ControlSize;
@@ -515,5 +535,25 @@ pub mod prelude {
     pub use crate::virtual_list::*;
     #[cfg(feature = "code_highlight")]
     pub use crate::code_highlight::*;
+    #[cfg(feature = "charts")]
+    pub use crate::chart::*;
+    #[cfg(feature = "rich_text")]
+    pub use crate::rich_text::*;
+    #[cfg(feature = "document_card")]
+    pub use crate::document_card::*;
+    #[cfg(feature = "masonry")]
+    pub use crate::masonry::*;
+    #[cfg(feature = "media_card")]
+    pub use crate::media_card::*;
+    #[cfg(feature = "navigation_menu")]
+    pub use crate::navigation_menu::*;
+    #[cfg(feature = "overflow_set")]
+    pub use crate::overflow_set::*;
+    #[cfg(feature = "transfer_list")]
+    pub use crate::transfer_list::*;
+    #[cfg(feature = "facepile")]
+    pub use crate::facepile::*;
+    #[cfg(feature = "activity_feed")]
+    pub use crate::activity_feed::*;
     pub use crate::STYLES;
 }
