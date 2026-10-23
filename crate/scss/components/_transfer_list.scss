@@ -1,0 +1,16 @@
+// ==============================================================================
+// Shadow Design — TransferList Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-transfer-list {
+    width: 100%;
+
+    &__column {
+      transition: border-color $duration-normal ease;
+    }
+  }
+}
