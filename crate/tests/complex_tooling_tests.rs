@@ -121,6 +121,20 @@ fn test_code_highlight_tokenizer() {
 #[test]
 fn test_resizable_direction_default() {
     assert_eq!(ResizableDirection::default(), ResizableDirection::Horizontal);
+    assert_ne!(ResizableDirection::Horizontal, ResizableDirection::Vertical);
+}
+
+#[test]
+fn test_resizable_panel_clamping() {
+    let min: f64 = 20.0;
+    let max: f64 = 70.0;
+    let size: f64 = 10.0;
+    let clamped = size.clamp(min, max);
+    assert_eq!(clamped, 20.0);
+
+    let over: f64 = 85.0;
+    let clamped_over = over.clamp(min, max);
+    assert_eq!(clamped_over, 70.0);
 }
 
 #[test]

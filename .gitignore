@@ -8,3 +8,8 @@
 
 # Audit artifacts
 .audit/
+
+
+# Graphify cache & temporary files
+graphify-out/cache/
+*.tmp

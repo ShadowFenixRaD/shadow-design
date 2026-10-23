@@ -1,0 +1,22 @@
+// ==============================================================================
+// Shadow Design — OverflowSet & ResponsiveToolbar Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-overflow-set {
+    display: flex;
+    align-items: center;
+
+    &__item {
+      white-space: nowrap;
+      transition: all $duration-fast ease;
+
+      &:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+    }
+  }
+}

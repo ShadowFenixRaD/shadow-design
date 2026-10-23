@@ -180,7 +180,6 @@ pub fn CommandPalette(
         ));
     });
 
-    let actions_clone = filtered_actions.clone();
     let on_select_clone = on_select;
 
     let handle_select = move |action: CommandAction| {
@@ -195,42 +194,78 @@ pub fn CommandPalette(
         }
     };
 
-    let handle_keydown = {
-        let acts = actions_clone.clone();
-        move |e: KeyboardEvent| {
-            match e.key() {
-                Key::ArrowDown => {
-                    e.prevent_default();
-                    if count > 0 {
-                        let cur = *active_index.read();
-                        active_index.set((cur + 1) % count);
-                    }
-                }
-                Key::ArrowUp => {
-                    e.prevent_default();
-                    if count > 0 {
-                        let cur = *active_index.read();
-                        active_index.set(if cur == 0 { count - 1 } else { cur - 1 });
-                    }
-                }
-                Key::Enter => {
-                    e.prevent_default();
-                    let cur = *active_index.read();
-                    if let Some(action) = acts.get(cur) {
-                        handle_select(action.clone());
-                    }
-                }
-                Key::Escape => {
-                    e.prevent_default();
-                    let mut op = opened;
-                    let mut sq = search_query;
-                    op.set(false);
-                    sq.set(String::new());
-                }
-                _ => {}
-            }
+    // Gestore eventi da tastiera nativo / globale quando il palette è aperto
+    let filtered_actions_for_keys = filtered_actions.clone();
+    use_effect(move || {
+        let is_open = *opened.read();
+        if !is_open {
+            return;
         }
-    };
+
+        let mut eval = document::eval(
+            r#"
+            if (window._sdCmdPaletteCleanup) {
+                window._sdCmdPaletteCleanup();
+            }
+            const onKeyDown = (e) => {
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    dioxus.send("down");
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    dioxus.send("up");
+                } else if (e.key === "Enter") {
+                    e.preventDefault();
+                    dioxus.send("enter");
+                } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    dioxus.send("escape");
+                }
+            };
+            window.addEventListener("keydown", onKeyDown, true);
+            window._sdCmdPaletteCleanup = () => {
+                window.removeEventListener("keydown", onKeyDown, true);
+                window._sdCmdPaletteCleanup = null;
+            };
+            "#
+        );
+
+        let filtered_len = filtered_actions_for_keys.len();
+        let current_acts = filtered_actions_for_keys.clone();
+        let handle_sel = handle_select;
+
+        spawn(async move {
+            while let Ok(msg) = eval.recv::<String>().await {
+                match msg.as_str() {
+                    "down" => {
+                        if filtered_len > 0 {
+                            let cur = *active_index.read();
+                            active_index.set((cur + 1) % filtered_len);
+                        }
+                    }
+                    "up" => {
+                        if filtered_len > 0 {
+                            let cur = *active_index.read();
+                            active_index.set(if cur == 0 { filtered_len - 1 } else { cur - 1 });
+                        }
+                    }
+                    "enter" => {
+                        let cur = *active_index.read();
+                        if let Some(act) = current_acts.get(cur) {
+                            handle_sel(act.clone());
+                        }
+                    }
+                    "escape" => {
+                        let mut op = opened;
+                        let mut sq = search_query;
+                        op.set(false);
+                        sq.set(String::new());
+                    }
+                    _ => {}
+                }
+            }
+        });
+    });
 
     #[cfg(feature = "theme")]
     let _theme = use_theme();
@@ -248,7 +283,6 @@ pub fn CommandPalette(
                 class: "sd-command-palette-dialog {class}",
                 tabindex: "-1",
                 onclick: move |e| e.stop_propagation(),
-                onkeydown: handle_keydown.clone(),
 
                 // Input bar superiore
                 div { class: "sd-command-palette-input-wrap",
@@ -260,7 +294,6 @@ pub fn CommandPalette(
                         class: "sd-command-palette-input",
                         placeholder: "{placeholder}",
                         value: "{search_query()}",
-                        onkeydown: handle_keydown.clone(),
                         oninput: move |e| {
                             let mut sq = search_query;
                             sq.set(e.value());

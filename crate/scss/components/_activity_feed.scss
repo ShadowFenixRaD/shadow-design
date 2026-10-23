@@ -1,0 +1,17 @@
+// ==============================================================================
+// Shadow Design — ActivityFeed Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-activity-feed {
+    width: 100%;
+  }
+
+  .sd-activity-item {
+    position: relative;
+    width: 100%;
+  }
+}

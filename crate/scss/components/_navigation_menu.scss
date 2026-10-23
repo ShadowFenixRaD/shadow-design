@@ -1,0 +1,17 @@
+// ==============================================================================
+// Shadow Design — NavigationMenu Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-nav-menu {
+    position: relative;
+    width: 100%;
+
+    &__viewport {
+      animation: sd-scale-in $duration-fast ease-out forwards;
+    }
+  }
+}

@@ -16,6 +16,8 @@ use pages::{
     BurgerPage, CloseButtonPage, CopyButtonPage, IndicatorPage, HighlightPage, LoadingOverlayPage, FieldsetPage, MarqueeSelectionPage, KeytipPage,
     FormValidationPage, ReactiveHooksPage,
     CommandPalettePage, DatePickerPage, DropzonePage, ResizablePage, CarouselPage, VirtualListPage, CodeHighlightPage,
+    ChartsPage, RichTextPage, DocumentCardPage, MasonryPage, MediaCardPage,
+    NavigationMenuPage, OverflowSetPage, TransferListPage, FacepilePage, ActivityFeedPage,
 };
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -180,6 +182,26 @@ pub enum Route {
     VirtualListPage {},
     #[route("/code-highlight")]
     CodeHighlightPage {},
+    #[route("/charts")]
+    ChartsPage {},
+    #[route("/rich-text")]
+    RichTextPage {},
+    #[route("/document-card")]
+    DocumentCardPage {},
+    #[route("/masonry")]
+    MasonryPage {},
+    #[route("/media-card")]
+    MediaCardPage {},
+    #[route("/navigation-menu")]
+    NavigationMenuPage {},
+    #[route("/overflow-set")]
+    OverflowSetPage {},
+    #[route("/transfer-list")]
+    TransferListPage {},
+    #[route("/facepile")]
+    FacepilePage {},
+    #[route("/activity-feed")]
+    ActivityFeedPage {},
 }
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");

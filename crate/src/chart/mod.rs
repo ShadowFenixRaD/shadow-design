@@ -1,0 +1,41 @@
+pub mod primitives;
+
+#[cfg(feature = "chart_area")]
+pub mod area;
+#[cfg(feature = "chart_bar")]
+pub mod bar;
+#[cfg(feature = "chart_gauge")]
+pub mod gauge;
+#[cfg(feature = "chart_heatmap")]
+pub mod heatmap;
+#[cfg(feature = "chart_line")]
+pub mod line;
+#[cfg(feature = "chart_pie")]
+pub mod pie;
+#[cfg(feature = "chart_radar")]
+pub mod radar;
+#[cfg(feature = "chart_scatter")]
+pub mod scatter;
+#[cfg(feature = "chart_sparkline")]
+pub mod sparkline;
+
+pub use primitives::*;
+
+#[cfg(feature = "chart_area")]
+pub use area::*;
+#[cfg(feature = "chart_bar")]
+pub use bar::*;
+#[cfg(feature = "chart_gauge")]
+pub use gauge::*;
+#[cfg(feature = "chart_heatmap")]
+pub use heatmap::*;
+#[cfg(feature = "chart_line")]
+pub use line::*;
+#[cfg(feature = "chart_pie")]
+pub use pie::*;
+#[cfg(feature = "chart_radar")]
+pub use radar::*;
+#[cfg(feature = "chart_scatter")]
+pub use scatter::*;
+#[cfg(feature = "chart_sparkline")]
+pub use sparkline::*;

@@ -1,0 +1,22 @@
+// ==============================================================================
+// Shadow Design — Facepile Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-facepile {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    &__overflow-btn {
+      transition: all $duration-fast ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}

@@ -315,6 +315,8 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                     }
                 }
                 div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::NavigationMenuPage {}, icon: IconKind::Menu, label: "NavigationMenu", collapsed }
+                    SidebarLink { to: Route::OverflowSetPage {}, icon: IconKind::Layers, label: "OverflowSet", collapsed }
                     SidebarLink { to: Route::NavLinkPage {}, icon: IconKind::Menu, label: "NavLink", collapsed }
                     SidebarLink { to: Route::TabsPage {}, icon: IconKind::Layers, label: "Tabs", collapsed }
                     SidebarLink { to: Route::BreadcrumbsPage {}, icon: IconKind::ChevronRight, label: "Breadcrumbs", collapsed }
@@ -375,6 +377,39 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
             }
 
+            // Sezione: Grafici & Analytics (SVG Native)
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-purple-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Layers, size: 12 }
+                        "Grafici & Analytics"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::ChartsPage {}, icon: IconKind::Sparkles, label: "Charts Suite (SVG)", collapsed }
+                }
+            }
+
+            // Sezione: Rich Content & Media
+            div { class: "flex flex-col",
+                if collapsed {
+                    div { class: "w-full my-1 border-t border-white/[0.06]" }
+                } else {
+                    p { class: "text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1.5",
+                        Icon { kind: IconKind::Paperclip, size: 12 }
+                        "Rich Content & Media"
+                    }
+                }
+                div { class: "flex flex-col gap-1",
+                    SidebarLink { to: Route::RichTextPage {}, icon: IconKind::Code, label: "RichTextEditor (TipTap)", collapsed }
+                    SidebarLink { to: Route::DocumentCardPage {}, icon: IconKind::Paperclip, label: "DocumentCard", collapsed }
+                    SidebarLink { to: Route::MasonryPage {}, icon: IconKind::Layers, label: "MasonryGrid", collapsed }
+                    SidebarLink { to: Route::MediaCardPage {}, icon: IconKind::Box, label: "MediaCard", collapsed }
+                }
+            }
+
             // Sezione 6: Overlay & Finestre
             div { class: "flex flex-col",
                 if collapsed {
@@ -412,7 +447,10 @@ fn SidebarView(collapsed: bool, on_toggle: EventHandler<()>) -> Element {
                 }
                 div { class: "flex flex-col gap-1",
                     SidebarLink { to: Route::AvatarsPage {}, icon: IconKind::Sparkles, label: "Avatar", collapsed }
+                    SidebarLink { to: Route::FacepilePage {}, icon: IconKind::Sparkles, label: "Facepile", collapsed }
                     SidebarLink { to: Route::ChatPage {}, icon: IconKind::MessageSquare, label: "Chat Bubble", collapsed }
+                    SidebarLink { to: Route::ActivityFeedPage {}, icon: IconKind::Clock, label: "ActivityFeed", collapsed }
+                    SidebarLink { to: Route::TransferListPage {}, icon: IconKind::Layers, label: "TransferList", collapsed }
                     SidebarLink { to: Route::AttachmentCardsPage {}, icon: IconKind::Paperclip, label: "AttachmentCard", collapsed }
                     SidebarLink { to: Route::TreesPage {}, icon: IconKind::Radio, label: "TreeView (Mesh)", collapsed }
                 }
