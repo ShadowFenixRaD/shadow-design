@@ -1,0 +1,34 @@
+// ==============================================================================
+// Shadow Design — RichTextEditor Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-rte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    &__toolbar {
+      transition: background-color $duration-normal ease;
+    }
+
+    &__group {
+      display: flex;
+      align-items: center;
+    }
+
+    &__control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all $duration-fast ease;
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}

@@ -206,3 +206,43 @@ pub fn AvatarGroup(
         }
     }
 }
+
+/// Proprietà persona per collaboratori, autori di documenti, timeline e facepile.
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct PersonaProps {
+    pub name: String,
+    pub avatar_url: Option<String>,
+    pub status: Option<PresenceStatus>,
+    pub role: Option<String>,
+}
+
+impl PersonaProps {
+    #[must_use]
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            avatar_url: None,
+            status: None,
+            role: None,
+        }
+    }
+
+    #[must_use]
+    pub fn with_avatar(mut self, url: impl Into<String>) -> Self {
+        self.avatar_url = Some(url.into());
+        self
+    }
+
+    #[must_use]
+    pub fn with_status(mut self, status: PresenceStatus) -> Self {
+        self.status = Some(status);
+        self
+    }
+
+    #[must_use]
+    pub fn with_role(mut self, role: impl Into<String>) -> Self {
+        self.role = Some(role.into());
+        self
+    }
+}
+

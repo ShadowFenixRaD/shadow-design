@@ -1,0 +1,16 @@
+// ==============================================================================
+// Shadow Design — DocumentCard Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-doc-card {
+    transition: all $duration-normal ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}

@@ -1,0 +1,14 @@
+// ==============================================================================
+// Shadow Design — Masonry & ImageList Component Styles
+// ==============================================================================
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+@layer sd-components {
+  .sd-masonry {
+    width: 100%;
+    orphans: 1;
+    widows: 1;
+  }
+}
