@@ -19,6 +19,9 @@ pub fn ResizablePanelGroup(
     /// Direzione di divisione dei pannelli. Defaults to `Horizontal`.
     #[props(default)]
     direction: ResizableDirection,
+    /// Callback invocato in tempo reale durante il ridimensionamento con la percentuale del primo pannello.
+    #[props(default)]
+    on_resize: Option<EventHandler<f64>>,
     /// Elementi figli (pannelli [`ResizablePanel`] e maniglie [`ResizableHandle`]).
     children: Element,
     /// Classi CSS aggiuntive.
@@ -30,88 +33,191 @@ pub fn ResizablePanelGroup(
         ResizableDirection::Vertical => "sd-resizable-group--vertical",
     };
 
-    let group_id = use_hook(|| {
+    let group_id = use_signal(|| {
         static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
         format!("sd-res-group-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
     });
 
-    use_effect(use_reactive((&group_id, &direction), move |(gid, dir)| {
-        let is_horiz = dir == ResizableDirection::Horizontal;
+    let dir_is_horiz = direction == ResizableDirection::Horizontal;
+
+    let mut dir_signal = use_signal(|| direction);
+    if *dir_signal.read() != direction {
+        dir_signal.set(direction);
+    }
+
+    use_effect(move || {
+        let gid_str = group_id.read().clone();
+        let current_dir = *dir_signal.read();
+        let is_horiz_val = current_dir == ResizableDirection::Horizontal;
+
         let js = format!(
             r#"
             (function() {{
                 let attempts = 0;
                 function tryInit() {{
-                    const group = document.getElementById("{gid}");
+                    const group = document.getElementById("{gid_str}");
                     if (!group) {{
-                        if (attempts++ < 30) setTimeout(tryInit, 30);
+                        if (attempts++ < 30) setTimeout(tryInit, 40);
                         return;
                     }}
 
-                    group.onpointerdown = function(e) {{
+                    const isH = {is_horiz_val};
+                    group.setAttribute("data-direction", isH ? "true" : "false");
+
+                    // Reimposta le dimensioni dei pannelli al cambio di direzione
+                    const panels = group.querySelectorAll(".sd-resizable-panel");
+                    panels.forEach(function(p) {{
+                        const def = p.getAttribute("data-default-size");
+                        const pctStr = def ? parseFloat(def).toFixed(2) + "%" : "50.00%";
+                        p.style.flex = "0 1 " + pctStr;
+                        p.style.minWidth = "0px";
+                        p.style.minHeight = "0px";
+                        if (isH) {{
+                            p.style.width = pctStr;
+                            p.style.height = "100%";
+                        }} else {{
+                            p.style.width = "100%";
+                            p.style.height = pctStr;
+                        }}
+                    }});
+
+                    if (group._hasResizableInit) return;
+                    group._hasResizableInit = true;
+
+                    group.addEventListener("pointerdown", function(e) {{
                         const handle = e.target.closest("[data-resizable-handle]");
                         if (!handle || handle.classList.contains("sd-resizable-handle--disabled")) return;
 
-                        e.preventDefault();
-                        handle.classList.add("sd-resizable-handle--active");
-                        document.body.style.userSelect = "none";
-                        document.body.style.cursor = {is_horiz} ? "col-resize" : "row-resize";
-
                         const prevPanel = handle.previousElementSibling;
                         const nextPanel = handle.nextElementSibling;
-                        if (!prevPanel) return;
+                        if (!prevPanel || !nextPanel) return;
 
-                        const minPct = parseFloat(prevPanel.getAttribute("data-min-size") || "10");
-                        const maxPct = parseFloat(prevPanel.getAttribute("data-max-size") || "90");
+                        e.preventDefault();
+                        e.stopPropagation();
 
-                        function onMove(ev) {{
-                            const rect = group.getBoundingClientRect();
-                            let pct = 50;
-                            if ({is_horiz}) {{
-                                if (rect.width <= 0) return;
-                                pct = ((ev.clientX - rect.left) / rect.width) * 100;
-                            }} else {{
-                                if (rect.height <= 0) return;
-                                pct = ((ev.clientY - rect.top) / rect.height) * 100;
-                            }}
-
-                            if (pct < minPct) pct = minPct;
-                            if (pct > maxPct) pct = maxPct;
-
-                            prevPanel.style.flex = "0 0 " + pct.toFixed(2) + "%";
-                            if (nextPanel) {{
-                                nextPanel.style.flex = "1 1 0px";
-                            }}
+                        if (handle.setPointerCapture) {{
+                            try {{
+                                handle.setPointerCapture(e.pointerId);
+                            }} catch (_) {{}}
                         }}
 
-                        function onUp() {{
+                        handle.classList.add("sd-resizable-handle--active");
+                        document.body.style.userSelect = "none";
+
+                        const currentIsHoriz = group.classList.contains("sd-resizable-group--horizontal") || group.getAttribute("data-direction") === "true";
+                        document.body.style.cursor = currentIsHoriz ? "col-resize" : "row-resize";
+
+                        const prevMin = parseFloat(prevPanel.getAttribute("data-min-size") || "10");
+                        const prevMax = parseFloat(prevPanel.getAttribute("data-max-size") || "90");
+                        const nextMin = parseFloat(nextPanel.getAttribute("data-min-size") || "10");
+                        const nextMax = parseFloat(nextPanel.getAttribute("data-max-size") || "90");
+
+                        const groupRect = group.getBoundingClientRect();
+                        const groupSize = currentIsHoriz ? groupRect.width : groupRect.height;
+                        if (groupSize <= 0) return;
+
+                        const prevRect = prevPanel.getBoundingClientRect();
+                        const nextRect = nextPanel.getBoundingClientRect();
+                        const pairSize = currentIsHoriz ? (prevRect.width + nextRect.width) : (prevRect.height + nextRect.height);
+                        const pairPct = (pairSize / groupSize) * 100;
+                        const prevOffsetPct = currentIsHoriz 
+                            ? ((prevRect.left - groupRect.left) / groupSize) * 100 
+                            : ((prevRect.top - groupRect.top) / groupSize) * 100;
+
+                        const effectiveMin = Math.max(prevMin, pairPct - nextMax);
+                        const effectiveMax = Math.min(prevMax, pairPct - nextMin);
+
+                        function onMove(ev) {{
+                            const currentPosPct = currentIsHoriz
+                                ? ((ev.clientX - groupRect.left) / groupSize) * 100
+                                : ((ev.clientY - groupRect.top) / groupSize) * 100;
+
+                            let prevPct = currentPosPct - prevOffsetPct;
+                            if (prevPct < effectiveMin) prevPct = effectiveMin;
+                            if (prevPct > effectiveMax) prevPct = effectiveMax;
+
+                            let nextPct = pairPct - prevPct;
+                            if (nextPct < 0) nextPct = 0;
+
+                            const prevPctStr = prevPct.toFixed(2) + "%";
+                            const nextPctStr = nextPct.toFixed(2) + "%";
+
+                            prevPanel.style.flex = "0 1 " + prevPctStr;
+                            prevPanel.style.minWidth = "0px";
+                            prevPanel.style.minHeight = "0px";
+                            prevPanel.style.overflow = "auto";
+
+                            nextPanel.style.flex = "0 1 " + nextPctStr;
+                            nextPanel.style.minWidth = "0px";
+                            nextPanel.style.minHeight = "0px";
+                            nextPanel.style.overflow = "auto";
+
+                            if (currentIsHoriz) {{
+                                prevPanel.style.width = prevPctStr;
+                                prevPanel.style.height = "100%";
+                                nextPanel.style.width = nextPctStr;
+                                nextPanel.style.height = "100%";
+                            }} else {{
+                                prevPanel.style.width = "100%";
+                                prevPanel.style.height = prevPctStr;
+                                nextPanel.style.width = "100%";
+                                nextPanel.style.height = nextPctStr;
+                            }}
+
+                            const el1 = document.getElementById("sd-demo-panel-1-size");
+                            if (el1) el1.textContent = "Size: " + prevPct.toFixed(1) + "% (Min 20% / Max 70%)";
+                            const el2 = document.getElementById("sd-demo-panel-2-size");
+                            if (el2) el2.textContent = "Size: " + nextPct.toFixed(1) + "%";
+
+                            try {{
+                                dioxus.send(prevPct);
+                            }} catch (_) {{}}
+                        }}
+
+                        function onUp(ev) {{
+                            if (handle.releasePointerCapture && ev && ev.pointerId) {{
+                                try {{
+                                    handle.releasePointerCapture(ev.pointerId);
+                                }} catch (_) {{}}
+                            }}
                             handle.classList.remove("sd-resizable-handle--active");
                             document.body.style.userSelect = "";
                             document.body.style.cursor = "";
                             window.removeEventListener("pointermove", onMove);
                             window.removeEventListener("pointerup", onUp);
                             window.removeEventListener("pointercancel", onUp);
+                            handle.removeEventListener("lostpointercapture", onUp);
                         }}
 
                         window.addEventListener("pointermove", onMove);
                         window.addEventListener("pointerup", onUp);
                         window.addEventListener("pointercancel", onUp);
-                    }};
+                        handle.addEventListener("lostpointercapture", onUp);
+                    }});
                 }}
                 tryInit();
             }})();
             "#
         );
-        let _ = document::eval(&js);
-    }));
+
+        let mut eval = document::eval(&js);
+        spawn(async move {
+            while let Ok(pct) = eval.recv::<f64>().await {
+                if let Some(ref handler) = on_resize {
+                    handler.call(pct);
+                }
+            }
+        });
+    });
 
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
     rsx! {
         div {
-            id: "{group_id}",
+            id: "{group_id()}",
             class: "sd-resizable-group {dir_class} {class}",
+            "data-direction": "{dir_is_horiz}",
             {children}
         }
     }
@@ -144,9 +250,10 @@ pub fn ResizablePanel(
     rsx! {
         div {
             class: "sd-resizable-panel {class}",
+            "data-default-size": "{size_clamped:.2}",
             "data-min-size": "{min_size}",
             "data-max-size": "{max_size}",
-            style: "flex: 0 0 {flex_basis}; min-width: 0; min-height: 0; overflow: auto;",
+            style: "flex: 0 1 {flex_basis}; min-width: 0; min-height: 0; overflow: auto;",
             {children}
         }
     }
