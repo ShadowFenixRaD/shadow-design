@@ -191,7 +191,6 @@ use dioxus::prelude::*;
 pub const STYLES: Asset = asset!("/scss/main.scss");
 
 pub mod a11y;
-pub(crate) mod glow;
 pub mod locale;
 pub(crate) mod util;
 
@@ -353,7 +352,7 @@ pub mod carousel;
 pub mod virtual_list;
 #[cfg(feature = "code_highlight")]
 pub mod code_highlight;
-#[cfg(feature = "charts")]
+#[cfg(feature = "chart_core")]
 pub mod chart;
 #[cfg(feature = "rich_text")]
 pub mod rich_text;
@@ -375,7 +374,8 @@ pub mod facepile;
 pub mod activity_feed;
 
 pub mod prelude {
-    pub use crate::a11y::ControlSize;
+    pub use crate::a11y::{AriaHeading, ControlSize, use_unique_id};
+    pub use crate::util::{hex_to_rgb, is_valid_hex_color, parse_hex_rgba};
     #[cfg(feature = "accordion")]
     pub use crate::accordion::*;
     #[cfg(feature = "alert")]
@@ -535,7 +535,7 @@ pub mod prelude {
     pub use crate::virtual_list::*;
     #[cfg(feature = "code_highlight")]
     pub use crate::code_highlight::*;
-    #[cfg(feature = "charts")]
+    #[cfg(feature = "chart_core")]
     pub use crate::chart::*;
     #[cfg(feature = "rich_text")]
     pub use crate::rich_text::*;

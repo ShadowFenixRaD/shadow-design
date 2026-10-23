@@ -93,9 +93,17 @@ pub fn tokenize_line(line: &str, lang: &str) -> Vec<SyntaxToken> {
             while i < len {
                 let c = chars[i];
                 s.push(c);
-                if c == quote && (i == 0 || chars[i - 1] != '\\') {
-                    i += 1;
-                    break;
+                if c == quote {
+                    let mut backslashes = 0;
+                    let mut b = i;
+                    while b > 0 && chars[b - 1] == '\\' {
+                        backslashes += 1;
+                        b -= 1;
+                    }
+                    if backslashes % 2 == 0 {
+                        i += 1;
+                        break;
+                    }
                 }
                 i += 1;
             }
@@ -184,7 +192,7 @@ pub fn CodeBlock(
     /// Codice sorgente da visualizzare ed evidenziare.
     code: String,
     /// Linguaggio di programmazione per il tokenizer (es. "rust", "rsx", "javascript", "python", "json", "bash").
-    #[props(default = "rust".to_string())]
+    #[props(default = "rust".to_string(), into)]
     language: String,
     /// Nome del file opzionale visualizzato nella barra superiore (es. "main.rs").
     #[props(default)]
@@ -273,7 +281,7 @@ pub fn CodeHighlight(
     /// Codice sorgente da visualizzare ed evidenziare.
     code: String,
     /// Linguaggio di programmazione per il tokenizer. Defaults to "rust".
-    #[props(default = "rust".to_string())]
+    #[props(default = "rust".to_string(), into)]
     language: String,
     /// Nome del file opzionale visualizzato nella barra superiore.
     #[props(default)]

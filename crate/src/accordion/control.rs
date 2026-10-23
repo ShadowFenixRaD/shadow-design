@@ -41,14 +41,50 @@ pub fn AccordionControl(
         }
     };
 
-    let mut acc_ctx_key = acc_ctx;
     let on_keydown = move |e: KeyboardEvent| {
         if is_disabled {
             return;
         }
-        if e.key() == Key::Enter || e.key() == Key::Character(" ".into()) {
-            e.prevent_default();
-            acc_ctx_key.toggle(&value);
+        let navigate = |dir: &'static str| {
+            let script = format!(
+                r#"
+                const btn = document.activeElement;
+                const root = btn ? btn.closest('.sd-accordion') : null;
+                if (root) {{
+                    const btns = Array.from(root.querySelectorAll('.sd-accordion__control:not([disabled])'));
+                    const idx = btns.indexOf(btn);
+                    if (btns.length > 0) {{
+                        let target = null;
+                        if ('{dir}' === 'next' && idx >= 0) target = btns[(idx + 1) % btns.length];
+                        else if ('{dir}' === 'prev' && idx >= 0) target = btns[(idx - 1 + btns.length) % btns.length];
+                        else if ('{dir}' === 'home') target = btns[0];
+                        else if ('{dir}' === 'end') target = btns[btns.length - 1];
+                        if (target) target.focus();
+                    }}
+                }}
+            "#
+            );
+            let _ = document::eval(&script);
+        };
+
+        match e.key() {
+            Key::ArrowDown => {
+                e.prevent_default();
+                navigate("next");
+            }
+            Key::ArrowUp => {
+                e.prevent_default();
+                navigate("prev");
+            }
+            Key::Home => {
+                e.prevent_default();
+                navigate("home");
+            }
+            Key::End => {
+                e.prevent_default();
+                navigate("end");
+            }
+            _ => {}
         }
     };
 

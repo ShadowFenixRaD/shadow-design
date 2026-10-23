@@ -29,18 +29,10 @@ pub fn Switch(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let track_checked_modifier = match &theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-switch__track--checked".to_string(),
-        crate::theme::PrimaryColor::Obsidian => "sd-switch__track--checked-obsidian".to_string(),
-        crate::theme::PrimaryColor::Crimson => "sd-switch__track--checked-crimson".to_string(),
-        crate::theme::PrimaryColor::Cyan => "sd-switch__track--checked-cyan".to_string(),
-        crate::theme::PrimaryColor::Emerald => "sd-switch__track--checked-emerald".to_string(),
-        crate::theme::PrimaryColor::Custom { .. } => {
-            format!(
-                "sd-switch__track--checked-{}",
-                theme_val.primary_color.css_prefix()
-            )
-        }
+    let track_checked_modifier = if theme_val.primary_color == crate::theme::PrimaryColor::Violet {
+        "sd-switch__track--checked".to_string()
+    } else {
+        format!("sd-switch__track--checked-{}", theme_val.primary_color.css_prefix())
     };
     #[cfg(feature = "theme")]
     let glow_modifier = if is_checked {
@@ -84,6 +76,17 @@ pub fn Switch(
         ""
     };
 
+    let do_toggle = move || {
+        if !disabled {
+            let next = !*checked.read();
+            let mut checked = checked;
+            *checked.write() = next;
+            if let Some(handler) = on_change.as_ref() {
+                handler.call(next);
+            }
+        }
+    };
+
     rsx! {
         div {
             class: "sd-switch {base_override} {disabled_class} {class_modifiers} {class}",
@@ -94,17 +97,9 @@ pub fn Switch(
                 class: "sd-switch__track {track_active_class}",
                 disabled: disabled,
                 "aria-checked": if is_checked { "true" } else { "false" },
-                "aria-labelledby": label_id.as_deref().unwrap_or(""),
-                "aria-describedby": desc_id.as_deref().unwrap_or(""),
-                onclick: move |_| {
-                    if !disabled {
-                        let next = !*checked.read();
-                        *checked.write() = next;
-                        if let Some(handler) = on_change.as_ref() {
-                            handler.call(next);
-                        }
-                    }
-                },
+                "aria-labelledby": label_id.as_deref(),
+                "aria-describedby": desc_id.as_deref(),
+                onclick: move |_| do_toggle(),
                 span {
                     class: "sd-switch__thumb {thumb_active_class}",
                     "aria-hidden": "true",
@@ -113,25 +108,17 @@ pub fn Switch(
             if label.is_some() || description.is_some() {
                 div {
                     class: "sd-switch__label-group",
-                    onclick: move |_| {
-                        if !disabled {
-                            let next = !*checked.read();
-                            *checked.write() = next;
-                            if let Some(handler) = on_change.as_ref() {
-                                handler.call(next);
-                            }
-                        }
-                    },
+                    onclick: move |_| do_toggle(),
                     if let Some(lbl) = label {
                         span {
-                            id: label_id.as_deref().unwrap_or(""),
+                            id: label_id.as_deref(),
                             class: "sd-switch__label",
                             "{lbl}"
                         }
                     }
                     if let Some(desc) = description {
                         span {
-                            id: desc_id.as_deref().unwrap_or(""),
+                            id: desc_id.as_deref(),
                             class: "sd-switch__description",
                             "{desc}"
                         }

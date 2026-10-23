@@ -42,13 +42,13 @@ pub fn Rating(
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("rating", &class);
     #[cfg(feature = "theme")]
-    let active_color_class = match &theme_val.primary_color {
+    let active_color_class = match theme_val.primary_color {
         crate::theme::PrimaryColor::Violet => "sd-rating--violet",
         crate::theme::PrimaryColor::Obsidian => "sd-rating--obsidian",
         crate::theme::PrimaryColor::Crimson => "sd-rating--crimson",
         crate::theme::PrimaryColor::Cyan => "sd-rating--cyan",
         crate::theme::PrimaryColor::Emerald => "sd-rating--emerald",
-        crate::theme::PrimaryColor::Custom { .. } => "sd-rating--violet",
+        _ => "sd-rating--violet",
     };
 
     #[cfg(not(feature = "theme"))]

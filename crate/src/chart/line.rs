@@ -116,7 +116,7 @@ pub fn LineChart(
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
-                    preserve_aspect_ratio: "none",
+                    preserve_aspect_ratio: "xMidYMid meet",
                     onmouseleave: move |_| {
                         hover_index.set(None);
                     },

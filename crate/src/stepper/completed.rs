@@ -28,8 +28,7 @@ pub fn StepperCompleted(props: StepperCompletedProps) -> Element {
     } else if let Some(target) = props.completed_step {
         active_idx >= target
     } else {
-        // Se non specificato, visibile se l'indice attivo è >= 3 o se specificato dal genitore
-        true
+        false
     };
 
     if is_visible {

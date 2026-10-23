@@ -17,6 +17,10 @@ pub struct Locale {
     pub clear_text: String,
     pub loading: String,
     pub close: String,
+    pub info: String,
+    pub success: String,
+    pub warning: String,
+    pub error: String,
 }
 
 impl Default for Locale {
@@ -42,6 +46,10 @@ impl Locale {
             clear_text: "Clear text".to_string(),
             loading: "Loading...".to_string(),
             close: "Close".to_string(),
+            info: "Info".to_string(),
+            success: "Success".to_string(),
+            warning: "Warning".to_string(),
+            error: "Error".to_string(),
         }
     }
 
@@ -61,6 +69,10 @@ impl Locale {
             clear_text: "Cancella testo".to_string(),
             loading: "Caricamento...".to_string(),
             close: "Chiudi".to_string(),
+            info: "Informazione".to_string(),
+            success: "Successo".to_string(),
+            warning: "Attenzione".to_string(),
+            error: "Errore".to_string(),
         }
     }
 

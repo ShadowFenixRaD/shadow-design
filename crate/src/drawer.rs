@@ -1,4 +1,4 @@
-use crate::icon::{Icon, IconKind};
+use crate::close_button::{CloseButton, CloseButtonSize, CloseButtonVariant};
 use crate::locale::use_locale;
 use dioxus::prelude::*;
 
@@ -156,6 +156,48 @@ pub fn Drawer(
                         let _ = data.set_focus(true).await;
                     });
                 },
+                onkeydown: {
+                    let drawer_id = drawer_id.clone();
+                    move |e: KeyboardEvent| {
+                        if e.key() == Key::Tab {
+                            let shift = e.modifiers().contains(Modifiers::SHIFT);
+                            let did = drawer_id.clone();
+                            e.prevent_default();
+                            spawn(async move {
+                                let script = format!(
+                                    r#"
+                                    const dialog = document.getElementById("{}");
+                                    if (!dialog) return;
+                                    const focusable = dialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                                    if (focusable.length === 0) return;
+                                    const first = focusable[0];
+                                    const last = focusable[focusable.length - 1];
+                                    if ({}) {{
+                                        if (document.activeElement === first) {{
+                                            last.focus();
+                                        }} else {{
+                                            const idx = Array.prototype.indexOf.call(focusable, document.activeElement);
+                                            if (idx > 0) focusable[idx - 1].focus();
+                                            else last.focus();
+                                        }}
+                                    }} else {{
+                                        if (document.activeElement === last) {{
+                                            first.focus();
+                                        }} else {{
+                                            const idx = Array.prototype.indexOf.call(focusable, document.activeElement);
+                                            if (idx >= 0 && idx < focusable.length - 1) focusable[idx + 1].focus();
+                                            else first.focus();
+                                        }}
+                                    }}
+                                    "#,
+                                    did,
+                                    if shift { "true" } else { "false" }
+                                );
+                                let _ = document::eval(&script).await;
+                            });
+                        }
+                    }
+                },
                 onclick: move |e| e.stop_propagation(),
                 div {
                     class: "sd-drawer__header",
@@ -166,13 +208,12 @@ pub fn Drawer(
                             "{t}"
                         }
                     }
-                    button {
-                        r#type: "button",
+                    CloseButton {
+                        size: CloseButtonSize::Md,
+                        variant: CloseButtonVariant::Subtle,
+                        aria_label: close_btn_label,
                         class: "sd-drawer__close",
-                        "aria-label": "{close_btn_label}",
-                        title: "{close_btn_label}",
                         onclick: move |_| *is_open.write() = false,
-                        Icon { kind: IconKind::X, size: 16 }
                     }
                 }
                 div {

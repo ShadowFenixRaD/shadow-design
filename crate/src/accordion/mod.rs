@@ -106,9 +106,11 @@ pub fn Accordion(
     let active_value = value.unwrap_or(fallback_signal);
 
     let mut multiple_sig = use_signal(|| multiple);
-    if *multiple_sig.read() != multiple {
-        *multiple_sig.write() = multiple;
-    }
+    use_effect(move || {
+        if *multiple_sig.peek() != multiple {
+            *multiple_sig.write() = multiple;
+        }
+    });
 
     let ctx = AccordionContext {
         multiple: multiple_sig,

@@ -1,26 +1,22 @@
 use crate::icon::{Icon, IconKind};
 use dioxus::prelude::*;
 
-#[derive(Clone, Copy, PartialEq, Debug, Default)]
-pub enum CheckboxSize {
-    Sm,
-    #[default]
-    Md,
-    Lg,
+pub type CheckboxSize = crate::a11y::ControlSize;
+
+pub trait CheckboxSizeExt {
+    fn scss_class(&self) -> &'static str;
+    fn icon_size(&self) -> u32;
 }
 
-impl CheckboxSize {
-    #[must_use]
-    pub fn scss_class(&self) -> &'static str {
+impl CheckboxSizeExt for CheckboxSize {
+    fn scss_class(&self) -> &'static str {
         match self {
             CheckboxSize::Sm => "sd-checkbox__box--sm",
             CheckboxSize::Md => "sd-checkbox__box--md",
             CheckboxSize::Lg => "sd-checkbox__box--lg",
         }
     }
-
-    #[must_use]
-    pub fn icon_size(&self) -> u32 {
+    fn icon_size(&self) -> u32 {
         match self {
             CheckboxSize::Sm => 11,
             CheckboxSize::Md => 13,
@@ -67,18 +63,10 @@ pub fn Checkbox(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let active_color_class = match &theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-checkbox__box--checked".to_string(),
-        crate::theme::PrimaryColor::Obsidian => "sd-checkbox__box--checked-obsidian".to_string(),
-        crate::theme::PrimaryColor::Crimson => "sd-checkbox__box--checked-crimson".to_string(),
-        crate::theme::PrimaryColor::Cyan => "sd-checkbox__box--checked-cyan".to_string(),
-        crate::theme::PrimaryColor::Emerald => "sd-checkbox__box--checked-emerald".to_string(),
-        crate::theme::PrimaryColor::Custom { .. } => {
-            format!(
-                "sd-checkbox__box--checked-{}",
-                theme_val.primary_color.css_prefix()
-            )
-        }
+    let active_color_class = if theme_val.primary_color == crate::theme::PrimaryColor::Violet {
+        "sd-checkbox__box--checked".to_string()
+    } else {
+        format!("sd-checkbox__box--checked-{}", theme_val.primary_color.css_prefix())
     };
     #[cfg(feature = "theme")]
     let glow_class = if is_checked || indeterminate {
@@ -135,7 +123,7 @@ pub fn Checkbox(
                 disabled: disabled,
                 "aria-checked": if indeterminate { "mixed" } else if is_checked { "true" } else { "false" },
                 "aria-invalid": if error.is_some() { "true" } else { "false" },
-                "aria-describedby": described_by.as_deref().unwrap_or(""),
+                "aria-describedby": described_by.as_deref(),
                 onchange: move |e| {
                     if !disabled {
                         let next = if indeterminate { true } else { e.checked() };
@@ -150,7 +138,7 @@ pub fn Checkbox(
                 class: "sd-checkbox__box {box_size} {checked_class} {glow_class} {error_class}",
                 "aria-hidden": "true",
                 if indeterminate {
-                    span { style: "display: block; width: 10px; height: 2px; background: currentColor; border-radius: 9999px;" }
+                    span { class: "sd-checkbox__indeterminate" }
                 } else if is_checked {
                     Icon { kind: IconKind::Check, size: size.icon_size() }
                 }
@@ -162,7 +150,7 @@ pub fn Checkbox(
                     }
                     if let Some(desc) = description.as_ref() {
                         span {
-                            id: desc_id.as_deref().unwrap_or(""),
+                            id: desc_id.as_deref(),
                             class: "sd-checkbox__description",
                             "{desc}"
                         }

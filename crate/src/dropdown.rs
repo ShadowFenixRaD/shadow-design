@@ -115,9 +115,28 @@ pub fn Dropdown(
 
     rsx! {
         div {
+            id: "{dropdown_id}",
             class: "sd-dropdown-container {open_container_class} {class_modifiers} {class}",
             onfocusout: move |_| {
-                *is_open.write() = false;
+                let cid = dropdown_id.clone();
+                spawn(async move {
+                    crate::util::sleep_ms(50).await;
+                    let script = format!(
+                        r#"
+                        const el = document.getElementById("{}");
+                        if (el && !el.contains(document.activeElement)) {{
+                            return true;
+                        }}
+                        return false;
+                        "#,
+                        cid
+                    );
+                    if let Ok(res) = document::eval(&script).await {
+                        if res.as_bool().unwrap_or(false) {
+                            *is_open.write() = false;
+                        }
+                    }
+                });
             },
             div {
                 id: "{trigger_id}",

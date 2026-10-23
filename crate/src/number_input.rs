@@ -119,31 +119,26 @@ pub fn NumberInput(
     let can_increment = !disabled && max.is_none_or(|m| current_val + step <= m + 1e-9);
     let can_decrement = !disabled && min.is_none_or(|m| current_val - step >= m - 1e-9);
 
-    let mut do_update = move |new_val: f64| {
+    let do_update = move |new_val: f64| {
         let clamped = format_and_clamp_number(new_val, min, max, precision);
+        let mut value = value;
         *value.write() = clamped;
-        if let Some(handler) = on_change {
+        if let Some(handler) = on_change.as_ref() {
             handler.call(clamped);
         }
     };
 
-    let do_increment = {
-        let mut do_update = do_update;
-        move || {
-            if can_increment {
-                let current = *value.read();
-                do_update(current + step);
-            }
+    let do_increment = move || {
+        if can_increment {
+            let current = *value.read();
+            do_update(current + step);
         }
     };
 
-    let do_decrement = {
-        let mut do_update = do_update;
-        move || {
-            if can_decrement {
-                let current = *value.read();
-                do_update(current - step);
-            }
+    let do_decrement = move || {
+        if can_decrement {
+            let current = *value.read();
+            do_update(current - step);
         }
     };
 
@@ -152,6 +147,9 @@ pub fn NumberInput(
     let down_disabled_class = if !can_decrement { "sd-number-input__stepper--disabled" } else { "" };
 
     let is_err = error.is_some();
+
+    let mut is_focused = use_signal(|| false);
+    let mut raw_text = use_signal(|| display_str.clone());
 
     rsx! {
         div {
@@ -176,16 +174,21 @@ pub fn NumberInput(
                     id: "{input_id}",
                     role: "spinbutton",
                     "aria-valuenow": "{current_val}",
-                    "aria-valuemin": min.map(|v| v.to_string()).unwrap_or_default(),
-                    "aria-valuemax": max.map(|v| v.to_string()).unwrap_or_default(),
+                    "aria-valuemin": min.map(|v| v.to_string()),
+                    "aria-valuemax": max.map(|v| v.to_string()),
                     "aria-invalid": if is_err { "true" } else { "false" },
-                    "aria-describedby": described_by.as_deref().unwrap_or(""),
+                    "aria-describedby": described_by.as_deref(),
                     disabled,
-                    placeholder: placeholder.as_deref().unwrap_or_default(),
+                    placeholder: placeholder.as_deref(),
                     class: "sd-number-input__field",
-                    value: "{display_str}",
-                    oninput: move |e| {
-                        let text = e.value();
+                    value: if is_focused() { raw_text() } else { display_str.clone() },
+                    onfocus: move |_| {
+                        is_focused.set(true);
+                        raw_text.set(display_str.clone());
+                    },
+                    onblur: move |_| {
+                        is_focused.set(false);
+                        let text = raw_text();
                         if let Ok(parsed) = text.trim().parse::<f64>() {
                             do_update(parsed);
                         } else if text.trim().is_empty() {
@@ -193,21 +196,28 @@ pub fn NumberInput(
                             do_update(fallback);
                         }
                     },
-                    onkeydown: {
-                        let mut do_increment = do_increment;
-                        let mut do_decrement = do_decrement;
-                        move |e| {
-                            match e.key() {
-                                Key::ArrowUp => {
-                                    e.prevent_default();
-                                    do_increment();
-                                }
-                                Key::ArrowDown => {
-                                    e.prevent_default();
-                                    do_decrement();
-                                }
-                                _ => {}
+                    oninput: move |e| {
+                        let text = e.value();
+                        raw_text.set(text.clone());
+                        if let Ok(parsed) = text.trim().parse::<f64>() {
+                            let clamped = parsed.clamp(min.unwrap_or(f64::NEG_INFINITY), max.unwrap_or(f64::INFINITY));
+                            *value.write() = clamped;
+                            if let Some(handler) = on_change.as_ref() {
+                                handler.call(clamped);
                             }
+                        }
+                    },
+                    onkeydown: move |e| {
+                        match e.key() {
+                            Key::ArrowUp => {
+                                e.prevent_default();
+                                do_increment();
+                            }
+                            Key::ArrowDown => {
+                                e.prevent_default();
+                                do_decrement();
+                            }
+                            _ => {}
                         }
                     },
                 }
@@ -225,12 +235,9 @@ pub fn NumberInput(
                         disabled: !can_increment,
                         "aria-label": "Incrementa",
                         class: "sd-number-input__stepper sd-number-input__stepper--up {up_disabled_class}",
-                        onclick: {
-                            let mut do_increment = do_increment;
-                            move |e| {
-                                e.stop_propagation();
-                                do_increment();
-                            }
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            do_increment();
                         },
                         Icon { kind: IconKind::ChevronUp, size: 11 }
                     }
@@ -240,12 +247,9 @@ pub fn NumberInput(
                         disabled: !can_decrement,
                         "aria-label": "Decrementa",
                         class: "sd-number-input__stepper sd-number-input__stepper--down {down_disabled_class}",
-                        onclick: {
-                            let mut do_decrement = do_decrement;
-                            move |e| {
-                                e.stop_propagation();
-                                do_decrement();
-                            }
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            do_decrement();
                         },
                         Icon { kind: IconKind::ChevronDown, size: 11 }
                     }

@@ -159,8 +159,7 @@ pub fn Radio(
             class: "sd-radio {disabled_class} {class}",
             onclick: {
                 let handle = handle_select;
-                move |e| {
-                    e.prevent_default();
+                move |_| {
                     handle();
                 }
             },
@@ -249,7 +248,19 @@ pub fn RadioCard(
     let val_click1 = value.clone();
     let val_click2 = value.clone();
 
-    let circle_selected_class = if is_selected { "sd-radio__circle--checked" } else { "" };
+    #[cfg(feature = "theme")]
+    let active_theme_class = match &theme_val.primary_color {
+        crate::theme::PrimaryColor::Violet => "sd-radio__circle--checked",
+        crate::theme::PrimaryColor::Obsidian => "sd-radio__circle--checked-obsidian",
+        crate::theme::PrimaryColor::Crimson => "sd-radio__circle--checked-crimson",
+        crate::theme::PrimaryColor::Cyan => "sd-radio__circle--checked-cyan",
+        crate::theme::PrimaryColor::Emerald => "sd-radio__circle--checked-emerald",
+        crate::theme::PrimaryColor::Custom { .. } => "sd-radio__circle--checked",
+    };
+    #[cfg(not(feature = "theme"))]
+    let active_theme_class = "sd-radio__circle--checked";
+
+    let circle_selected_class = if is_selected { active_theme_class } else { "" };
 
     rsx! {
         div {

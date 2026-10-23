@@ -1,5 +1,7 @@
 use crate::icon::{Icon, IconKind};
 use crate::locale::use_locale;
+use crate::a11y::AriaHeading;
+use crate::close_button::{CloseButton, CloseButtonSize, CloseButtonVariant};
 use dioxus::prelude::*;
 
 /// Severity variants for system alerts.
@@ -194,35 +196,22 @@ pub fn Alert(
             div { class: "sd-alert__content",
                 span { class: "sd-visually-hidden", "{prefix_text}: " }
                 if let Some(t) = &title {
-                    match heading_level {
-                        Some(lvl) => rsx! {
-                            div {
-                                id: "{title_id}",
-                                role: "heading",
-                                "aria-level": "{lvl}",
-                                class: "sd-alert__title {title_variant_class}",
-                                "{t}"
-                            }
-                        },
-                        None => rsx! {
-                            div {
-                                id: "{title_id}",
-                                class: "sd-alert__title {title_variant_class}",
-                                "{t}"
-                            }
-                        },
+                    AriaHeading {
+                        level: heading_level,
+                        id: title_id.clone(),
+                        class: format!("sd-alert__title {title_variant_class}"),
+                        "{t}"
                     }
                 }
                 div { class: "sd-alert__body", {children} }
             }
             if let Some(close_handler) = on_close {
-                button {
-                    r#type: "button",
+                CloseButton {
+                    size: CloseButtonSize::Sm,
+                    variant: CloseButtonVariant::Subtle,
+                    aria_label: close_btn_label,
                     class: "sd-alert__close",
-                    "aria-label": "{close_btn_label}",
-                    title: "{close_btn_label}",
                     onclick: move |e| close_handler.call(e),
-                    Icon { kind: IconKind::X, size: 14 }
                 }
             }
         }

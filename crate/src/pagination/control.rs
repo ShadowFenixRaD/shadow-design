@@ -115,8 +115,8 @@ pub fn PaginationControl(props: PaginationControlProps) -> Element {
             r#type: "button",
             class: "sd-pagination__control {size_class} {active_class} {disabled_class} {props.class}",
             disabled: props.is_disabled,
-            "aria-current": if props.is_active { "page" } else { "" },
-            "aria-label": props.aria_label.as_deref().unwrap_or(""),
+            "aria-current": if props.is_active { Some("page") } else { None },
+            "aria-label": props.aria_label.as_deref(),
             onclick: move |evt| {
                 if !props.is_disabled {
                     if let Some(ref handler) = props.on_click {

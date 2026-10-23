@@ -71,10 +71,7 @@ pub fn Dropzone(
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
-    let dropzone_id = use_hook(|| {
-        static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-        format!("sd-dropzone-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
-    });
+    let dropzone_id = crate::a11y::use_unique_id("dropzone", None);
 
     use_effect(use_reactive((&dropzone_id, &disabled, &loading), move |(zid, dis, load)| {
         if dis || load {

@@ -36,6 +36,30 @@ pub fn Spoiler(
     let mut is_expanded_sig = expanded.unwrap_or(fallback_expanded);
     let is_expanded = *is_expanded_sig.read();
 
+    let content_id = crate::a11y::use_unique_id("sd-spoiler-content", None);
+    let mut is_overflowing = use_signal(|| true);
+
+    let content_id_effect = content_id.clone();
+    use_effect(move || {
+        let cid = content_id_effect.clone();
+        spawn(async move {
+            let eval_res = document::eval(&format!(
+                r#"
+                const el = document.getElementById("{cid}");
+                if (el) {{
+                    return el.scrollHeight > {max_height};
+                }}
+                return true;
+                "#
+            ));
+            if let Ok(val) = eval_res.await {
+                if let Some(b) = val.as_bool() {
+                    is_overflowing.set(b);
+                }
+            }
+        });
+    });
+
     let toggle_action = move |_: MouseEvent| {
         let next = !is_expanded;
         is_expanded_sig.set(next);
@@ -75,23 +99,26 @@ pub fn Spoiler(
             class: "sd-spoiler {state_class} {base_override} {class_modifiers} {class}",
             "data-expanded": "{is_expanded}",
             div {
+                id: "{content_id}",
                 class: "sd-spoiler__content",
                 style: "{content_style}",
                 {children}
             }
-            if !is_expanded {
+            if !is_expanded && is_overflowing() {
                 div { class: "sd-spoiler__overlay" }
             }
-            div { class: "sd-spoiler__actions",
-                Button {
-                    variant: ButtonVariant::Ghost,
-                    size: ButtonSize::Sm,
-                    onclick: toggle_action,
-                    class: "sd-spoiler__btn",
-                    span { "{label_text}" }
-                    Icon {
-                        kind: if is_expanded { IconKind::ChevronUp } else { IconKind::ChevronDown },
-                        size: 15,
+            if is_overflowing() {
+                div { class: "sd-spoiler__actions",
+                    Button {
+                        variant: ButtonVariant::Ghost,
+                        size: ButtonSize::Sm,
+                        onclick: toggle_action,
+                        class: "sd-spoiler__btn",
+                        span { "{label_text}" }
+                        Icon {
+                            kind: if is_expanded { IconKind::ChevronUp } else { IconKind::ChevronDown },
+                            size: 15,
+                        }
                     }
                 }
             }

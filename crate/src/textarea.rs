@@ -1,4 +1,5 @@
-use crate::icon::{Icon, IconKind};
+use crate::close_button::{CloseButton, CloseButtonSize, CloseButtonVariant};
+use crate::locale::use_locale;
 use dioxus::prelude::*;
 
 /// Componente `Textarea` multilinea con supporto ad autosize reattivo, conteggio caratteri,
@@ -84,6 +85,8 @@ pub fn Textarea(
     };
 
     let text_val = value();
+    let locale = use_locale();
+    let textarea_id = crate::a11y::use_unique_id("textarea", None);
     let char_count = text_val.chars().count();
 
     // Calcolo righe dinamiche per autosize
@@ -126,11 +129,13 @@ pub fn Textarea(
         div {
             class: "sd-textarea-wrapper {class_modifiers} {class}",
             if let Some(lbl) = label {
-                label { class: "sd-textarea-label", "{lbl}" }
+                label { r#for: "{textarea_id}", class: "sd-textarea-label", "{lbl}" }
             }
             div {
                 class: "sd-textarea-container",
                 textarea {
+                    id: "{textarea_id}",
+                    "aria-invalid": if error.is_some() { "true" } else { "false" },
                     class: "sd-textarea {autosize_class} {error_class} {disabled_class} {clear_padding_class} {base_override} {radius_class} {glow_class}",
                     style: "{resize_style}",
                     placeholder: placeholder.unwrap_or_default(),
@@ -149,18 +154,18 @@ pub fn Textarea(
                 }
 
                 if has_clear_btn {
-                    button {
-                        r#type: "button",
+                    CloseButton {
+                        size: CloseButtonSize::Sm,
+                        variant: CloseButtonVariant::Subtle,
+                        aria_label: locale.clear_text.clone(),
                         class: "sd-textarea-clear",
-                        title: "Cancella testo",
-                        onclick: move |e| {
+                        onclick: move |e: MouseEvent| {
                             e.stop_propagation();
                             *value.write() = String::new();
                             if let Some(h) = &on_change {
                                 h.call(String::new());
                             }
                         },
-                        Icon { kind: IconKind::X, size: 12 }
                     }
                 }
             }
@@ -168,7 +173,7 @@ pub fn Textarea(
             if error.is_some() || help_text.is_some() || show_count {
                 div {
                     class: "sd-textarea-footer",
-                    if let Some(err) = error {
+                    if let Some(ref err) = error {
                         span { class: "sd-textarea-error", "{err}" }
                     } else if let Some(help) = help_text {
                         span { class: "sd-textarea-help", "{help}" }

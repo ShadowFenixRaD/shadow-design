@@ -73,14 +73,7 @@ pub fn Badge(
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("badge", &class);
     #[cfg(feature = "theme")]
-    let default_badge_variant = match variant {
-        BadgeVariant::Default => &theme_val.badge_default,
-        BadgeVariant::Primary => &theme_val.badge_primary,
-        BadgeVariant::Success => &theme_val.badge_success,
-        BadgeVariant::Warning => &theme_val.badge_warning,
-        BadgeVariant::Danger => &theme_val.badge_danger,
-        BadgeVariant::Outline => &theme_val.badge_outline,
-    };
+    let default_badge_variant = theme_val.badge_variant_classes(variant);
     #[cfg(feature = "theme")]
     let variant_class = theme_val.resolve_variant_class("badge", variant.name(), default_badge_variant);
     #[cfg(feature = "theme")]

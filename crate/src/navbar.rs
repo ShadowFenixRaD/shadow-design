@@ -19,10 +19,7 @@ pub fn Navbar(
 ) -> Element {
     let mut is_open = use_signal(|| false);
 
-    let nav_id = use_hook(|| {
-        static NEXT_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-        format!("sd-navbar-{}", NEXT_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
-    });
+    let nav_id = crate::a11y::use_unique_id("navbar", None);
     let actions_id = format!("{nav_id}-actions");
     let toggle_id = format!("{nav_id}-toggle");
 

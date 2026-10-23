@@ -171,6 +171,7 @@ pub fn TableCell(
     #[props(default)] align: TableAlign,
     #[props(default)] sort_direction: Option<SortDirection>,
     #[props(default)] on_sort: Option<EventHandler<()>>,
+    #[props(default)] col_span: Option<usize>,
     #[props(default)] class: String,
     #[props(default)] style: Option<String>,
     children: Element,
@@ -181,6 +182,7 @@ pub fn TableCell(
 
     let combined_class = format!("sd-table-cell {align_class} {sortable_class} {sort_dir_class} {class}");
 
+    let cs_attr = col_span.map(|n| n.to_string());
     if is_header {
         let aria_sort = sort_direction.map(|dir| match dir {
             SortDirection::Ascending => "ascending",
@@ -192,6 +194,7 @@ pub fn TableCell(
             th {
                 class: "{combined_class}",
                 style: style,
+                colspan: cs_attr.as_deref(),
                 aria_sort: aria_sort,
                 onclick: move |_| {
                     if let Some(h) = &on_sort {
@@ -220,6 +223,7 @@ pub fn TableCell(
             td {
                 class: "{combined_class}",
                 style: style,
+                colspan: cs_attr.as_deref(),
                 {children}
             }
         }
@@ -501,7 +505,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                         TableRow {
                             TableCell {
                                 class: "sd-table-cell--empty text-center py-10",
-                                style: format!("grid-column: span {};", columns.len()),
+                                col_span: Some(columns.len()),
                                 if let Some(empty) = empty_state {
                                     {empty}
                                 } else {

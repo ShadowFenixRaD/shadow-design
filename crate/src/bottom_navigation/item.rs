@@ -75,12 +75,21 @@ pub fn BottomNavItem(props: BottomNavItemProps) -> Element {
     };
 
     if let Some(ref href) = props.href {
+        let href_attr = if props.disabled { None } else { Some(href.as_str()) };
+        let aria_disabled = if props.disabled { Some("true") } else { None };
+        let tabindex_attr = if props.disabled { Some("-1") } else { None };
         rsx! {
             a {
                 class: "sd-bottom-nav-item {active_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
-                href: "{href}",
-                "aria-current": if props.active { "page" } else { "" },
+                href: href_attr,
+                "aria-disabled": aria_disabled,
+                tabindex: tabindex_attr,
+                "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {
+                    if props.disabled {
+                        evt.prevent_default();
+                        return;
+                    }
                     if let Some(ref handler) = props.on_click {
                         handler.call(evt);
                     }

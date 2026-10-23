@@ -25,6 +25,7 @@ pub fn AreaChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_index = use_signal(|| None::<usize>);
+    let chart_uid = crate::a11y::use_unique_id("area-chart", None);
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -160,7 +161,7 @@ pub fn AreaChart(
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
-                    preserve_aspect_ratio: "none",
+                    preserve_aspect_ratio: "xMidYMid meet",
                     onmouseleave: move |_| {
                         hover_index.set(None);
                     },
@@ -176,7 +177,7 @@ pub fn AreaChart(
                     defs {
                         for (orig_idx, _, color, _, _) in &series_renders {
                             linearGradient {
-                                id: "area-grad-{orig_idx}",
+                                id: "{chart_uid}-grad-{orig_idx}",
                                 x1: "0",
                                 y1: "0",
                                 x2: "0",
@@ -219,7 +220,7 @@ pub fn AreaChart(
                                 if with_gradient {
                                     path {
                                         d: "{area_d}",
-                                        fill: "url(#area-grad-{orig_idx})",
+                                        fill: "url(#{chart_uid}-grad-{orig_idx})",
                                         pointer_events: "none",
                                     }
                                 }

@@ -38,35 +38,34 @@ pub fn Carousel(
     let can_go_prev = r#loop || idx > 0;
     let can_go_next = r#loop || idx < count - 1;
 
-    let handle_prev = move |_| {
+    let prev_slide = move || {
+        let mut idx_sig = current_idx;
         if count > 0 {
             let next_val = if idx == 0 {
                 if r#loop { count - 1 } else { 0 }
             } else {
                 idx - 1
             };
-            current_idx.set(next_val);
+            idx_sig.set(next_val);
         }
     };
 
-    let handle_next = move |_| {
+    let next_slide = move || {
+        let mut idx_sig = current_idx;
         if count > 0 {
             let next_val = if idx >= count - 1 {
                 if r#loop { 0 } else { count - 1 }
             } else {
                 idx + 1
             };
-            current_idx.set(next_val);
+            idx_sig.set(next_val);
         }
     };
 
     let track_transform = format!("translateX(-{}%)", idx * 100);
     let pad_class = if padded { "sd-carousel--padded" } else { "" };
 
-    let carousel_id = use_hook(|| {
-        static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-        format!("sd-carousel-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
-    });
+    let carousel_id = crate::a11y::use_unique_id("carousel", None);
 
     use_effect(use_reactive(&carousel_id, move |cid| {
         let js = format!(
@@ -122,9 +121,28 @@ pub fn Carousel(
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
+    let on_prev_click = move |_| prev_slide();
+    let on_next_click = move |_| next_slide();
     rsx! {
         div {
             id: "{carousel_id}",
+            tabindex: "0",
+            role: "region",
+            "aria-roledescription": "carousel",
+            "aria-label": "Carosello di contenuti",
+            onkeydown: move |e: KeyboardEvent| {
+                match e.key() {
+                    Key::ArrowLeft => {
+                        e.prevent_default();
+                        prev_slide();
+                    }
+                    Key::ArrowRight => {
+                        e.prevent_default();
+                        next_slide();
+                    }
+                    _ => {}
+                }
+            },
             class: "sd-carousel {pad_class} {class}",
             // Viewport con overflow nascosto
             div { class: "sd-carousel-viewport",
@@ -142,7 +160,7 @@ pub fn Carousel(
                     r#type: "button",
                     disabled: !can_go_prev,
                     class: format!("sd-carousel-control sd-carousel-control--prev {}", if !can_go_prev { "sd-carousel-control--disabled" } else { "" }),
-                    onclick: handle_prev,
+                    onclick: on_prev_click,
                     "aria-label": "Slide precedente",
                     Icon { kind: IconKind::ChevronLeft, size: 18 }
                 }
@@ -150,7 +168,7 @@ pub fn Carousel(
                     r#type: "button",
                     disabled: !can_go_next,
                     class: format!("sd-carousel-control sd-carousel-control--next {}", if !can_go_next { "sd-carousel-control--disabled" } else { "" }),
-                    onclick: handle_next,
+                    onclick: on_next_click,
                     "aria-label": "Slide successiva",
                     Icon { kind: IconKind::ChevronRight, size: 18 }
                 }
@@ -158,7 +176,7 @@ pub fn Carousel(
 
             // Indicatori a punto (Dots)
             if with_indicators && count > 1 {
-                div { class: "sd-carousel-indicators",
+                div { class: "sd-carousel-indicators", role: "tablist",
                     for i in 0..count {
                         {
                             let is_active = i == idx;
@@ -167,6 +185,8 @@ pub fn Carousel(
                                 button {
                                     key: "{i}",
                                     r#type: "button",
+                                    role: "tab",
+                                    "aria-selected": if is_active { "true" } else { "false" },
                                     class: "{dot_class}",
                                     "aria-label": "Vai alla slide {i + 1}",
                                     onclick: move |_| current_idx.set(i),

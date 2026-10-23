@@ -15,40 +15,61 @@ fn split_highlight(text: &str, query: &str, case_sensitive: bool) -> Vec<Chunk> 
     }
 
     let mut chunks = Vec::new();
-    let haystack = if case_sensitive {
-        text.to_string()
-    } else {
-        text.to_lowercase()
-    };
-    let needle = if case_sensitive {
-        query.to_string()
-    } else {
-        query.to_lowercase()
-    };
+    let text_chars: Vec<char> = text.chars().collect();
+    let query_chars: Vec<char> = query.chars().collect();
 
-    let mut start = 0;
-    while let Some(pos) = haystack[start..].find(&needle) {
-        let match_start = start + pos;
-        let match_end = match_start + needle.len();
-
-        if match_start > start {
-            chunks.push(Chunk {
-                text: text[start..match_start].to_string(),
-                is_match: false,
-            });
-        }
-
-        chunks.push(Chunk {
-            text: text[match_start..match_end].to_string(),
-            is_match: true,
-        });
-
-        start = match_end;
+    if query_chars.is_empty() || text_chars.len() < query_chars.len() {
+        return vec![Chunk {
+            text: text.to_string(),
+            is_match: false,
+        }];
     }
 
-    if start < text.len() {
+    let matches_at = |start_idx: usize| -> bool {
+        if start_idx + query_chars.len() > text_chars.len() {
+            return false;
+        }
+        for (qi, &qc) in query_chars.iter().enumerate() {
+            let tc = text_chars[start_idx + qi];
+            if case_sensitive {
+                if tc != qc {
+                    return false;
+                }
+            } else if tc.to_lowercase().ne(qc.to_lowercase()) {
+                return false;
+            }
+        }
+        true
+    };
+
+    let mut i = 0;
+    let mut last_end = 0;
+
+    while i <= text_chars.len().saturating_sub(query_chars.len()) {
+        if matches_at(i) {
+            if i > last_end {
+                let unmatch: String = text_chars[last_end..i].iter().collect();
+                chunks.push(Chunk {
+                    text: unmatch,
+                    is_match: false,
+                });
+            }
+            let matched: String = text_chars[i..i + query_chars.len()].iter().collect();
+            chunks.push(Chunk {
+                text: matched,
+                is_match: true,
+            });
+            i += query_chars.len();
+            last_end = i;
+        } else {
+            i += 1;
+        }
+    }
+
+    if last_end < text_chars.len() {
+        let tail: String = text_chars[last_end..].iter().collect();
         chunks.push(Chunk {
-            text: text[start..].to_string(),
+            text: tail,
             is_match: false,
         });
     }

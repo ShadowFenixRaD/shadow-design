@@ -2,16 +2,7 @@ use crate::icon::{Icon, IconKind};
 use crate::locale::use_locale;
 use dioxus::prelude::*;
 
-async fn sleep_ms(ms: u64) {
-    #[cfg(target_arch = "wasm32")]
-    {
-        gloo_timers::future::TimeoutFuture::new(ms as u32).await;
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
-    }
-}
+use crate::util::sleep_ms;
 
 /// Severity variants for system toast notifications.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
@@ -278,20 +269,25 @@ fn NotificationToast(item: NotificationItem, on_dismiss: EventHandler<()>) -> El
     #[cfg(not(feature = "animation"))]
     let anim_class = "animate-toast-enter";
 
+    let mut timer_started = use_signal(|| false);
+
     use_effect(move || {
-        if let Some(dur) = item.duration {
-            let on_dismiss_fn = on_dismiss;
-            spawn(async move {
-                let total_ms = dur.as_millis() as u64;
-                let mut elapsed_ms = 0u64;
-                while elapsed_ms < total_ms {
-                    sleep_ms(100).await;
-                    if !is_paused() {
-                        elapsed_ms += 100;
+        if !timer_started() {
+            timer_started.set(true);
+            if let Some(dur) = item.duration {
+                let on_dismiss_fn = on_dismiss;
+                spawn(async move {
+                    let total_ms = dur.as_millis() as u64;
+                    let mut elapsed_ms = 0u64;
+                    while elapsed_ms < total_ms {
+                        sleep_ms(100).await;
+                        if !is_paused() {
+                            elapsed_ms += 100;
+                        }
                     }
-                }
-                on_dismiss_fn.call(());
-            });
+                    on_dismiss_fn.call(());
+                });
+            }
         }
     });
 

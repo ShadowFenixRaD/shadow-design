@@ -3,12 +3,11 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 use dioxus::prelude::*;
 
-#[allow(dead_code)]
 static NEXT_ID: AtomicUsize = AtomicUsize::new(1);
 
 /// Generates a stable unique ID for a component instance, or uses `user_id` if provided.
-#[allow(dead_code)]
-pub(crate) fn use_unique_id(prefix: &str, user_id: Option<String>) -> String {
+#[must_use]
+pub fn use_unique_id(prefix: &str, user_id: Option<String>) -> String {
     use_hook(move || {
         if let Some(id) = user_id {
             id
@@ -41,14 +40,17 @@ impl ControlSize {
 
 /// Helper component to render headings with accessible ARIA levels (A11Y-21).
 #[component]
-pub(crate) fn AriaHeading(
+pub fn AriaHeading(
     level: Option<u8>,
-    class: String,
+    #[props(default)] id: Option<String>,
+    #[props(default)] class: String,
     children: Element,
 ) -> Element {
+    let id_attr = id.as_deref();
     if let Some(lvl) = level {
         rsx! {
             div {
+                id: id_attr,
                 role: "heading",
                 aria_level: "{lvl}",
                 class: "{class}",
@@ -58,6 +60,7 @@ pub(crate) fn AriaHeading(
     } else {
         rsx! {
             div {
+                id: id_attr,
                 class: "{class}",
                 {children}
             }

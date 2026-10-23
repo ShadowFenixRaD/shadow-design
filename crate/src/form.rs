@@ -114,6 +114,7 @@ impl<T: Clone + 'static> UseForm<T> {
 
     /// Run the registered validation function against current values.
     /// Returns `true` if the form is valid (no errors), `false` otherwise.
+    #[must_use]
     pub fn validate(&self) -> bool {
         let validator_guard = self.validator.read();
         if let Some(ref val_fn) = *validator_guard {
@@ -161,6 +162,7 @@ impl<T: Clone + 'static> UseForm<T> {
 /// Configuration options for initializing [`use_form`].
 pub struct FormOptions<T: Clone + 'static> {
     pub initial_values: T,
+    #[allow(clippy::type_complexity)]
     pub validate: Option<Box<dyn Fn(&T) -> HashMap<String, String>>>,
 }
 

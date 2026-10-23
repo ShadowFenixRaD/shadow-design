@@ -76,13 +76,13 @@ pub fn Slider(
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("slider", glow);
     #[cfg(feature = "theme")]
-    let accent_bar_class = match &theme_val.primary_color {
+    let accent_bar_class = match theme_val.primary_color {
         crate::theme::PrimaryColor::Violet => "sd-slider__bar--violet",
         crate::theme::PrimaryColor::Obsidian => "sd-slider__bar--obsidian",
         crate::theme::PrimaryColor::Crimson => "sd-slider__bar--crimson",
         crate::theme::PrimaryColor::Cyan => "sd-slider__bar--cyan",
         crate::theme::PrimaryColor::Emerald => "sd-slider__bar--emerald",
-        crate::theme::PrimaryColor::Custom { .. } => "sd-slider__bar--violet",
+        _ => "sd-slider__bar--violet",
     };
 
     #[cfg(not(feature = "theme"))]
@@ -228,13 +228,13 @@ pub fn RangeSlider(
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("slider", glow);
     #[cfg(feature = "theme")]
-    let accent_bar_class = match &theme_val.primary_color {
+    let accent_bar_class = match theme_val.primary_color {
         crate::theme::PrimaryColor::Violet => "sd-slider__bar--violet",
         crate::theme::PrimaryColor::Obsidian => "sd-slider__bar--obsidian",
         crate::theme::PrimaryColor::Crimson => "sd-slider__bar--crimson",
         crate::theme::PrimaryColor::Cyan => "sd-slider__bar--cyan",
         crate::theme::PrimaryColor::Emerald => "sd-slider__bar--emerald",
-        crate::theme::PrimaryColor::Custom { .. } => "sd-slider__bar--violet",
+        _ => "sd-slider__bar--violet",
     };
 
     #[cfg(not(feature = "theme"))]

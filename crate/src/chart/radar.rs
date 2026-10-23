@@ -219,16 +219,26 @@ pub fn RadarChart(
                                     {
                                         let is_h = hover_axis() == Some(pt_idx);
                                         rsx! {
-                                            circle {
-                                                key: "radar-dot-{orig_idx}-{pt_idx}",
-                                                cx: "{cx}",
-                                                cy: "{cy}",
-                                                r: if is_h { "5.5" } else { "3.5" },
-                                                fill: "#09090b",
-                                                stroke: if is_h { "#ffffff" } else { "{color}" },
-                                                stroke_width: if is_h { "2.5" } else { "2" },
-                                                class: "transition-all duration-150",
-                                                pointer_events: "none",
+                                            g {
+                                                key: "radar-dot-group-{orig_idx}-{pt_idx}",
+                                                circle {
+                                                    cx: "{cx}",
+                                                    cy: "{cy}",
+                                                    r: if is_h { "5.5" } else { "3.5" },
+                                                    fill: "#09090b",
+                                                    stroke: if is_h { "#ffffff" } else { "{color}" },
+                                                    stroke_width: if is_h { "2.5" } else { "2" },
+                                                    class: "transition-all duration-150",
+                                                    pointer_events: "none",
+                                                }
+                                                circle {
+                                                    cx: "{cx}",
+                                                    cy: "{cy}",
+                                                    r: "12",
+                                                    fill: "transparent",
+                                                    style: "cursor: pointer;",
+                                                    onmouseenter: move |_| hover_axis.set(Some(pt_idx)),
+                                                }
                                             }
                                         }
                                     }

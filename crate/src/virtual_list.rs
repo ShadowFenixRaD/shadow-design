@@ -28,8 +28,9 @@ pub fn VirtualList(
     let total_height = (item_count as u64) * (item_height as u64);
     let cur_scroll = *scroll_top.read();
 
-    let start_idx = (cur_scroll / item_height) as usize;
-    let visible_count = height.div_ceil(item_height) as usize;
+    let safe_item_height = item_height.max(1);
+    let start_idx = (cur_scroll / safe_item_height) as usize;
+    let visible_count = height.div_ceil(safe_item_height) as usize;
 
     let render_start = start_idx.saturating_sub(overscan);
     let render_end = (start_idx + visible_count + overscan).min(item_count);

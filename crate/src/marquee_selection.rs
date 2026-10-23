@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Bounding rectangle for active marquee selection.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
@@ -29,10 +28,7 @@ pub fn MarqueeSelection(
     /// Selectable children inside the container.
     children: Element,
 ) -> Element {
-    let container_id = use_hook(|| {
-        static ID: AtomicU64 = AtomicU64::new(1);
-        format!("sd-marquee-{}", ID.fetch_add(1, Ordering::Relaxed))
-    });
+    let container_id = crate::a11y::use_unique_id("marquee", None);
 
     let box_id = format!("{container_id}-box");
 

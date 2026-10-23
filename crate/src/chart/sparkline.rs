@@ -82,7 +82,7 @@ pub fn Sparkline(
     let line_path = generate_svg_path(&coords, curve_type);
     let area_path = generate_svg_area_path(&coords, h, curve_type);
 
-    let grad_id = format!("spark-grad-{:x}", data.len() + width as usize);
+    let grad_id = crate::a11y::use_unique_id("spark-grad", None);
     let mut hover_index = use_signal(|| None::<usize>);
 
     rsx! {

@@ -45,6 +45,7 @@ pub fn AppShellNavbar(props: AppShellNavbarProps) -> Element {
             role: "navigation",
             "aria-label": "Navigazione laterale dell'applicazione",
             "aria-hidden": if is_collapsed { "true" } else { "false" },
+            inert: is_collapsed,
             class: "sd-app-shell__navbar {border_class} {collapsed_class} {props.class}",
             style: if is_collapsed {
                 "width: 0px; min-width: 0px; max-width: 0px; padding: 0px; border-right-width: 0px;"

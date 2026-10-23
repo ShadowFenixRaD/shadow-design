@@ -113,11 +113,13 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
     let mut internal_expanded = use_signal(|| false);
     let mut last_max_items = use_signal(|| props.max_items);
 
-    // Se max_items cambia da esterno, ripristiniamo la compressione interna
-    if *last_max_items.read() != props.max_items {
-        last_max_items.set(props.max_items);
-        internal_expanded.set(false);
-    }
+    let max_items_prop = props.max_items;
+    use_effect(move || {
+        if *last_max_items.peek() != max_items_prop {
+            last_max_items.set(max_items_prop);
+            internal_expanded.set(false);
+        }
+    });
 
     let is_expanded = match props.expanded {
         Some(s) => s(),

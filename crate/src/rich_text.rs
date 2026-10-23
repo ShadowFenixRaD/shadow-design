@@ -196,7 +196,7 @@ pub fn RichTextEditor(
 ) -> Element {
     let mut current_mode = use_signal(|| mode.unwrap_or(RichTextMode::Wysiwyg));
     let h_style = min_height.unwrap_or_else(|| "240px".to_string());
-    let editor_id = use_signal(|| format!("sd-rte-{}", rand_simple_id()));
+    let editor_id = use_signal(|| crate::a11y::use_unique_id("rte", None));
 
     let rendered_html = markdown_to_html(&value());
 
@@ -599,12 +599,7 @@ pub fn html_to_markdown(html: &str) -> String {
         .to_string()
 }
 
-use std::sync::atomic::{AtomicU32, Ordering};
-static RTE_ID_COUNTER: AtomicU32 = AtomicU32::new(1000);
 
-fn rand_simple_id() -> u32 {
-    RTE_ID_COUNTER.fetch_add(1, Ordering::Relaxed)
-}
 
 #[cfg(test)]
 mod tests {

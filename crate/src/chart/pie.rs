@@ -123,9 +123,24 @@ pub fn PieChart(
                             let x2_out = center_x + r_out * end_a.cos();
                             let y2_out = center_y + r_out * end_a.sin();
 
-                            let large_arc = if (end_a - start_a) > PI { 1 } else { 0 };
+                            let sweep = end_a - start_a;
+                            let is_full_circle = sweep >= 2.0 * std::f64::consts::PI - 0.0001;
+                            let large_arc = if sweep > std::f64::consts::PI { 1 } else { 0 };
 
-                            let path_d = if r_in > 0.0 {
+                            let path_d = if is_full_circle {
+                                if r_in > 0.0 {
+                                    format!(
+                                        "M {:.2} {:.2} A {:.2} {:.2} 0 1 1 {:.2} {:.2} A {:.2} {:.2} 0 1 1 {:.2} {:.2} M {:.2} {:.2} A {:.2} {:.2} 0 1 0 {:.2} {:.2} A {:.2} {:.2} 0 1 0 {:.2} {:.2} Z",
+                                        center_x, center_y - r_out, r_out, r_out, center_x, center_y + r_out, r_out, r_out, center_x, center_y - r_out,
+                                        center_x, center_y - r_in, r_in, r_in, center_x, center_y + r_in, r_in, r_in, center_x, center_y - r_in
+                                    )
+                                } else {
+                                    format!(
+                                        "M {:.2} {:.2} A {:.2} {:.2} 0 1 1 {:.2} {:.2} A {:.2} {:.2} 0 1 1 {:.2} {:.2} Z",
+                                        center_x, center_y - r_out, r_out, r_out, center_x, center_y + r_out, r_out, r_out, center_x, center_y - r_out
+                                    )
+                                }
+                            } else if r_in > 0.0 {
                                 let x1_in = center_x + r_in * end_a.cos();
                                 let y1_in = center_y + r_in * end_a.sin();
                                 let x2_in = center_x + r_in * start_a.cos();

@@ -136,7 +136,7 @@ pub fn StepperStep(props: StepperStepProps) -> Element {
                 r#type: "button",
                 class: "sd-stepper-step__header",
                 disabled: !is_clickable,
-                "aria-current": if is_active { "step" } else { "" },
+                "aria-current": if is_active { Some("step") } else { None },
                 onclick: on_click_step,
                 div { class: "sd-stepper-step__circle",
                     {circle_content}

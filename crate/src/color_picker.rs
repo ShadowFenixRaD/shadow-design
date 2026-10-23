@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use crate::a11y::{use_unique_id, ControlSize};
-use crate::icon::{Icon, IconKind};
+use crate::close_button::{CloseButton, CloseButtonSize, CloseButtonVariant};
 use crate::util::cx;
 
 /// Supported output formatting modes for colors.
@@ -63,57 +63,18 @@ impl Default for Hsla {
 /// Parses a hex color string with or without leading '#'.
 #[must_use]
 pub fn parse_hex(input: &str) -> Option<Rgba> {
-    let clean = input.trim().trim_start_matches('#');
-    match clean.len() {
-        3 => {
-            let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).ok()?;
-            let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).ok()?;
-            let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).ok()?;
-            Some(Rgba { r, g, b, a: 1.0 })
-        }
-        4 => {
-            let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).ok()?;
-            let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).ok()?;
-            let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).ok()?;
-            let a_val = u8::from_str_radix(&clean[3..4].repeat(2), 16).ok()?;
-            Some(Rgba {
-                r,
-                g,
-                b,
-                a: (a_val as f32) / 255.0,
-            })
-        }
-        6 => {
-            let r = u8::from_str_radix(&clean[0..2], 16).ok()?;
-            let g = u8::from_str_radix(&clean[2..4], 16).ok()?;
-            let b = u8::from_str_radix(&clean[4..6], 16).ok()?;
-            Some(Rgba { r, g, b, a: 1.0 })
-        }
-        8 => {
-            let r = u8::from_str_radix(&clean[0..2], 16).ok()?;
-            let g = u8::from_str_radix(&clean[2..4], 16).ok()?;
-            let b = u8::from_str_radix(&clean[4..6], 16).ok()?;
-            let a_val = u8::from_str_radix(&clean[6..8], 16).ok()?;
-            Some(Rgba {
-                r,
-                g,
-                b,
-                a: (a_val as f32) / 255.0,
-            })
-        }
-        _ => None,
-    }
+    let (r, g, b, a) = crate::util::parse_hex_rgba(input)?;
+    Some(Rgba { r, g, b, a })
 }
 
 /// Parses an RGB or RGBA string. Supports `rgb(...)`, `rgba(...)`, or raw `r, g, b` / `r g b`.
 #[must_use]
 pub fn parse_rgb(input: &str) -> Option<Rgba> {
     let clean = input.trim();
-    let inner = if (clean.starts_with("rgb(") || clean.starts_with("rgba(")) && clean.ends_with(')') {
-        clean
-            .trim_start_matches("rgba(")
-            .trim_start_matches("rgb(")
-            .trim_end_matches(')')
+    let inner = if clean.starts_with("rgba(") && clean.ends_with(')') {
+        &clean[5..clean.len() - 1]
+    } else if clean.starts_with("rgb(") && clean.ends_with(')') {
+        &clean[4..clean.len() - 1]
     } else {
         clean
     };
@@ -384,10 +345,12 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
     let mut current_hue = use_signal(|| hsla.h);
 
     // Keep hue synchronized when color has sufficient saturation and brightness
-    if hsv_s > 1.0 && hsv_v > 1.0 && (*current_hue.read() - hsv_h).abs() > 0.5 {
-        current_hue.set(hsv_h);
-    }
-    let hue_val = *current_hue.read();
+    use_effect(use_reactive((&hsv_h, &hsv_s, &hsv_v), move |(h, s, v)| {
+        if s > 1.0 && v > 1.0 && (*current_hue.read() - h).abs() > 0.5 {
+            current_hue.set(h);
+        }
+    }));
+    let hue_val = if hsv_s > 1.0 && hsv_v > 1.0 { hsv_h } else { *current_hue.read() };
 
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
@@ -471,7 +434,31 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                 tabindex: "0",
                 role: "slider",
                 aria_label: "Color saturation and brightness gradient picker",
+                "aria-valuenow": "{hsv_s:.0}",
+                "aria-valuetext": "Saturation {hsv_s:.0}%, Brightness {hsv_v:.0}%",
                 onmounted: move |m| mounted_area.set(Some(m)),
+                onkeydown: move |evt: KeyboardEvent| {
+                    if props.disabled {
+                        return;
+                    }
+                    let fmt = *active_format.read();
+                    let step = 2.0;
+                    let (delta_s, delta_v) = match evt.key() {
+                        Key::ArrowLeft => (-step, 0.0),
+                        Key::ArrowRight => (step, 0.0),
+                        Key::ArrowUp => (0.0, step),
+                        Key::ArrowDown => (0.0, -step),
+                        _ => return,
+                    };
+                    let new_s = (hsv_s + delta_s).clamp(0.0, 100.0);
+                    let new_v = (hsv_v + delta_v).clamp(0.0, 100.0);
+                    let new_rgba = hsv_to_rgb(hue_val, new_s, new_v, cur_alpha);
+                    let formatted = format_color(&new_rgba, fmt, with_alpha_area);
+                    val_area.set(formatted.clone());
+                    if let Some(handler) = on_change_area.as_ref() {
+                        handler.call(formatted);
+                    }
+                },
                 onclick: move |evt: MouseEvent| {
                     if props.disabled {
                         return;
@@ -1013,17 +1000,17 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
 
                 // Clear button
                 if props.clearable && !current_str.is_empty() && !props.disabled {
-                    button {
-                        r#type: "button",
+                    CloseButton {
+                        size: CloseButtonSize::Sm,
+                        variant: CloseButtonVariant::Subtle,
+                        aria_label: "Clear color".to_string(),
                         class: "sd-color-input__clear-btn",
-                        title: "Clear color",
                         onclick: move |_| {
                             val_clear.set(String::new());
                             if let Some(handler) = on_change_clear.as_ref() {
                                 handler.call(String::new());
                             }
                         },
-                        Icon { kind: IconKind::X, size: 14 }
                     }
                 }
             }

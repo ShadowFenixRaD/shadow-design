@@ -1,4 +1,5 @@
-use crate::icon::{Icon, IconKind, RenderSvgIcon, SvgIcon};
+use crate::icon::{RenderSvgIcon, SvgIcon};
+use crate::close_button::{CloseButton, CloseButtonSize, CloseButtonVariant};
 use dioxus::prelude::*;
 
 #[component]
@@ -118,7 +119,7 @@ pub fn TextInput(
                         button {
                             r#type: "button",
                             class: "sd-input-icon sd-input-icon--left sd-input-icon--interactive",
-                            onclick: move |e| {
+                            onclick: move |e: MouseEvent| {
                                 e.stop_propagation();
                                 handler.call(e);
                             },
@@ -139,30 +140,29 @@ pub fn TextInput(
                     placeholder: placeholder.as_deref().unwrap_or_default(),
                     disabled,
                     "aria-invalid": if error.is_some() { "true" } else { "false" },
-                    "aria-describedby": described_by.as_deref().unwrap_or(""),
+                    "aria-describedby": described_by.as_deref(),
                     class: "sd-input {base_override} {icon_class} {error_class} {radius_class} {glow_class}",
                     oninput: move |e| {
                         *value.write() = e.value();
                     },
                 }
                 if has_clear {
-                    button {
-                        r#type: "button",
+                    CloseButton {
+                        size: CloseButtonSize::Sm,
+                        variant: CloseButtonVariant::Transparent,
+                        aria_label: locale.clear_text.clone(),
                         class: "sd-input-icon sd-input-icon--right sd-input-icon--interactive",
-                        title: "{locale.clear_text}",
-                        "aria-label": "{locale.clear_text}",
-                        onclick: move |e| {
+                        onclick: move |e: MouseEvent| {
                             e.stop_propagation();
                             *value.write() = String::new();
                         },
-                        Icon { kind: IconKind::X, size: 14 }
                     }
                 } else if let Some(ricon) = right_icon {
                     if let Some(handler) = on_right_icon_click {
                         button {
                             r#type: "button",
                             class: "sd-input-icon sd-input-icon--right sd-input-icon--interactive",
-                            onclick: move |e| {
+                            onclick: move |e: MouseEvent| {
                                 e.stop_propagation();
                                 handler.call(e);
                             },

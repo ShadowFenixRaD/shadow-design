@@ -117,8 +117,26 @@ pub fn ScatterChart(
         .iter()
         .enumerate()
         .map(|(i, pt)| {
-            let cx = padding_left + ((pt.x - min_x) / (max_x - min_x)) * plot_w;
-            let cy = padding_top + plot_h - ((pt.y - min_y) / (max_y - min_y)) * plot_h;
+            let norm_x = match x_scale {
+                ScaleType::Linear => (pt.x - min_x) / (max_x - min_x),
+                ScaleType::Log => {
+                    let safe_min = min_x.max(1e-6);
+                    let safe_max = max_x.max(safe_min + 1e-6);
+                    let safe_val = pt.x.max(safe_min);
+                    (safe_val.ln() - safe_min.ln()) / (safe_max.ln() - safe_min.ln())
+                }
+            };
+            let norm_y = match y_scale {
+                ScaleType::Linear => (pt.y - min_y) / (max_y - min_y),
+                ScaleType::Log => {
+                    let safe_min = min_y.max(1e-6);
+                    let safe_max = max_y.max(safe_min + 1e-6);
+                    let safe_val = pt.y.max(safe_min);
+                    (safe_val.ln() - safe_min.ln()) / (safe_max.ln() - safe_min.ln())
+                }
+            };
+            let cx = padding_left + norm_x.clamp(0.0, 1.0) * plot_w;
+            let cy = padding_top + plot_h - norm_y.clamp(0.0, 1.0) * plot_h;
 
             let radius = if let Some(z) = pt.z {
                 let frac = (z - min_z) / (max_z - min_z);
@@ -168,7 +186,7 @@ pub fn ScatterChart(
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
-                    preserve_aspect_ratio: "none",
+                    preserve_aspect_ratio: "xMidYMid meet",
                     onmouseleave: move |_| {
                         hover_index.set(None);
                     },

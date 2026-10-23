@@ -45,6 +45,7 @@ pub struct PopoverContext {
     pub position: Signal<PopoverPosition>,
     pub with_arrow: Signal<bool>,
     pub close_on_click_outside: bool,
+    pub glow: Option<bool>,
 }
 
 /// Popover container anchored to any trigger element.
@@ -77,19 +78,20 @@ pub fn Popover(
     children: Element,
 ) -> Element {
     let mut position_sig = use_signal(|| position);
-    if *position_sig.read() != position {
-        position_sig.set(position);
-    }
+    use_effect(use_reactive(&position, move |pos| {
+        position_sig.set(pos);
+    }));
     let mut arrow_sig = use_signal(|| with_arrow);
-    if *arrow_sig.read() != with_arrow {
-        arrow_sig.set(with_arrow);
-    }
+    use_effect(use_reactive(&with_arrow, move |arr| {
+        arrow_sig.set(arr);
+    }));
 
     use_context_provider(|| PopoverContext {
         opened,
         position: position_sig,
         with_arrow: arrow_sig,
         close_on_click_outside,
+        glow,
     });
 
     let handle_keydown = move |e: KeyboardEvent| {
@@ -154,14 +156,17 @@ pub fn PopoverDropdown(
     }
 
     let pos_class = ctx.position.read().class_name();
-    let glow_class = if glow == Some(true) {
+    let effective_glow = glow.or(ctx.glow);
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("popover", effective_glow);
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if effective_glow == Some(true) {
         "sd-popover-dropdown--glow"
     } else {
         ""
     };
-
-    #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("popover").unwrap_or("");
     #[cfg(not(feature = "theme"))]

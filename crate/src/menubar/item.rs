@@ -90,10 +90,18 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
         }
     };
 
+    let is_checkbox = props.checked.is_some();
+    let aria_checked = match props.checked {
+        Some(true) => Some("true"),
+        Some(false) => Some("false"),
+        None => None,
+    };
+
     rsx! {
         button {
             r#type: "button",
-            role: "menuitem",
+            role: if is_checkbox { "menuitemcheckbox" } else { "menuitem" },
+            "aria-checked": aria_checked,
             disabled: props.disabled,
             class: "sd-menubar__item {disabled_class} {props.class}",
             onclick: on_click,

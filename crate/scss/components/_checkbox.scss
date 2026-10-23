@@ -33,6 +33,14 @@
     pointer-events: none !important;
   }
 
+  &__indeterminate {
+    display: block;
+    width: 10px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 9999px;
+  }
+
   &__box {
     position: relative;
     display: inline-flex;

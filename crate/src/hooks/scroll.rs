@@ -26,42 +26,54 @@ impl UseWindowScroll {
 }
 
 /// Tracks window scroll coordinates `(x, y)` reactively and provides smooth programmatic scrolling.
+#[must_use]
 pub fn use_window_scroll() -> UseWindowScroll {
     let mut position = use_signal(|| (0.0, 0.0));
+    let listener_key = crate::a11y::use_unique_id("sd-scroll", None);
 
-    use_hook(|| {
-        let js = r#"
-        (function() {
-            let ticking = false;
-            let lastY = -1;
-            let lastX = -1;
+    let key_for_effect = listener_key.clone();
+    use_effect(move || {
+        let js = format!(
+            r#"
+            (function() {{
+                const key = "{key_for_effect}";
+                window._sd_scroll = window._sd_scroll || {{}};
+                if (window._sd_scroll[key]) {{
+                    window.removeEventListener("scroll", window._sd_scroll[key]);
+                }}
+                let ticking = false;
+                let lastY = -1;
+                let lastX = -1;
 
-            function update() {
-                const y = Math.round(window.scrollY || window.pageYOffset || 0);
-                const x = Math.round(window.scrollX || window.pageXOffset || 0);
-                if (Math.abs(y - lastY) >= 2 || Math.abs(x - lastX) >= 2) {
-                    lastY = y;
-                    lastX = x;
-                    dioxus.send([x, y]);
-                }
-            }
+                function update() {{
+                    const y = Math.round(window.scrollY || window.pageYOffset || 0);
+                    const x = Math.round(window.scrollX || window.pageXOffset || 0);
+                    if (Math.abs(y - lastY) >= 2 || Math.abs(x - lastX) >= 2) {{
+                        lastY = y;
+                        lastX = x;
+                        dioxus.send([x, y]);
+                    }}
+                }}
 
-            window.addEventListener("scroll", () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        update();
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            }, { passive: true });
+                function onScroll() {{
+                    if (!ticking) {{
+                        window.requestAnimationFrame(() => {{
+                            update();
+                            ticking = false;
+                        }});
+                        ticking = true;
+                    }}
+                }}
 
-            update();
-        })();
-        "#;
+                window._sd_scroll[key] = onScroll;
+                window.addEventListener("scroll", onScroll, {{ passive: true }});
+                update();
+            }})();
+            "#
+        );
 
         spawn(async move {
-            let mut eval = document::eval(js);
+            let mut eval = document::eval(&js);
             while let Ok(msg) = eval.recv::<serde_json::Value>().await {
                 if let Some(arr) = msg.as_array() {
                     let x = arr.first().and_then(|v| v.as_f64()).unwrap_or(0.0);
@@ -70,6 +82,18 @@ pub fn use_window_scroll() -> UseWindowScroll {
                 }
             }
         });
+    });
+
+    let key_for_drop = listener_key;
+    use_drop(move || {
+        let _ = document::eval(&format!(
+            r#"
+            if (window._sd_scroll && window._sd_scroll["{key_for_drop}"]) {{
+                window.removeEventListener("scroll", window._sd_scroll["{key_for_drop}"]);
+                delete window._sd_scroll["{key_for_drop}"];
+            }}
+            "#
+        ));
     });
 
     UseWindowScroll { position }

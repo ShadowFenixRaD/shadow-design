@@ -675,11 +675,11 @@ pub fn Select(
                         if filtered_items.is_empty() && !show_create_option {
                             div { class: "sd-select-empty", "{nothing_found_text}" }
                         } else {
-                            for grp in groups.iter() {
+                            for (g_idx, grp) in groups.iter().enumerate() {
                                 {
                                     let grp_name = grp.clone();
                                     let grp_key = grp_name.clone().unwrap_or_else(|| "__default__".to_string());
-                                    let grp_header_id = format!("{listbox_id}-grp-{grp_key}");
+                                    let grp_header_id = format!("{listbox_id}-grp-{g_idx}");
                                     rsx! {
                                         div {
                                             key: "{grp_key}",
@@ -1330,11 +1330,11 @@ pub fn MultiSelect(
                         if filtered_items.is_empty() && !show_create_option {
                             div { class: "sd-select-empty", "{nothing_found_text}" }
                         } else {
-                            for grp in groups.iter() {
+                            for (g_idx, grp) in groups.iter().enumerate() {
                                 {
                                     let grp_name = grp.clone();
                                     let grp_key = grp_name.clone().unwrap_or_else(|| "__default__".to_string());
-                                    let grp_header_id = format!("{listbox_id}-grp-{grp_key}");
+                                    let grp_header_id = format!("{listbox_id}-grp-{g_idx}");
                                     rsx! {
                                         div {
                                             key: "{grp_key}",

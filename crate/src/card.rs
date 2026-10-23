@@ -77,14 +77,7 @@ pub fn Card(
     #[props(default)] footer: Option<Element>,
     #[props(default)] children: Element,
 ) -> Element {
-    let card_id = use_hook(|| {
-        if let Some(user_id) = id {
-            user_id
-        } else {
-            static NEXT_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-            format!("sd-card-{}", NEXT_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
-        }
-    });
+    let card_id = crate::a11y::use_unique_id("card", id);
     let title_id = format!("{card_id}-title");
 
     let effective_onclick = onclick.or(on_click);
@@ -126,26 +119,12 @@ pub fn Card(
         .unwrap_or_default();
 
     let progress_element = if let Some(prog_val) = progress {
-        #[cfg(feature = "progress")]
         rsx! {
             div {
                 class: "sd-card__progress",
                 crate::progress::ProgressBar {
                     value: prog_val,
                     size: crate::progress::ProgressSize::Sm,
-                }
-            }
-        }
-        #[cfg(not(feature = "progress"))]
-        rsx! {
-            div {
-                class: "sd-card__progress",
-                div {
-                    class: "sd-card__progress-track",
-                    div {
-                        class: "sd-card__progress-fill",
-                        style: "width: {prog_val.clamp(0.0, 100.0)}%;",
-                    }
                 }
             }
         }
@@ -163,16 +142,7 @@ pub fn Card(
     let class_modifiers = theme_val.resolve_class_modifiers("card", &class);
     #[cfg(feature = "theme")]
     let glow_class = match glow {
-        Some(true) => match &theme_val.primary_color {
-            crate::theme::PrimaryColor::Violet => "sd-card--glow-violet".to_string(),
-            crate::theme::PrimaryColor::Obsidian => "sd-card--glow-obsidian".to_string(),
-            crate::theme::PrimaryColor::Crimson => "sd-card--glow-crimson".to_string(),
-            crate::theme::PrimaryColor::Cyan => "sd-card--glow-cyan".to_string(),
-            crate::theme::PrimaryColor::Emerald => "sd-card--glow-emerald".to_string(),
-            crate::theme::PrimaryColor::Custom { .. } => {
-                format!("sd-card--glow-{}", theme_val.primary_color.css_prefix())
-            }
-        },
+        Some(true) => format!("sd-card--glow-{}", theme_val.primary_color.css_prefix()),
         Some(false) => "".to_string(),
         None => {
             if hover_glow
@@ -199,14 +169,12 @@ pub fn Card(
         "".to_string()
     };
 
+    let card_id_kd = card_id.clone();
     let handle_keydown = move |evt: KeyboardEvent| {
         if is_button && (evt.key() == Key::Enter || evt.key() == Key::Character(" ".to_string())) {
             evt.prevent_default();
-            let _ = document::eval(r#"
-                if (document.activeElement) {
-                    document.activeElement.click();
-                }
-            "#);
+            let script = format!(r#"document.getElementById("{}")?.click();"#, card_id_kd);
+            let _ = document::eval(&script);
         }
     };
 
@@ -214,9 +182,9 @@ pub fn Card(
         div {
             id: "{card_id}",
             class: "sd-card {base_override} {variant_class} {actionable_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
-            role: if is_button { "button" } else { "" },
-            tabindex: if is_button { "0" } else { "" },
-            "aria-labelledby": if is_button && title.is_some() { "{title_id}" } else { "" },
+            role: if is_button { Some("button") } else { None },
+            tabindex: if is_button { Some("0") } else { None },
+            "aria-labelledby": if is_button && title.is_some() { Some(title_id.as_str()) } else { None },
             onclick: move |evt| {
                 if let Some(h) = &effective_onclick {
                     h.call(evt);

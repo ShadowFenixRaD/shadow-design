@@ -45,6 +45,7 @@ pub fn AppShellAside(props: AppShellAsideProps) -> Element {
             role: "complementary",
             "aria-label": "Pannello secondario ausiliario",
             "aria-hidden": if is_collapsed { "true" } else { "false" },
+            inert: is_collapsed,
             class: "sd-app-shell__aside {border_class} {collapsed_class} {props.class}",
             style: if is_collapsed {
                 "width: 0px; min-width: 0px; max-width: 0px; padding: 0px; border-left-width: 0px;"

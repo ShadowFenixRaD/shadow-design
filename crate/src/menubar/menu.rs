@@ -92,6 +92,14 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
             class: "sd-menubar__trigger {active_class} {disabled_class} {props.class}",
             onclick: on_click,
             onmouseenter: on_mouseenter,
+            onkeydown: move |e: KeyboardEvent| {
+                if e.key() == Key::Escape {
+                    if let Some(c) = menubar_ctx {
+                        let mut sig = c.active_menu;
+                        sig.set(None);
+                    }
+                }
+            },
             {props.children}
         }
     }
@@ -134,6 +142,14 @@ pub fn MenubarContent(props: MenubarContentProps) -> Element {
                 role: "menu",
                 class: "sd-menubar__content {props.class}",
                 "aria-orientation": "vertical",
+                onkeydown: move |e: KeyboardEvent| {
+                    if e.key() == Key::Escape {
+                        if let Some(c) = close_ctx {
+                            let mut sig = c.active_menu;
+                            sig.set(None);
+                        }
+                    }
+                },
                 {props.children}
             }
         }

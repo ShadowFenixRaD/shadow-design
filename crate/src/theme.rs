@@ -10,39 +10,23 @@ use crate::button::ButtonVariant;
 #[cfg(feature = "card")]
 use crate::card::CardShadow;
 
-/// Verifica se una stringa è un colore esadecimale CSS valido (#rgb, #rgba, #rrggbb, #rrggbbaa).
-#[must_use]
-pub fn is_valid_hex_color(hex: &str) -> bool {
-    let s = hex.trim();
-    if !s.starts_with('#') {
-        return false;
-    }
-    let body = &s[1..];
-    (body.len() == 3 || body.len() == 4 || body.len() == 6 || body.len() == 8)
-        && body.chars().all(|c| c.is_ascii_hexdigit())
-}
+pub use crate::util::{hex_to_rgb, is_valid_hex_color, parse_hex_rgba};
 
-/// Converte un colore hex valido in tuple (r, g, b). Se non valido, restituisce None.
-#[must_use]
-pub fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
-    if !is_valid_hex_color(hex) {
-        return None;
-    }
-    let s = hex.trim().trim_start_matches('#');
-    match s.len() {
-        3 | 4 => {
-            let r = u8::from_str_radix(&s[0..1].repeat(2), 16).ok()?;
-            let g = u8::from_str_radix(&s[1..2].repeat(2), 16).ok()?;
-            let b = u8::from_str_radix(&s[2..3].repeat(2), 16).ok()?;
-            Some((r, g, b))
-        }
-        6 | 8 => {
-            let r = u8::from_str_radix(&s[0..2], 16).ok()?;
-            let g = u8::from_str_radix(&s[2..4], 16).ok()?;
-            let b = u8::from_str_radix(&s[4..6], 16).ok()?;
-            Some((r, g, b))
-        }
-        _ => None,
+fn sanitize_css_prefix(raw: &str) -> String {
+    let sanitized: String = raw
+        .to_lowercase()
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+        .collect();
+    let trimmed = sanitized
+        .split('-')
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join("-");
+    if trimmed.is_empty() {
+        "custom".to_string()
+    } else {
+        trimmed
     }
 }
 
@@ -120,23 +104,7 @@ impl PrimaryColor {
             PrimaryColor::Emerald => "emerald".to_string(),
             PrimaryColor::Custom { css_prefix, .. } => match css_prefix {
                 None => "custom".to_string(),
-                Some(p) => {
-                    let sanitized: String = p
-                        .to_lowercase()
-                        .chars()
-                        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-                        .collect();
-                    let trimmed = sanitized
-                        .split('-')
-                        .filter(|s| !s.is_empty())
-                        .collect::<Vec<_>>()
-                        .join("-");
-                    if trimmed.is_empty() {
-                        "custom".to_string()
-                    } else {
-                        trimmed
-                    }
-                }
+                Some(p) => sanitize_css_prefix(p),
             },
         }
     }
@@ -166,22 +134,7 @@ impl PrimaryColor {
         } else {
             "#a855f7".to_string()
         };
-        let p = css_prefix.into();
-        let sanitized: String = p
-            .to_lowercase()
-            .chars()
-            .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-            .collect();
-        let trimmed = sanitized
-            .split('-')
-            .filter(|s| !s.is_empty())
-            .collect::<Vec<_>>()
-            .join("-");
-        let final_prefix = if trimmed.is_empty() {
-            "custom".to_string()
-        } else {
-            trimmed
-        };
+        let final_prefix = sanitize_css_prefix(&css_prefix.into());
         Self::Custom {
             name: name.into(),
             hex: valid_hex,
@@ -611,6 +564,30 @@ impl Theme {
         )
     }
 
+    /// Restituisce le sole variabili CSS come stili inline per il wrapping scoped.
+    #[must_use]
+    pub fn to_inline_css_variables(&self) -> String {
+        let safe_primary = if is_valid_hex_color(self.primary_color.accent_hex()) {
+            self.primary_color.accent_hex()
+        } else {
+            "#a855f7"
+        };
+        let (r, g, b) = hex_to_rgb(safe_primary).unwrap_or((168, 85, 247));
+        let safe_s0 = if is_valid_hex_color(&self.surface_0) { &self.surface_0 } else { "#030305" };
+        let safe_s1 = if is_valid_hex_color(&self.surface_1) { &self.surface_1 } else { "#09090d" };
+        let safe_s2 = if is_valid_hex_color(&self.surface_2) { &self.surface_2 } else { "#111118" };
+        let safe_s3 = if is_valid_hex_color(&self.surface_3) { &self.surface_3 } else { "#181824" };
+        let glow_strength = match self.glow_mode {
+            GlowMode::Off => "0",
+            GlowMode::Subtle => "0.7",
+            GlowMode::Expressive => "1.0",
+        };
+
+        format!(
+            "--sd-primary-color: {safe_primary}; --sd-accent: {safe_primary}; --sd-accent-rgb: {r}, {g}, {b}; --sd-surface-0: {safe_s0}; --sd-surface-1: {safe_s1}; --sd-surface-2: {safe_s2}; --sd-surface-3: {safe_s3}; --sd-glow-strength: {glow_strength};"
+        )
+    }
+
     /// Calcola i valori di glow per ogni componente in base al colore primario e alla modalità (DS-13, DS-12, DS-02).
     fn calculate_glows(color: &PrimaryColor, mode: GlowMode) -> GlowTokens {
         if mode == GlowMode::Off {
@@ -971,9 +948,9 @@ impl Theme {
                 let prefix = color.css_prefix();
                 ColorTokens {
                     sidebar_link_active: "sd-sidebar-link--active".to_string(),
-                    border_accent: "border-purple-500/40".to_string(),
-                    text_accent: "text-purple-400".to_string(),
-                    text_accent_bright: "text-purple-300".to_string(),
+                    border_accent: "border-custom".to_string(),
+                    text_accent: "text-custom".to_string(),
+                    text_accent_bright: "text-custom-bright".to_string(),
                     button_primary: format!("sd-btn--primary-{}", prefix),
                     badge_primary: "sd-badge--primary".to_string(),
                     banner: "sd-banner".to_string(),
@@ -1475,10 +1452,73 @@ impl ThemeBuilder {
 
 /// Provider per iniettare il tema reattivo nel Context Dioxus (RS-07, DS-02, DS-10).
 #[component]
-pub fn ThemeProvider(#[props(default)] theme: Option<Signal<Theme>>, children: Element) -> Element {
+pub fn ThemeProvider(
+    #[props(default)] theme: Option<Signal<Theme>>,
+    #[props(default)] persist_key: Option<String>,
+    children: Element,
+) -> Element {
     let owned = use_signal(Theme::default);
-    let active_theme = theme.unwrap_or(owned);
+    #[allow(unused_mut)]
+    let mut active_theme = theme.unwrap_or(owned);
     use_context_provider(|| active_theme);
+
+    #[cfg(feature = "serde")]
+    {
+        let mut is_restored = use_signal(|| persist_key.is_none());
+        if let Some(storage_key) = persist_key.clone() {
+            use_hook(move || {
+                let sk = storage_key.clone();
+                spawn(async move {
+                    let js = format!(
+                        r#"
+                        try {{
+                            return (typeof window !== "undefined" && window.localStorage)
+                                ? (window.localStorage.getItem("{sk}") || "")
+                                : "";
+                        }} catch(e) {{
+                            return "";
+                        }}
+                        "#
+                    );
+                    let eval = document::eval(&js);
+                    if let Ok(val) = eval.await {
+                        if let Some(json_str) = val.as_str() {
+                            if !json_str.is_empty() {
+                                if let Ok(loaded) = serde_json::from_str::<Theme>(json_str) {
+                                    *active_theme.write() = loaded;
+                                }
+                            }
+                        }
+                    }
+                    is_restored.set(true);
+                });
+            });
+
+            let save_key = persist_key.unwrap_or_default();
+            use_effect(move || {
+                if !is_restored() {
+                    return;
+                }
+                let current = active_theme();
+                if let Ok(json) = serde_json::to_string(&current) {
+                    let sk = save_key.clone();
+                    spawn(async move {
+                        let js_str = serde_json::to_string(&json).unwrap_or_default();
+                        let eval = document::eval(&format!(
+                            r#"
+                            try {{
+                                if (typeof window !== "undefined" && window.localStorage) {{
+                                    window.localStorage.setItem("{sk}", {js_str});
+                                }}
+                            }} catch(e) {{}}
+                            "#
+                        ));
+                        let _ = eval.await;
+                    });
+                }
+            });
+        }
+    }
 
     let theme_val = active_theme.read();
     let prefix = theme_val.primary_color.css_prefix();
@@ -1493,12 +1533,13 @@ pub fn ThemeProvider(#[props(default)] theme: Option<Signal<Theme>>, children: E
         GlowMode::Expressive => "sd-glow-expressive",
     };
     let css_vars = theme_val.to_css_variables();
+    let inline_vars = theme_val.to_inline_css_variables();
 
     rsx! {
         div {
             class: "sd-theme-wrapper sd-theme-{prefix} {radius_class} {glow_class}",
             "data-sd-theme": "{prefix}",
-            style: "display: contents;",
+            style: "display: contents; {inline_vars}",
             document::Style { "{css_vars}" }
             {children}
         }

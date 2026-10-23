@@ -90,9 +90,11 @@ pub fn Stepper(props: StepperProps) -> Element {
         allow_click_completed: props.allow_click_completed,
         on_change: props.on_change,
     };
-    if *ctx.peek() != current {
-        *ctx.write() = current;
-    }
+    use_effect(move || {
+        if *ctx.peek() != current {
+            *ctx.write() = current.clone();
+        }
+    });
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();

@@ -95,66 +95,46 @@ pub fn Tab(
     let class_modifiers = String::new();
 
     let handle_keydown = move |e: KeyboardEvent| {
+        let navigate_tab = |dir: &'static str| {
+            let script = format!(
+                r#"
+                const tab = document.activeElement;
+                if (tab && tab.getAttribute('role') === 'tab') {{
+                    const tablist = tab.closest('[role="tablist"]');
+                    if (tablist) {{
+                        const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
+                        const idx = tabs.indexOf(tab);
+                        if (tabs.length > 0) {{
+                            let target = null;
+                            if ('{dir}' === 'next' && idx >= 0) target = tabs[(idx + 1) % tabs.length];
+                            else if ('{dir}' === 'prev' && idx >= 0) target = tabs[(idx - 1 + tabs.length) % tabs.length];
+                            else if ('{dir}' === 'home') target = tabs[0];
+                            else if ('{dir}' === 'end') target = tabs[tabs.length - 1];
+                            if (target) {{ target.focus(); target.click(); }}
+                        }}
+                    }}
+                }}
+            "#
+            );
+            let _ = document::eval(&script);
+        };
+
         match e.key() {
             Key::ArrowRight => {
                 e.prevent_default();
-                let _ = document::eval(r#"
-                    const tab = document.activeElement;
-                    if (tab && tab.getAttribute('role') === 'tab') {
-                        const tablist = tab.closest('[role="tablist"]');
-                        if (tablist) {
-                            const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
-                            const idx = tabs.indexOf(tab);
-                            if (idx >= 0 && tabs.length > 0) {
-                                const next = tabs[(idx + 1) % tabs.length];
-                                if (next) { next.focus(); next.click(); }
-                            }
-                        }
-                    }
-                "#);
+                navigate_tab("next");
             }
             Key::ArrowLeft => {
                 e.prevent_default();
-                let _ = document::eval(r#"
-                    const tab = document.activeElement;
-                    if (tab && tab.getAttribute('role') === 'tab') {
-                        const tablist = tab.closest('[role="tablist"]');
-                        if (tablist) {
-                            const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
-                            const idx = tabs.indexOf(tab);
-                            if (idx >= 0 && tabs.length > 0) {
-                                const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
-                                if (prev) { prev.focus(); prev.click(); }
-                            }
-                        }
-                    }
-                "#);
+                navigate_tab("prev");
             }
             Key::Home => {
                 e.prevent_default();
-                let _ = document::eval(r#"
-                    const tab = document.activeElement;
-                    if (tab && tab.getAttribute('role') === 'tab') {
-                        const tablist = tab.closest('[role="tablist"]');
-                        if (tablist) {
-                            const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
-                            if (tabs.length > 0 && tabs[0]) { tabs[0].focus(); tabs[0].click(); }
-                        }
-                    }
-                "#);
+                navigate_tab("home");
             }
             Key::End => {
                 e.prevent_default();
-                let _ = document::eval(r#"
-                    const tab = document.activeElement;
-                    if (tab && tab.getAttribute('role') === 'tab') {
-                        const tablist = tab.closest('[role="tablist"]');
-                        if (tablist) {
-                            const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([disabled])'));
-                            if (tabs.length > 0 && tabs[tabs.length - 1]) { tabs[tabs.length - 1].focus(); tabs[tabs.length - 1].click(); }
-                        }
-                    }
-                "#);
+                navigate_tab("end");
             }
             _ => {}
         }

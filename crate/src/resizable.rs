@@ -33,10 +33,7 @@ pub fn ResizablePanelGroup(
         ResizableDirection::Vertical => "sd-resizable-group--vertical",
     };
 
-    let group_id = use_signal(|| {
-        static ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-        format!("sd-res-group-{}", ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
-    });
+    let group_id = use_signal(|| crate::a11y::use_unique_id("res-group", None));
 
     let dir_is_horiz = direction == ResizableDirection::Horizontal;
 
@@ -164,10 +161,7 @@ pub fn ResizablePanelGroup(
                                 nextPanel.style.height = nextPctStr;
                             }}
 
-                            const el1 = document.getElementById("sd-demo-panel-1-size");
-                            if (el1) el1.textContent = "Size: " + prevPct.toFixed(1) + "% (Min 20% / Max 70%)";
-                            const el2 = document.getElementById("sd-demo-panel-2-size");
-                            if (el2) el2.textContent = "Size: " + nextPct.toFixed(1) + "%";
+
 
                             try {{
                                 dioxus.send(prevPct);
@@ -282,6 +276,11 @@ pub fn ResizableHandle(
 
     rsx! {
         div {
+            role: "separator",
+            tabindex: if disabled { "-1" } else { "0" },
+            aria_valuenow: "50",
+            aria_valuemin: "0",
+            aria_valuemax: "100",
             class: "sd-resizable-handle {disabled_class} {class}",
             "data-resizable-handle": "true",
             if with_handle {

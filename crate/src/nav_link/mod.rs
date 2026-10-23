@@ -140,12 +140,21 @@ pub fn NavLink(props: NavLinkProps) -> Element {
     };
 
     let interactive_item = if let Some(ref href) = props.href {
+        let href_attr = if props.disabled { None } else { Some(href.as_str()) };
+        let aria_disabled = if props.disabled { Some("true") } else { None };
+        let tabindex_attr = if props.disabled { Some("-1") } else { None };
         rsx! {
             a {
                 class: "sd-nav-link__item",
-                href: "{href}",
-                "aria-current": if props.active { "page" } else { "" },
+                href: href_attr,
+                "aria-disabled": aria_disabled,
+                tabindex: tabindex_attr,
+                "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {
+                    if props.disabled {
+                        evt.prevent_default();
+                        return;
+                    }
                     if has_children {
                         toggle_open();
                     }

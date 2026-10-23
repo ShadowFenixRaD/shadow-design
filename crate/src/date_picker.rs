@@ -507,7 +507,18 @@ pub fn DatePicker(
 
             if *is_open.read() {
                 div {
+                    class: "sd-date-picker-backdrop",
+                    style: "position: fixed; inset: 0; z-index: 995; background: transparent;",
+                    onclick: move |_| is_open.set(false),
+                }
+                div {
                     class: "sd-date-picker-popup",
+                    style: "position: absolute; z-index: 996;",
+                    onkeydown: move |e: KeyboardEvent| {
+                        if e.key() == Key::Escape {
+                            is_open.set(false);
+                        }
+                    },
                     Calendar {
                         selected: *value.read(),
                         min_date: min_date,

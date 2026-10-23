@@ -62,6 +62,7 @@ pub enum IconKind {
     // Tooling & Estensioni
     Calendar,
     GripVertical,
+    MoreHorizontal,
 }
 
 impl IconKind {
@@ -119,6 +120,7 @@ impl IconKind {
         IconKind::Plus,
         IconKind::Calendar,
         IconKind::GripVertical,
+        IconKind::MoreHorizontal,
     ];
 
     #[must_use]
@@ -177,6 +179,7 @@ impl IconKind {
             IconKind::Plus => "Plus",
             IconKind::Calendar => "Calendar",
             IconKind::GripVertical => "GripVertical",
+            IconKind::MoreHorizontal => "MoreHorizontal",
         }
     }
 }
@@ -506,7 +509,12 @@ fn render_icon_paths(kind: IconKind) -> Element {
                     path { d: "M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" }
                     path { d: "M19.1 4.9C23 8.8 23 15.2 19.1 19.1" }
                 },
-                IconKind::Signal | IconKind::SignalHigh => rsx! {
+                IconKind::Signal => rsx! {
+                    path { d: "M2 20h.01" }
+                    path { d: "M7 20v-4" }
+                    path { d: "M12 20v-8" }
+                },
+                IconKind::SignalHigh => rsx! {
                     path { d: "M2 20h.01" }
                     path { d: "M7 20v-4" }
                     path { d: "M12 20v-8" }
@@ -564,6 +572,11 @@ fn render_icon_paths(kind: IconKind) -> Element {
                     circle { cx: "15", cy: "5", r: "1" }
                     circle { cx: "15", cy: "19", r: "1" }
                 },
+                IconKind::MoreHorizontal => rsx! {
+                    circle { cx: "12", cy: "12", r: "1" }
+                    circle { cx: "19", cy: "12", r: "1" }
+                    circle { cx: "5", cy: "12", r: "1" }
+                },
             }
         }
     }
@@ -574,7 +587,7 @@ mod tests {
 
     #[test]
     fn test_icon_kind_all_completeness() {
-        assert_eq!(IconKind::ALL.len(), 53);
+        assert_eq!(IconKind::ALL.len(), 54);
         for icon in IconKind::ALL {
             assert!(!icon.name().is_empty());
         }

@@ -686,77 +686,31 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
 
 #[component]
 pub fn SearchPalette(mut is_open: Signal<bool>) -> Element {
-    let query = use_signal(String::new);
     let nav = use_navigator();
 
-    let filtered: Vec<&ComponentNavEntry> = {
-        let q = query().to_lowercase();
-        if q.is_empty() {
-            COMPONENTS.iter().take(8).collect()
-        } else {
-            COMPONENTS
-                .iter()
-                .filter(|c| {
-                    c.name.to_lowercase().contains(&q)
-                        || c.group.to_lowercase().contains(&q)
-                        || c.keywords.to_lowercase().contains(&q)
-                })
-                .collect()
-        }
-    };
+    let actions: Vec<CommandAction> = COMPONENTS
+        .iter()
+        .map(|comp| {
+            let mut act = CommandAction::new(comp.name, comp.name)
+                .with_description(comp.description)
+                .with_category(comp.group)
+                .with_icon(comp.icon);
+            let kws: Vec<&str> = comp.keywords.split_whitespace().collect();
+            act = act.with_keywords(kws);
+            act
+        })
+        .collect();
 
     rsx! {
-        Modal {
-            is_open: is_open,
-            size: ModalSize::Xl,
-            class: "max-w-4xl w-full".to_string(),
-            title: Some("Cerca componenti e documentazione".to_string()),
-            div { class: "flex flex-col gap-4 w-full min-w-0",
-                TextInput {
-                    value: query,
-                    placeholder: "Digita per cercare... (es. Button, Select, Theme)".to_string(),
-                    left_icon: SvgIcon::Kind(IconKind::Search),
+        CommandPalette {
+            opened: is_open,
+            actions: actions,
+            placeholder: "Cerca componenti o naviga... (Ctrl+K)".to_string(),
+            on_select: move |action: CommandAction| {
+                if let Some(comp) = COMPONENTS.iter().find(|c| c.name == action.id) {
+                    nav.push(comp.route.clone());
                 }
-
-                div { class: "flex flex-col gap-1 max-h-96 overflow-y-auto overflow-x-hidden pr-1 w-full min-w-0",
-                    if filtered.is_empty() {
-                        div { class: "p-6 text-center text-xs text-zinc-500 font-mono w-full",
-                            "Nessun componente corrispondente a \"{query}\""
-                        }
-                    } else {
-                        for comp in filtered {
-                            button {
-                                key: "{comp.name}",
-                                r#type: "button",
-                                class: "w-full flex items-center justify-between p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.06] hover:border-purple-500/30 transition-all cursor-pointer text-left group gap-4 min-w-0 box-border",
-                                onclick: {
-                                    let r = comp.route.clone();
-                                    move |_| {
-                                        is_open.set(false);
-                                        nav.push(r.clone());
-                                    }
-                                },
-                                div { class: "flex items-center gap-3.5 min-w-0 flex-1",
-                                    span { class: "text-zinc-400 group-hover:text-purple-300 transition-colors shrink-0 p-2 rounded-lg bg-white/[0.03] border border-white/[0.04] flex items-center justify-center",
-                                        Icon { kind: comp.icon, size: 18 }
-                                    }
-                                    div { class: "flex flex-col min-w-0 flex-1",
-                                        span { class: "text-sm font-semibold text-zinc-100 group-hover:text-white transition-colors truncate",
-                                            "{comp.name}"
-                                        }
-                                        span { class: "text-xs text-zinc-400 truncate w-full",
-                                            "{comp.description}"
-                                        }
-                                    }
-                                }
-                                span { class: "text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/[0.04] text-zinc-400 border border-white/[0.06] shrink-0 whitespace-nowrap",
-                                    "{comp.group}"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            },
         }
     }
 }

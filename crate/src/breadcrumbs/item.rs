@@ -52,7 +52,7 @@ pub fn BreadcrumbItem(props: BreadcrumbItemProps) -> Element {
         rsx! {
             li {
                 class: "sd-breadcrumb-item {current_class} {props.class}",
-                "aria-current": if props.is_current { "page" } else { "" },
+                "aria-current": if props.is_current { Some("page") } else { None },
                 span { class: "sd-breadcrumb-item__content",
                     {icon_el}
                     span { class: "sd-breadcrumb-item__label", {props.children} }

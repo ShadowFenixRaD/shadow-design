@@ -133,7 +133,7 @@ pub fn OverflowSet(
                                 r#type: "button",
                                 class: "sd-overflow-set__more-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer",
                                 title: "{overflow_button_label}",
-                                span { "•••" }
+                                Icon { kind: IconKind::MoreHorizontal, size: 16 }
                             }
                         },
                         for act in all_overflow {

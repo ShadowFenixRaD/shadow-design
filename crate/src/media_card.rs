@@ -10,14 +10,17 @@ pub fn CardActionArea(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
+    let action_id = crate::a11y::use_unique_id("card-action", None);
     let state_cls = if !disabled {
         "cursor-pointer hover:border-purple-500/40 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-purple-500"
     } else {
         "opacity-60 cursor-not-allowed"
     };
 
+    let aid_kd = action_id.clone();
     rsx! {
         div {
+            id: "{action_id}",
             class: "sd-card-action-area group relative w-full rounded-xl transition-all outline-none {state_cls} {class}",
             tabindex: if disabled { "-1" } else { "0" },
             onclick: move |evt| {
@@ -29,9 +32,14 @@ pub fn CardActionArea(
             },
             onkeydown: move |evt: KeyboardEvent| {
                 if !disabled && (evt.key() == Key::Enter || evt.key() == Key::Character(" ".to_string())) {
-                    if let Some(_handler) = &on_click {
-                        // Simula trigger da tastiera
-                    }
+                    evt.prevent_default();
+                    let aid = aid_kd.clone();
+                    let _ = document::eval(&format!(
+                        r#"
+                        const el = document.getElementById("{aid}");
+                        if (el) el.click();
+                        "#
+                    ));
                 }
             },
             {children}

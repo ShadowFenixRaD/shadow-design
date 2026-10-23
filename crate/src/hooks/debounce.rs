@@ -1,21 +1,10 @@
 use dioxus::prelude::*;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::Arc;
-#[cfg(not(target_arch = "wasm32"))]
-use std::time::Duration;
-
-async fn sleep_ms(ms: u64) {
-    #[cfg(target_arch = "wasm32")]
-    {
-        gloo_timers::future::TimeoutFuture::new(ms as u32).await;
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        tokio::time::sleep(Duration::from_millis(ms)).await;
-    }
-}
+use std::sync::{Arc, Mutex};
+use crate::util::sleep_ms;
 
 /// Returns a debounced clone of `source` signal that only updates after `delay_ms` of inactivity.
+#[must_use]
 pub fn use_debounced_signal<T: Clone + PartialEq + 'static>(
     source: Signal<T>,
     delay_ms: u64,
@@ -42,6 +31,8 @@ pub fn use_debounced_signal<T: Clone + PartialEq + 'static>(
 }
 
 /// Returns a throttled clone of `source` signal that updates at most once every `interval_ms`.
+/// Includes trailing-edge execution so the final value emitted during cooldown is never lost.
+#[must_use]
 pub fn use_throttle<T: Clone + PartialEq + 'static>(
     source: Signal<T>,
     interval_ms: u64,
@@ -49,17 +40,30 @@ pub fn use_throttle<T: Clone + PartialEq + 'static>(
     let initial = source.read().clone();
     let mut throttled = use_signal(|| initial);
     let is_cooling_down = use_hook(|| Arc::new(AtomicBool::new(false)));
+    let trailing_value = use_hook(|| Arc::new(Mutex::new(None::<T>)));
 
     let cooldown_clone = Arc::clone(&is_cooling_down);
+    let trailing_clone = Arc::clone(&trailing_value);
     use_effect(move || {
         let val = source.read().clone();
         if !cooldown_clone.swap(true, Ordering::Relaxed) {
             throttled.set(val);
             let cd = Arc::clone(&cooldown_clone);
+            let tr = Arc::clone(&trailing_clone);
             spawn(async move {
-                sleep_ms(interval_ms).await;
-                cd.store(false, Ordering::Relaxed);
+                loop {
+                    sleep_ms(interval_ms).await;
+                    let next = tr.lock().ok().and_then(|mut g| g.take());
+                    if let Some(v) = next {
+                        throttled.set(v);
+                    } else {
+                        cd.store(false, Ordering::Relaxed);
+                        break;
+                    }
+                }
             });
+        } else if let Ok(mut g) = trailing_clone.lock() {
+            *g = Some(val);
         }
     });
 

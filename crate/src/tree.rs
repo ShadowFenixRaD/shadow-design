@@ -81,13 +81,22 @@ fn TreeNodeRow(
     let selected_class = if is_selected { "sd-tree-node--selected" } else { "" };
     let indent_px = level * 18;
 
+    let aria_expanded = if has_children {
+        Some(if is_expanded() { "true" } else { "false" })
+    } else {
+        None
+    };
+
     rsx! {
         div {
             class: "sd-tree-node-wrapper",
+            role: "treeitem",
+            aria_expanded: aria_expanded,
+            aria_selected: if is_selected { "true" } else { "false" },
 
-            div {
-                class: "sd-tree-node {selected_class}",
-                style: "padding-left: {indent_px}px;",
+                div {
+                    class: "sd-tree-node {selected_class}",
+                    style: "padding-left: {indent_px}px;",
                 onclick: {
                     let id_click = node.id.clone();
                     move |_| {
