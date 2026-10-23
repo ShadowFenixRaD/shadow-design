@@ -542,6 +542,7 @@ pub fn Select(
             _ => {}
         }
     };
+    let handle_keydown_search = handle_keydown.clone();
 
     rsx! {
         div {
@@ -650,6 +651,7 @@ pub fn Select(
                                     placeholder: "{search_placeholder_text}",
                                     value: "{search_query()}",
                                     autofocus: true,
+                                    onkeydown: handle_keydown_search,
                                     oninput: move |e| {
                                         search_query.set(e.value());
                                         active.set(None);
@@ -1146,6 +1148,7 @@ pub fn MultiSelect(
             _ => {}
         }
     };
+    let handle_keydown_search = handle_keydown.clone();
 
     rsx! {
         div {
@@ -1305,6 +1308,7 @@ pub fn MultiSelect(
                                     placeholder: "{search_placeholder_text}",
                                     value: "{search_query()}",
                                     autofocus: true,
+                                    onkeydown: handle_keydown_search,
                                     oninput: move |e| {
                                         search_query.set(e.value());
                                         active.set(None);

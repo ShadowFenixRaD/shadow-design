@@ -80,7 +80,7 @@ pub fn ActivityFeedPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Feed e timeline di attività collaborative con avatar autore, badge icona evento, connettori continui e supporto per risposte e commenti inline." }
             }
 
-            FeatureBanner { feature_name: "activity-feed" }
+            FeatureBanner { feature_name: "activity_feed" }
 
             ShowcaseTabs {
                 preview: rsx! {

@@ -39,7 +39,7 @@
     &__tooltip {
       pointer-events: none;
       position: absolute;
-      z-index: 1050;
+      z-index: 100;
       padding: 0.5rem 0.75rem;
       border-radius: $radius-md;
       background-color: rgba(9, 9, 11, 0.95);

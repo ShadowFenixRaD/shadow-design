@@ -65,7 +65,7 @@ pub fn Rating(
 
     let do_select = move |val: f64| {
         if !readonly && !disabled {
-            let clamped = val.clamp(0.0, count as f64);
+            let clamped = clamp_rating_value(val, count, fractions);
             *value.write() = clamped;
             if let Some(handler) = &on_change {
                 handler.call(clamped);
@@ -112,6 +112,14 @@ pub fn Rating(
                                 Key::ArrowLeft | Key::ArrowDown => {
                                     e.prevent_default();
                                     do_select((curr - step).max(0.0));
+                                }
+                                Key::Home => {
+                                    e.prevent_default();
+                                    do_select(0.0);
+                                }
+                                Key::End => {
+                                    e.prevent_default();
+                                    do_select(count as f64);
                                 }
                                 _ => {}
                             }

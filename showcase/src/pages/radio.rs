@@ -8,8 +8,8 @@ pub fn RadioPage() -> Element {
     let plan = use_signal(|| "pro".to_string());
     let storage_type = use_signal(|| "nvme".to_string());
     let mut orientation = use_signal(|| RadioOrientation::Vertical);
-    let mut is_disabled = use_signal(|| false);
-    let mut has_error = use_signal(|| false);
+    let is_disabled = use_signal(|| false);
+    let has_error = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -180,21 +180,15 @@ RadioGroup {
                             }
 
                             div { class: "pt-2 flex flex-col gap-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: is_disabled(),
-                                        onchange: move |e| is_disabled.set(e.checked()),
-                                    }
-                                    "Disabilitato"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: "Disabilitato".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: has_error(),
-                                        onchange: move |e| has_error.set(e.checked()),
-                                    }
-                                    "Stato Errore"
+                                Checkbox {
+                                    checked: has_error,
+                                    label: "Stato Errore".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }

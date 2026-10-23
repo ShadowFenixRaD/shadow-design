@@ -401,13 +401,14 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
         data.clone()
     };
 
+    let safe_page_size = page_size.max(1);
     let total = total_items.unwrap_or(sorted_data.len());
-    let total_pages = if total == 0 { 1 } else { total.div_ceil(page_size) };
+    let total_pages = if total == 0 { 1 } else { total.div_ceil(safe_page_size) };
 
     // Slice dei dati per paginazione client-side se total_items non è fornito
-    let display_items = if total_items.is_none() && sorted_data.len() > page_size {
-        let start = (current_page.saturating_sub(1)) * page_size;
-        let end = (start + page_size).min(sorted_data.len());
+    let display_items = if total_items.is_none() && sorted_data.len() > safe_page_size {
+        let start = (current_page.saturating_sub(1)) * safe_page_size;
+        let end = (start + safe_page_size).min(sorted_data.len());
         if start < sorted_data.len() {
             sorted_data[start..end].to_vec()
         } else {

@@ -59,9 +59,9 @@ pub fn CloseButton(
     /// Visual variant. Defaults to [`CloseButtonVariant::Subtle`].
     #[props(default)]
     variant: CloseButtonVariant,
-    /// Accessible label and title attribute. Defaults to "Chiudi".
-    #[props(default = "Chiudi".to_string())]
-    aria_label: String,
+    /// Accessible label and title attribute. Defaults to localized close label.
+    #[props(default, into)]
+    aria_label: Option<String>,
     /// Whether the button is disabled. Defaults to false.
     #[props(default = false)]
     disabled: bool,
@@ -72,6 +72,8 @@ pub fn CloseButton(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let effective_aria_label = aria_label.unwrap_or(locale.close);
     let size_class = size.class_name();
     let variant_class = variant.class_name();
     let icon_sz = size.icon_size();
@@ -89,8 +91,8 @@ pub fn CloseButton(
         button {
             r#type: "button",
             class: "sd-close-btn {size_class} {variant_class} {class}",
-            title: "{aria_label}",
-            "aria-label": "{aria_label}",
+            title: "{effective_aria_label}",
+            "aria-label": "{effective_aria_label}",
             disabled: disabled,
             onclick: handle_click,
             Icon { kind: IconKind::X, size: icon_sz }

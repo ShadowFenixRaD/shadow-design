@@ -10,6 +10,9 @@ pub fn TextareaPage() -> Element {
     let commit_msg = use_signal(|| "feat(core): implement zero-cost abstractions".to_string());
     let feedback = use_signal(String::new);
     let resize_demo_text = use_signal(|| "Trascina la maniglia in basso a destra per ridimensionare questo campo liberamente sia in larghezza che in altezza!".to_string());
+    let height_only_text = use_signal(|| "Trascina l'angolo in basso a destra: questo campo consente di modificare solo l'altezza in verticale.".to_string());
+    let readonly_text = use_signal(|| "Questo campo è in sola lettura e non può essere modificato.".to_string());
+    let disabled_text = use_signal(|| "Contenuto bloccato dal sistema.".to_string());
 
     let props = vec![
         PropRow {
@@ -208,7 +211,7 @@ Textarea {
                 subtitle: "Parametri opzionali 'resize_width' e 'resize_height' per abilitare il trascinamento manuale dall'angolo in basso a destra".to_string(),
                 div { class: "grid grid-cols-1 md:grid-cols-2 gap-6 pt-2",
                     Textarea {
-                        value: use_signal(|| "Trascina l'angolo in basso a destra: questo campo consente di modificare solo l'altezza in verticale.".to_string()),
+                        value: height_only_text,
                         label: Some("Resize Solo Altezza (resize_height: true)".to_string()),
                         resize_height: true,
                         min_rows: 3,
@@ -231,14 +234,14 @@ Textarea {
                 subtitle: "Comportamento visivo con stato disabilitato, sola lettura ed errore di validazione".to_string(),
                 div { class: "grid grid-cols-1 md:grid-cols-3 gap-6 pt-2",
                     Textarea {
-                        value: use_signal(|| "Questo campo è in sola lettura e non può essere modificato.".to_string()),
+                        value: readonly_text,
                         label: Some("Sola Lettura (Readonly)".to_string()),
                         readonly: true,
                         min_rows: 3,
                     }
 
                     Textarea {
-                        value: use_signal(|| "Contenuto bloccato dal sistema.".to_string()),
+                        value: disabled_text,
                         label: Some("Disabilitato (Disabled)".to_string()),
                         disabled: true,
                         min_rows: 3,

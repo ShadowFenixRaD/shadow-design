@@ -1,42 +1,36 @@
 use dioxus::prelude::*;
 
-/// Copies text to clipboard using the asynchronous Clipboard API with a textarea fallback.
-///
-/// Returns true if copying succeeded, false otherwise.
+/// Compatibility helper using document eval
 pub async fn copy_text(text: &str) -> bool {
-    let json_text = serde_json::to_string(text).unwrap_or_else(|_| format!("\"{}\"", text.replace('"', "\\\"")));
     let script = format!(
         r#"
-        const text = {json_text};
         if (navigator.clipboard && window.isSecureContext) {{
             try {{
-                await navigator.clipboard.writeText(text);
+                await navigator.clipboard.writeText({});
                 return true;
-            }} catch (err) {{
-                // fallback below
-            }}
+            }} catch (e) {{}}
         }}
         try {{
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            textArea.style.top = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            const success = document.execCommand('copy');
-            textArea.remove();
-            return success;
-        }} catch (err) {{
+            const ta = document.createElement("textarea");
+            ta.value = {};
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            const res = document.execCommand("copy");
+            ta.remove();
+            return res;
+        }} catch (e) {{
             return false;
         }}
-        "#
+        "#,
+        serde_json::to_string(text).unwrap_or_default(),
+        serde_json::to_string(text).unwrap_or_default(),
     );
-
-    let res = document::eval(&script).await;
-    match res {
-        Ok(val) => val.as_bool().unwrap_or(false),
+    let eval = document::eval(&script);
+    match eval.await {
+        Ok(v) => v.as_bool().unwrap_or(false),
         Err(_) => false,
     }
 }

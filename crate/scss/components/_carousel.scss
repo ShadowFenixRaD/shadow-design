@@ -2,6 +2,8 @@
 @use '../mixins' as *;
 
 // Carousel interactive slider
+
+@layer sd-components {
 .sd-carousel {
   position: relative;
   width: 100%;
@@ -123,4 +125,6 @@
       box-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
     }
   }
+}
+
 }

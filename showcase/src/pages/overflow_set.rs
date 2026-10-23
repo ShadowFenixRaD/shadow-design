@@ -58,7 +58,7 @@ pub fn OverflowSetPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Barra degli strumenti intelligente che garantisce zero overflow visivo spostando automaticamente le azioni in eccesso in una tendina Altre azioni (•••)." }
             }
 
-            FeatureBanner { feature_name: "overflow-set" }
+            FeatureBanner { feature_name: "overflow_set" }
 
             ShowcaseTabs {
                 preview: rsx! {

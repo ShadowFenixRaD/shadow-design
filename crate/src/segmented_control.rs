@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 
-#[cfg(feature = "icon")]
 use crate::icon::{RenderSvgIcon, SvgIcon};
 
 /// Dimensione del SegmentedControl.
@@ -28,7 +27,6 @@ impl SegmentedControlSize {
 pub struct SegmentOption {
     pub value: String,
     pub label: String,
-    #[cfg(feature = "icon")]
     pub icon: Option<SvgIcon>,
     pub disabled: bool,
 }
@@ -38,7 +36,6 @@ impl SegmentOption {
         Self {
             value: value.into(),
             label: label.into(),
-            #[cfg(feature = "icon")]
             icon: None,
             disabled: false,
         }

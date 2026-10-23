@@ -10,6 +10,7 @@ pub fn CheckboxPage() -> Element {
     let diagnostics = use_signal(|| true);
     let indeterminate_state = use_signal(|| false);
     let error_state = use_signal(|| false);
+    let disabled_active = use_signal(|| true);
     let mut custom_glow = use_signal(|| true);
 
     let props = vec![
@@ -131,7 +132,7 @@ Checkbox {
                                 }
 
                                 Checkbox {
-                                    checked: use_signal(|| true),
+                                    checked: disabled_active,
                                     disabled: true,
                                     label: "Checkbox Disabilitata (Attiva)".to_string(),
                                     description: "Opzione non modificabile con i tuoi permessi attuali".to_string(),

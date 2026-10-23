@@ -1,3 +1,5 @@
+#![cfg(feature = "accordion")]
+
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 

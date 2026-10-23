@@ -1,3 +1,5 @@
+#![cfg(feature = "table")]
+
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 

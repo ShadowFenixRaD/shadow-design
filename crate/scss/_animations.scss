@@ -206,7 +206,33 @@
   }
 
   // Supporto Prefers-Reduced-Motion (A11Y-15) — le demo con .sd-motion-demo rimangono sempre attive
-  @media (prefers-reduced-motion: reduce) {
+  
+// Bounce & Pulse Utilities
+@keyframes sd-bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes sd-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.animate-bounce {
+  animation: sd-bounce 1s infinite;
+}
+
+.animate-pulse {
+  animation: sd-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
     .animate-fade-in:not(.sd-motion-demo),
     .animate-slide-in-right:not(.sd-motion-demo),
     .animate-slide-in-left:not(.sd-motion-demo),
@@ -227,6 +253,8 @@
       animation-iteration-count: 1 !important;
     }
 
+    .animate-bounce:not(.sd-motion-demo),
+    .animate-pulse:not(.sd-motion-demo),
     .animate-pulse-glow:not(.sd-motion-demo),
     .sd-badge__dot-ping:not(.sd-motion-demo) {
       animation: none !important;

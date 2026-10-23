@@ -1,3 +1,5 @@
+#![cfg(feature = "timeline")]
+
 use shadow_design::prelude::*;
 
 #[test]

@@ -11,8 +11,8 @@ pub fn NumberInputPage() -> Element {
 
     let mut step_val = use_signal(|| 1.0);
     let mut precision_val = use_signal(|| 0usize);
-    let mut is_disabled = use_signal(|| false);
-    let mut has_error = use_signal(|| false);
+    let is_disabled = use_signal(|| false);
+    let has_error = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -179,21 +179,15 @@ NumberInput {
                             }
 
                             div { class: "pt-2 flex flex-col gap-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: is_disabled(),
-                                        oninput: move |e| is_disabled.set(e.value() == "true"),
-                                    }
-                                    "Disabilitato"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: "Disabilitato".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: has_error(),
-                                        oninput: move |e| has_error.set(e.value() == "true"),
-                                    }
-                                    "Stato Errore"
+                                Checkbox {
+                                    checked: has_error,
+                                    label: "Stato Errore".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }

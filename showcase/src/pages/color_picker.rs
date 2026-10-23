@@ -13,8 +13,8 @@ pub fn ColorPickerPage() -> Element {
     // Playground state
     let play_color = use_signal(|| "#a855f7".to_string());
     let mut play_format = use_signal(|| ColorFormat::Hex);
-    let mut play_alpha = use_signal(|| true);
-    let mut play_disabled = use_signal(|| false);
+    let play_alpha = use_signal(|| true);
+    let play_disabled = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -93,7 +93,7 @@ ColorInput {
                 }
             }
 
-            FeatureBanner { feature_name: "color-picker" }
+            FeatureBanner { feature_name: "color_picker" }
 
             ShowcaseTabs {
                 props: props,
@@ -106,44 +106,33 @@ ColorInput {
                                 Heading { order: HeadingOrder::H3, "Live Playground" }
 
                                 div { class: "flex flex-wrap gap-4 items-center p-4 bg-zinc-950/60 rounded-lg border border-white/5",
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300",
-                                        "Formato:"
-                                        select {
-                                            class: "bg-zinc-900 text-zinc-100 rounded px-2 py-1 text-sm border border-white/10",
-                                            value: match *play_format.read() {
-                                                ColorFormat::Hex => "hex",
-                                                ColorFormat::Rgb => "rgb",
-                                                ColorFormat::Hsl => "hsl",
-                                            },
-                                            onchange: move |e| {
-                                                match e.value().as_str() {
-                                                    "rgb" => play_format.set(ColorFormat::Rgb),
-                                                    "hsl" => play_format.set(ColorFormat::Hsl),
-                                                    _ => play_format.set(ColorFormat::Hex),
-                                                }
-                                            },
-                                            option { value: "hex", "HEX (#RRGGBB)" }
-                                            option { value: "rgb", "RGB (rgb/rgba)" }
-                                            option { value: "hsl", "HSL (hsl/hsla)" }
+                                    div { class: "flex items-center gap-1.5",
+                                        span { class: "text-xs text-zinc-400 mr-2", "Formato:" }
+                                        for (fmt, name) in [
+                                            (ColorFormat::Hex, "HEX"),
+                                            (ColorFormat::Rgb, "RGB"),
+                                            (ColorFormat::Hsl, "HSL"),
+                                        ] {
+                                            button {
+                                                r#type: "button",
+                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
+                                                    if *play_format.read() == fmt { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                                onclick: move |_| play_format.set(fmt),
+                                                "{name}"
+                                            }
                                         }
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_alpha.read(),
-                                            onchange: move |e| play_alpha.set(e.checked()),
-                                        }
-                                        "Canale Alpha (Trasparenza)"
+                                    Checkbox {
+                                        checked: play_alpha,
+                                        label: "Canale Alpha (Trasparenza)".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_disabled.read(),
-                                            onchange: move |e| play_disabled.set(e.checked()),
-                                        }
-                                        "Disabilitato"
+                                    Checkbox {
+                                        checked: play_disabled,
+                                        label: "Disabilitato".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
                                 }
 

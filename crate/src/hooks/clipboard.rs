@@ -56,24 +56,10 @@ impl UseClipboard {
                 copied.set(true);
                 error.set(false);
 
-                #[cfg(target_arch = "wasm32")]
-                {
-                    let ver_check = ver_arc.clone();
-                    gloo_timers::callback::Timeout::new(timeout, move || {
-                        if current_ver == ver_check.load(Ordering::Relaxed) {
-                            copied.set(false);
-                        }
-                    })
-                    .forget();
-                }
-
-                #[cfg(not(target_arch = "wasm32"))]
-                {
-                    let ver_check = ver_arc.clone();
-                    tokio::time::sleep(std::time::Duration::from_millis(timeout as u64)).await;
-                    if current_ver == ver_check.load(Ordering::Relaxed) {
-                        copied.set(false);
-                    }
+                let ver_check = ver_arc.clone();
+                crate::util::sleep_ms(timeout as u64).await;
+                if current_ver == ver_check.load(Ordering::Relaxed) {
+                    copied.set(false);
                 }
             } else {
                 error.set(true);

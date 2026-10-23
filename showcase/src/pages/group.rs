@@ -10,8 +10,8 @@ pub fn GroupPage() -> Element {
     let mut selected_gap = use_signal(|| SpacingToken::Md);
     let mut selected_align = use_signal(|| AlignItems::Center);
     let mut selected_justify = use_signal(|| JustifyContent::Start);
-    let mut wrap = use_signal(|| true);
-    let mut grow = use_signal(|| false);
+    let wrap = use_signal(|| true);
+    let grow = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -150,23 +150,15 @@ pub fn GroupPage() -> Element {
                                 }
 
                                 div { class: "flex items-center gap-6 pt-2 border-t border-white/[0.06]",
-                                    label { class: "flex items-center gap-2 cursor-pointer text-xs font-mono text-zinc-300",
-                                        input {
-                                            r#type: "checkbox",
-                                            class: "cursor-pointer",
-                                            checked: wrap(),
-                                            onchange: move |e| wrap.set(e.checked()),
-                                        }
-                                        "Wrap (Ritorno a capo automatico)"
+                                    Checkbox {
+                                        checked: wrap,
+                                        label: "Wrap (Ritorno a capo automatico)".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
-                                    label { class: "flex items-center gap-2 cursor-pointer text-xs font-mono text-zinc-300",
-                                        input {
-                                            r#type: "checkbox",
-                                            class: "cursor-pointer",
-                                            checked: grow(),
-                                            onchange: move |e| grow.set(e.checked()),
-                                        }
-                                        "Grow (Espansione uniforme elementi)"
+                                    Checkbox {
+                                        checked: grow,
+                                        label: "Grow (Espansione uniforme elementi)".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
                                 }
                             }

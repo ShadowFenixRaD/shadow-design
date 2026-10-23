@@ -60,7 +60,7 @@ pub fn DocumentCardPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Scheda ricca per la visualizzazione di documenti, allegati e file con thumbnail preview, badge cromatici di formato e barra azioni rapide in hover." }
             }
 
-            FeatureBanner { feature_name: "document-card" }
+            FeatureBanner { feature_name: "document_card" }
 
             ShowcaseTabs {
                 preview: rsx! {

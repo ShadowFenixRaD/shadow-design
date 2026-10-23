@@ -84,6 +84,9 @@ pub fn Button(
     #[props(default)] left_icon: Option<Element>,
     #[props(default)] right_icon: Option<Element>,
     #[props(default)] class: String,
+    #[props(default)] aria_label: Option<String>,
+    #[props(default)] aria_pressed: Option<bool>,
+    #[props(default)] button_type: Option<String>,
     onclick: Option<EventHandler<MouseEvent>>,
     children: Element,
 ) -> Element {
@@ -155,11 +158,15 @@ pub fn Button(
     let locale = crate::locale::use_locale();
     let effective_loading_label = loading_label.unwrap_or(locale.loading);
 
+    let btn_type = button_type.unwrap_or_else(|| "button".to_string());
+
     rsx! {
         button {
-            r#type: "button",
+            r#type: "{btn_type}",
             class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {loading_class} {radius_class} {glow_class} {class_modifiers} {class}",
             disabled: disabled,
+            aria_label: aria_label,
+            aria_pressed: aria_pressed.map(|p| p.to_string()),
             "aria-disabled": if disabled || loading { "true" } else { "false" },
             "aria-busy": if loading { "true" } else { "false" },
             onclick: move |evt| {

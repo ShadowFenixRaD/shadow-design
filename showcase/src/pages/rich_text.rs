@@ -58,7 +58,7 @@ RichTextEditor {
                 Text { dimmed: true, size: TextSize::Sm, "Editor di testo ricco con motore duale WYSIWYG + Markdown, toolbar modulare componibile e zero dipendenze JavaScript esterne." }
             }
 
-            FeatureBanner { feature_name: "rich-text-editor" }
+            FeatureBanner { feature_name: "rich_text" }
 
             ShowcaseTabs {
                 preview: rsx! {

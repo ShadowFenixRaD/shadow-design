@@ -99,9 +99,7 @@ pub fn CommandPalette(
     let search_query = use_signal(String::new);
     let mut active_index = use_signal(|| 0usize);
 
-    if !*opened.read() {
-        return rsx! {};
-    }
+    // early return moved below hooks
 
     let query_val = search_query.read().trim().to_lowercase();
 
@@ -135,18 +133,11 @@ pub fn CommandPalette(
 
     let count = filtered_actions.len();
 
-    // Normalizza active_index per prevenire overflow
-    let current_idx = {
-        let mut idx = *active_index.read();
-        if count == 0 {
-            0
-        } else if idx >= count {
-            idx = count - 1;
-            active_index.set(idx);
-            idx
-        } else {
-            idx
-        }
+    // Normalizza active_index per prevenire overflow senza mutare nel body
+    let current_idx = if count == 0 {
+        0
+    } else {
+        (*active_index.read()).min(count - 1)
     };
 
     use_effect(move || {
@@ -267,8 +258,22 @@ pub fn CommandPalette(
         });
     });
 
+    use_drop(move || {
+        let _ = document::eval(
+            r#"
+            if (window._sdCmdPaletteCleanup) {
+                window._sdCmdPaletteCleanup();
+            }
+            "#
+        );
+    });
+
     #[cfg(feature = "theme")]
     let _theme = use_theme();
+
+    if !*opened.read() {
+        return rsx! {};
+    }
 
     rsx! {
         div {

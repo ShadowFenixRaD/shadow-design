@@ -171,7 +171,7 @@ pub fn NavLink(props: NavLinkProps) -> Element {
                 r#type: "button",
                 class: "sd-nav-link__item sd-nav-link__item--button",
                 disabled: props.disabled,
-                "aria-current": if props.active { "page" } else { "" },
+                "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {
                     if has_children {
                         toggle_open();

@@ -2,6 +2,8 @@
 @use '../mixins' as *;
 
 // DatePicker & Calendar Styling
+
+@layer sd-components {
 .sd-date-picker-wrap {
   position: relative;
   display: inline-block;
@@ -241,4 +243,6 @@
       color: #c084fc;
     }
   }
+}
+
 }

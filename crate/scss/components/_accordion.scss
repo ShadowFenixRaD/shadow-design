@@ -4,6 +4,8 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+
+@layer sd-components {
 .sd-accordion {
   width: 100%;
   display: flex;
@@ -22,7 +24,7 @@
   &--contained {
     background-color: var(--color-surface-1, #0a0a0c);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--sd-radius-md, #{-md});
     overflow: hidden;
 
     .sd-accordion__item + .sd-accordion__item {
@@ -37,7 +39,7 @@
     .sd-accordion__item {
       background-color: var(--color-surface-1, #0a0a0c);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-md, 8px);
+      border-radius: var(--sd-radius-md, #{-md});
       transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
                   box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
                   background-color 0.2s ease;
@@ -172,4 +174,6 @@
   &__inner {
     width: 100%;
   }
+}
+
 }

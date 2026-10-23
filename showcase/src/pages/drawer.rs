@@ -7,6 +7,8 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 pub fn DrawerPage() -> Element {
     let mut right_open = use_signal(|| false);
     let mut left_open = use_signal(|| false);
+    let gzip_enabled = use_signal(|| true);
+    let debug_tracing = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -94,12 +96,12 @@ Drawer {
                     p { "Configura i parametri del runtime e della connettività cluster." }
                     div { class: "space-y-4 pt-3 border-t border-white/[0.06]",
                         Switch {
-                            checked: use_signal(|| true),
+                            checked: gzip_enabled,
                             label: "Compressione Gzip Automatica".to_string(),
                             description: "Ottimizza il payload di asset statici".to_string(),
                         }
                         Switch {
-                            checked: use_signal(|| false),
+                            checked: debug_tracing,
                             label: "Debug Hot Reload Tracing".to_string(),
                             description: "Stampa logs dettagliati nella console".to_string(),
                         }

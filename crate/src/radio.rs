@@ -172,6 +172,8 @@ pub fn Radio(
                 checked: is_selected,
                 disabled: is_disabled,
                 class: "sd-radio__input sr-only",
+                tabindex: "-1",
+                "aria-hidden": "true",
             }
 
             span {

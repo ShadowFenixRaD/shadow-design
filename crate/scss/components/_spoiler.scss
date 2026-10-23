@@ -4,6 +4,8 @@
 @use '../variables' as *;
 @use '../mixins' as *;
 
+
+@layer sd-components {
 .sd-spoiler {
   position: relative;
   width: 100%;
@@ -51,4 +53,6 @@
       display: none;
     }
   }
+}
+
 }

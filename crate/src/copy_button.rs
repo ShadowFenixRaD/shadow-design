@@ -1,16 +1,6 @@
 use crate::icon::{Icon, IconKind};
+use crate::util::sleep_ms;
 use dioxus::prelude::*;
-
-async fn sleep_ms(ms: u64) {
-    #[cfg(target_arch = "wasm32")]
-    {
-        gloo_timers::future::TimeoutFuture::new(ms as u32).await;
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
-    }
-}
 
 /// Standalone copy-to-clipboard button with visual confirmation feedback.
 #[component]

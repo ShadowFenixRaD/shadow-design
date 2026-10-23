@@ -17,7 +17,7 @@ pub fn ChipPage() -> Element {
     let play_checked = use_signal(|| true);
     let mut play_variant = use_signal(|| ChipVariant::Filled);
     let mut play_size = use_signal(|| ControlSize::Md);
-    let mut play_disabled = use_signal(|| false);
+    let play_disabled = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -122,60 +122,45 @@ Chip {
                                 Heading { order: HeadingOrder::H3, "Live Playground" }
 
                                 div { class: "flex flex-wrap gap-4 items-center p-4 bg-zinc-950/60 rounded-lg border border-white/5",
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300",
-                                        "Variante:"
-                                        select {
-                                            class: "bg-zinc-900 text-zinc-100 rounded px-2 py-1 text-sm border border-white/10",
-                                            value: match *play_variant.read() {
-                                                ChipVariant::Filled => "filled",
-                                                ChipVariant::Outline => "outline",
-                                                ChipVariant::Light => "light",
-                                                ChipVariant::Subtle => "subtle",
-                                            },
-                                            onchange: move |e| {
-                                                match e.value().as_str() {
-                                                    "outline" => play_variant.set(ChipVariant::Outline),
-                                                    "light" => play_variant.set(ChipVariant::Light),
-                                                    "subtle" => play_variant.set(ChipVariant::Subtle),
-                                                    _ => play_variant.set(ChipVariant::Filled),
-                                                }
-                                            },
-                                            option { value: "filled", "Filled (Accent Glow)" }
-                                            option { value: "outline", "Outline" }
-                                            option { value: "light", "Light" }
-                                            option { value: "subtle", "Subtle" }
+                                    div { class: "flex items-center gap-1.5",
+                                        span { class: "text-xs text-zinc-400 mr-2", "Variante:" }
+                                        for (v, name) in [
+                                            (ChipVariant::Filled, "Filled"),
+                                            (ChipVariant::Outline, "Outline"),
+                                            (ChipVariant::Light, "Light"),
+                                            (ChipVariant::Subtle, "Subtle"),
+                                        ] {
+                                            button {
+                                                r#type: "button",
+                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
+                                                    if *play_variant.read() == v { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                                onclick: move |_| play_variant.set(v),
+                                                "{name}"
+                                            }
                                         }
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300",
-                                        "Dimensione:"
-                                        select {
-                                            class: "bg-zinc-900 text-zinc-100 rounded px-2 py-1 text-sm border border-white/10",
-                                            value: match *play_size.read() {
-                                                ControlSize::Sm => "sm",
-                                                ControlSize::Md => "md",
-                                                ControlSize::Lg => "lg",
-                                            },
-                                            onchange: move |e| {
-                                                match e.value().as_str() {
-                                                    "sm" => play_size.set(ControlSize::Sm),
-                                                    "lg" => play_size.set(ControlSize::Lg),
-                                                    _ => play_size.set(ControlSize::Md),
-                                                }
-                                            },
-                                            option { value: "sm", "Small (26px)" }
-                                            option { value: "md", "Medium (32px)" }
-                                            option { value: "lg", "Large (38px)" }
+                                    div { class: "flex items-center gap-1.5",
+                                        span { class: "text-xs text-zinc-400 mr-2", "Dimensione:" }
+                                        for (s, name) in [
+                                            (ControlSize::Sm, "Sm"),
+                                            (ControlSize::Md, "Md"),
+                                            (ControlSize::Lg, "Lg"),
+                                        ] {
+                                            button {
+                                                r#type: "button",
+                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
+                                                    if *play_size.read() == s { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                                onclick: move |_| play_size.set(s),
+                                                "{name}"
+                                            }
                                         }
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_disabled.read(),
-                                            onchange: move |e| play_disabled.set(e.checked()),
-                                        }
-                                        "Disabilitato"
+                                    Checkbox {
+                                        checked: play_disabled,
+                                        label: "Disabilitato".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
                                 }
 

@@ -53,12 +53,13 @@ impl Date {
     pub fn day_of_week(&self) -> u32 {
         let t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
         let mut y = self.year;
-        if self.month < 3 {
+        let m = self.month.clamp(1, 12);
+        if m < 3 {
             y -= 1;
         }
-        let dow_sun_zero = (y + y / 4 - y / 100 + y / 400 + t[(self.month - 1) as usize] + self.day as i32) % 7;
+        let dow_sun_zero = (y + y / 4 - y / 100 + y / 400 + t[(m - 1) as usize] + self.day as i32).rem_euclid(7);
         // Converti da Domenica=0 a Lunedì=0 ... Domenica=6
-        let res = (dow_sun_zero + 6) % 7;
+        let res = (dow_sun_zero + 6).rem_euclid(7);
         res as u32
     }
 

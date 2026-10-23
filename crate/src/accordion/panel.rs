@@ -47,6 +47,7 @@ pub fn AccordionPanel(
             id: "{item_ctx.panel_id}",
             "aria-labelledby": "{item_ctx.control_id}",
             "aria-hidden": if !is_expanded { "true" } else { "false" },
+            inert: !is_expanded,
             class: "sd-accordion__panel {state_class} {base_override} {class_modifiers} {class}",
             div { class: "sd-accordion__content",
                 {children}

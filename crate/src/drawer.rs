@@ -74,18 +74,7 @@ pub fn Drawer(
     let drawer_id = crate::a11y::use_unique_id("sd-drawer", id);
     let title_id = format!("{drawer_id}-title");
 
-    use_effect(move || {
-        let is_currently_open = *is_open.read();
-        if is_currently_open {
-            let _ = document::eval("document.body.style.overflow = 'hidden'");
-        } else {
-            let _ = document::eval("document.body.style.overflow = ''");
-        }
-    });
-
-    use_drop(move || {
-        let _ = document::eval("document.body.style.overflow = ''");
-    });
+    crate::a11y::use_body_scroll_lock(is_open);
 
     if !open {
         return rsx! {};

@@ -57,7 +57,7 @@ pub fn MediaCardPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Scheda contenitore arricchita con testata multimediale a rapporto d'aspetto fisso ed effetto cliccabile tattile esteso a tutta la superficie." }
             }
 
-            FeatureBanner { feature_name: "media-card" }
+            FeatureBanner { feature_name: "media_card" }
 
             ShowcaseTabs {
                 preview: rsx! {

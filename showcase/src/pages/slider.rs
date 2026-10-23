@@ -9,8 +9,8 @@ pub fn SliderPage() -> Element {
     let brightness = use_signal(|| 80.0);
     let price_range = use_signal(|| (20.0, 75.0));
 
-    let mut is_disabled = use_signal(|| false);
-    let mut show_tooltip = use_signal(|| true);
+    let is_disabled = use_signal(|| false);
+    let show_tooltip = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -149,21 +149,15 @@ RangeSlider {
                         // Configurator
                         div { class: "space-y-4 text-xs font-mono",
                             div { class: "flex flex-col gap-2",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: show_tooltip(),
-                                        oninput: move |e| show_tooltip.set(e.value() == "true"),
-                                    }
-                                    "Mostra Tooltip Valore"
+                                Checkbox {
+                                    checked: show_tooltip,
+                                    label: "Mostra Tooltip Valore".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: is_disabled(),
-                                        oninput: move |e| is_disabled.set(e.value() == "true"),
-                                    }
-                                    "Disabilitato"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: "Disabilitato".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }

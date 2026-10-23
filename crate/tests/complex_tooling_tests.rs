@@ -1,3 +1,5 @@
+#![cfg(feature = "all")]
+
 use shadow_design::code_highlight::{tokenize_line, SyntaxTokenKind};
 use shadow_design::command_palette::CommandAction;
 use shadow_design::date_picker::Date;

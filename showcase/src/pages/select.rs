@@ -9,6 +9,9 @@ pub fn SelectPage() -> Element {
     let selected_role = use_signal(|| None::<String>);
     let selected_skills = use_signal(|| vec!["rust".to_string(), "dioxus".to_string()]);
     let combobox_val = use_signal(|| "Neon".to_string());
+    let disabled_select_val = use_signal(|| Some("1".to_string()));
+    let error_select_val = use_signal(|| None::<String>);
+    let loading_select_val = use_signal(|| None::<String>);
     let mut active_api_tab = use_signal(|| 0usize);
 
     let frameworks_data = vec![
@@ -409,21 +412,21 @@ Combobox {
                 div { class: "grid grid-cols-1 md:grid-cols-3 gap-6 pt-2",
                     Select {
                         data: vec![SelectItem::new("1", "Opzione")],
-                        value: use_signal(|| Some("1".to_string())),
+                        value: disabled_select_val,
                         label: Some("Stato Disabilitato".to_string()),
                         disabled: true,
                     }
 
                     Select {
                         data: vec![SelectItem::new("1", "Opzione")],
-                        value: use_signal(|| None::<String>),
+                        value: error_select_val,
                         label: Some("Stato di Errore".to_string()),
                         error: Some("Selezione obbligatoria".to_string()),
                     }
 
                     Select {
                         data: vec![SelectItem::new("1", "Opzione")],
-                        value: use_signal(|| None::<String>),
+                        value: loading_select_val,
                         label: Some("Caricamento Asincrono".to_string()),
                         loading: true,
                     }

@@ -14,10 +14,10 @@ pub fn PinInputPage() -> Element {
     // Interactive playground controls
     let playground_val = use_signal(|| "13".to_string());
     let mut play_len = use_signal(|| 4usize);
-    let mut play_mask = use_signal(|| false);
-    let mut play_numeric = use_signal(|| true);
-    let mut play_disabled = use_signal(|| false);
-    let mut play_error = use_signal(|| false);
+    let play_mask = use_signal(|| false);
+    let play_numeric = use_signal(|| true);
+    let play_disabled = use_signal(|| false);
+    let play_error = use_signal(|| false);
     let mut play_size = use_signal(|| ControlSize::Md);
 
     let props = vec![
@@ -121,7 +121,7 @@ PinInput {
                 }
             }
 
-            FeatureBanner { feature_name: "pin-input" }
+            FeatureBanner { feature_name: "pin_input" }
 
             ShowcaseTabs {
                 props: props,
@@ -134,78 +134,58 @@ PinInput {
                                 Heading { order: HeadingOrder::H3, "Live Playground" }
 
                                 div { class: "flex flex-wrap gap-4 items-center p-4 bg-zinc-950/60 rounded-lg border border-white/5",
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300",
-                                        "Lunghezza:"
-                                        select {
-                                            class: "bg-zinc-900 text-zinc-100 rounded px-2 py-1 text-sm border border-white/10",
-                                            value: "{play_len}",
-                                            onchange: move |e| {
-                                                if let Ok(l) = e.value().parse::<usize>() {
-                                                    play_len.set(l);
-                                                }
-                                            },
-                                            option { value: "4", "4 cifre" }
-                                            option { value: "6", "6 cifre" }
-                                            option { value: "8", "8 cifre" }
+                                    div { class: "flex items-center gap-1.5",
+                                        span { class: "text-xs text-zinc-400 mr-2", "Lunghezza:" }
+                                        for len in [4, 6, 8] {
+                                            button {
+                                                r#type: "button",
+                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
+                                                    if *play_len.read() == len { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                                onclick: move |_| play_len.set(len),
+                                                "{len} cifre"
+                                            }
                                         }
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300",
-                                        "Dimensione:"
-                                        select {
-                                            class: "bg-zinc-900 text-zinc-100 rounded px-2 py-1 text-sm border border-white/10",
-                                            value: match *play_size.read() {
-                                                ControlSize::Sm => "sm",
-                                                ControlSize::Md => "md",
-                                                ControlSize::Lg => "lg",
-                                            },
-                                            onchange: move |e| {
-                                                match e.value().as_str() {
-                                                    "sm" => play_size.set(ControlSize::Sm),
-                                                    "lg" => play_size.set(ControlSize::Lg),
-                                                    _ => play_size.set(ControlSize::Md),
-                                                }
-                                            },
-                                            option { value: "sm", "Small (36px)" }
-                                            option { value: "md", "Medium (44px)" }
-                                            option { value: "lg", "Large (54px)" }
+                                    div { class: "flex items-center gap-1.5",
+                                        span { class: "text-xs text-zinc-400 mr-2", "Dimensione:" }
+                                        for (s, name) in [
+                                            (ControlSize::Sm, "Sm"),
+                                            (ControlSize::Md, "Md"),
+                                            (ControlSize::Lg, "Lg"),
+                                        ] {
+                                            button {
+                                                r#type: "button",
+                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
+                                                    if *play_size.read() == s { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
+                                                onclick: move |_| play_size.set(s),
+                                                "{name}"
+                                            }
                                         }
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_mask.read(),
-                                            onchange: move |e| play_mask.set(e.checked()),
-                                        }
-                                        "Maschera (password)"
+                                    Checkbox {
+                                        checked: play_mask,
+                                        label: "Maschera (password)".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_numeric.read(),
-                                            onchange: move |e| play_numeric.set(e.checked()),
-                                        }
-                                        "Solo Numeri"
+                                    Checkbox {
+                                        checked: play_numeric,
+                                        label: "Solo Numeri".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_error.read(),
-                                            onchange: move |e| play_error.set(e.checked()),
-                                        }
-                                        "Errore"
+                                    Checkbox {
+                                        checked: play_error,
+                                        label: "Errore".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
 
-                                    label { class: "flex items-center gap-2 text-sm text-zinc-300 cursor-pointer",
-                                        input {
-                                            r#type: "checkbox",
-                                            checked: *play_disabled.read(),
-                                            onchange: move |e| play_disabled.set(e.checked()),
-                                        }
-                                        "Disabilitato"
+                                    Checkbox {
+                                        checked: play_disabled,
+                                        label: "Disabilitato".to_string(),
+                                        size: CheckboxSize::Sm,
                                     }
                                 }
 

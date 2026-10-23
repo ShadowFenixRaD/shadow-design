@@ -289,6 +289,7 @@ pub fn PinInput(props: PinInputProps) -> Element {
                                 match evt.key() {
                                     Key::Backspace => {
                                         if cell_value.is_empty() && i > 0 {
+                                            evt.prevent_default();
                                             let prev_id = format!("{gid_keydown}-cell-{}", i - 1);
                                             let mut new_chars = chars_keydown.clone();
                                             if i - 1 < new_chars.len() {

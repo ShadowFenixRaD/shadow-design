@@ -87,6 +87,17 @@ pub fn Textarea(
     let text_val = value();
     let locale = use_locale();
     let textarea_id = crate::a11y::use_unique_id("textarea", None);
+    let err_id = if error.is_some() {
+        Some(format!("{}-err", textarea_id))
+    } else {
+        None
+    };
+    let help_id = if error.is_none() && help_text.is_some() {
+        Some(format!("{}-help", textarea_id))
+    } else {
+        None
+    };
+    let described_by = err_id.as_ref().or(help_id.as_ref());
     let char_count = text_val.chars().count();
 
     // Calcolo righe dinamiche per autosize
@@ -136,6 +147,7 @@ pub fn Textarea(
                 textarea {
                     id: "{textarea_id}",
                     "aria-invalid": if error.is_some() { "true" } else { "false" },
+                    "aria-describedby": described_by.map(|s| s.as_str()),
                     class: "sd-textarea {autosize_class} {error_class} {disabled_class} {clear_padding_class} {base_override} {radius_class} {glow_class}",
                     style: "{resize_style}",
                     placeholder: placeholder.unwrap_or_default(),
@@ -174,9 +186,9 @@ pub fn Textarea(
                 div {
                     class: "sd-textarea-footer",
                     if let Some(ref err) = error {
-                        span { class: "sd-textarea-error", "{err}" }
+                        span { id: err_id.as_deref(), class: "sd-textarea-error", "{err}" }
                     } else if let Some(help) = help_text {
-                        span { class: "sd-textarea-help", "{help}" }
+                        span { id: help_id.as_deref(), class: "sd-textarea-help", "{help}" }
                     } else {
                         span {}
                     }

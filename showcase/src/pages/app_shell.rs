@@ -143,7 +143,7 @@ AppShell {
                 Text { dimmed: true, size: TextSize::Sm, "Architettura e layout master responsive a 5 zone (Header, Navbar, Aside, Main, Footer) con gerarchia z-index standardizzata, hairline specular top e scrolling indipendente." }
             }
 
-            FeatureBanner { feature_name: "app-shell" }
+            FeatureBanner { feature_name: "app_shell" }
 
             ShowcaseTabs {
                 preview: rsx! {

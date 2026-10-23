@@ -103,7 +103,7 @@ pub fn BottomNavItem(props: BottomNavItemProps) -> Element {
                 r#type: "button",
                 class: "sd-bottom-nav-item sd-bottom-nav-item--button {active_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
                 disabled: props.disabled,
-                "aria-current": if props.active { "page" } else { "" },
+                "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {
                     if let Some(ref handler) = props.on_click {
                         handler.call(evt);

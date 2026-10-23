@@ -94,7 +94,7 @@ pub fn NavigationMenuPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Barra di navigazione per applicazioni ad elevata complessità con pannelli a discesa a larghezza estesa, suddivisi in più colonne con schede di anteprima incorporate." }
             }
 
-            FeatureBanner { feature_name: "navigation-menu" }
+            FeatureBanner { feature_name: "navigation_menu" }
 
             ShowcaseTabs {
                 preview: rsx! {

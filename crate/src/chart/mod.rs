@@ -1,3 +1,4 @@
+#[cfg(feature = "chart_primitives")]
 pub mod primitives;
 
 #[cfg(feature = "chart_area")]

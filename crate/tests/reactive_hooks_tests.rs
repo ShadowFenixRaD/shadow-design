@@ -1,3 +1,5 @@
+#![cfg(feature = "hooks")]
+
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 use std::collections::HashMap;

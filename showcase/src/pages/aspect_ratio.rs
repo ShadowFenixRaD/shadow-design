@@ -69,7 +69,7 @@ pub fn AspectRatioPage() -> Element {
                 Text { dimmed: true, size: TextSize::Sm, "Contenitore universale per vincolare il rapporto di forma di immagini, canvas, mappe, video player o iframe, azzerando il Cumulative Layout Shift (CLS)." }
             }
 
-            FeatureBanner { feature_name: "aspect-ratio" }
+            FeatureBanner { feature_name: "aspect_ratio" }
 
             ShowcaseTabs {
                 preview: rsx! {

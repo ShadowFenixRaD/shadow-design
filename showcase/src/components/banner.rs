@@ -11,7 +11,7 @@ pub fn FeatureBanner(feature_name: &'static str) -> Element {
                     Icon { kind: IconKind::Box, size: 15 }
                     "Feature Cargo:"
                 }
-                code { class: "px-2 py-0.5 rounded bg-[#030305] {theme().text_accent_bright} font-mono text-xs border border-white/10",
+                Code {
                     "shadow-design = {{ version = \"{VERSION}\", default-features = false, features = [\"{feature_name}\"] }}"
                 }
             }

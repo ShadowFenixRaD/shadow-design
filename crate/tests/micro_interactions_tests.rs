@@ -1,3 +1,5 @@
+#![cfg(feature = "all")]
+
 use shadow_design::prelude::*;
 
 #[test]

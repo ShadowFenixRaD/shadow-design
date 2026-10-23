@@ -11,8 +11,8 @@ pub fn RatingPage() -> Element {
 
     let mut star_count = use_signal(|| 5usize);
     let mut fractions_val = use_signal(|| 1usize);
-    let mut is_readonly = use_signal(|| false);
-    let mut is_disabled = use_signal(|| false);
+    let is_readonly = use_signal(|| false);
+    let is_disabled = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -180,21 +180,15 @@ Rating {
                             }
 
                             div { class: "pt-2 flex flex-col gap-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: is_readonly(),
-                                        oninput: move |e| is_readonly.set(e.value() == "true"),
-                                    }
-                                    "Sola Lettura (Readonly)"
+                                Checkbox {
+                                    checked: is_readonly,
+                                    label: "Sola Lettura (Readonly)".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
-                                label { class: "flex items-center gap-2 cursor-pointer text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: is_disabled(),
-                                        oninput: move |e| is_disabled.set(e.value() == "true"),
-                                    }
-                                    "Disabilitato"
+                                Checkbox {
+                                    checked: is_disabled,
+                                    label: "Disabilitato".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
                             }
                         }

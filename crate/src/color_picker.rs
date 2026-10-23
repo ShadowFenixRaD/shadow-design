@@ -97,11 +97,48 @@ pub fn parse_rgb(input: &str) -> Option<Rgba> {
     Some(Rgba { r, g, b, a })
 }
 
-/// Flexible color parser trying Hex and RGB.
+/// Parses an HSL or HSLA string. Supports `hsl(...)`, `hsla(...)`, or raw `h, s, l` / `h s l`.
+#[must_use]
+pub fn parse_hsl(input: &str) -> Option<Rgba> {
+    let clean = input.trim();
+    let inner = if clean.starts_with("hsla(") && clean.ends_with(')') {
+        &clean[5..clean.len() - 1]
+    } else if clean.starts_with("hsl(") && clean.ends_with(')') {
+        &clean[4..clean.len() - 1]
+    } else {
+        clean
+    };
+    let parts: Vec<&str> = if inner.contains(',') {
+        inner.split(',').map(str::trim).collect()
+    } else {
+        inner.split_whitespace().collect()
+    };
+    if parts.len() < 3 {
+        return None;
+    }
+    let h = parts[0].trim_end_matches("deg").parse::<f32>().ok()?;
+    let s = parts[1].trim_end_matches('%').parse::<f32>().ok()?;
+    let l = parts[2].trim_end_matches('%').parse::<f32>().ok()?;
+    let a = if parts.len() >= 4 {
+        parts[3].trim_end_matches('%').parse::<f32>().ok()?.clamp(0.0, 1.0)
+    } else {
+        1.0
+    };
+    let hsla = Hsla {
+        h: (h % 360.0 + 360.0) % 360.0,
+        s: s.clamp(0.0, 100.0),
+        l: l.clamp(0.0, 100.0),
+        a,
+    };
+    Some(hsl_to_rgba(&hsla))
+}
+
+/// Flexible color parser trying Hex, RGB, and HSL.
 #[must_use]
 pub fn parse_color(input: &str) -> Rgba {
     parse_hex(input)
         .or_else(|| parse_rgb(input))
+        .or_else(|| parse_hsl(input))
         .unwrap_or_default()
 }
 
@@ -1153,6 +1190,18 @@ mod tests {
         assert_eq!(format_color(&color, ColorFormat::Hex, true), "#a855f780");
         assert_eq!(format_color(&color, ColorFormat::Rgb, false), "rgb(168, 85, 247)");
         assert_eq!(format_color(&color, ColorFormat::Rgb, true), "rgba(168, 85, 247, 0.50)");
+    }
+
+    #[test]
+    fn test_parse_hsl() {
+        let parsed = parse_color("hsl(270, 60%, 50%)");
+        assert!(parsed.r > 100);
+        assert_eq!(parsed.a, 1.0);
+        let parsed_alpha = parse_color("hsla(180, 100%, 50%, 0.75)");
+        assert_eq!(parsed_alpha.r, 0);
+        assert_eq!(parsed_alpha.g, 255);
+        assert_eq!(parsed_alpha.b, 255);
+        assert!((parsed_alpha.a - 0.75).abs() < 0.01);
     }
 
     #[test]

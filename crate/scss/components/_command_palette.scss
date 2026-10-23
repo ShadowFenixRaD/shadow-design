@@ -2,6 +2,8 @@
 @use '../mixins' as *;
 
 // CommandPalette (Spotlight) Universal Quick Search Modal
+
+@layer sd-components {
 .sd-command-palette-backdrop {
   position: fixed;
   inset: 0;
@@ -164,4 +166,6 @@
     align-items: center;
     gap: 5px;
   }
+}
+
 }

@@ -1,3 +1,5 @@
+#![cfg(feature = "spoiler")]
+
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 

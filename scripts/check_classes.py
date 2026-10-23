@@ -38,9 +38,9 @@ def scan_source_classes():
     for root_dir in root_dirs:
         for root, _, files in os.walk(root_dir):
             for file in files:
-                if file == "nav.rs":
+                if file == 'nav.rs':
                     continue
-                if file.endswith(".rs"):
+                if file.endswith('.rs'):
                     path = os.path.join(root, file)
                     with open(path, "r", encoding="utf-8") as f:
                         text = f.read()
@@ -62,7 +62,7 @@ def main():
 
     missing = []
     # Dynamic or special tokens to skip
-    ignore_prefixes = ("sd-", "group", "lucide", "rsx")
+    ignore_prefixes = ('lucide', 'rsx')
     for token in sorted(used_classes):
         if token in css_classes:
             continue

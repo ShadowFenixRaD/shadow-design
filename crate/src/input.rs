@@ -16,6 +16,8 @@ pub fn TextInput(
     #[props(default)] right_icon: Option<SvgIcon>,
     #[props(default)] on_left_icon_click: Option<EventHandler<MouseEvent>>,
     #[props(default)] on_right_icon_click: Option<EventHandler<MouseEvent>>,
+    #[props(default)] left_icon_label: Option<String>,
+    #[props(default)] right_icon_label: Option<String>,
     #[props(default)] input_type: Option<String>,
     #[props(default)] id: Option<String>,
     #[props(default)] class: String,
@@ -119,6 +121,8 @@ pub fn TextInput(
                         button {
                             r#type: "button",
                             class: "sd-input-icon sd-input-icon--left sd-input-icon--interactive",
+                            "aria-label": left_icon_label.as_deref(),
+                            title: left_icon_label.as_deref(),
                             onclick: move |e: MouseEvent| {
                                 e.stop_propagation();
                                 handler.call(e);
@@ -162,6 +166,8 @@ pub fn TextInput(
                         button {
                             r#type: "button",
                             class: "sd-input-icon sd-input-icon--right sd-input-icon--interactive",
+                            "aria-label": right_icon_label.as_deref(),
+                            title: right_icon_label.as_deref(),
                             onclick: move |e: MouseEvent| {
                                 e.stop_propagation();
                                 handler.call(e);

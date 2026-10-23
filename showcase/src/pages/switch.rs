@@ -8,6 +8,7 @@ pub fn SwitchPage() -> Element {
     let dev_mode = use_signal(|| true);
     let push_alerts = use_signal(|| false);
     let telemetry = use_signal(|| true);
+    let locked_state = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -78,7 +79,7 @@ Switch {
                             }
 
                             Switch {
-                                checked: use_signal(|| false),
+                                checked: locked_state,
                                 label: "Opzione Bloccata (Disabled)".to_string(),
                                 description: "Non modificabile con i privilegi utente correnti".to_string(),
                                 disabled: true,

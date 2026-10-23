@@ -116,8 +116,7 @@ pub fn ChipGroup(props: ChipGroupProps) -> Element {
     rsx! {
         div {
             class: "{container_class}",
-            role: "group",
-            aria_multiselectable: if props.multiple { "true" } else { "false" },
+            role: if props.multiple { "group" } else { "radiogroup" },
             {props.children}
         }
     }

@@ -182,6 +182,7 @@ pub fn Collapsible(
         div {
             class: "sd-collapsible {state_class} {base_override} {class_modifiers} {class}",
             "aria-hidden": if !is_open { "true" } else { "false" },
+            inert: !is_open,
             div { class: "sd-collapsible__inner",
                 {children}
             }

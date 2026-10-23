@@ -7,6 +7,29 @@ pub struct TabListCtx {
     pub base_id: String,
 }
 
+/// Root wrapper for coordinating a [`TabList`] and its corresponding [`TabPanel`] components.
+#[component]
+pub fn Tabs(
+    /// Optional base ID used for all contained tabs and panels.
+    #[props(default)]
+    id: Option<String>,
+    /// Additional CSS or SCSS classes.
+    #[props(default)]
+    class: String,
+    /// Children containing [`TabList`] and [`TabPanel`] elements.
+    children: Element,
+) -> Element {
+    let base_id = crate::a11y::use_unique_id("sd-tabs", id);
+    use_context_provider(|| TabListCtx { base_id: base_id.clone() });
+
+    rsx! {
+        div {
+            class: "sd-tabs {class}",
+            {children}
+        }
+    }
+}
+
 /// Container list for horizontal tab navigation adhering to the APG Tabs pattern.
 #[component]
 pub fn TabList(
@@ -22,7 +45,12 @@ pub fn TabList(
     /// Child [`Tab`] elements.
     children: Element,
 ) -> Element {
-    let base_id = crate::a11y::use_unique_id("sd-tabs", id);
+    let parent_ctx = try_use_context::<TabListCtx>();
+    let base_id = if let Some(ctx) = parent_ctx {
+        ctx.base_id
+    } else {
+        id.unwrap_or_else(|| "sd-tabs".to_string())
+    };
     use_context_provider(|| TabListCtx { base_id: base_id.clone() });
 
     #[cfg(feature = "theme")]
@@ -184,6 +212,9 @@ pub fn TabPanel(
     value: String,
     /// Reactive signal holding the currently active tab value.
     active: Signal<String>,
+    /// Optional base ID if used outside of [`Tabs`].
+    #[props(default)]
+    id: Option<String>,
     /// If true, inactive panels are kept mounted with `hidden: true` instead of unmounting.
     #[props(default)]
     keep_mounted: bool,
@@ -203,7 +234,7 @@ pub fn TabPanel(
     }
 
     let ctx = try_use_context::<TabListCtx>();
-    let base_id = ctx.map(|c| c.base_id).unwrap_or_else(|| "sd-tabs".to_string());
+    let base_id = id.or_else(|| ctx.map(|c| c.base_id)).unwrap_or_else(|| "sd-tabs".to_string());
     let val_sanitized = value.replace(' ', "-").to_lowercase();
     let tab_id = format!("{base_id}-tab-{val_sanitized}");
     let panel_id = format!("{base_id}-panel-{val_sanitized}");

@@ -17,7 +17,8 @@ pub fn GaugeChart(
     #[props(default = 220)] height: u32,
     #[props(default)] class: String,
 ) -> Element {
-    let clamped_val = value.clamp(min, max);
+    let (lo, hi) = if min <= max { (min, max) } else { (max, min) };
+    let clamped_val = value.clamp(lo, hi);
     let range = if (max - min).abs() < f64::EPSILON { 1.0 } else { max - min };
     let fraction = (clamped_val - min) / range;
 
@@ -170,7 +171,8 @@ pub fn RadialBar(
     #[props(default = 160)] height: u32,
     #[props(default)] class: String,
 ) -> Element {
-    let clamped_val = value.clamp(min, max);
+    let (lo, hi) = if min <= max { (min, max) } else { (max, min) };
+    let clamped_val = value.clamp(lo, hi);
     let range = if (max - min).abs() < f64::EPSILON { 1.0 } else { max - min };
     let fraction = (clamped_val - min) / range;
 
@@ -221,7 +223,7 @@ pub fn RadialBar(
                     font_size: "18",
                     font_weight: "bold",
                     font_family: "monospace",
-                    "{clamped_val:.0}%"
+                    "{(fraction * 100.0):.0}%"
                 }
 
                 if let Some(lbl) = &label {

@@ -69,7 +69,7 @@ TransferList {
                 Text { dimmed: true, size: TextSize::Sm, "Interfaccia a due colonne affiancate in stile Material UI per trasferire elementi da un elenco di origine a un elenco di destinazione con ricerca e selezione multipla." }
             }
 
-            FeatureBanner { feature_name: "transfer-list" }
+            FeatureBanner { feature_name: "transfer_list" }
 
             ShowcaseTabs {
                 preview: rsx! {

@@ -14,27 +14,9 @@ pub fn Layout() -> Element {
     let radius = theme().radius_scale;
     let glow = theme().glow_mode;
 
-    // Listener globale per scorciatoia tastiera Ctrl+K / Cmd+K (SC-24)
-    use_hook(|| {
-        spawn(async move {
-            let eval = document::eval(
-                r#"
-                window.addEventListener("keydown", (e) => {
-                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-                        e.preventDefault();
-                        const demoBtn = document.getElementById("sd-command-palette-demo-trigger");
-                        if (demoBtn) {
-                            demoBtn.click();
-                            return;
-                        }
-                        const btn = document.getElementById("sd-search-palette-trigger");
-                        if (btn) btn.click();
-                    }
-                });
-                "#,
-            );
-            let _ = eval.await;
-        });
+    // Scorciatoia globale nativa Ctrl+K (SC-24)
+    use_hotkey("Ctrl+K", move || {
+        is_search_open.set(true);
     });
 
     let seg_active_class = match primary {
@@ -53,13 +35,6 @@ pub fn Layout() -> Element {
 
     rsx! {
         div { class: "{theme().root}",
-            // Hidden button for global Ctrl+K trigger
-            button {
-                id: "sd-search-palette-trigger",
-                class: "hidden",
-                onclick: move |_| is_search_open.set(true),
-            }
-
             SearchPalette { is_open: is_search_open }
 
             // Header Superiore con Mantine-Style Theme Toolbar

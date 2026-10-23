@@ -31,6 +31,9 @@ pub fn is_valid_hex_color(hex: &str) -> bool {
 #[must_use]
 pub fn parse_hex_rgba(input: &str) -> Option<(u8, u8, u8, f32)> {
     let clean = input.trim().trim_start_matches('#');
+    if !clean.is_ascii() {
+        return None;
+    }
     match clean.len() {
         3 => {
             let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).ok()?;

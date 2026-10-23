@@ -15,11 +15,11 @@ pub struct PeerRecord {
 
 #[component]
 pub fn TablesPage() -> Element {
-    let mut striped = use_signal(|| true);
-    let mut bordered = use_signal(|| false);
-    let mut hoverable = use_signal(|| true);
-    let mut compact = use_signal(|| false);
-    let mut loading = use_signal(|| false);
+    let striped = use_signal(|| true);
+    let bordered = use_signal(|| false);
+    let hoverable = use_signal(|| true);
+    let compact = use_signal(|| false);
+    let loading = use_signal(|| false);
 
     let page = use_signal(|| 1usize);
     let sort_key = use_signal(|| Some("latency".to_string()));
@@ -193,45 +193,30 @@ pub fn TablesPage() -> Element {
 
                         // Controls
                         div { class: "p-5 rounded-xl bg-zinc-950/60 border border-white/[0.08] flex flex-wrap gap-6 items-center text-xs text-zinc-300",
-                            label { class: "flex items-center gap-2 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: striped(),
-                                    onchange: move |e| striped.set(e.checked())
-                                }
-                                "Righe Alternate (Striped)"
+                            Checkbox {
+                                checked: striped,
+                                label: "Righe Alternate (Striped)".to_string(),
+                                size: CheckboxSize::Sm,
                             }
-                            label { class: "flex items-center gap-2 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: bordered(),
-                                    onchange: move |e| bordered.set(e.checked())
-                                }
-                                "Bordi Celle (Bordered)"
+                            Checkbox {
+                                checked: bordered,
+                                label: "Bordi Celle (Bordered)".to_string(),
+                                size: CheckboxSize::Sm,
                             }
-                            label { class: "flex items-center gap-2 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: hoverable(),
-                                    onchange: move |e| hoverable.set(e.checked())
-                                }
-                                "Hover Righe"
+                            Checkbox {
+                                checked: hoverable,
+                                label: "Hover Righe".to_string(),
+                                size: CheckboxSize::Sm,
                             }
-                            label { class: "flex items-center gap-2 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: compact(),
-                                    onchange: move |e| compact.set(e.checked())
-                                }
-                                "Compatta (Compact)"
+                            Checkbox {
+                                checked: compact,
+                                label: "Compatta (Compact)".to_string(),
+                                size: CheckboxSize::Sm,
                             }
-                            label { class: "flex items-center gap-2 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: loading(),
-                                    onchange: move |e| loading.set(e.checked())
-                                }
-                                "Stato di Caricamento (Loading)"
+                            Checkbox {
+                                checked: loading,
+                                label: "Stato di Caricamento (Loading)".to_string(),
+                                size: CheckboxSize::Sm,
                             }
                         }
                     }

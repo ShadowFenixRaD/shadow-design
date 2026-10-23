@@ -58,7 +58,7 @@ pub fn Transition(
     let anim_class = variant.classes();
     rsx! {
         div {
-            class: "{anim_class} sd-motion-demo {class}",
+            class: "{anim_class} {class}",
             {children}
         }
     }

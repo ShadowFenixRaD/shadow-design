@@ -200,7 +200,7 @@ pub fn NumberInput(
                         let text = e.value();
                         raw_text.set(text.clone());
                         if let Ok(parsed) = text.trim().parse::<f64>() {
-                            let clamped = parsed.clamp(min.unwrap_or(f64::NEG_INFINITY), max.unwrap_or(f64::INFINITY));
+                            let clamped = format_and_clamp_number(parsed, min, max, precision);
                             *value.write() = clamped;
                             if let Some(handler) = on_change.as_ref() {
                                 handler.call(clamped);
@@ -216,6 +216,18 @@ pub fn NumberInput(
                             Key::ArrowDown => {
                                 e.prevent_default();
                                 do_decrement();
+                            }
+                            Key::Home => {
+                                if let Some(m) = min {
+                                    e.prevent_default();
+                                    do_update(m);
+                                }
+                            }
+                            Key::End => {
+                                if let Some(m) = max {
+                                    e.prevent_default();
+                                    do_update(m);
+                                }
                             }
                             _ => {}
                         }

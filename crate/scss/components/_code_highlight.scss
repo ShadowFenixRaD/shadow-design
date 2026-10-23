@@ -2,6 +2,8 @@
 @use '../mixins' as *;
 
 // CodeBlock & CodeHighlight syntax highlighting
+
+@layer sd-components {
 .sd-code-block {
   width: 100%;
   border-radius: 12px;
@@ -126,4 +128,6 @@
   &-plain {
     color: #f4f4f5;
   }
+}
+
 }

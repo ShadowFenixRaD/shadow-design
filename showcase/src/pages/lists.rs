@@ -10,8 +10,17 @@ pub fn ListsPage() -> Element {
     let mut spacing = use_signal(|| ListSpacing::Sm);
     let mut size = use_signal(|| ListSize::Md);
     let mut orientation = use_signal(|| ListOrientation::Vertical);
-    let mut center = use_signal(|| false);
-    let mut use_custom_icons = use_signal(|| false);
+    let is_horizontal = use_signal(|| false);
+    let center = use_signal(|| false);
+    let use_custom_icons = use_signal(|| false);
+
+    use_effect(move || {
+        if is_horizontal() {
+            orientation.set(ListOrientation::Horizontal);
+        } else {
+            orientation.set(ListOrientation::Vertical);
+        }
+    });
 
     let props = vec![
         PropRow {
@@ -197,42 +206,27 @@ pub fn ListsPage() -> Element {
 
                             // Orientation & Center
                             div { class: "flex gap-4 pt-2 border-t border-white/[0.06]",
-                                label { class: "flex items-center gap-2 cursor-pointer text-xs text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: orientation() == ListOrientation::Horizontal,
-                                        onchange: move |e| {
-                                            if e.checked() {
-                                                orientation.set(ListOrientation::Horizontal);
-                                            } else {
-                                                orientation.set(ListOrientation::Vertical);
-                                            }
-                                        }
-                                    }
-                                    "Orizzontale"
+                                Checkbox {
+                                    checked: is_horizontal,
+                                    label: "Orizzontale".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
 
-                                label { class: "flex items-center gap-2 cursor-pointer text-xs text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: center(),
-                                        onchange: move |e| center.set(e.checked())
-                                    }
-                                    "Allinea al Centro"
+                                Checkbox {
+                                    checked: center,
+                                    label: "Allinea al Centro".to_string(),
+                                    size: CheckboxSize::Sm,
                                 }
 
-                                label { class: "flex items-center gap-2 cursor-pointer text-xs text-zinc-300",
-                                    input {
-                                        r#type: "checkbox",
-                                        checked: use_custom_icons(),
-                                        onchange: move |e| {
-                                            use_custom_icons.set(e.checked());
-                                            if e.checked() {
-                                                marker.set(ListMarker::Custom);
-                                            }
+                                Checkbox {
+                                    checked: use_custom_icons,
+                                    label: "Icone SVG Custom".to_string(),
+                                    size: CheckboxSize::Sm,
+                                    on_change: move |c| {
+                                        if c {
+                                            marker.set(ListMarker::Custom);
                                         }
-                                    }
-                                    "Icone SVG Custom"
+                                    },
                                 }
                             }
                         }
