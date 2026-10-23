@@ -1,17 +1,17 @@
 # Graph Report - shadow-design  (2026-10-23)
 
 ## Corpus Check
-- 252 files · ~167,876 words
+- 252 files · ~167,959 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 106 file(s) not represented in the graph (top: .scss 94, (none) 7, .toml 2)
 
 ## Summary
-- 2196 nodes · 3886 edges · 188 communities (98 shown, 90 thin omitted)
+- 2198 nodes · 3888 edges · 190 communities (97 shown, 93 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 77 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8e8d38be`
+- Built from commit: `fc2a2cde`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -86,7 +86,7 @@
 - src/drawer.rs
 - modal.rs
 - ScrollType
-- Icon
+- src/loading_overlay.rs
 - AffixPosition
 - src/media_card.rs
 - Burger
@@ -195,6 +195,8 @@
 - renovate.json
 - BreadcrumbItemProps
 - App
+- AlertDialog
+- TextInput
 
 ## God Nodes (most connected - your core abstractions)
 1. `IconKind` - 134 edges
@@ -233,7 +235,7 @@
 - 2-file cycle: `crate/src/accordion/mod.rs -> crate/src/accordion/panel.rs -> crate/src/accordion/mod.rs`
 - 3-file cycle: `showcase/src/components/layout.rs -> showcase/src/components/nav.rs -> showcase/src/main.rs -> showcase/src/components/layout.rs`
 
-## Communities (188 total, 90 thin omitted)
+## Communities (190 total, 93 thin omitted)
 
 ### Community 0 - "src/main.rs"
 Cohesion: 0.06
@@ -253,7 +255,7 @@ Nodes (22): NotificationContainer(), NotificationHandle, NotificationItem, Notif
 
 ### Community 5 - "ButtonVariant"
 Cohesion: 0.09
-Nodes (16): AlertDialog(), ConfirmDialog(), Button(), ButtonSize, Lg, Md, Sm, Xl (+8 more)
+Nodes (16): Button(), ButtonSize, Lg, Md, Sm, Xl, Xs, ButtonVariant (+8 more)
 
 ### Community 6 - "AnimationVariant"
 Cohesion: 0.05
@@ -376,7 +378,7 @@ Cohesion: 0.12
 Nodes (7): PropRow, PropsTable(), CopyButtonPage(), DropzonePage(), UserRegistrationModel, SelectPage(), StepperPage()
 
 ### Community 37 - "src/select.rs"
-Cohesion: 0.25
+Cohesion: 0.24
 Nodes (10): Combobox(), display_label(), filter_items(), MultiSelect(), Select(), SelectItem, SelectOption(), test_display_label() (+2 more)
 
 ### Community 38 - "Changelog — Shadow Design"
@@ -499,10 +501,6 @@ Nodes (7): Modal(), ModalSize, Lg, Md, Sm, Xl, Xxl
 Cohesion: 0.23
 Nodes (7): ScrollArea(), ScrollAreaProps, ScrollType, Always, Auto, Hover, Never
 
-### Community 71 - "Icon"
-Cohesion: 0.25
-Nodes (3): Icon(), render_icon_paths(), LoadingOverlay()
-
 ### Community 73 - "AffixPosition"
 Cohesion: 0.29
 Nodes (7): Affix(), AffixPosition, BottomLeft, BottomRight, TopLeft, TopRight, BackToTop()
@@ -596,8 +594,8 @@ Cohesion: 0.43
 Nodes (5): Tab(), TabList(), TabListCtx, TabPanel(), Tabs()
 
 ### Community 105 - "RatioPreset"
-Cohesion: 0.18
-Nodes (6): TextInput(), RatioPreset, Cinematic21_9, Square1_1, Standard4_3, Widescreen16_9
+Cohesion: 0.33
+Nodes (5): RatioPreset, Cinematic21_9, Square1_1, Standard4_3, Widescreen16_9
 
 ### Community 108 - "src/highlight.rs"
 Cohesion: 0.60
@@ -616,7 +614,7 @@ Cohesion: 0.17
 Nodes (7): AlignItems, Baseline, Center, End, Start, Stretch, Stack()
 
 ### Community 172 - "src/coachmark.rs"
-Cohesion: 0.29
+Cohesion: 0.28
 Nodes (7): Coachmark(), CoachmarkPosition, Bottom, Left, Right, Top, TeachingBubble()
 
 ### Community 177 - "nav_link/mod.rs"
@@ -629,20 +627,20 @@ Nodes (7): JustifyContent, Center, End, SpaceAround, SpaceBetween, SpaceEvenly, 
 
 ## Knowledge Gaps
 - **392 isolated node(s):** `shadow-design`, `Sm`, `Md`, `Lg`, `Default` (+387 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 995 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **90 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 997 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **93 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `IconKind` connect `IconKind` to `avatar.rs`, `notification.rs`, `ButtonVariant`, `src/rich_text.rs`, `complex_tooling_tests.rs`, `SvgIcon`, `menubar/mod.rs`, `stepper/mod.rs`, `src/overflow_set.rs`, `accordion/mod.rs`, `ControlSize`, `Date`, `ComponentSpacing`, `use_theme`, `CommandAction`, `src/select.rs`, `AlertVariant`, `breadcrumbs/mod.rs`, `src/chip.rs`, `src/coachmark.rs`, `CloseButton`, `nav_link/mod.rs`, `DeliveryStatus`, `Signal`, `NavigationLinkItem`, `src/speed_dial.rs`, `TreeNode`, `Icon`, `AffixPosition`, `CheckboxSize`, `src/context_menu.rs`, `src/number_input.rs`, `src/transfer_list.rs`, `layout.rs`, `src/rating.rs`, `Signal`, `src/tabs.rs`?**
-  _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Why does `IconKind` connect `IconKind` to `avatar.rs`, `notification.rs`, `ButtonVariant`, `src/rich_text.rs`, `complex_tooling_tests.rs`, `SvgIcon`, `menubar/mod.rs`, `stepper/mod.rs`, `src/overflow_set.rs`, `accordion/mod.rs`, `ControlSize`, `Date`, `ComponentSpacing`, `use_theme`, `CommandAction`, `src/select.rs`, `AlertVariant`, `breadcrumbs/mod.rs`, `src/chip.rs`, `CloseButton`, `nav_link/mod.rs`, `DeliveryStatus`, `Signal`, `NavigationLinkItem`, `AlertDialog`, `src/speed_dial.rs`, `TreeNode`, `src/loading_overlay.rs`, `AffixPosition`, `CheckboxSize`, `src/context_menu.rs`, `src/number_input.rs`, `src/transfer_list.rs`, `layout.rs`, `src/rating.rs`, `Signal`, `src/tabs.rs`?**
+  _High betweenness centrality (0.079) - this node is a cross-community bridge._
 - **What connects `shadow-design`, `Sm`, `Md` to the rest of the system?**
   _392 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `src/main.rs` be split into smaller, more focused modules?**
   _Cohesion score 0.06287985039738195 - nodes in this community are weakly interconnected._
-- **Why does `Signal` connect `Signal` to `IconKind`, `notification.rs`, `ButtonVariant`, `src/rich_text.rs`, `table.rs`, `menubar/mod.rs`, `app_shell/mod.rs`, `src/color_picker.rs`, `src/overflow_set.rs`, `accordion/mod.rs`, `ControlSize`, `src/slider.rs`, `Date`, `src/textarea.rs`, `PopoverPosition`, `CommandAction`, `src/select.rs`, `breadcrumbs/mod.rs`, `src/chip.rs`, `PrimaryColor`, `super`, `nav_link/mod.rs`, `Signal`, `UseForm<T>`, `hooks/mod.rs`, `area.rs`, `src/pin_input.rs`, `HoverCardPosition`, `SegmentedControl`, `src/speed_dial.rs`, `TreeNode`, `src/drawer.rs`, `modal.rs`, `Burger`, `CheckboxSize`, `src/context_menu.rs`, `use_locale`, `src/number_input.rs`, `src/transfer_list.rs`, `layout.rs`, `ColorFormat`, `src/rating.rs`, `src/tabs.rs`, `RatioPreset`, `UseWindowScroll`, `Switch`?**
-  _High betweenness centrality (0.057) - this node is a cross-community bridge._
+- **Why does `Signal` connect `Signal` to `IconKind`, `notification.rs`, `src/rich_text.rs`, `table.rs`, `menubar/mod.rs`, `app_shell/mod.rs`, `src/color_picker.rs`, `src/overflow_set.rs`, `accordion/mod.rs`, `ControlSize`, `src/slider.rs`, `Date`, `src/textarea.rs`, `PopoverPosition`, `CommandAction`, `src/select.rs`, `breadcrumbs/mod.rs`, `src/chip.rs`, `PrimaryColor`, `super`, `nav_link/mod.rs`, `Signal`, `UseForm<T>`, `hooks/mod.rs`, `area.rs`, `src/pin_input.rs`, `AlertDialog`, `TextInput`, `HoverCardPosition`, `SegmentedControl`, `src/speed_dial.rs`, `TreeNode`, `src/drawer.rs`, `modal.rs`, `Burger`, `CheckboxSize`, `src/context_menu.rs`, `use_locale`, `src/number_input.rs`, `src/transfer_list.rs`, `layout.rs`, `ColorFormat`, `src/rating.rs`, `src/tabs.rs`, `UseWindowScroll`, `Switch`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
 - **Should `lib.rs` be split into smaller, more focused modules?**
   _Cohesion score 0.03333333333333333 - nodes in this community are weakly interconnected._
 - **Why does `Theme` connect `Theme` to `lib.rs`, `Signal`, `notification.rs`, `ButtonVariant`, `CardShadow`, `PrimaryColor`, `ComponentOverride`, `RadiusScale`, `GlowMode`, `BadgeVariant`, `PrimaryColor`, `ElevationStyle`, `ThemeBuilder`?**

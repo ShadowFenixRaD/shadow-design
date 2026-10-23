@@ -196,11 +196,11 @@ pub fn RichTextEditor(
 ) -> Element {
     let mut current_mode = use_signal(|| mode.unwrap_or(RichTextMode::Wysiwyg));
     let h_style = min_height.unwrap_or_else(|| "240px".to_string());
-    let editor_id = use_signal(|| crate::a11y::use_unique_id("rte", None));
+    let editor_id = crate::a11y::use_unique_id("rte", None);
 
     let rendered_html = markdown_to_html(&value());
 
-    let eid = editor_id();
+    let eid = editor_id.clone();
     let apply_cmd = EventHandler::new(move |cmd: RichTextCommand| {
         let el_id = eid.clone();
         spawn(async move {
@@ -262,7 +262,7 @@ pub fn RichTextEditor(
     let btn_md_cls = if current_mode() == RichTextMode::Markdown { "bg-purple-600 text-white font-semibold" } else { "text-zinc-400 hover:text-zinc-200" };
     let btn_split_cls = if current_mode() == RichTextMode::Split { "bg-purple-600 text-white font-semibold" } else { "text-zinc-400 hover:text-zinc-200" };
 
-    let eid_sync = editor_id();
+    let eid_sync = editor_id.clone();
 
     rsx! {
         div { class: "sd-rte w-full rounded-xl border border-white/[0.12] bg-zinc-950/60 overflow-hidden shadow-lg transition-all focus-within:border-purple-500/50 {class}",

@@ -140,6 +140,47 @@ fn test_resizable_panel_clamping() {
 }
 
 #[test]
+fn test_resizable_component_render() {
+    use dioxus::prelude::*;
+    use shadow_design::resizable::{ResizablePanelGroup, ResizablePanel, ResizableHandle};
+    let mut dom = VirtualDom::new(|| {
+        rsx! {
+            ResizablePanelGroup {
+                ResizablePanel { "Panel 1" }
+                ResizableHandle {}
+                ResizablePanel { "Panel 2" }
+            }
+        }
+    });
+    dom.rebuild_in_place();
+}
+
+#[test]
+fn test_resizable_rerender_on_click() {
+    use dioxus::prelude::*;
+    use shadow_design::resizable::{ResizablePanelGroup, ResizablePanel, ResizableHandle, ResizableDirection};
+    let mut dom = VirtualDom::new(|| {
+        let mut dir = use_signal(|| ResizableDirection::Horizontal);
+        rsx! {
+            button {
+                onclick: move |_| dir.set(ResizableDirection::Vertical),
+                "Toggle"
+            }
+            ResizablePanelGroup {
+                direction: dir(),
+                ResizablePanel { "P1" }
+                ResizableHandle {}
+                ResizablePanel { "P2" }
+            }
+        }
+    });
+    dom.rebuild_in_place();
+    // Simulate clicking and re-rendering!
+    dom.mark_dirty(ScopeId::ROOT);
+    dom.render_immediate(&mut dioxus::core::NoOpMutations);
+}
+
+#[test]
 fn test_calendar_view_mode_defaults() {
     use shadow_design::date_picker::CalendarViewMode;
     assert_eq!(CalendarViewMode::default(), CalendarViewMode::Day);

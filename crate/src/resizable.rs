@@ -33,22 +33,17 @@ pub fn ResizablePanelGroup(
         ResizableDirection::Vertical => "sd-resizable-group--vertical",
     };
 
-    let group_id = use_signal(|| crate::a11y::use_unique_id("res-group", None));
+    let group_id = crate::a11y::use_unique_id("res-group", None);
 
     let dir_is_horiz = direction == ResizableDirection::Horizontal;
 
-    let mut dir_signal = use_signal(|| direction);
-    if *dir_signal.read() != direction {
-        dir_signal.set(direction);
-    }
-
-    use_effect(move || {
-        let gid_str = group_id.read().clone();
-        let current_dir = *dir_signal.read();
+    let gid_clone = group_id.clone();
+    use_effect(use_reactive(&direction, move |current_dir| {
+        let gid_str = gid_clone.clone();
         let is_horiz_val = current_dir == ResizableDirection::Horizontal;
 
         let js = format!(
-            r#"
+                r#"
             (function() {{
                 let attempts = 0;
                 function tryInit() {{
@@ -202,14 +197,14 @@ pub fn ResizablePanelGroup(
                 }
             }
         });
-    });
+    }));
 
     #[cfg(feature = "theme")]
     let _theme = use_theme();
 
     rsx! {
         div {
-            id: "{group_id()}",
+            id: "{group_id}",
             class: "sd-resizable-group {dir_class} {class}",
             "data-direction": "{dir_is_horiz}",
             {children}

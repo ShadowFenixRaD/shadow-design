@@ -648,15 +648,15 @@
     "semantic_hash": ""
   },
   "crate/src/resizable.rs": {
-    "mtime": 1792790102.5507057,
-    "seen": 1792790221.8357797,
-    "ast_hash": "d86337fdc5a46e3d65397a86c13f5d20",
+    "mtime": 1792791941.1799676,
+    "seen": 1792792001.3311677,
+    "ast_hash": "6edb7f7e1d79c33dc8019d4449125b75",
     "semantic_hash": ""
   },
   "crate/src/rich_text.rs": {
-    "mtime": 1792790102.5517297,
-    "seen": 1792790221.8357806,
-    "ast_hash": "629b0af01d0b927f92cdbc6d7dddc524",
+    "mtime": 1792791841.3051083,
+    "seen": 1792792001.3311691,
+    "ast_hash": "da2998492d3111fd51cb34bcdd1d6025",
     "semantic_hash": ""
   },
   "crate/src/scroll_area/mod.rs": {
@@ -810,9 +810,9 @@
     "semantic_hash": ""
   },
   "crate/tests/complex_tooling_tests.rs": {
-    "mtime": 1792790102.726043,
-    "seen": 1792790221.8357995,
-    "ast_hash": "50077d242d1d2f094d34dc898df23b7a",
+    "mtime": 1792791884.0821984,
+    "seen": 1792792001.3312235,
+    "ast_hash": "01effb6850524feca37c3a473c156a6f",
     "semantic_hash": ""
   },
   "crate/tests/floating_overlays_tests.rs": {
@@ -918,8 +918,8 @@
     "semantic_hash": ""
   },
   "showcase/src/main.rs": {
-    "mtime": 1792790102.784016,
-    "seen": 1792790221.8358142,
+    "mtime": 1792791977.829995,
+    "seen": 1792792001.3312392,
     "ast_hash": "a63310fe3eb490c88fc6f0e874707587",
     "semantic_hash": ""
   },

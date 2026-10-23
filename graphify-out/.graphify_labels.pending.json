@@ -70,7 +70,7 @@
   "68": "src/drawer.rs",
   "69": "modal.rs",
   "70": "ScrollType",
-  "71": "Icon",
+  "71": "src/loading_overlay.rs",
   "72": "compat_the_mind_tests.rs",
   "73": "AffixPosition",
   "74": "src/media_card.rs",
@@ -186,5 +186,7 @@
   "184": "shadow-design",
   "185": "renovate.json",
   "186": "BreadcrumbItemProps",
-  "187": "App"
+  "187": "App",
+  "188": "AlertDialog",
+  "189": "TextInput"
 }
