@@ -42,6 +42,7 @@ pub fn RadarChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_axis = use_signal(|| None::<usize>);
+    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 400.0;
     let svg_h = 320.0;
@@ -141,12 +142,23 @@ pub fn RadarChart(
                 entries.push((s_label, format!("{v:.1}"), color.clone()));
             }
         }
-        Some((pt.axis.clone(), entries, center_x, center_y))
+        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { center_x };
+        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { center_y };
+        let is_right = mx > svg_w / 2.0 || mouse_pos().0 > 200.0;
+        Some((pt.axis.clone(), entries, mx, my, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col items-center {class}",
-            div { class: "relative w-full max-w-md",
+            div {
+                class: "relative w-full max-w-md",
+                onmousemove: move |evt| {
+                    let c = evt.element_coordinates();
+                    mouse_pos.set((c.x, c.y));
+                },
+                onmouseleave: move |_| {
+                    hover_axis.set(None);
+                },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
@@ -228,12 +240,13 @@ pub fn RadarChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos)) = current_tooltip_data {
+                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
                             x: x_pos,
                             y: y_pos,
+                            align_right: align_r,
                             visible: true,
                         }
                     }

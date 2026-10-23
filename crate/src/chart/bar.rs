@@ -31,6 +31,7 @@ pub fn BarChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_index = use_signal(|| None::<usize>);
+    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -102,12 +103,23 @@ pub fn BarChart(
             }
         }
         let cx = padding_left + idx as f64 * group_w + group_w / 2.0;
-        Some((pt.label.clone(), entries, cx, padding_top + 20.0))
+        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { padding_top + plot_h / 2.0 };
+        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
+        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
+        Some((pt.label.clone(), entries, mx, my, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col {class}",
-            div { class: "relative w-full",
+            div {
+                class: "relative w-full",
+                onmousemove: move |evt| {
+                    let c = evt.element_coordinates();
+                    mouse_pos.set((c.x, c.y));
+                },
+                onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
@@ -229,12 +241,13 @@ pub fn BarChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos)) = current_tooltip_data {
+                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
                             x: x_pos,
                             y: y_pos,
+                            align_right: align_r,
                             visible: true,
                         }
                     }

@@ -83,11 +83,21 @@ pub fn Sparkline(
     let area_path = generate_svg_area_path(&coords, h, curve_type);
 
     let grad_id = format!("spark-grad-{:x}", data.len() + width as usize);
+    let mut hover_index = use_signal(|| None::<usize>);
 
     rsx! {
         div {
-            class: "inline-block select-none overflow-hidden shrink-0 {class}",
+            class: "relative inline-block select-none shrink-0 {class}",
             style: "width: {width}px; height: {height}px;",
+            onmousemove: move |evt| {
+                let c = evt.element_coordinates();
+                let ratio = (c.x / w).clamp(0.0, 1.0);
+                let idx = (ratio * (n - 1) as f64).round() as usize;
+                hover_index.set(Some(idx.min(n - 1)));
+            },
+            onmouseleave: move |_| {
+                hover_index.set(None);
+            },
             svg {
                 class: "w-full h-full overflow-visible",
                 view_box: "0 0 {width} {height}",
@@ -124,6 +134,49 @@ pub fn Sparkline(
                     stroke_linecap: "round",
                     stroke_linejoin: "round",
                     style: "filter: drop-shadow(0 0 4px {resolved_color}88);",
+                }
+
+                // Punto interattivo attivo su hover
+                if let Some(idx) = hover_index() {
+                    if idx < coords.len() {
+                        {
+                            let (cx, cy) = coords[idx];
+                            rsx! {
+                                circle {
+                                    cx: "{cx}",
+                                    cy: "{cy}",
+                                    r: "3.5",
+                                    fill: "{resolved_color}",
+                                    stroke: "#ffffff",
+                                    stroke_width: "1.5",
+                                    style: "filter: drop-shadow(0 0 6px {resolved_color});",
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Micro-tooltip con dato live
+            if let Some(idx) = hover_index() {
+                if idx < data.len() {
+                    {
+                        let val = data[idx];
+                        let (cx, cy) = coords[idx];
+                        let is_right = cx > w / 2.0;
+                        let (pos_style, transform) = if is_right {
+                            (format!("left: {cx}px; top: {cy}px;"), "transform: translate(-100%, -50%); margin-left: -8px;")
+                        } else {
+                            (format!("left: {cx}px; top: {cy}px;"), "transform: translateY(-50%); margin-left: 8px;")
+                        };
+                        rsx! {
+                            div {
+                                class: "pointer-events-none absolute z-[1000] px-2 py-0.5 rounded-md bg-zinc-950/95 border border-white/20 text-[11px] font-mono font-bold text-white shadow-xl backdrop-blur-md whitespace-nowrap",
+                                style: "{pos_style} {transform}",
+                                "{val:.2}"
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -223,7 +223,9 @@ pub fn TransferList(
                                             }
                                         },
                                         div { class: "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-all {chk_cls}",
-                                            Icon { kind: IconKind::Check, size: 12 }
+                                            if is_selected {
+                                                Icon { kind: IconKind::Check, size: 12 }
+                                            }
                                         }
                                         div { class: "flex flex-col min-w-0 flex-1",
                                             span { class: "text-xs font-medium truncate", "{item.label}" }
@@ -337,7 +339,9 @@ pub fn TransferList(
                                             }
                                         },
                                         div { class: "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-all {chk_cls}",
-                                            Icon { kind: IconKind::Check, size: 12 }
+                                            if is_selected {
+                                                Icon { kind: IconKind::Check, size: 12 }
+                                            }
                                         }
                                         div { class: "flex flex-col min-w-0 flex-1",
                                             span { class: "text-xs font-medium truncate", "{item.label}" }

@@ -52,6 +52,7 @@ pub fn Heatmap(
     #[props(default)] class: String,
 ) -> Element {
     let mut hover_cell = use_signal(|| None::<usize>);
+    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     // Calcolo dimensioni griglia (max X e max Y)
     let max_x = data.iter().map(|c| c.x).max().unwrap_or(0);
@@ -94,13 +95,24 @@ pub fn Heatmap(
             ("Valore".to_string(), format!("{:.1}", cell.value), "#a855f7".to_string()),
         ];
         let cx = pad_left + cell.x as f64 * step + (cell_size as f64 / 2.0);
-        let cy = pad_top + cell.y as f64 * step;
-        Some((title, entries, cx, cy))
+        let cy = pad_top + cell.y as f64 * step + (cell_size as f64 / 2.0);
+        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { cy };
+        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
+        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
+        Some((title, entries, mx, my, is_right))
     });
 
     rsx! {
-        div { class: "w-full flex flex-col overflow-x-auto {class}",
-            div { class: "relative inline-block min-w-full",
+        div { class: "w-full flex flex-col {class}",
+            div {
+                class: "relative w-full overflow-visible",
+                onmousemove: move |evt| {
+                    let c = evt.element_coordinates();
+                    mouse_pos.set((c.x, c.y));
+                },
+                onmouseleave: move |_| {
+                    hover_cell.set(None);
+                },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
@@ -179,12 +191,13 @@ pub fn Heatmap(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos)) = current_tooltip_data {
+                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
                             x: x_pos,
                             y: y_pos,
+                            align_right: align_r,
                             visible: true,
                         }
                     }

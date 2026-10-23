@@ -360,23 +360,31 @@ pub fn ChartLegend(
     }
 }
 
-/// Tooltip popover per grafico con visualizzazione coordinate e valori.
+/// Tooltip popover per grafico con visualizzazione coordinate e valori allineato alla posizione del mouse.
 #[component]
 pub fn ChartTooltip(
     title: String,
     entries: Vec<(String, String, String)>,
     x: f64,
     y: f64,
-    visible: bool,
+    #[props(default)] align_right: bool,
+    #[props(default = true)] visible: bool,
 ) -> Element {
     if !visible || entries.is_empty() {
         return rsx! {};
     }
 
+    // Posizionamento laterale (a destra o sinistra) alla stessa altezza del cursore (translateY -50%)
+    let (pos_style, transform) = if align_right {
+        (format!("left: {x}px; top: {y}px;"), "transform: translate(-100%, -50%); margin-left: -14px;")
+    } else {
+        (format!("left: {x}px; top: {y}px;"), "transform: translateY(-50%); margin-left: 14px;")
+    };
+
     rsx! {
         div {
-            class: "sd-chart__tooltip pointer-events-none absolute z-[100] px-3 py-2 rounded-lg bg-zinc-950/90 border border-white/10 shadow-xl backdrop-blur-md text-xs font-mono transition-transform duration-75",
-            style: "left: {x}px; top: {y}px; transform: translate(-50%, -110%);",
+            class: "sd-chart__tooltip pointer-events-none absolute z-[1000] px-3 py-2 rounded-lg bg-zinc-950/95 border border-white/15 shadow-2xl backdrop-blur-md text-xs font-mono transition-all duration-75",
+            style: "{pos_style} {transform}",
             div { class: "font-semibold text-zinc-100 mb-1 pb-1 border-b border-white/[0.08]",
                 "{title}"
             }
@@ -385,7 +393,7 @@ pub fn ChartTooltip(
                     div { key: "{lbl}", class: "flex items-center justify-between gap-4 min-w-[120px]",
                         div { class: "flex items-center gap-1.5",
                             span {
-                                class: "w-2 h-2 rounded-full shrink-0",
+                                class: "w-2 h-2 rounded-full shrink-0 shadow-sm",
                                 style: "background-color: {col};",
                             }
                             span { class: "text-zinc-400", "{lbl}:" }

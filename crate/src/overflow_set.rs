@@ -62,7 +62,7 @@ pub fn OverflowSet(
     #[props(default)] on_action: Option<EventHandler<String>>,
     #[props(default)] class: String,
 ) -> Element {
-    let mut is_menu_open = use_signal(|| false);
+    let is_menu_open = use_signal(|| false);
     let limit = max_visible.unwrap_or(4);
 
     let (visible, excess) = if items.len() > limit {
@@ -133,10 +133,6 @@ pub fn OverflowSet(
                                 r#type: "button",
                                 class: "sd-overflow-set__more-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer",
                                 title: "{overflow_button_label}",
-                                onclick: move |_| {
-                                    let curr = is_menu_open();
-                                    is_menu_open.set(!curr);
-                                },
                                 span { "•••" }
                             }
                         },
