@@ -73,7 +73,6 @@ pub fn ScatterChart(
     #[props(default)] class: String,
 ) -> Element {
     let mut hover_index = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -150,38 +149,38 @@ pub fn ScatterChart(
         if let Some(z) = pt.z {
             entries.push(("Z / Peso".to_string(), format!("{z:.1}"), col.clone()));
         }
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { cy };
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
-        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((title, entries, mx, my, is_right))
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 60.0;
+        Some((title, entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col {class}",
             div {
                 class: "relative w-full",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                    let mut closest = None;
-                    let mut min_d = 18.0f64;
-                    for (idx, cx, cy, r, _, _) in &mapped_points {
-                        let dx = c.x - cx;
-                        let dy = c.y - cy;
-                        let d = (dx * dx + dy * dy).sqrt();
-                        if d <= (r + 8.0) && d < min_d {
-                            min_d = d;
-                            closest = Some(*idx);
-                        }
-                    }
-                    hover_index.set(closest);
-                },
                 onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_index.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    preserve_aspect_ratio: "none",
+                    onmouseleave: move |_| {
+                        hover_index.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_index.set(None),
+                    }
 
                     if with_grid {
                         ChartGrid {
@@ -210,13 +209,13 @@ pub fn ScatterChart(
                                     cy: "{cy}",
                                     r: "{r_draw}",
                                     fill: "{color}",
-                                    fill_opacity: if is_h { "0.9" } else { "0.6" },
-                                    stroke: "{color}",
-                                    stroke_width: "1.5",
+                                    fill_opacity: if is_h { "1.0" } else { "0.7" },
+                                    stroke: if is_h { "#ffffff" } else { "{color}" },
+                                    stroke_width: if is_h { "2.5" } else { "1.5" },
                                     class: "cursor-pointer transition-all duration-150",
-                                    style: if is_h { "filter: drop-shadow(0 0 10px {color});" } else { "" },
                                     onmouseenter: move |_| hover_index.set(Some(n_idx)),
                                     onmouseleave: move |_| hover_index.set(None),
+                                    onpointerleave: move |_| hover_index.set(None),
                                 }
                             }
                         }
@@ -229,6 +228,7 @@ pub fn ScatterChart(
                         fill: "rgba(255, 255, 255, 0.45)",
                         font_size: "10.5",
                         font_family: "monospace",
+                        pointer_events: "none",
                         "{min_x:.1}"
                     }
                     text {
@@ -238,6 +238,7 @@ pub fn ScatterChart(
                         fill: "rgba(255, 255, 255, 0.45)",
                         font_size: "10.5",
                         font_family: "monospace",
+                        pointer_events: "none",
                         "{max_x:.1}"
                     }
                     text {
@@ -248,6 +249,7 @@ pub fn ScatterChart(
                         fill: "rgba(255, 255, 255, 0.45)",
                         font_size: "10.5",
                         font_family: "monospace",
+                        pointer_events: "none",
                         "{min_y:.1}"
                     }
                     text {
@@ -258,17 +260,18 @@ pub fn ScatterChart(
                         fill: "rgba(255, 255, 255, 0.45)",
                         font_size: "10.5",
                         font_family: "monospace",
+                        pointer_events: "none",
                         "{max_y:.1}"
                     }
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

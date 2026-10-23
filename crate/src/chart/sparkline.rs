@@ -102,9 +102,18 @@ pub fn Sparkline(
             onmouseleave: move |_| {
                 hover_index.set(None);
             },
+            onpointerleave: move |_| {
+                hover_index.set(None);
+            },
             svg {
                 class: "w-full h-full overflow-visible",
                 view_box: "0 0 {width} {height}",
+                onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
+                    hover_index.set(None);
+                },
                 defs {
                     linearGradient {
                         id: "{grad_id}",
@@ -128,6 +137,7 @@ pub fn Sparkline(
                     path {
                         d: "{area_path}",
                         fill: "url(#{grad_id})",
+                        pointer_events: "none",
                     }
                 }
                 path {
@@ -138,6 +148,7 @@ pub fn Sparkline(
                     stroke_linecap: "round",
                     stroke_linejoin: "round",
                     style: "filter: drop-shadow(0 0 4px {resolved_color}88);",
+                    pointer_events: "none",
                 }
 
                 // Punto interattivo attivo su hover
@@ -153,7 +164,7 @@ pub fn Sparkline(
                                     fill: "{resolved_color}",
                                     stroke: "#ffffff",
                                     stroke_width: "1.5",
-                                    style: "filter: drop-shadow(0 0 6px {resolved_color});",
+                                    pointer_events: "none",
                                 }
                             }
                         }

@@ -25,7 +25,6 @@ pub fn AreaChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_index = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -141,32 +140,39 @@ pub fn AreaChart(
             }
         }
         let cx = padding_left + idx as f64 * x_step;
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { padding_top + plot_h / 2.0 };
-        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((pt.label.clone(), entries, cx, my, is_right))
+        let cy = series_renders.last().map(|s| s.3[idx].1).unwrap_or(padding_top + plot_h / 2.0);
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 60.0;
+        Some((pt.label.clone(), entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col {class}",
             div {
                 class: "relative w-full",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                    if c.x >= padding_left && c.x <= padding_left + plot_w && c.y >= padding_top && c.y <= baseline_y {
-                        let ratio = ((c.x - padding_left) / plot_w).clamp(0.0, 1.0);
-                        let idx = (ratio * (n - 1) as f64).round() as usize;
-                        hover_index.set(Some(idx.min(n.saturating_sub(1))));
-                    } else {
-                        hover_index.set(None);
-                    }
-                },
                 onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_index.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    preserve_aspect_ratio: "none",
+                    onmouseleave: move |_| {
+                        hover_index.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_index.set(None),
+                    }
                     defs {
                         for (orig_idx, _, color, _, _) in &series_renders {
                             linearGradient {
@@ -214,6 +220,7 @@ pub fn AreaChart(
                                     path {
                                         d: "{area_d}",
                                         fill: "url(#area-grad-{orig_idx})",
+                                        pointer_events: "none",
                                     }
                                 }
                                 path {
@@ -224,18 +231,26 @@ pub fn AreaChart(
                                     stroke_linecap: "round",
                                     stroke_linejoin: "round",
                                     style: "filter: drop-shadow(0 0 6px {color}88);",
+                                    pointer_events: "none",
                                 }
                                 if with_dots {
                                     for (pt_idx, (cx, cy)) in top_coords.iter().enumerate() {
-                                        circle {
-                                            key: "dot-{orig_idx}-{pt_idx}",
-                                            cx: "{cx}",
-                                            cy: "{cy}",
-                                            r: if hover_index() == Some(pt_idx) { "5" } else { "3.5" },
-                                            fill: "#09090b",
-                                            stroke: "{color}",
-                                            stroke_width: "2",
-                                            class: "transition-all duration-150",
+                                        {
+                                            let is_h = hover_index() == Some(pt_idx);
+                                            let dot_r = if is_h { "5.5" } else { "3.5" };
+                                            rsx! {
+                                                circle {
+                                                    key: "dot-{orig_idx}-{pt_idx}",
+                                                    cx: "{cx}",
+                                                    cy: "{cy}",
+                                                    r: "{dot_r}",
+                                                    fill: "#09090b",
+                                                    stroke: if is_h { "#ffffff" } else { "{color}" },
+                                                    stroke_width: if is_h { "2.5" } else { "2" },
+                                                    class: "transition-all duration-150",
+                                                    pointer_events: "none",
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -256,6 +271,7 @@ pub fn AreaChart(
                                     stroke: "rgba(255, 255, 255, 0.25)",
                                     stroke_width: "1.5",
                                     stroke_dasharray: "3 3",
+                                    pointer_events: "none",
                                 }
                             }
                         }
@@ -275,6 +291,7 @@ pub fn AreaChart(
                                     fill: "rgba(255, 255, 255, 0.45)",
                                     font_size: "11",
                                     font_family: "monospace",
+                                    pointer_events: "none",
                                     "{lbl}"
                                 }
                             }
@@ -289,18 +306,50 @@ pub fn AreaChart(
                         fill: "rgba(255, 255, 255, 0.40)",
                         font_size: "10",
                         font_family: "monospace",
+                        pointer_events: "none",
                         "{max_val_used:.0}"
+                    }
+
+                    // Zone interattive hover per ciascun punto dati (copertura totale senza gap)
+                    for i in 0..n {
+                        {
+                            let (zone_x, zone_w) = if n <= 1 {
+                                (0.0, svg_w)
+                            } else if i == 0 {
+                                (0.0, padding_left + x_step / 2.0)
+                            } else if i == n - 1 {
+                                let zx = padding_left + (i as f64 - 0.5) * x_step;
+                                (zx, (svg_w - zx).max(1.0))
+                            } else {
+                                (padding_left + (i as f64 - 0.5) * x_step, x_step)
+                            };
+                            rsx! {
+                                rect {
+                                    key: "hover-zone-{i}",
+                                    x: "{zone_x}",
+                                    y: "0",
+                                    width: "{zone_w}",
+                                    height: "{svg_h}",
+                                    fill: "rgba(0, 0, 0, 0.001)",
+                                    style: "pointer-events: all;",
+                                    class: "cursor-pointer",
+                                    onmouseenter: move |_| hover_index.set(Some(i)),
+                                    onmouseleave: move |_| hover_index.set(None),
+                                    onpointerleave: move |_| hover_index.set(None),
+                                }
+                            }
+                        }
                     }
                 }
 
-                // Tooltip Dioxus posizionato
+                // Tooltip Dioxus posizionato in percentuale
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

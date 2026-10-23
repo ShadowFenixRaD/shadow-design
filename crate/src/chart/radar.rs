@@ -42,7 +42,6 @@ pub fn RadarChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_axis = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 400.0;
     let svg_h = 320.0;
@@ -142,26 +141,40 @@ pub fn RadarChart(
                 entries.push((s_label, format!("{v:.1}"), color.clone()));
             }
         }
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { center_x };
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { center_y };
-        let is_right = mx > svg_w / 2.0 || mouse_pos().0 > 200.0;
-        Some((pt.axis.clone(), entries, mx, my, is_right))
+        let angle = -PI / 2.0 + idx as f64 * angle_step;
+        let cx = center_x + (max_radius * 0.75) * angle.cos();
+        let cy = center_y + (max_radius * 0.75) * angle.sin();
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 50.0;
+        Some((pt.axis.clone(), entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col items-center {class}",
             div {
                 class: "relative w-full max-w-md",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                },
                 onmouseleave: move |_| {
+                    hover_axis.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_axis.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    onmouseleave: move |_| {
+                        hover_axis.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_axis.set(None),
+                    }
 
                     // Griglia concentrica
                     for (lvl_idx, poly_pts) in grid_polygons.iter().enumerate() {
@@ -171,6 +184,7 @@ pub fn RadarChart(
                             fill: "none",
                             stroke: "rgba(255, 255, 255, 0.08)",
                             stroke_width: "1",
+                            pointer_events: "none",
                         }
                     }
 
@@ -184,6 +198,7 @@ pub fn RadarChart(
                             y2: "{py}",
                             stroke: "rgba(255, 255, 255, 0.10)",
                             stroke_width: "1",
+                            pointer_events: "none",
                         }
                     }
 
@@ -197,17 +212,25 @@ pub fn RadarChart(
                                 stroke: "{color}",
                                 stroke_width: "2",
                                 style: "filter: drop-shadow(0 0 6px {color}66);",
+                                pointer_events: "none",
                             }
                             if with_dots {
                                 for (pt_idx, (cx, cy)) in coords.iter().enumerate() {
-                                    circle {
-                                        key: "radar-dot-{orig_idx}-{pt_idx}",
-                                        cx: "{cx}",
-                                        cy: "{cy}",
-                                        r: if hover_axis() == Some(pt_idx) { "5" } else { "3.5" },
-                                        fill: "#09090b",
-                                        stroke: "{color}",
-                                        stroke_width: "2",
+                                    {
+                                        let is_h = hover_axis() == Some(pt_idx);
+                                        rsx! {
+                                            circle {
+                                                key: "radar-dot-{orig_idx}-{pt_idx}",
+                                                cx: "{cx}",
+                                                cy: "{cy}",
+                                                r: if is_h { "5.5" } else { "3.5" },
+                                                fill: "#09090b",
+                                                stroke: if is_h { "#ffffff" } else { "{color}" },
+                                                stroke_width: if is_h { "2.5" } else { "2" },
+                                                class: "transition-all duration-150",
+                                                pointer_events: "none",
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -232,6 +255,7 @@ pub fn RadarChart(
                                     class: "cursor-pointer transition-colors",
                                     onmouseenter: move |_| hover_axis.set(Some(i)),
                                     onmouseleave: move |_| hover_axis.set(None),
+                                    onpointerleave: move |_| hover_axis.set(None),
                                     "{lbl}"
                                 }
                             }
@@ -240,12 +264,12 @@ pub fn RadarChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

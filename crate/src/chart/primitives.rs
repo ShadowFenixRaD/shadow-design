@@ -260,16 +260,39 @@ pub fn ChartContainer(
     view_box: String,
     #[props(default = 300)] height: u32,
     #[props(default)] class: String,
+    #[props(default = "xMidYMid meet".to_string())] preserve_aspect_ratio: String,
+    #[props(default)] onmouseleave: Option<EventHandler<MouseEvent>>,
+    #[props(default)] onpointerleave: Option<EventHandler<PointerEvent>>,
     children: Element,
 ) -> Element {
     rsx! {
         div {
             class: "sd-chart w-full relative select-none {class}",
             style: "min-height: {height}px;",
+            onmouseleave: move |evt| {
+                if let Some(handler) = &onmouseleave {
+                    handler.call(evt);
+                }
+            },
+            onpointerleave: move |evt| {
+                if let Some(handler) = &onpointerleave {
+                    handler.call(evt);
+                }
+            },
             svg {
                 class: "sd-chart__svg w-full h-full overflow-visible",
                 view_box: "{view_box}",
-                preserve_aspect_ratio: "xMidYMid meet",
+                preserve_aspect_ratio: "{preserve_aspect_ratio}",
+                onmouseleave: move |evt| {
+                    if let Some(handler) = &onmouseleave {
+                        handler.call(evt);
+                    }
+                },
+                onpointerleave: move |evt| {
+                    if let Some(handler) = &onpointerleave {
+                        handler.call(evt);
+                    }
+                },
                 {children}
             }
         }
@@ -388,8 +411,10 @@ pub fn ChartLegend(
 pub fn ChartTooltip(
     title: String,
     entries: Vec<(String, String, String)>,
-    x: f64,
-    y: f64,
+    #[props(default = 0.0)] x: f64,
+    #[props(default = 0.0)] y: f64,
+    #[props(default = 0.0)] x_percent: f64,
+    #[props(default = 0.0)] y_percent: f64,
     #[props(default)] align_right: bool,
     #[props(default = true)] visible: bool,
 ) -> Element {
@@ -397,18 +422,39 @@ pub fn ChartTooltip(
         return rsx! {};
     }
 
-    // Posizionamento laterale (a destra o sinistra) alla stessa altezza del cursore (translateY -50%)
-    let safe_x = x.clamp(16.0, 584.0);
-    let (pos_style, transform) = if align_right {
-        (format!("left: {safe_x}px; top: {y}px;"), "transform: translate(-100%, -50%); margin-left: -14px;")
+    let (pos_style, transform) = if x_percent > 0.0 || y_percent > 0.0 {
+        let xp = x_percent.clamp(0.0, 100.0);
+        let yp = y_percent.clamp(0.0, 100.0);
+        if align_right {
+            (
+                format!("left: {xp:.2}%; top: {yp:.2}%;"),
+                "transform: translate(-100%, -50%); margin-left: -14px;",
+            )
+        } else {
+            (
+                format!("left: {xp:.2}%; top: {yp:.2}%;"),
+                "transform: translateY(-50%); margin-left: 14px;",
+            )
+        }
     } else {
-        (format!("left: {safe_x}px; top: {y}px;"), "transform: translateY(-50%); margin-left: 14px;")
+        let safe_x = x.clamp(16.0, 584.0);
+        if align_right {
+            (
+                format!("left: {safe_x}px; top: {y}px;"),
+                "transform: translate(-100%, -50%); margin-left: -14px;",
+            )
+        } else {
+            (
+                format!("left: {safe_x}px; top: {y}px;"),
+                "transform: translateY(-50%); margin-left: 14px;",
+            )
+        }
     };
 
     rsx! {
         div {
             class: "sd-chart__tooltip pointer-events-none absolute z-[1000] px-3.5 py-2.5 rounded-lg bg-zinc-950/95 border border-white/15 shadow-2xl backdrop-blur-md text-xs font-mono transition-all duration-75 whitespace-nowrap min-w-max",
-            style: "{pos_style} {transform}",
+            style: "{pos_style} {transform} pointer-events: none !important;",
             div { class: "font-semibold text-zinc-100 mb-1.5 pb-1 border-b border-white/[0.08] whitespace-nowrap",
                 "{title}"
             }

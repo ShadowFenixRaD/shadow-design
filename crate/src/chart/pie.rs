@@ -42,7 +42,6 @@ pub fn PieChart(
     #[props(default)] class: String,
 ) -> Element {
     let mut hover_index = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 400.0;
     let svg_h = 300.0;
@@ -69,54 +68,48 @@ pub fn PieChart(
     }
 
     let current_tooltip_data = hover_index().and_then(|idx| {
-        if idx >= slices.len() {
-            return None;
-        }
-        let (_, ref name, val, frac, ref col, _, _) = slices[idx];
+        let item = slices.iter().find(|s| s.0 == idx)?;
+        let (_, ref name, val, frac, ref col, start_a, end_a) = *item;
         let pct_str = format!("{:.1}%", frac * 100.0);
         let entries = vec![
             (name.clone(), format!("{val:.1}"), col.clone()),
             ("Percentuale".to_string(), pct_str, col.clone()),
         ];
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { center_x };
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { center_y };
-        let is_right = mx > svg_w / 2.0 || mouse_pos().0 > 175.0;
-        Some((name.clone(), entries, mx, my, is_right))
+        let mid_a = (start_a + end_a) / 2.0;
+        let r_mid = (inner_r + outer_radius) / 2.0;
+        let cx = center_x + r_mid * mid_a.cos();
+        let cy = center_y + r_mid * mid_a.sin();
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 50.0;
+        Some((name.clone(), entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col items-center {class}",
             div {
                 class: "relative w-full max-w-md",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                    let dx = c.x - center_x;
-                    let dy = c.y - center_y;
-                    let dist = (dx * dx + dy * dy).sqrt();
-                    if dist >= inner_r && dist <= outer_radius + 10.0 {
-                        let mut angle = dy.atan2(dx);
-                        if angle < 0.0 {
-                            angle += 2.0 * PI;
-                        }
-                        let mut found = None;
-                        for (idx, _, _, _, _, start_a, end_a) in &slices {
-                            if angle >= *start_a && angle <= *end_a {
-                                found = Some(*idx);
-                                break;
-                            }
-                        }
-                        hover_index.set(found);
-                    } else {
-                        hover_index.set(None);
-                    }
-                },
                 onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_index.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    onmouseleave: move |_| {
+                        hover_index.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_index.set(None),
+                    }
 
                     for (idx, _name, _, _, color, start_a, end_a) in &slices {
                         {
@@ -156,13 +149,14 @@ pub fn PieChart(
                                     key: "slice-{idx}",
                                     d: "{path_d}",
                                     fill: "{color}",
-                                    stroke: "#09090b",
-                                    stroke_width: "{stroke_width}",
+                                    stroke: if is_hovered { "#ffffff" } else { "#09090b" },
+                                    stroke_width: if is_hovered { "2.5" } else { "{stroke_width}" },
                                     opacity: if hover_index().is_some() && !is_hovered { "0.6" } else { "1.0" },
-                                    style: if is_hovered { "filter: drop-shadow(0 0 10px {color}cc); cursor: pointer;" } else { "cursor: pointer;" },
+                                    style: "cursor: pointer;",
                                     class: "transition-all duration-150",
                                     onmouseenter: move |_| hover_index.set(Some(n_idx)),
                                     onmouseleave: move |_| hover_index.set(None),
+                                    onpointerleave: move |_| hover_index.set(None),
                                 }
                             }
                         }
@@ -199,12 +193,12 @@ pub fn PieChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

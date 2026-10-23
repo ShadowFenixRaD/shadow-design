@@ -24,7 +24,6 @@ pub fn LineChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_index = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -97,26 +96,39 @@ pub fn LineChart(
             }
         }
         let cx = padding_left + idx as f64 * x_step;
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { padding_top + plot_h / 2.0 };
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
-        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((pt.label.clone(), entries, mx, my, is_right))
+        let cy = padding_top + plot_h / 2.0;
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 60.0;
+        Some((pt.label.clone(), entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col {class}",
             div {
                 class: "relative w-full",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                },
                 onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_index.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    preserve_aspect_ratio: "none",
+                    onmouseleave: move |_| {
+                        hover_index.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_index.set(None),
+                    }
                     if with_grid {
                         ChartGrid {
                             x: padding_left,
@@ -144,6 +156,7 @@ pub fn LineChart(
                                         stroke_linejoin: "round",
                                         stroke_dasharray: if *dashed { "6 4" } else { "none" },
                                         style: "filter: drop-shadow(0 0 6px {color}88);",
+                                        pointer_events: "none",
                                     }
                                 }
                             }
@@ -164,9 +177,10 @@ pub fn LineChart(
                                                 cy: "{cy}",
                                                 r: if is_hovered { "5.5" } else { "3.5" },
                                                 fill: "#09090b",
-                                                stroke: "{color}",
-                                                stroke_width: "2",
+                                                stroke: if is_hovered { "#ffffff" } else { "{color}" },
+                                                stroke_width: if is_hovered { "2.5" } else { "2" },
                                                 class: "transition-all duration-150",
+                                                pointer_events: "none",
                                             }
                                         }
                                     }
@@ -188,6 +202,7 @@ pub fn LineChart(
                                     stroke: "rgba(255, 255, 255, 0.25)",
                                     stroke_width: "1.5",
                                     stroke_dasharray: "3 3",
+                                    pointer_events: "none",
                                 }
                             }
                         }
@@ -206,28 +221,39 @@ pub fn LineChart(
                                     fill: "rgba(255, 255, 255, 0.45)",
                                     font_size: "11",
                                     font_family: "monospace",
+                                    pointer_events: "none",
                                     "{pt.label}"
                                 }
                             }
                         }
                     }
 
-                    // Hover zone
+                    // Hover zone contigue in coordinate SVG native (copertura totale senza gap)
                     for i in 0..n {
                         {
-                            let col_w = if n > 1 { plot_w / n as f64 } else { plot_w };
-                            let col_x = padding_left + i as f64 * x_step - (col_w / 2.0);
+                            let (zone_x, zone_w) = if n <= 1 {
+                                (0.0, svg_w)
+                            } else if i == 0 {
+                                (0.0, padding_left + x_step / 2.0)
+                            } else if i == n - 1 {
+                                let zx = padding_left + (i as f64 - 0.5) * x_step;
+                                (zx, (svg_w - zx).max(1.0))
+                            } else {
+                                (padding_left + (i as f64 - 0.5) * x_step, x_step)
+                            };
                             rsx! {
                                 rect {
                                     key: "hover-zone-{i}",
-                                    x: "{col_x.max(padding_left)}",
-                                    y: "{padding_top}",
-                                    width: "{col_w}",
-                                    height: "{plot_h}",
-                                    fill: "transparent",
+                                    x: "{zone_x}",
+                                    y: "0",
+                                    width: "{zone_w}",
+                                    height: "{svg_h}",
+                                    fill: "rgba(0, 0, 0, 0.001)",
+                                    style: "pointer-events: all;",
                                     class: "cursor-pointer",
                                     onmouseenter: move |_| hover_index.set(Some(i)),
                                     onmouseleave: move |_| hover_index.set(None),
+                                    onpointerleave: move |_| hover_index.set(None),
                                 }
                             }
                         }
@@ -235,12 +261,12 @@ pub fn LineChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

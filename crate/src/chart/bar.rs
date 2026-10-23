@@ -31,7 +31,6 @@ pub fn BarChart(
 ) -> Element {
     let hidden_series = use_signal(BTreeSet::<String>::new);
     let mut hover_index = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     let svg_w = 600.0;
     let svg_h = 260.0;
@@ -103,36 +102,38 @@ pub fn BarChart(
             }
         }
         let cx = padding_left + idx as f64 * group_w + group_w / 2.0;
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { padding_top + plot_h / 2.0 };
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
-        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((pt.label.clone(), entries, mx, my, is_right))
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = 35.0;
+        let is_right = x_pct > 60.0;
+        Some((pt.label.clone(), entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
         div { class: "w-full flex flex-col {class}",
             div {
                 class: "relative w-full",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                    if c.x >= padding_left && c.x <= padding_left + plot_w && c.y >= padding_top && c.y <= baseline_y + 10.0 {
-                        let col = ((c.x - padding_left) / group_w).floor() as usize;
-                        if col < data.len() {
-                            hover_index.set(Some(col));
-                        } else {
-                            hover_index.set(None);
-                        }
-                    } else {
-                        hover_index.set(None);
-                    }
-                },
                 onmouseleave: move |_| {
+                    hover_index.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_index.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    preserve_aspect_ratio: "none",
+                    onmouseleave: move |_| {
+                        hover_index.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_index.set(None),
+                    }
                     if with_grid {
                         ChartGrid {
                             x: padding_left,
@@ -149,8 +150,8 @@ pub fn BarChart(
                         {
                             let is_hovered = hover_index() == Some(i);
                             let group_x = padding_left + i as f64 * group_w + group_offset_x;
-                            let opacity_val = if is_hovered { "1.0" } else { "0.85" };
-                            let label_color = if is_hovered { "rgba(255, 255, 255, 0.9)" } else { "rgba(255, 255, 255, 0.45)" };
+                            let opacity_val = if hover_index().is_some() && !is_hovered { "0.55" } else { "1.0" };
+                            let label_color = if is_hovered { "rgba(255, 255, 255, 0.95)" } else { "rgba(255, 255, 255, 0.45)" };
 
                             rsx! {
                                 g { key: "bar-group-{i}",
@@ -162,7 +163,6 @@ pub fn BarChart(
                                                 let bx = group_x + sub_idx as f64 * bar_w;
                                                 let by = baseline_y - bh;
                                                 let color = get_series_color(orig_idx, s.color.as_deref());
-                                                let shadow_style = if is_hovered { format!("filter: drop-shadow(0 0 8px {color}aa);") } else { String::new() };
 
                                                 rsx! {
                                                     rect {
@@ -174,9 +174,11 @@ pub fn BarChart(
                                                         rx: "{bar_radius}",
                                                         ry: "{bar_radius}",
                                                         fill: "{color}",
+                                                        stroke: if is_hovered { "#ffffff" } else { "none" },
+                                                        stroke_width: if is_hovered { "1.5" } else { "0" },
                                                         opacity: "{opacity_val}",
-                                                        style: "{shadow_style}",
                                                         class: "transition-all duration-150",
+                                                        pointer_events: "none",
                                                     }
                                                 }
                                             }
@@ -199,7 +201,6 @@ pub fn BarChart(
                                                         let by = current_bottom - bh;
                                                         let color = get_series_color(orig_idx, s.color.as_deref());
                                                         current_bottom = by;
-                                                        let shadow_style = if is_hovered { format!("filter: drop-shadow(0 0 8px {color}aa);") } else { String::new() };
 
                                                         rsx! {
                                                             rect {
@@ -211,9 +212,11 @@ pub fn BarChart(
                                                                 rx: "{bar_radius}",
                                                                 ry: "{bar_radius}",
                                                                 fill: "{color}",
+                                                                stroke: if is_hovered { "#ffffff" } else { "none" },
+                                                                stroke_width: if is_hovered { "1.5" } else { "0" },
                                                                 opacity: "{opacity_val}",
-                                                                style: "{shadow_style}",
                                                                 class: "transition-all duration-150",
+                                                                pointer_events: "none",
                                                             }
                                                         }
                                                     }
@@ -230,19 +233,37 @@ pub fn BarChart(
                                         fill: "{label_color}",
                                         font_size: "11",
                                         font_family: "monospace",
+                                        pointer_events: "none",
                                         "{pt.label}"
                                     }
 
-                                    // Zona interattiva hover
-                                    rect {
-                                        x: "{padding_left + i as f64 * group_w}",
-                                        y: "{padding_top}",
-                                        width: "{group_w}",
-                                        height: "{plot_h}",
-                                        fill: "transparent",
-                                        class: "cursor-pointer",
-                                        onmouseenter: move |_| hover_index.set(Some(i)),
-                                        onmouseleave: move |_| hover_index.set(None),
+                                    // Zona interattiva hover senza gap
+                                    {
+                                        let (zone_x, zone_w) = if n <= 1 {
+                                            (0.0, svg_w)
+                                        } else if i == 0 {
+                                            (0.0, padding_left + group_w)
+                                        } else if i == n - 1 {
+                                            let zx = padding_left + i as f64 * group_w;
+                                            (zx, (svg_w - zx).max(1.0))
+                                        } else {
+                                            (padding_left + i as f64 * group_w, group_w)
+                                        };
+                                        rsx! {
+                                            rect {
+                                                key: "bar-hover-zone-{i}",
+                                                x: "{zone_x}",
+                                                y: "0",
+                                                width: "{zone_w}",
+                                                height: "{svg_h}",
+                                                fill: "rgba(0, 0, 0, 0.001)",
+                                                style: "pointer-events: all;",
+                                                class: "cursor-pointer",
+                                                onmouseenter: move |_| hover_index.set(Some(i)),
+                                                onmouseleave: move |_| hover_index.set(None),
+                                                onpointerleave: move |_| hover_index.set(None),
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -251,12 +272,12 @@ pub fn BarChart(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }

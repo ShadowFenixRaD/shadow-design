@@ -52,7 +52,6 @@ pub fn Heatmap(
     #[props(default)] class: String,
 ) -> Element {
     let mut hover_cell = use_signal(|| None::<usize>);
-    let mut mouse_pos = use_signal(|| (0.0f64, 0.0f64));
 
     // Calcolo dimensioni griglia (max X e max Y)
     let max_x = data.iter().map(|c| c.x).max().unwrap_or(0);
@@ -96,42 +95,38 @@ pub fn Heatmap(
         ];
         let cx = pad_left + cell.x as f64 * step + (cell_size as f64 / 2.0);
         let cy = pad_top + cell.y as f64 * step + (cell_size as f64 / 2.0);
-        let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { cy };
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
-        let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((title, entries, mx, my, is_right))
+        let x_pct = (cx / svg_w) * 100.0;
+        let y_pct = (cy / svg_h) * 100.0;
+        let is_right = x_pct > 60.0;
+        Some((title, entries, x_pct, y_pct, is_right))
     });
 
     rsx! {
-        div { class: "w-full flex flex-col {class}",
+        div { class: "w-full flex flex-col items-center {class}",
             div {
                 class: "relative w-full overflow-visible",
-                onmousemove: move |evt| {
-                    let c = evt.element_coordinates();
-                    mouse_pos.set((c.x, c.y));
-                    let mut found = None;
-                    if c.x >= pad_left && c.y >= pad_top {
-                        let grid_x = ((c.x - pad_left) / step).floor() as isize;
-                        let grid_y = ((c.y - pad_top) / step).floor() as isize;
-                        let off_x = (c.x - pad_left) - (grid_x as f64 * step);
-                        let off_y = (c.y - pad_top) - (grid_y as f64 * step);
-                        if off_x <= cell_size as f64 && off_y <= cell_size as f64 {
-                            for (idx, cell) in data.iter().enumerate() {
-                                if cell.x as isize == grid_x && cell.y as isize == grid_y {
-                                    found = Some(idx);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    hover_cell.set(found);
-                },
+                style: "max-width: {svg_w}px;",
                 onmouseleave: move |_| {
+                    hover_cell.set(None);
+                },
+                onpointerleave: move |_| {
                     hover_cell.set(None);
                 },
                 ChartContainer {
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
+                    onmouseleave: move |_| {
+                        hover_cell.set(None);
+                    },
+                    rect {
+                        x: "0",
+                        y: "0",
+                        width: "{svg_w}",
+                        height: "{svg_h}",
+                        fill: "rgba(0, 0, 0, 0.001)",
+                        style: "pointer-events: all;",
+                        onmouseenter: move |_| hover_cell.set(None),
+                    }
 
                     // Etichette asse Y
                     for (yi, yl) in y_labels.iter().enumerate() {
@@ -146,6 +141,7 @@ pub fn Heatmap(
                                     fill: "rgba(255, 255, 255, 0.4)",
                                     font_size: "10",
                                     font_family: "monospace",
+                                    pointer_events: "none",
                                     "{yl}"
                                 }
                             }
@@ -174,12 +170,13 @@ pub fn Heatmap(
                                     rx: "{cell_radius}",
                                     ry: "{cell_radius}",
                                     fill: "{color}",
-                                    stroke: if is_h { "#ffffff" } else { "rgba(255, 255, 255, 0.04)" },
-                                    stroke_width: if is_h { "1.5" } else { "1" },
+                                    stroke: if is_h { "#ffffff" } else { "rgba(255, 255, 255, 0.08)" },
+                                    stroke_width: if is_h { "2" } else { "1" },
                                     class: "cursor-pointer transition-all duration-150",
-                                    style: if is_h { "filter: drop-shadow(0 0 6px {color});" } else { "" },
+                                    style: "pointer-events: all;",
                                     onmouseenter: move |_| hover_cell.set(Some(i)),
                                     onmouseleave: move |_| hover_cell.set(None),
+                                    onpointerleave: move |_| hover_cell.set(None),
                                 }
                             }
                         }
@@ -199,6 +196,7 @@ pub fn Heatmap(
                                     fill: "rgba(255, 255, 255, 0.4)",
                                     font_size: "10",
                                     font_family: "monospace",
+                                    pointer_events: "none",
                                     "{xl}"
                                 }
                             }
@@ -207,12 +205,12 @@ pub fn Heatmap(
                 }
 
                 if with_tooltip {
-                    if let Some((title, entries, x_pos, y_pos, align_r)) = current_tooltip_data {
+                    if let Some((title, entries, x_pct, y_pct, align_r)) = current_tooltip_data {
                         ChartTooltip {
                             title: title,
                             entries: entries,
-                            x: x_pos,
-                            y: y_pos,
+                            x_percent: x_pct,
+                            y_percent: y_pct,
                             align_right: align_r,
                             visible: true,
                         }
