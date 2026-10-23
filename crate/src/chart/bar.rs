@@ -116,6 +116,16 @@ pub fn BarChart(
                 onmousemove: move |evt| {
                     let c = evt.element_coordinates();
                     mouse_pos.set((c.x, c.y));
+                    if c.x >= padding_left && c.x <= padding_left + plot_w && c.y >= padding_top && c.y <= baseline_y + 10.0 {
+                        let col = ((c.x - padding_left) / group_w).floor() as usize;
+                        if col < data.len() {
+                            hover_index.set(Some(col));
+                        } else {
+                            hover_index.set(None);
+                        }
+                    } else {
+                        hover_index.set(None);
+                    }
                 },
                 onmouseleave: move |_| {
                     hover_index.set(None);

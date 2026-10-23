@@ -231,6 +231,29 @@ pub fn generate_svg_area_path(coords: &[(f64, f64)], baseline_y: f64, curve: Cur
     )
 }
 
+/// Genera un path chiuso per un'area impilata tra due curve (top e bottom).
+#[must_use]
+pub fn generate_stacked_area_band_path(
+    top: &[(f64, f64)],
+    bottom: &[(f64, f64)],
+    curve: CurveType,
+) -> String {
+    if top.is_empty() || bottom.is_empty() {
+        return String::new();
+    }
+    let top_path = generate_svg_path(top, curve);
+    let rev_bottom: Vec<(f64, f64)> = bottom.iter().rev().copied().collect();
+    let bottom_path = generate_svg_path(&rev_bottom, curve);
+
+    let bottom_segment = if let Some(stripped) = bottom_path.strip_prefix('M') {
+        format!("L{stripped}")
+    } else {
+        bottom_path
+    };
+
+    format!("{top_path} {bottom_segment} Z")
+}
+
 /// Contenitore responsive SVG per i grafici vettoriali Shadow.
 #[component]
 pub fn ChartContainer(
@@ -375,30 +398,31 @@ pub fn ChartTooltip(
     }
 
     // Posizionamento laterale (a destra o sinistra) alla stessa altezza del cursore (translateY -50%)
+    let safe_x = x.clamp(16.0, 584.0);
     let (pos_style, transform) = if align_right {
-        (format!("left: {x}px; top: {y}px;"), "transform: translate(-100%, -50%); margin-left: -14px;")
+        (format!("left: {safe_x}px; top: {y}px;"), "transform: translate(-100%, -50%); margin-left: -14px;")
     } else {
-        (format!("left: {x}px; top: {y}px;"), "transform: translateY(-50%); margin-left: 14px;")
+        (format!("left: {safe_x}px; top: {y}px;"), "transform: translateY(-50%); margin-left: 14px;")
     };
 
     rsx! {
         div {
-            class: "sd-chart__tooltip pointer-events-none absolute z-[1000] px-3 py-2 rounded-lg bg-zinc-950/95 border border-white/15 shadow-2xl backdrop-blur-md text-xs font-mono transition-all duration-75",
+            class: "sd-chart__tooltip pointer-events-none absolute z-[1000] px-3.5 py-2.5 rounded-lg bg-zinc-950/95 border border-white/15 shadow-2xl backdrop-blur-md text-xs font-mono transition-all duration-75 whitespace-nowrap min-w-max",
             style: "{pos_style} {transform}",
-            div { class: "font-semibold text-zinc-100 mb-1 pb-1 border-b border-white/[0.08]",
+            div { class: "font-semibold text-zinc-100 mb-1.5 pb-1 border-b border-white/[0.08] whitespace-nowrap",
                 "{title}"
             }
-            div { class: "flex flex-col gap-1",
+            div { class: "flex flex-col gap-1.5",
                 for (lbl, val, col) in entries {
-                    div { key: "{lbl}", class: "flex items-center justify-between gap-4 min-w-[120px]",
-                        div { class: "flex items-center gap-1.5",
+                    div { key: "{lbl}", class: "flex items-center justify-between gap-5 min-w-[130px] whitespace-nowrap",
+                        div { class: "flex items-center gap-2 whitespace-nowrap",
                             span {
                                 class: "w-2 h-2 rounded-full shrink-0 shadow-sm",
                                 style: "background-color: {col};",
                             }
-                            span { class: "text-zinc-400", "{lbl}:" }
+                            span { class: "text-zinc-400 whitespace-nowrap", "{lbl}:" }
                         }
-                        span { class: "font-bold text-zinc-100", "{val}" }
+                        span { class: "font-bold text-zinc-100 whitespace-nowrap", "{val}" }
                     }
                 }
             }

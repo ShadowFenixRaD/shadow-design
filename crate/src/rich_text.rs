@@ -599,10 +599,11 @@ pub fn html_to_markdown(html: &str) -> String {
         .to_string()
 }
 
+use std::sync::atomic::{AtomicU32, Ordering};
+static RTE_ID_COUNTER: AtomicU32 = AtomicU32::new(1000);
+
 fn rand_simple_id() -> u32 {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let d = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
-    (d.subsec_nanos() % 100_000) + 1000
+    RTE_ID_COUNTER.fetch_add(1, Ordering::Relaxed)
 }
 
 #[cfg(test)]

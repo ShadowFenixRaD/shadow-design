@@ -91,6 +91,10 @@ pub fn Sparkline(
             style: "width: {width}px; height: {height}px;",
             onmousemove: move |evt| {
                 let c = evt.element_coordinates();
+                if c.x < 0.0 || c.x > w || c.y < -5.0 || c.y > h + 5.0 {
+                    hover_index.set(None);
+                    return;
+                }
                 let ratio = (c.x / w).clamp(0.0, 1.0);
                 let idx = (ratio * (n - 1) as f64).round() as usize;
                 hover_index.set(Some(idx.min(n - 1)));

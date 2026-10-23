@@ -6,6 +6,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 #[component]
 pub fn ChartsPage() -> Element {
     let mut selected_chart_tab = use_signal(|| "area".to_string());
+    let mut heatmap_mode = use_signal(|| "month".to_string());
 
     // Dati di esempio per grafici cartesiani (Area, Bar, Line)
     let sample_points = vec![
@@ -54,17 +55,40 @@ pub fn ChartsPage() -> Element {
         ScatterPoint::new(85.0, 90.0).with_z(22.0).with_label("Zeta"),
     ];
 
-    // Dati Sparkline
-    let spark_up = vec![10.0, 15.0, 14.0, 22.0, 28.0, 26.0, 35.0, 42.0];
-    let spark_down = vec![50.0, 45.0, 48.0, 38.0, 32.0, 35.0, 24.0, 18.0];
+    // Dati Sparkline (Matematicamente coerenti con i delta percentuali e assoluti mostrati)
+    // Partenza da 32.7 con incremento del +28.4% (+9.3pt) = 42.0!
+    let spark_up = vec![32.7, 33.5, 35.0, 34.2, 37.8, 38.5, 40.1, 42.0];
+    // Partenza da 60.0ms con delta di -42ms = 18.0ms esatti!
+    let spark_down = vec![60.0, 56.0, 52.0, 48.0, 38.0, 32.0, 24.0, 18.0];
 
-    // Dati Heatmap
+    // Dati Heatmap Mensile
     let sample_heatmap = {
         let mut cells = Vec::new();
         for x in 0..12 {
             for y in 0..5 {
                 let v = ((x * 7 + y * 13) % 40) as f64;
                 cells.push(HeatmapCell::new(x, y, v).with_label(format!("Mese {}, Canale {}", x + 1, y + 1)));
+            }
+        }
+        cells
+    };
+
+    // Dati Heatmap Giornaliera (Calendar Heatmap 52 Settimane x 7 Giorni: Lun-Dom)
+    let sample_daily_heatmap = {
+        let mut cells = Vec::new();
+        for w in 0..52 {
+            for d in 0..7 {
+                let count = if (w * 7 + d * 13) % 4 == 0 {
+                    ((w * 3 + d * 5) % 15) as f64
+                } else if (w * 11 + d) % 3 == 0 {
+                    ((w + d * 2) % 8) as f64
+                } else {
+                    0.0
+                };
+                let day_name = match d {
+                    0 => "Lun", 1 => "Mar", 2 => "Mer", 3 => "Gio", 4 => "Ven", 5 => "Sab", _ => "Dom",
+                };
+                cells.push(HeatmapCell::new(w, d, count).with_label(format!("Settimana {}, {}: {} commit", w + 1, day_name, count as usize)));
             }
         }
         cells
@@ -215,17 +239,19 @@ pub fn ChartsPage() -> Element {
                             }
                         } else if selected_chart_tab() == "sparkline" {
                             div { class: "flex flex-wrap items-center justify-center gap-8 py-8",
-                                div { class: "flex items-center gap-3 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
+                                div { class: "flex items-center gap-4 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
                                     div { class: "flex flex-col",
                                         span { class: "text-xs font-mono text-zinc-400", "CPU Load" }
-                                        span { class: "text-lg font-bold text-white", "+28.4%" }
+                                        span { class: "text-lg font-bold text-white", "42.0%" }
+                                        span { class: "text-[11px] font-mono text-emerald-400", "+28.4% (+9.3pt)" }
                                     }
                                     Sparkline { data: spark_up.clone(), trend: TrendDirection::Positive }
                                 }
-                                div { class: "flex items-center gap-3 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
+                                div { class: "flex items-center gap-4 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
                                     div { class: "flex flex-col",
                                         span { class: "text-xs font-mono text-zinc-400", "Latency" }
-                                        span { class: "text-lg font-bold text-white", "-42ms" }
+                                        span { class: "text-lg font-bold text-white", "18 ms" }
+                                        span { class: "text-[11px] font-mono text-emerald-400", "-42 ms (da 60 ms)" }
                                     }
                                     Sparkline { data: spark_down.clone(), trend: TrendDirection::Negative }
                                 }
@@ -252,11 +278,44 @@ pub fn ChartsPage() -> Element {
                             }
                         } else if selected_chart_tab() == "heatmap" {
                             div { class: "flex flex-col items-center w-full gap-4",
-                                Heatmap {
-                                    data: sample_heatmap.clone(),
-                                    x_labels: vec!["G".to_string(), "F".to_string(), "M".to_string(), "A".to_string(), "M".to_string(), "G".to_string(), "L".to_string(), "A".to_string(), "S".to_string(), "O".to_string(), "N".to_string(), "D".to_string()],
-                                    y_labels: vec!["S1".to_string(), "S2".to_string(), "S3".to_string(), "S4".to_string(), "S5".to_string()],
-                                    height: 220,
+                                // Sotto-selettore Vista Mese vs Giorno
+                                div { class: "flex items-center gap-2 p-1 rounded-lg bg-zinc-900 border border-white/10 self-start",
+                                    button {
+                                        r#type: "button",
+                                        class: if heatmap_mode() == "month" {
+                                            "px-3 py-1 text-xs font-medium rounded-md bg-purple-950/80 text-purple-200 border border-purple-500/40"
+                                        } else {
+                                            "px-3 py-1 text-xs font-medium rounded-md text-zinc-400 hover:text-white"
+                                        },
+                                        onclick: move |_| heatmap_mode.set("month".to_string()),
+                                        "Vista Mensile (12 Mesi x 5 Canali)"
+                                    }
+                                    button {
+                                        r#type: "button",
+                                        class: if heatmap_mode() == "day" {
+                                            "px-3 py-1 text-xs font-medium rounded-md bg-purple-950/80 text-purple-200 border border-purple-500/40"
+                                        } else {
+                                            "px-3 py-1 text-xs font-medium rounded-md text-zinc-400 hover:text-white"
+                                        },
+                                        onclick: move |_| heatmap_mode.set("day".to_string()),
+                                        "Vista Giornaliera (Calendar Heatmap 52 Settimane x 7 Giorni)"
+                                    }
+                                }
+
+                                if heatmap_mode() == "month" {
+                                    Heatmap {
+                                        data: sample_heatmap.clone(),
+                                        x_labels: vec!["G".to_string(), "F".to_string(), "M".to_string(), "A".to_string(), "M".to_string(), "G".to_string(), "L".to_string(), "A".to_string(), "S".to_string(), "O".to_string(), "N".to_string(), "D".to_string()],
+                                        y_labels: vec!["S1".to_string(), "S2".to_string(), "S3".to_string(), "S4".to_string(), "S5".to_string()],
+                                        height: 220,
+                                    }
+                                } else {
+                                    div { class: "w-full overflow-x-auto py-2",
+                                        CalendarHeatmap {
+                                            data: sample_daily_heatmap.clone(),
+                                            height: 150,
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -91,6 +91,25 @@ pub fn PieChart(
                 onmousemove: move |evt| {
                     let c = evt.element_coordinates();
                     mouse_pos.set((c.x, c.y));
+                    let dx = c.x - center_x;
+                    let dy = c.y - center_y;
+                    let dist = (dx * dx + dy * dy).sqrt();
+                    if dist >= inner_r && dist <= outer_radius + 10.0 {
+                        let mut angle = dy.atan2(dx);
+                        if angle < 0.0 {
+                            angle += 2.0 * PI;
+                        }
+                        let mut found = None;
+                        for (idx, _, _, _, _, start_a, end_a) in &slices {
+                            if angle >= *start_a && angle <= *end_a {
+                                found = Some(*idx);
+                                break;
+                            }
+                        }
+                        hover_index.set(found);
+                    } else {
+                        hover_index.set(None);
+                    }
                 },
                 onmouseleave: move |_| {
                     hover_index.set(None);

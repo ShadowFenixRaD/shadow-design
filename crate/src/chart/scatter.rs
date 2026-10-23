@@ -163,6 +163,18 @@ pub fn ScatterChart(
                 onmousemove: move |evt| {
                     let c = evt.element_coordinates();
                     mouse_pos.set((c.x, c.y));
+                    let mut closest = None;
+                    let mut min_d = 18.0f64;
+                    for (idx, cx, cy, r, _, _) in &mapped_points {
+                        let dx = c.x - cx;
+                        let dy = c.y - cy;
+                        let d = (dx * dx + dy * dy).sqrt();
+                        if d <= (r + 8.0) && d < min_d {
+                            min_d = d;
+                            closest = Some(*idx);
+                        }
+                    }
+                    hover_index.set(closest);
                 },
                 onmouseleave: move |_| {
                     hover_index.set(None);

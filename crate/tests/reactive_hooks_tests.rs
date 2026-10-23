@@ -12,7 +12,7 @@ struct TestFormModel {
 #[test]
 fn test_form_validation_and_errors() {
     let mut dom = VirtualDom::new(|| {
-        let mut form = use_form(
+        let form = use_form(
             TestFormModel {
                 username: "".to_string(),
                 email: "invalid-email".to_string(),

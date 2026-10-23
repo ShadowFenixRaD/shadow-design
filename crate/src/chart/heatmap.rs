@@ -109,6 +109,22 @@ pub fn Heatmap(
                 onmousemove: move |evt| {
                     let c = evt.element_coordinates();
                     mouse_pos.set((c.x, c.y));
+                    let mut found = None;
+                    if c.x >= pad_left && c.y >= pad_top {
+                        let grid_x = ((c.x - pad_left) / step).floor() as isize;
+                        let grid_y = ((c.y - pad_top) / step).floor() as isize;
+                        let off_x = (c.x - pad_left) - (grid_x as f64 * step);
+                        let off_y = (c.y - pad_top) - (grid_y as f64 * step);
+                        if off_x <= cell_size as f64 && off_y <= cell_size as f64 {
+                            for (idx, cell) in data.iter().enumerate() {
+                                if cell.x as isize == grid_x && cell.y as isize == grid_y {
+                                    found = Some(idx);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    hover_cell.set(found);
                 },
                 onmouseleave: move |_| {
                     hover_cell.set(None);

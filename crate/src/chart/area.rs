@@ -2,17 +2,19 @@ use dioxus::prelude::*;
 use std::collections::BTreeSet;
 
 use super::primitives::{
-    compute_min_max, generate_svg_area_path, generate_svg_path, get_series_color, ChartContainer,
-    ChartDataPoint, ChartGrid, ChartLegend, ChartSeries, ChartTooltip, CurveType,
+    compute_min_max, generate_stacked_area_band_path, generate_svg_area_path, generate_svg_path,
+    get_series_color, ChartContainer, ChartDataPoint, ChartGrid, ChartLegend, ChartSeries,
+    ChartTooltip, CurveType,
 };
 
-/// Grafico ad area vettoriale SVG con supporto per gradienti sfumati, multi-serie e tooltip live.
+/// Grafico ad area vettoriale SVG con supporto per serie sovrapposte/impilate (Stacked Area), gradienti sfumati e tooltip interattivo.
 #[allow(clippy::type_complexity)]
 #[component]
 pub fn AreaChart(
     data: Vec<ChartDataPoint>,
     series: Vec<ChartSeries>,
     #[props(default)] curve_type: CurveType,
+    #[props(default = true)] stacked: bool,
     #[props(default = true)] with_gradient: bool,
     #[props(default = true)] with_dots: bool,
     #[props(default = true)] with_grid: bool,
@@ -34,19 +36,13 @@ pub fn AreaChart(
 
     let plot_w = svg_w - padding_left - padding_right;
     let plot_h = svg_h - padding_top - padding_bottom;
+    let baseline_y = padding_top + plot_h;
 
     let active_series: Vec<(usize, &ChartSeries)> = series
         .iter()
         .enumerate()
         .filter(|(_, s)| !hidden_series().contains(&s.name))
         .collect();
-
-    let (min_val, max_val) = compute_min_max(&data, &series);
-    let range = if (max_val - min_val).abs() < f64::EPSILON {
-        1.0
-    } else {
-        max_val - min_val
-    };
 
     let n = data.len();
     let x_step = if n > 1 {
@@ -55,27 +51,81 @@ pub fn AreaChart(
         plot_w
     };
 
-    // Calcolo coordinate (x, y) per ciascuna serie attiva
-    let series_coords: Vec<(usize, String, String, Vec<(f64, f64)>)> = active_series
-        .iter()
-        .map(|&(orig_idx, s)| {
+    // Calcolo scale e coordinate (Stacked o Normal)
+    let (series_renders, max_val_used) = if stacked {
+        // Modalità Stacked: calcolo della somma cumulativa ad ogni punto
+        let mut max_sum = 1.0f64;
+        for pt in &data {
+            let sum: f64 = active_series.iter().filter_map(|(_, s)| pt.get(&s.name)).sum();
+            if sum > max_sum {
+                max_sum = sum;
+            }
+        }
+
+        let mut renders = Vec::new();
+        // Tracciamento dal basso verso l'alto
+        let mut prev_top_coords = vec![(0.0f64, baseline_y); n];
+        for (i, _) in data.iter().enumerate() {
+            let cx = padding_left + i as f64 * x_step;
+            prev_top_coords[i] = (cx, baseline_y);
+        }
+
+        let mut cumulative_values = vec![0.0f64; n];
+
+        for &(orig_idx, s) in &active_series {
             let color = get_series_color(orig_idx, s.color.as_deref());
-            let coords: Vec<(f64, f64)> = data
-                .iter()
-                .enumerate()
-                .filter_map(|(i, pt)| {
-                    pt.get(&s.name).map(|v| {
+            let mut top_coords = Vec::with_capacity(n);
+            let mut bottom_coords = Vec::with_capacity(n);
+
+            for (i, pt) in data.iter().enumerate() {
+                let val = pt.get(&s.name).unwrap_or(0.0).max(0.0);
+                let cx = padding_left + i as f64 * x_step;
+                let bot_y = prev_top_coords[i].1;
+
+                cumulative_values[i] += val;
+                let top_y = padding_top + plot_h - (cumulative_values[i] / max_sum) * plot_h;
+
+                top_coords.push((cx, top_y));
+                bottom_coords.push((cx, bot_y));
+            }
+
+            prev_top_coords = top_coords.clone();
+            renders.push((orig_idx, s.name.clone(), color, top_coords, bottom_coords));
+        }
+
+        (renders, max_sum)
+    } else {
+        // Modalità Non-stacked classica
+        let (min_val, max_val) = compute_min_max(&data, &series);
+        let range = if (max_val - min_val).abs() < f64::EPSILON {
+            1.0
+        } else {
+            max_val - min_val
+        };
+
+        let renders = active_series
+            .iter()
+            .map(|&(orig_idx, s)| {
+                let color = get_series_color(orig_idx, s.color.as_deref());
+                let top_coords: Vec<(f64, f64)> = data
+                    .iter()
+                    .enumerate()
+                    .map(|(i, pt)| {
+                        let v = pt.get(&s.name).unwrap_or(0.0);
                         let cx = padding_left + i as f64 * x_step;
                         let cy = padding_top + plot_h - ((v - min_val) / range) * plot_h;
                         (cx, cy)
                     })
-                })
-                .collect();
-            (orig_idx, s.name.clone(), color, coords)
-        })
-        .collect();
+                    .collect();
+                let bottom_coords: Vec<(f64, f64)> = (0..n)
+                    .map(|i| (padding_left + i as f64 * x_step, baseline_y))
+                    .collect();
+                (orig_idx, s.name.clone(), color, top_coords, bottom_coords)
+            })
+            .collect();
 
-    let baseline_y = padding_top + plot_h;
+        (renders, max_val)
+    };
 
     // Dati per il tooltip attivo
     let current_tooltip_data = hover_index().and_then(|idx| {
@@ -84,7 +134,7 @@ pub fn AreaChart(
         }
         let pt = &data[idx];
         let mut entries = Vec::new();
-        for &(orig_idx, ref name, ref color, _) in &series_coords {
+        for &(orig_idx, ref name, ref color, _, _) in &series_renders {
             if let Some(v) = pt.get(name) {
                 let s_label = series[orig_idx].display_label().to_string();
                 entries.push((s_label, format!("{v:.1}"), color.clone()));
@@ -92,9 +142,8 @@ pub fn AreaChart(
         }
         let cx = padding_left + idx as f64 * x_step;
         let my = if mouse_pos().1 > 0.0 { mouse_pos().1 } else { padding_top + plot_h / 2.0 };
-        let mx = if mouse_pos().0 > 0.0 { mouse_pos().0 } else { cx };
         let is_right = cx > svg_w / 2.0 || mouse_pos().0 > 300.0;
-        Some((pt.label.clone(), entries, mx, my, is_right))
+        Some((pt.label.clone(), entries, cx, my, is_right))
     });
 
     rsx! {
@@ -104,6 +153,13 @@ pub fn AreaChart(
                 onmousemove: move |evt| {
                     let c = evt.element_coordinates();
                     mouse_pos.set((c.x, c.y));
+                    if c.x >= padding_left && c.x <= padding_left + plot_w && c.y >= padding_top && c.y <= baseline_y {
+                        let ratio = ((c.x - padding_left) / plot_w).clamp(0.0, 1.0);
+                        let idx = (ratio * (n - 1) as f64).round() as usize;
+                        hover_index.set(Some(idx.min(n.saturating_sub(1))));
+                    } else {
+                        hover_index.set(None);
+                    }
                 },
                 onmouseleave: move |_| {
                     hover_index.set(None);
@@ -112,7 +168,7 @@ pub fn AreaChart(
                     view_box: "0 0 {svg_w} {svg_h}",
                     height: height,
                     defs {
-                        for (orig_idx, _, color, _) in &series_coords {
+                        for (orig_idx, _, color, _, _) in &series_renders {
                             linearGradient {
                                 id: "area-grad-{orig_idx}",
                                 x1: "0",
@@ -122,12 +178,12 @@ pub fn AreaChart(
                                 stop {
                                     offset: "0%",
                                     stop_color: "{color}",
-                                    stop_opacity: "0.45",
+                                    stop_opacity: "0.55",
                                 }
                                 stop {
                                     offset: "100%",
                                     stop_color: "{color}",
-                                    stop_opacity: "0.02",
+                                    stop_opacity: "0.05",
                                 }
                             }
                         }
@@ -144,11 +200,15 @@ pub fn AreaChart(
                         }
                     }
 
-                    // Aree e linee
-                    for (orig_idx, _, color, coords) in &series_coords {
+                    // Aree e linee (ordinate per render corretto)
+                    for (orig_idx, _, color, top_coords, bottom_coords) in &series_renders {
                         {
-                            let area_d = generate_svg_area_path(coords, baseline_y, curve_type);
-                            let line_d = generate_svg_path(coords, curve_type);
+                            let area_d = if stacked {
+                                generate_stacked_area_band_path(top_coords, bottom_coords, curve_type)
+                            } else {
+                                generate_svg_area_path(top_coords, baseline_y, curve_type)
+                            };
+                            let line_d = generate_svg_path(top_coords, curve_type);
                             rsx! {
                                 if with_gradient {
                                     path {
@@ -166,7 +226,7 @@ pub fn AreaChart(
                                     style: "filter: drop-shadow(0 0 6px {color}88);",
                                 }
                                 if with_dots {
-                                    for (pt_idx, (cx, cy)) in coords.iter().enumerate() {
+                                    for (pt_idx, (cx, cy)) in top_coords.iter().enumerate() {
                                         circle {
                                             key: "dot-{orig_idx}-{pt_idx}",
                                             cx: "{cx}",
@@ -221,25 +281,15 @@ pub fn AreaChart(
                         }
                     }
 
-                    // Aree invisibili interattive per hover asse X
-                    for i in 0..n {
-                        {
-                            let col_w = if n > 1 { plot_w / n as f64 } else { plot_w };
-                            let col_x = padding_left + i as f64 * x_step - (col_w / 2.0);
-                            rsx! {
-                                rect {
-                                    key: "hover-zone-{i}",
-                                    x: "{col_x.max(padding_left)}",
-                                    y: "{padding_top}",
-                                    width: "{col_w}",
-                                    height: "{plot_h}",
-                                    fill: "transparent",
-                                    class: "cursor-pointer",
-                                    onmouseenter: move |_| hover_index.set(Some(i)),
-                                    onmouseleave: move |_| hover_index.set(None),
-                                }
-                            }
-                        }
+                    // Etichette asse Y (massimo)
+                    text {
+                        x: "{padding_left - 8.0}",
+                        y: "{padding_top + 6.0}",
+                        text_anchor: "end",
+                        fill: "rgba(255, 255, 255, 0.40)",
+                        font_size: "10",
+                        font_family: "monospace",
+                        "{max_val_used:.0}"
                     }
                 }
 

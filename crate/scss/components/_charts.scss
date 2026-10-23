@@ -39,13 +39,13 @@
     &__tooltip {
       pointer-events: none;
       position: absolute;
-      z-index: 100;
+      z-index: 1050;
       padding: 0.5rem 0.75rem;
       border-radius: $radius-md;
-      background-color: rgba(9, 9, 11, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
+      background-color: rgba(9, 9, 11, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8), 0 0 15px rgba(168, 85, 247, 0.2);
+      backdrop-filter: blur(16px);
       font-size: 0.75rem;
       font-family: $font-mono;
       transition: transform 75ms ease;
