@@ -188,6 +188,9 @@ use dioxus::prelude::*;
 ///
 /// Downstream projects do not need Node.js, npm, or Tailwind CLI; Dioxus bundles
 /// the SCSS stylesheet automatically.
+/// Current version of `shadow-design` defined in Cargo.toml.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub const STYLES: Asset = asset!("/scss/main.scss");
 
 pub mod a11y;
@@ -556,4 +559,5 @@ pub mod prelude {
     #[cfg(feature = "activity_feed")]
     pub use crate::activity_feed::*;
     pub use crate::STYLES;
+    pub use crate::VERSION;
 }

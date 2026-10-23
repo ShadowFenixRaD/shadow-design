@@ -128,7 +128,7 @@ AppShell {
         AppShellFooter {
             height: "36px",
             div { class: "flex items-center justify-between w-full px-4 text-xs text-zinc-500 font-mono",
-                span { "Ready • v0.3.0" }
+                span { "Ready • v{VERSION}" }
                 span { "Shadow Design System" }
             }
         }
@@ -267,7 +267,7 @@ AppShell {
                                                 span { class: "w-1.5 h-1.5 rounded-full bg-emerald-400" }
                                                 span { "Tutti i sistemi operativi" }
                                             }
-                                            span { "Shadow Design v0.3.0" }
+                                            span { "Shadow Design v{VERSION}" }
                                         }
                                     }
                                 },

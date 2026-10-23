@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
+pub use shadow_design::VERSION;
 
 mod components;
 mod pages;

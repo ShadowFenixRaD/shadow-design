@@ -2,50 +2,23 @@ use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
 use crate::components::CodeBlock;
-const CARGO_FEATURES: &[&str] = &[
-    "button",
-    "card",
-    "input",
-    "select",
-    "textarea",
-    "checkbox",
-    "badge",
-    "navbar",
-    "modal",
-    "alert",
-    "theme",
-    "icon",
-    "typography",
-    "notification",
-    "tabs",
-    "switch",
-    "tooltip",
-    "drawer",
-    "dropdown",
-    "animation",
-    "avatar",
-    "chat",
-    "progress",
-    "attachment_card",
-    "contact_card",
-    "segmented_control",
-    "divider",
-    "tree",
-    "skeleton",
-];
+use crate::components::nav::all_cargo_features;
+
 
 #[component]
 pub fn Home() -> Element {
     let mut theme = use_theme();
     let nav = use_navigator();
+    let cargo_features = all_cargo_features();
 
-    let install_code = r#"[dependencies]
+    let install_code = format!(
+        r#"[dependencies]
 # Importa solo i moduli desiderati con default-features = false (zero bloat):
-shadow-design = { version = "0.3.0", default-features = false, features = ["button", "card", "theme", "icon"] }
+shadow-design = {{ version = "{VERSION}", default-features = false, features = ["button", "card", "theme", "icon"] }}
 
 # Oppure include l'intera suite:
-# shadow-design = { version = "0.3.0", features = ["all"] }"#
-        .to_string();
+# shadow-design = {{ version = "{VERSION}", features = ["all"] }}"#
+    );
 
     let rust_example = r#"use dioxus::prelude::*;
 use shadow_design::prelude::*;
@@ -188,7 +161,7 @@ pub fn App() -> Element {
                         "Ogni componente è racchiuso dietro una feature flag Cargo indipendente. Compila esclusivamente il codice che la tua applicazione utilizza."
                     }
                     div { class: "flex flex-wrap gap-1.5",
-                        for feat in CARGO_FEATURES {
+                        for feat in &cargo_features {
                             Badge { label: (*feat).to_string(), variant: BadgeVariant::Primary }
                         }
                     }

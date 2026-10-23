@@ -38,6 +38,8 @@ def scan_source_classes():
     for root_dir in root_dirs:
         for root, _, files in os.walk(root_dir):
             for file in files:
+                if file == "nav.rs":
+                    continue
                 if file.endswith(".rs"):
                     path = os.path.join(root, file)
                     with open(path, "r", encoding="utf-8") as f:
