@@ -596,6 +596,92 @@ pub const COMPONENTS: &[ComponentNavEntry] = &[
         keywords: "code highlight syntax codeblock pre line numbers copy",
         description: "Blocco codice con syntax highlighting multilingua e pulsante di copia.",
     },
+
+    // --- Visualizzazione Dati (Epic #10) ---
+    ComponentNavEntry {
+        name: "Charts & Data Viz",
+        route: Route::ChartsPage {},
+        group: "Visualizzazione Dati",
+        icon: IconKind::Layers,
+        keywords: "charts area bar line pie donut radar scatter bubble sparkline gauge heatmap data telemetry",
+        description: "Suite completa di grafici vettoriali SVG ad alte prestazioni senza dipendenze JS.",
+    },
+
+    // --- Contenuti & Media (Epic #11) ---
+    ComponentNavEntry {
+        name: "RichTextEditor",
+        route: Route::RichTextPage {},
+        group: "Contenuti & Media",
+        icon: IconKind::Terminal,
+        keywords: "rich text editor wysiwyg markdown formatting code table",
+        description: "Editor di testo ricco con motore duale WYSIWYG + Markdown e toolbar modulare.",
+    },
+    ComponentNavEntry {
+        name: "DocumentCard",
+        route: Route::DocumentCardPage {},
+        group: "Contenuti & Media",
+        icon: IconKind::Paperclip,
+        keywords: "document card file preview pdf docx author actions download",
+        description: "Scheda per documenti e file con thumbnail preview, metadati e azioni rapide.",
+    },
+    ComponentNavEntry {
+        name: "Masonry & ImageList",
+        route: Route::MasonryPage {},
+        group: "Contenuti & Media",
+        icon: IconKind::Box,
+        keywords: "masonry image list gallery lightbox responsive waterfall cascade",
+        description: "Griglia a cascata fluida in stile Pinterest con Lightbox modale interattivo.",
+    },
+    ComponentNavEntry {
+        name: "MediaCard",
+        route: Route::MediaCardPage {},
+        group: "Contenuti & Media",
+        icon: IconKind::Box,
+        keywords: "media card aspect ratio tactile action area video header",
+        description: "Scheda multimediale immersiva ad aspect ratio fisso ed effetto tattile esteso.",
+    },
+
+    // --- Navigazione Avanzata & Collaborazione (Epic #12) ---
+    ComponentNavEntry {
+        name: "NavigationMenu",
+        route: Route::NavigationMenuPage {},
+        group: "Navigazione Avanzata",
+        icon: IconKind::Menu,
+        keywords: "navigation menu megamenu mega multi column preview card shadcn",
+        description: "Barra di navigazione Mega-Menu per applicazioni enterprise complesse.",
+    },
+    ComponentNavEntry {
+        name: "OverflowSet / Toolbar",
+        route: Route::OverflowSetPage {},
+        group: "Navigazione Avanzata",
+        icon: IconKind::Menu,
+        keywords: "overflow set responsive toolbar actions compact fluent dropdown",
+        description: "Barra strumenti che sposta le azioni in eccesso in tendina evitando overflow.",
+    },
+    ComponentNavEntry {
+        name: "TransferList",
+        route: Route::TransferListPage {},
+        group: "Inserimento & Form",
+        icon: IconKind::Layers,
+        keywords: "transfer list dual columns move items select assign mui",
+        description: "Interfaccia a due colonne per spostare e assegnare elementi con ricerca.",
+    },
+    ComponentNavEntry {
+        name: "Facepile",
+        route: Route::FacepilePage {},
+        group: "Collaborazione & Feed",
+        icon: IconKind::Sparkles,
+        keywords: "facepile avatars team presence overflow cluster members fluent",
+        description: "Cluster compatto di avatar di collaboratori con badge +N e menu membri.",
+    },
+    ComponentNavEntry {
+        name: "ActivityFeed",
+        route: Route::ActivityFeedPage {},
+        group: "Collaborazione & Feed",
+        icon: IconKind::MessageSquare,
+        keywords: "activity feed timeline audit log comments replies collaboration",
+        description: "Feed e timeline di eventi collaborativi con commenti e risposte inline.",
+    },
 ];
 
 #[component]
