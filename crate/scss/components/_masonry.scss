@@ -1,14 +1,175 @@
 // ==============================================================================
-// Shadow Design — Masonry & ImageList Component Styles
+// Shadow Design: Masonry and ImageList
+// Recipes: container (tile; interactive when it opens the lightbox) + modal
+// layer over the shared backdrop (lightbox).
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
+@use '../layers' as *;
+@use '../zindex' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-masonry {
     width: 100%;
+    column-count: var(--sd-masonry-cols, 1);
+    column-gap: var(--sd-masonry-gap, var(--sd-space-2));
     orphans: 1;
     widows: 1;
+
+    @include bp-up(sm) { column-count: var(--sd-masonry-cols-sm, var(--sd-masonry-cols, 1)); }
+    @include bp-up(md) { column-count: var(--sd-masonry-cols-md, var(--sd-masonry-cols, 1)); }
+    @include bp-up(lg) { column-count: var(--sd-masonry-cols-lg, var(--sd-masonry-cols, 1)); }
+    @include bp-up(xl) { column-count: var(--sd-masonry-cols-xl, var(--sd-masonry-cols, 1)); }
+
+    &__item {
+      @include sd-surface(1);
+      position: relative;
+      overflow: hidden;
+      break-inside: avoid;
+      margin-bottom: var(--sd-masonry-gap, var(--sd-space-2));
+
+      &--interactive {
+        @include sd-surface-interactive;
+      }
+    }
+
+    &__image {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    // Caption scrim: keeps text readable over the image. Always visible; static.
+    &__caption {
+      position: absolute;
+      inset: auto 0 0 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--sd-space-3);
+      background-color: var(--sd-scrim);
+    }
+
+    &__caption-title {
+      font-size: var(--sd-text-sm);
+      font-weight: 600;
+      color: var(--sd-text);
+      @include text-truncate;
+    }
+
+    &__caption-sub {
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text-muted);
+      @include text-truncate;
+    }
+
+    // Lightbox: backdrop recipe on the modal layer.
+    &__lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: z('modal-back');
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sd-space-4);
+      background-color: var(--sd-scrim);
+      backdrop-filter: blur(var(--sd-backdrop-blur));
+      -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+      user-select: none;
+      @include sd-animate(sd-fade-in);
+    }
+
+    &__lightbox-bar {
+      position: absolute;
+      top: var(--sd-space-4);
+      left: var(--sd-space-4);
+      right: var(--sd-space-4);
+      z-index: z('modal-content');
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__lightbox-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+    }
+
+    &__lightbox-count {
+      padding: var(--sd-space-1) var(--sd-space-3);
+      border-radius: var(--sd-radius-full);
+      background-color: var(--sd-tint-3);
+      color: var(--sd-text-muted);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      font-variant-numeric: tabular-nums;
+    }
+
+    &__lightbox-title {
+      font-size: var(--sd-text-sm);
+      font-weight: 600;
+      color: var(--sd-text);
+    }
+
+    &__lightbox-btn {
+      @include sd-lit-fill(secondary);
+      @include sd-press;
+      z-index: z('modal-content');
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--sd-control-md);
+      height: var(--sd-control-md);
+      padding: 0;
+      border-radius: var(--sd-radius-md);
+
+      &--prev,
+      &--next {
+        position: absolute;
+        top: 50%;
+        margin-top: calc(var(--sd-control-md) / -2);
+      }
+
+      &--prev { left: var(--sd-space-4); }
+      &--next { right: var(--sd-space-4); }
+    }
+
+    &__lightbox-frame {
+      @include sd-surface(3);
+      @include sd-animate(sd-pop-in);
+      z-index: z('modal-content');
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: 64rem;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+
+    &__lightbox-image {
+      max-width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+    }
+
+    &__lightbox-sub {
+      width: 100%;
+      padding: var(--sd-space-3);
+      box-sizing: border-box;
+      border-top: 1px solid var(--sd-border-subtle);
+      background-color: var(--sd-tint-1);
+      text-align: center;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text-muted);
+    }
+  }
+
+  .sd-image-list {
+    position: relative;
+    width: 100%;
   }
 }

@@ -1,76 +1,65 @@
 // ==============================================================================
-// Shadow Design — Navbar Styles
+// Shadow Design: Navbar
+// Recipes: container (bar) + floating panel (collapsed menu) + ghost control.
+// Mobile first: collapses below `sm`, the toggle disappears from `sm` upwards.
 // ==============================================================================
-@use '../variables' as *;
+@use '../layers' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-.sd-navbar {
-  position: sticky;
-  top: 0;
-  z-index: z('header');
-  width: 100%;
-  background-color: rgba(3, 3, 5, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: $border-hairline;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85);
-  padding: 12px 24px;
-  @include specular-top(0.08);
+  .sd-navbar {
+    @include sd-surface(1);
+    position: sticky;
+    top: 0;
+    z-index: z('header');
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--sd-space-3) var(--sd-space-6);
+    border-width: 0 0 1px;
+    border-radius: 0;
 
-  &__inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  &__brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  &__toggle {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: $radius-md;
-    color: $zinc-200;
-    padding: 6px;
-    cursor: pointer;
-    transition: background-color $duration-fast ease, border-color $duration-fast ease;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.25);
-      color: #ffffff;
+    &__inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sd-space-4);
     }
 
-    &:focus-visible {
-      outline: 2px solid var(--sd-focus-ring, rgba(168, 85, 247, 0.85));
-      outline-offset: 2px;
+    &__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-3);
     }
-  }
 
-  &--collapsible {
-    @media (max-width: 640px) {
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-4);
+    }
+
+    &__toggle {
+      @include sd-lit-fill(ghost);
+      @include sd-press;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-width: var(--sd-control-sm);
+      height: var(--sd-control-sm);
+      padding: 0 var(--sd-space-2);
+      border-radius: var(--sd-radius-md);
+    }
+
+    &--collapsible {
       .sd-navbar__toggle {
         display: inline-flex;
       }
 
       .sd-navbar__actions {
+        @include sd-surface(2);
+        @include sd-animate(sd-pop-in);
         display: none;
         position: absolute;
         top: 100%;
@@ -78,20 +67,36 @@
         right: 0;
         flex-direction: column;
         align-items: stretch;
-        background-color: rgba(3, 3, 5, 0.96);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: $border-hairline;
-        padding: 16px 24px;
-        gap: 12px;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+        gap: var(--sd-space-3);
+        padding: var(--sd-space-4) var(--sd-space-6);
+        border-width: 0 0 1px;
+        border-radius: var(--sd-radius-lg);
+      }
 
-        &--open {
+      .sd-navbar__actions--open {
+        display: flex;
+      }
+
+      @include bp-up(sm) {
+        .sd-navbar__toggle {
+          display: none;
+        }
+
+        .sd-navbar__actions,
+        .sd-navbar__actions--open {
           display: flex;
+          position: static;
+          flex-direction: row;
+          align-items: center;
+          gap: var(--sd-space-4);
+          padding: 0;
+          border: none;
+          border-radius: 0;
+          background: transparent;
+          --sd-shadow-specular: #{$sd-shadow-none};
+          --sd-shadow-elev: #{$sd-shadow-none};
         }
       }
     }
   }
 }
-}
-

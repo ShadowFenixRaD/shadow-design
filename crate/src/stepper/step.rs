@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use crate::icon::{Icon, IconKind, RenderSvgIcon, SvgIcon};
-use crate::stepper::{StepperCtx, StepperOrientation};
+use crate::stepper::StepperCtx;
 
 /// Stato di avanzamento di un singolo step.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
@@ -64,7 +64,6 @@ pub struct StepperStepProps {
 pub fn StepperStep(props: StepperStepProps) -> Element {
     let ctx_sig = try_use_context::<Signal<StepperCtx>>();
     let active_idx = ctx_sig.as_ref().map(|c| c.read().active).unwrap_or(0);
-    let orientation = ctx_sig.as_ref().map(|c| c.read().orientation).unwrap_or(StepperOrientation::Horizontal);
     let allow_click = ctx_sig.as_ref().map(|c| c.read().allow_click_completed).unwrap_or(true);
 
     let current_state = props.state.unwrap_or(if props.step < active_idx {
@@ -91,7 +90,6 @@ pub fn StepperStep(props: StepperStepProps) -> Element {
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
 
-    let orientation_class = orientation.as_class();
     let state_class = current_state.as_class();
     let clickable_class = if is_clickable { "sd-stepper-step--clickable" } else { "" };
     let disabled_class = if props.disabled { "sd-stepper-step--disabled" } else { "" };
@@ -129,23 +127,34 @@ pub fn StepperStep(props: StepperStepProps) -> Element {
         }
     };
 
+    let header_content = rsx! {
+        div { class: "sd-stepper-step__circle",
+            {circle_content}
+        }
+        div { class: "sd-stepper-step__label-container",
+            span { class: "sd-stepper-step__label", "{props.label}" }
+            if let Some(ref desc) = props.description {
+                span { class: "sd-stepper-step__description", "{desc}" }
+            }
+        }
+    };
+
     rsx! {
         div {
-            class: "sd-stepper-step {orientation_class} {state_class} {clickable_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
-            button {
-                r#type: "button",
-                class: "sd-stepper-step__header",
-                disabled: !is_clickable,
-                "aria-current": if is_active { Some("step") } else { None },
-                onclick: on_click_step,
-                div { class: "sd-stepper-step__circle",
-                    {circle_content}
+            class: "sd-stepper-step {state_class} {clickable_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
+            if is_clickable {
+                button {
+                    r#type: "button",
+                    class: "sd-stepper-step__header",
+                    "aria-current": if is_active { Some("step") } else { None },
+                    onclick: on_click_step,
+                    {header_content}
                 }
-                div { class: "sd-stepper-step__label-container",
-                    span { class: "sd-stepper-step__label", "{props.label}" }
-                    if let Some(ref desc) = props.description {
-                        span { class: "sd-stepper-step__description", "{desc}" }
-                    }
+            } else {
+                div {
+                    class: "sd-stepper-step__header",
+                    "aria-current": if is_active { Some("step") } else { None },
+                    {header_content}
                 }
             }
             // Linea connettiva tra step

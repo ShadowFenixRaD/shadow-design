@@ -1,21 +1,26 @@
 // ==============================================================================
-// Shadow Design — AppShell Master Layout Component Styles (BEM)
+// Shadow Design: AppShell
+// Recipes: container (header, navbar, aside, footer) + backdrop. Below `md` the
+// navbar and aside become off-canvas panels (floating layer + backdrop) instead
+// of squeezing the content.
 // ==============================================================================
-@use '../variables' as *;
+@use '../layers' as *;
+@use '../zindex' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-app-shell {
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
-    background: #000000;
+    background-color: var(--sd-void);
+    color: var(--sd-text);
     overflow: hidden;
-    z-index: 10;
 
     &--fullscreen {
       min-height: 100vh;
@@ -23,29 +28,28 @@
     }
 
     &__header {
+      @include sd-surface(1);
       position: relative;
+      z-index: z('header');
       width: 100%;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1rem;
+      padding: 0 var(--sd-space-4);
       box-sizing: border-box;
-      background: rgba(4, 4, 6, 0.95);
-      z-index: 30; // Scala universale Z-index
+      border-width: 0;
+      border-radius: 0;
 
       &--sticky {
         position: sticky;
         top: 0;
         left: 0;
         right: 0;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
       }
 
       &--border {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        @include specular-top(0.08);
+        border-bottom-width: 1px;
       }
     }
 
@@ -62,78 +66,83 @@
       overflow: hidden;
     }
 
-    &__navbar {
-      position: relative;
+    // Backdrop for the off-canvas panels. Not needed from `md` upwards.
+    &__backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: z('drawer-back');
+      background-color: var(--sd-scrim);
+      backdrop-filter: blur(var(--sd-backdrop-blur));
+      -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+      @include sd-animate(sd-fade-in);
+
+      @include bp-up(md) {
+        display: none;
+      }
+    }
+
+    // Side panels: off-canvas overlay on small screens, docked from `md`.
+    &__navbar,
+    &__aside {
+      @include sd-surface(1);
+      @include sd-transition(width, min-width, border-color, $duration: var(--sd-dur-slow));
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: z('drawer');
       height: 100%;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      background: #040405;
-      z-index: 25;
+      border-width: 0;
+      border-radius: 0;
       overflow: hidden;
-      transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease;
+      --sd-shadow-elev: var(--sd-elev-3);
 
-      &--border {
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
+      @include bp-up(md) {
+        position: relative;
+        z-index: z('sticky');
+        --sd-shadow-elev: var(--sd-elev-1);
       }
 
       &--collapsed {
-        border-right-color: transparent !important;
         pointer-events: none;
-
-        .sd-app-shell__navbar-inner {
-          opacity: 0;
-          visibility: hidden;
-          pointer-events: none;
-        }
+        --sd-shadow-elev: #{$sd-shadow-none};
       }
+    }
 
-      &-inner {
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        box-sizing: border-box;
-        @include custom-scrollbar;
-        transition: opacity 0.16s ease, visibility 0.24s ease;
+    &__navbar {
+      left: 0;
+
+      &--border {
+        border-right-width: 1px;
       }
     }
 
     &__aside {
-      position: relative;
-      height: 100%;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      background: #040405;
-      z-index: 25;
-      overflow: hidden;
-      transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease;
+      right: 0;
 
       &--border {
-        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        border-left-width: 1px;
       }
+    }
 
-      &--collapsed {
-        border-left-color: transparent !important;
-        pointer-events: none;
+    &__navbar-inner,
+    &__aside-inner {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      @include sd-scrollbar;
+      @include sd-transition(opacity, visibility, $duration: var(--sd-dur-fast));
+    }
 
-        .sd-app-shell__aside-inner {
-          opacity: 0;
-          visibility: hidden;
-          pointer-events: none;
-        }
-      }
-
-      &-inner {
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        box-sizing: border-box;
-        @include custom-scrollbar;
-        transition: opacity 0.16s ease, visibility 0.24s ease;
-      }
+    &__navbar--collapsed .sd-app-shell__navbar-inner,
+    &__aside--collapsed .sd-app-shell__aside-inner {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     &__content-area {
@@ -147,7 +156,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       box-sizing: border-box;
-      @include custom-scrollbar;
+      @include sd-scrollbar;
     }
 
     &__main {
@@ -160,20 +169,21 @@
     }
 
     &__footer {
+      @include sd-surface(1);
       position: relative;
+      z-index: z('sticky');
       width: 100%;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1rem;
+      padding: 0 var(--sd-space-4);
       box-sizing: border-box;
-      background: #020203;
-      z-index: 20;
+      border-width: 0;
+      border-radius: 0;
 
       &--border {
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+        border-top-width: 1px;
       }
     }
   }

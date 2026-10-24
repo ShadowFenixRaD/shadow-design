@@ -32,11 +32,6 @@ pub fn BreadcrumbItem(props: BreadcrumbItemProps) -> Element {
         ""
     };
     let has_action = props.href.is_some() || props.on_click.is_some();
-    let interactive_class = if has_action && !props.is_current {
-        "sd-breadcrumb-item--interactive"
-    } else {
-        ""
-    };
 
     let icon_el = if let Some(ref ic) = props.icon {
         rsx! {
@@ -62,7 +57,7 @@ pub fn BreadcrumbItem(props: BreadcrumbItemProps) -> Element {
     } else if let Some(ref href) = props.href {
         rsx! {
             li {
-                class: "sd-breadcrumb-item {interactive_class} {props.class}",
+                class: "sd-breadcrumb-item {props.class}",
                 a {
                     class: "sd-breadcrumb-item__link",
                     href: "{href}",
@@ -79,7 +74,7 @@ pub fn BreadcrumbItem(props: BreadcrumbItemProps) -> Element {
     } else {
         rsx! {
             li {
-                class: "sd-breadcrumb-item {interactive_class} {props.class}",
+                class: "sd-breadcrumb-item {props.class}",
                 button {
                     r#type: "button",
                     class: "sd-breadcrumb-item__link sd-breadcrumb-item__button",

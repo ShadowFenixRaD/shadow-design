@@ -55,6 +55,19 @@ pub enum ComponentSpacing {
 }
 
 impl ComponentSpacing {
+    /// CSS value of the spacing token used for the column gap.
+    #[must_use]
+    pub fn token(&self) -> &'static str {
+        match self {
+            Self::None => "0",
+            Self::Xs => "var(--sd-space-1)",
+            Self::Sm => "var(--sd-space-2)",
+            Self::Md => "var(--sd-space-4)",
+            Self::Lg => "var(--sd-space-6)",
+            Self::Xl => "var(--sd-space-8)",
+        }
+    }
+
     #[must_use]
     pub fn to_px(&self) -> u32 {
         match self {
@@ -109,7 +122,22 @@ impl MasonryItem {
     }
 }
 
-/// Griglia a cascata in stile Pinterest con altezze eterogenee distribuite fluidamente.
+impl ResponsiveCols {
+    /// Inline custom properties read by `.sd-masonry` (one column count per breakpoint).
+    fn style(&self, gap: ComponentSpacing) -> String {
+        format!(
+            "--sd-masonry-cols: {}; --sd-masonry-cols-sm: {}; --sd-masonry-cols-md: {}; --sd-masonry-cols-lg: {}; --sd-masonry-cols-xl: {}; --sd-masonry-gap: {};",
+            self.base,
+            self.sm,
+            self.md,
+            self.lg,
+            self.xl,
+            gap.token()
+        )
+    }
+}
+
+/// Waterfall grid with columns of uneven height; the column count follows the breakpoints in `cols`.
 #[component]
 pub fn MasonryGrid(
     #[props(default)] cols: ResponsiveCols,
@@ -117,18 +145,16 @@ pub fn MasonryGrid(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
-    let gap_px = gap.to_px();
-
     rsx! {
         div {
-            class: "sd-masonry w-full {class}",
-            style: "column-count: {cols.base}; column-gap: {gap_px}px;",
+            class: "sd-masonry {class}",
+            style: "{cols.style(gap)}",
             {children}
         }
     }
 }
 
-/// Galleria di immagini Masonry con anteprima ad alto contrasto e Lightbox modale interattivo.
+/// Masonry image gallery with an optional modal lightbox.
 #[component]
 pub fn ImageList(
     items: Vec<MasonryItem>,
@@ -137,16 +163,21 @@ pub fn ImageList(
     #[props(default = true)] with_lightbox: bool,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut selected_index = use_signal(|| None::<usize>);
 
     let total = items.len();
-    let gap_px = gap.to_px();
+    let item_class = if with_lightbox {
+        "sd-masonry__item sd-masonry__item--interactive"
+    } else {
+        "sd-masonry__item"
+    };
 
     rsx! {
-        div { class: "w-full relative {class}",
+        div { class: "sd-image-list {class}",
             div {
-                class: "sd-masonry w-full",
-                style: "column-count: {cols.base}; column-gap: {gap_px}px;",
+                class: "sd-masonry",
+                style: "{cols.style(gap)}",
 
                 for (idx, item) in items.iter().enumerate() {
                     {
@@ -157,9 +188,17 @@ pub fn ImageList(
                         rsx! {
                             div {
                                 key: "{item.id}",
-                                class: "break-inside-avoid mb-[{gap_px}px] group relative rounded-xl overflow-hidden border border-white/[0.08] bg-zinc-900 cursor-pointer shadow-md hover:border-purple-500/40 transition-all",
+                                class: "{item_class}",
+                                role: if with_lightbox { Some("button") } else { None },
+                                tabindex: if with_lightbox { "0" } else { "-1" },
                                 onclick: move |_| {
                                     if with_lightbox {
+                                        selected_index.set(Some(idx));
+                                    }
+                                },
+                                onkeydown: move |e: KeyboardEvent| {
+                                    if with_lightbox && (e.key() == Key::Enter || e.key() == Key::Character(" ".to_string())) {
+                                        e.prevent_default();
                                         selected_index.set(Some(idx));
                                     }
                                 },
@@ -167,17 +206,17 @@ pub fn ImageList(
                                 img {
                                     src: "{src}",
                                     alt: "{title.clone().unwrap_or_default()}",
-                                    class: "w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300 block",
+                                    class: "sd-masonry__image",
                                     loading: "lazy",
                                 }
 
                                 if title.is_some() || sub.is_some() {
-                                    div { class: "absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end",
+                                    div { class: "sd-masonry__caption",
                                         if let Some(t) = &title {
-                                            span { class: "text-sm font-semibold text-white truncate", "{t}" }
+                                            span { class: "sd-masonry__caption-title", "{t}" }
                                         }
                                         if let Some(s) = &sub {
-                                            span { class: "text-xs text-zinc-300 truncate", "{s}" }
+                                            span { class: "sd-masonry__caption-sub", "{s}" }
                                         }
                                     }
                                 }
@@ -187,7 +226,7 @@ pub fn ImageList(
                 }
             }
 
-            // Lightbox Modal
+            // Lightbox: modal layer over a backdrop.
             if let Some(idx) = selected_index() {
                 if let Some(item) = items.get(idx) {
                     {
@@ -197,35 +236,43 @@ pub fn ImageList(
 
                         rsx! {
                             div {
-                                class: "fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 select-none",
+                                class: "sd-masonry__lightbox",
+                                role: "dialog",
+                                "aria-modal": "true",
+                                "aria-label": "{cur_title.clone().unwrap_or_default()}",
                                 onclick: move |_| selected_index.set(None),
+                                onkeydown: move |e: KeyboardEvent| {
+                                    if e.key() == Key::Escape {
+                                        selected_index.set(None);
+                                    }
+                                },
 
-                                // Barra superiore
                                 div {
-                                    class: "absolute top-4 inset-x-4 flex items-center justify-between text-zinc-300 z-10",
+                                    class: "sd-masonry__lightbox-bar",
                                     onclick: move |e| e.stop_propagation(),
 
-                                    div { class: "flex items-center gap-2",
-                                        span { class: "font-mono text-xs px-2.5 py-1 rounded bg-white/10",
+                                    div { class: "sd-masonry__lightbox-meta",
+                                        span { class: "sd-masonry__lightbox-count",
                                             "{idx + 1} / {total}"
                                         }
                                         if let Some(t) = &cur_title {
-                                            span { class: "text-sm font-semibold text-white", "{t}" }
+                                            span { class: "sd-masonry__lightbox-title", "{t}" }
                                         }
                                     }
 
                                     button {
                                         r#type: "button",
-                                        class: "p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer",
+                                        class: "sd-masonry__lightbox-btn",
+                                        "aria-label": "{locale.close}",
                                         onclick: move |_| selected_index.set(None),
                                         Icon { kind: IconKind::X, size: 20 }
                                     }
                                 }
 
-                                // Pulsanti navigazione
                                 button {
                                     r#type: "button",
-                                    class: "absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-purple-600/80 text-white transition-all cursor-pointer z-10",
+                                    class: "sd-masonry__lightbox-btn sd-masonry__lightbox-btn--prev",
+                                    "aria-label": "{locale.previous}",
                                     onclick: move |e| {
                                         e.stop_propagation();
                                         if let Some(i) = selected_index() {
@@ -236,12 +283,13 @@ pub fn ImageList(
                                             }
                                         }
                                     },
-                                    Icon { kind: IconKind::ChevronLeft, size: 24 }
+                                    Icon { kind: IconKind::ChevronLeft, size: 20 }
                                 }
 
                                 button {
                                     r#type: "button",
-                                    class: "absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-purple-600/80 text-white transition-all cursor-pointer z-10",
+                                    class: "sd-masonry__lightbox-btn sd-masonry__lightbox-btn--next",
+                                    "aria-label": "{locale.next}",
                                     onclick: move |e| {
                                         e.stop_propagation();
                                         if let Some(i) = selected_index() {
@@ -252,22 +300,21 @@ pub fn ImageList(
                                             }
                                         }
                                     },
-                                    Icon { kind: IconKind::ChevronRight, size: 24 }
+                                    Icon { kind: IconKind::ChevronRight, size: 20 }
                                 }
 
-                                // Immagine principale
                                 div {
-                                    class: "max-w-5xl max-h-[80vh] flex flex-col items-center justify-center overflow-hidden rounded-xl border border-white/10 shadow-2xl",
+                                    class: "sd-masonry__lightbox-frame",
                                     onclick: move |e| e.stop_propagation(),
 
                                     img {
                                         src: "{cur_src}",
                                         alt: "{cur_title.clone().unwrap_or_default()}",
-                                        class: "max-w-full max-h-[75vh] object-contain",
+                                        class: "sd-masonry__lightbox-image",
                                     }
 
                                     if let Some(sub_text) = cur_sub {
-                                        div { class: "w-full p-3 bg-zinc-950 text-center text-xs text-zinc-300 font-mono border-t border-white/10",
+                                        div { class: "sd-masonry__lightbox-sub",
                                             "{sub_text}"
                                         }
                                     }

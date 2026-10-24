@@ -1,6 +1,4 @@
 use crate::icon::{Icon, IconKind};
-#[cfg(feature = "theme")]
-use crate::theme::use_theme;
 use dioxus::prelude::*;
 
 /// Direzione di divisione e ridimensionamento dei pannelli.
@@ -199,9 +197,6 @@ pub fn ResizablePanelGroup(
         });
     }));
 
-    #[cfg(feature = "theme")]
-    let _theme = use_theme();
-
     rsx! {
         div {
             id: "{group_id}",
@@ -233,9 +228,6 @@ pub fn ResizablePanel(
     let size_clamped = default_size.clamp(min_size, max_size);
     let flex_basis = format!("{size_clamped:.2}%");
 
-    #[cfg(feature = "theme")]
-    let _theme = use_theme();
-
     rsx! {
         div {
             class: "sd-resizable-panel {class}",
@@ -266,13 +258,11 @@ pub fn ResizableHandle(
 ) -> Element {
     let disabled_class = if disabled { "sd-resizable-handle--disabled" } else { "" };
 
-    #[cfg(feature = "theme")]
-    let _theme = use_theme();
-
     rsx! {
         div {
             role: "separator",
             tabindex: if disabled { "-1" } else { "0" },
+            "aria-disabled": if disabled { "true" } else { "false" },
             aria_valuenow: "50",
             aria_valuemin: "0",
             aria_valuemax: "100",

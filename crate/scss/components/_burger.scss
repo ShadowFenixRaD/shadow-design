@@ -1,47 +1,46 @@
 // ==============================================================================
-// Shadow Design — Burger Component
+// Shadow Design: Burger (interactive icon toggle, no container material)
 // ==============================================================================
-@use '../variables' as *;
+@use '../layers' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-burger {
+    --sd-burger-w: 24px;
+    --sd-burger-h: 18px;
+    --sd-burger-line-h: 2px;
+    --sd-burger-translate: 8px;
+    --sd-burger-line: var(--sd-burger-color, var(--sd-text-muted));
+
     position: relative;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    padding: 0;
-    user-select: none;
-    outline: none;
-    transition: opacity 0.15s ease;
-
-    &:hover {
-      opacity: 0.85;
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
-      border-radius: 4px;
-    }
-
-    // Default sizing variables
-    --sd-burger-w: 24px;
-    --sd-burger-h: 18px;
-    --sd-burger-line-h: 2px;
-    --sd-burger-color: #f4f4f5;
-    --sd-burger-translate: 8px;
-
     width: var(--sd-burger-w);
     height: var(--sd-burger-h);
+    padding: 0;
+    border: none;
+    border-radius: var(--sd-radius-xs);
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+    @include sd-focus-ring(var(--sd-space-1));
+    @include sd-press(0.92);
+    @include sd-transition(transform, opacity);
+
+    @include sd-hover {
+      --sd-burger-line: var(--sd-burger-color, var(--sd-text));
+    }
+
+    &[aria-disabled='true'],
+    &:disabled {
+      @include sd-disabled;
+    }
 
     &--sm {
       --sd-burger-w: 18px;
       --sd-burger-h: 14px;
-      --sd-burger-line-h: 2px;
       --sd-burger-translate: 6px;
     }
 
@@ -64,11 +63,10 @@
     display: block;
     width: 100%;
     height: var(--sd-burger-line-h);
-    background-color: var(--sd-burger-color);
-    border-radius: 9999px;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.18s ease;
+    background-color: var(--sd-burger-line);
+    border-radius: var(--sd-radius-full);
     transform-origin: center;
+    @include sd-transition(transform, opacity, background-color, $duration: var(--sd-dur));
 
     .sd-burger--open &--top {
       transform: translateY(var(--sd-burger-translate)) rotate(45deg);

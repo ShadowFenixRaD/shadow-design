@@ -66,6 +66,40 @@ pub fn AppShell(props: AppShellProps) -> Element {
         aside_collapsed,
     });
 
+    // Below `md` (768px) the side panels are off-canvas. Uncontrolled panels start
+    // closed there so the content is not covered on first paint.
+    let nav_controlled = props.navbar_collapsed.is_some();
+    let aside_controlled = props.aside_collapsed.is_some();
+    use_effect(move || {
+        if nav_controlled && aside_controlled {
+            return;
+        }
+        let mut nav = nav_collapsed;
+        let mut aside = aside_collapsed;
+        spawn(async move {
+            let mut ev = document::eval("dioxus.send(window.matchMedia('(min-width: 768px)').matches)");
+            if let Ok(wide) = ev.recv::<bool>().await {
+                if !wide {
+                    if !nav_controlled {
+                        nav.set(true);
+                    }
+                    if !aside_controlled {
+                        aside.set(true);
+                    }
+                }
+            }
+        });
+    });
+
+    let panel_open = (props.navbar.is_some() && !nav_collapsed())
+        || (props.aside.is_some() && !aside_collapsed());
+    let close_panels = move |_| {
+        let mut nav = nav_collapsed;
+        let mut aside = aside_collapsed;
+        nav.set(true);
+        aside.set(true);
+    };
+
     let fullscreen_class = if props.fullscreen {
         "sd-app-shell--fullscreen"
     } else {
@@ -91,6 +125,9 @@ pub fn AppShell(props: AppShellProps) -> Element {
                 {hdr}
             }
             div { class: "sd-app-shell__body",
+                if panel_open {
+                    div { class: "sd-app-shell__backdrop", onclick: close_panels }
+                }
                 if let Some(ref nav) = props.navbar {
                     {nav}
                 }

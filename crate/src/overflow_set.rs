@@ -58,7 +58,7 @@ pub fn OverflowSet(
     items: Vec<ToolbarAction>,
     #[props(default)] overflow_items: Vec<ToolbarAction>,
     #[props(default)] max_visible: Option<usize>,
-    #[props(default = "Altre azioni".to_string())] overflow_button_label: String,
+    #[props(default = "More actions".to_string())] overflow_button_label: String,
     #[props(default)] on_action: Option<EventHandler<String>>,
     #[props(default)] class: String,
 ) -> Element {
@@ -80,7 +80,7 @@ pub fn OverflowSet(
     let has_overflow = !all_overflow.is_empty();
 
     rsx! {
-        div { class: "sd-overflow-set flex items-center gap-1.5 p-1 rounded-xl bg-zinc-950/70 border border-white/[0.08] backdrop-blur-md shadow-sm {class}",
+        div { class: "sd-overflow-set {class}",
             // Azioni Visibili
             for act in visible {
                 {
@@ -89,20 +89,14 @@ pub fn OverflowSet(
                     let icon_opt = act.icon;
                     let disabled = act.disabled;
                     let danger = act.danger;
-                    let btn_cls = if disabled {
-                        "opacity-40 cursor-not-allowed text-zinc-500"
-                    } else if danger {
-                        "text-red-300 hover:text-white hover:bg-red-500/20 hover:border-red-500/30"
-                    } else {
-                        "text-zinc-300 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.08]"
-                    };
+                    let btn_cls = if danger { "sd-overflow-set__item--danger" } else { "" };
 
                     rsx! {
                         button {
                             key: "{action_id}",
                             r#type: "button",
                             disabled: disabled,
-                            class: "sd-overflow-set__item flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border border-transparent {btn_cls}",
+                            class: "sd-overflow-set__item {btn_cls}",
                             onclick: {
                                 let aid = action_id.clone();
                                 move |_| {
@@ -124,15 +118,16 @@ pub fn OverflowSet(
 
             // Dropdown di Overflow
             if has_overflow {
-                div { class: "ml-auto border-l border-white/[0.08] pl-1.5",
+                div { class: "sd-overflow-set__more",
                     Dropdown {
                         is_open: is_menu_open,
                         placement: DropdownPlacement::BottomRight,
                         trigger: rsx! {
                             button {
                                 r#type: "button",
-                                class: "sd-overflow-set__more-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer",
+                                class: "sd-overflow-set__more-btn",
                                 title: "{overflow_button_label}",
+                                "aria-label": "{overflow_button_label}",
                                 Icon { kind: IconKind::MoreHorizontal, size: 16 }
                             }
                         },
@@ -172,7 +167,7 @@ pub fn ResponsiveToolbar(
     items: Vec<ToolbarAction>,
     #[props(default)] overflow_items: Vec<ToolbarAction>,
     #[props(default)] max_visible: Option<usize>,
-    #[props(default = "Altre azioni".to_string())] overflow_button_label: String,
+    #[props(default = "More actions".to_string())] overflow_button_label: String,
     #[props(default)] on_action: Option<EventHandler<String>>,
     #[props(default)] class: String,
 ) -> Element {

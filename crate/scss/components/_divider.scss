@@ -1,46 +1,46 @@
 // ==============================================================================
-// Shadow Design — Divider Styles
+// Shadow Design: Divider (static separator, border tokens only)
 // ==============================================================================
-@use '../variables' as *;
-@use '../mixins' as *;
+@use '../layers' as *;
 
 @layer sd-components {
   .sd-divider {
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 12px 0;
     width: 100%;
+    flex-shrink: 0;
 
-    &.sd-divider--vertical {
-      border-top: none;
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
-      margin: 0 12px;
-      height: 100%;
-      min-height: 20px;
-      width: 0;
-      min-width: 0;
-      flex-shrink: 0;
+    &--horizontal {
+      border-top: 1px solid var(--sd-border);
+      margin: var(--sd-space-3) 0;
+    }
+
+    &--vertical {
       display: inline-block;
       vertical-align: middle;
+      width: 0;
+      min-width: 0;
+      height: 100%;
+      min-height: var(--sd-icon-lg);
+      border-left: 1px solid var(--sd-border);
+      margin: 0 var(--sd-space-3);
     }
   }
 
   .sd-divider-with-label {
     display: flex;
     align-items: center;
+    gap: var(--sd-space-3);
     width: 100%;
-    margin: 16px 0;
-    gap: 12px;
-    border: none;
+    flex-shrink: 0;
+
+    &.sd-divider--horizontal { margin: var(--sd-space-4) 0; }
 
     &.sd-divider--vertical {
-      border: none !important;
-      border-left: none !important;
       flex-direction: column;
       width: auto;
       height: 100%;
-      min-height: 60px;
-      margin: 0 16px;
+      min-height: var(--sd-space-10);
+      margin: 0 var(--sd-space-4);
 
       .sd-divider__line {
         width: 1px;
@@ -52,18 +52,18 @@
     .sd-divider__line {
       flex: 1;
       height: 1px;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--sd-border);
     }
 
     .sd-divider__label {
-      font-size: 11px;
-      font-family: $font-mono;
-      color: $zinc-400;
-      text-transform: uppercase;
+      padding: 0 var(--sd-space-1);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
       letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sd-text-subtle);
       white-space: nowrap;
       user-select: none;
-      padding: 0 4px;
     }
   }
 }

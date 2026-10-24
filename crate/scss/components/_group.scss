@@ -1,43 +1,30 @@
 // ==============================================================================
-// Shadow Design — Group Component SCSS
+// Shadow Design: Group (flex row layout primitive)
 // ==============================================================================
 @use '../layers' as *;
-@use '../variables' as *;
+
+$_gap: (none: 0, xs: var(--sd-space-1), sm: var(--sd-space-2), md: var(--sd-space-4), lg: var(--sd-space-6), xl: var(--sd-space-8));
 
 @layer sd-components {
-  // ----------------------------------------------------------------------------
-  // Group Container (Flex Row Layout)
-  // ----------------------------------------------------------------------------
   .sd-group {
     display: flex;
     flex-direction: row;
     box-sizing: border-box;
 
-    // Wrapping
     &--wrap   { flex-wrap: wrap; }
     &--nowrap { flex-wrap: nowrap; }
+    &--grow > * { flex-grow: 1; }
 
-    // Grow
-    &--grow > * {
-      flex-grow: 1;
+    @each $k, $v in $_gap {
+      &--gap-#{$k} { gap: $v; }
     }
 
-    // Gaps
-    &--gap-none { gap: 0px; }
-    &--gap-xs   { gap: 4px; }
-    &--gap-sm   { gap: 8px; }
-    &--gap-md   { gap: 16px; }
-    &--gap-lg   { gap: 24px; }
-    &--gap-xl   { gap: 32px; }
-
-    // Align Items
     &--align-start    { align-items: flex-start; }
     &--align-center   { align-items: center; }
     &--align-end      { align-items: flex-end; }
     &--align-stretch  { align-items: stretch; }
     &--align-baseline { align-items: baseline; }
 
-    // Justify Content
     &--justify-start   { justify-content: flex-start; }
     &--justify-center  { justify-content: center; }
     &--justify-end     { justify-content: flex-end; }

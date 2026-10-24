@@ -1,119 +1,122 @@
-@use '../variables' as *;
+// ==============================================================================
+// Shadow Design: Resizable panels
+// Recipes: container (group) + interactive handle (hover, focus, drag, disabled).
+// ==============================================================================
+@use '../layers' as *;
 @use '../mixins' as *;
 
-// Resizable panel groups and handles
-
 @layer sd-components {
-.sd-resizable-group {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 150px;
-  overflow: hidden;
-
-  &--horizontal {
-    flex-direction: row;
-  }
-
-  &--vertical {
-    flex-direction: column;
-  }
-}
-
-.sd-resizable-panel {
-  position: relative;
-  overflow: auto;
-  box-sizing: border-box;
-
-  .sd-resizable-group--horizontal > & {
-    height: 100%;
-    min-width: 0;
-  }
-
-  .sd-resizable-group--vertical > & {
+  .sd-resizable-group {
+    @include sd-surface(1);
+    display: flex;
     width: 100%;
-    min-height: 0;
-  }
-}
-
-.sd-resizable-handle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.08);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-  user-select: none;
-  touch-action: none;
-  flex-shrink: 0;
-  z-index: 10;
-
-  &::after {
-    content: '';
-    position: absolute;
-    z-index: 1;
-  }
-
-  .sd-resizable-group--horizontal > & {
-    width: 6px;
     height: 100%;
-    align-self: stretch;
-    cursor: col-resize;
+    min-height: calc(var(--sd-space-10) * 4);
+    overflow: hidden;
+    box-sizing: border-box;
 
-    &::after {
-      top: 0;
-      bottom: 0;
-      left: -4px;
-      right: -4px;
-      cursor: col-resize;
+    &--horizontal { flex-direction: row; }
+    &--vertical { flex-direction: column; }
+  }
+
+  .sd-resizable-panel {
+    position: relative;
+    overflow: auto;
+    box-sizing: border-box;
+    @include sd-scrollbar;
+
+    .sd-resizable-group--horizontal > & {
+      height: 100%;
+      min-width: 0;
+    }
+
+    .sd-resizable-group--vertical > & {
+      width: 100%;
+      min-height: 0;
     }
   }
 
-  .sd-resizable-group--vertical > & {
-    height: 6px;
-    width: 100%;
-    align-self: stretch;
-    cursor: row-resize;
-
-    &::after {
-      left: 0;
-      right: 0;
-      top: -4px;
-      bottom: -4px;
-      cursor: row-resize;
-    }
-
-    > .sd-resizable-handle-grip {
-      transform: rotate(90deg);
-    }
-  }
-
-  &:hover,
-  &--active {
-    background-color: #a855f7;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-  }
-
-  &--disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  &-grip {
-    position: absolute;
+  .sd-resizable-handle {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 24px;
-    border-radius: 4px;
-    background-color: #18181b;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #a1a1aa;
-    pointer-events: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-}
+    flex-shrink: 0;
+    background-color: var(--sd-border);
+    user-select: none;
+    touch-action: none;
+    z-index: 1;
+    @include sd-shadow;
+    @include sd-transition(background-color, box-shadow);
+    @include sd-focus-ring(0);
 
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 1;
+    }
+
+    .sd-resizable-group--horizontal > & {
+      width: var(--sd-space-1);
+      height: 100%;
+      align-self: stretch;
+      cursor: col-resize;
+
+      &::after {
+        top: 0;
+        bottom: 0;
+        left: calc(-1 * var(--sd-space-1));
+        right: calc(-1 * var(--sd-space-1));
+        cursor: col-resize;
+      }
+    }
+
+    .sd-resizable-group--vertical > & {
+      height: var(--sd-space-1);
+      width: 100%;
+      align-self: stretch;
+      cursor: row-resize;
+
+      &::after {
+        left: 0;
+        right: 0;
+        top: calc(-1 * var(--sd-space-1));
+        bottom: calc(-1 * var(--sd-space-1));
+        cursor: row-resize;
+      }
+
+      > .sd-resizable-handle-grip {
+        transform: rotate(90deg);
+      }
+    }
+
+    @include sd-hover {
+      background-color: var(--sd-accent);
+    }
+
+    &--active,
+    &--active:hover {
+      background-color: var(--sd-accent);
+      --sd-shadow-glow: var(--sd-glow-sm);
+    }
+
+    &--disabled {
+      @include sd-disabled;
+    }
+
+    &-grip {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--sd-space-4);
+      height: var(--sd-space-6);
+      border-radius: var(--sd-radius-sm);
+      background-color: var(--sd-surface-2);
+      border: 1px solid var(--sd-border-strong);
+      color: var(--sd-text-muted);
+      pointer-events: none;
+      @include sd-shadow(var(--sd-specular), var(--sd-elev-1));
+    }
+  }
 }

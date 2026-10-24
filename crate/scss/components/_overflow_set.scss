@@ -1,22 +1,32 @@
 // ==============================================================================
-// Shadow Design — OverflowSet & ResponsiveToolbar Component Styles
+// Shadow Design: OverflowSet and ResponsiveToolbar
+// Recipes: track (toolbar) + item (action, overflow trigger) + item-danger.
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
+@use '../layers' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-overflow-set {
+    @include sd-track;
     display: flex;
     align-items: center;
+    gap: var(--sd-space-1);
 
-    &__item {
+    &__item,
+    &__more-btn {
+      @include sd-item(md);
+      @include sd-press;
       white-space: nowrap;
-      transition: all $duration-fast ease;
+    }
 
-      &:active:not(:disabled) {
-        transform: scale(0.97);
-      }
+    &__item--danger {
+      @include sd-item-danger;
+    }
+
+    &__more {
+      margin-left: auto;
+      padding-left: var(--sd-space-1);
+      border-left: 1px solid var(--sd-border-subtle);
     }
   }
 }

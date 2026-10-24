@@ -1,35 +1,27 @@
 // ==============================================================================
-// Shadow Design — Stack Component SCSS
+// Shadow Design: Stack (flex column layout primitive)
 // ==============================================================================
 @use '../layers' as *;
-@use '../variables' as *;
+
+$_gap: (none: 0, xs: var(--sd-space-1), sm: var(--sd-space-2), md: var(--sd-space-4), lg: var(--sd-space-6), xl: var(--sd-space-8));
 
 @layer sd-components {
-  // ----------------------------------------------------------------------------
-  // Stack Container (Flex Column Layout)
-  // ----------------------------------------------------------------------------
   .sd-stack {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     width: 100%;
 
-    // Gaps
-    &--gap-none { gap: 0px; }
-    &--gap-xs   { gap: 4px; }
-    &--gap-sm   { gap: 8px; }
-    &--gap-md   { gap: 16px; }
-    &--gap-lg   { gap: 24px; }
-    &--gap-xl   { gap: 32px; }
+    @each $k, $v in $_gap {
+      &--gap-#{$k} { gap: $v; }
+    }
 
-    // Align Items (Cross-Axis)
     &--align-start    { align-items: flex-start; }
     &--align-center   { align-items: center; }
     &--align-end      { align-items: flex-end; }
     &--align-stretch  { align-items: stretch; }
     &--align-baseline { align-items: baseline; }
 
-    // Justify Content (Main-Axis)
     &--justify-start   { justify-content: flex-start; }
     &--justify-center  { justify-content: center; }
     &--justify-end     { justify-content: flex-end; }

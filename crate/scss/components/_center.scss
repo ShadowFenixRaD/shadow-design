@@ -1,21 +1,15 @@
 // ==============================================================================
-// Shadow Design — Center Component SCSS
+// Shadow Design: Center (layout primitive)
 // ==============================================================================
 @use '../layers' as *;
-@use '../variables' as *;
 
 @layer sd-components {
-  // ----------------------------------------------------------------------------
-  // Center Container (Horizontal & Vertical Centering)
-  // ----------------------------------------------------------------------------
   .sd-center {
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
 
-    &--inline {
-      display: inline-flex;
-    }
+    &--inline { display: inline-flex; }
   }
 }

@@ -26,7 +26,6 @@ pub fn Navbar(
     let toggle_id = format!("{nav_id}-toggle");
 
     let collapsible_class = if collapsible { "sd-navbar--collapsible" } else { "" };
-    let open_class = if collapsible && *is_open.read() { "sd-navbar--open" } else { "" };
 
     let effective_toggle_aria = toggle_aria_label.unwrap_or_else(|| {
         if *is_open.read() {
@@ -70,7 +69,7 @@ pub fn Navbar(
     rsx! {
         nav {
             "aria-label": "{aria_label}",
-            class: "sd-navbar {base_override} {collapsible_class} {open_class} {class_modifiers} {class}",
+            class: "sd-navbar {base_override} {collapsible_class} {class_modifiers} {class}",
             div {
                 class: "sd-navbar__inner",
                 div { class: "sd-navbar__brand", {brand} }

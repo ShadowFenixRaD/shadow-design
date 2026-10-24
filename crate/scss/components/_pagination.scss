@@ -1,7 +1,8 @@
 // ==============================================================================
-// Shadow Design — Pagination Component Styles (BEM)
+// Shadow Design: Pagination
+// Recipes: track (list) + item (page / arrows) + selected(border) for the current page.
 // ==============================================================================
-@use '../variables' as *;
+@use '../layers' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
@@ -9,16 +10,17 @@
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
+    max-width: 100%;
 
     &__list {
+      @include sd-track;
       display: inline-flex;
       flex-direction: row;
       flex-wrap: nowrap;
       align-items: center;
       list-style: none;
       margin: 0;
-      padding: 0;
-      gap: 0.25rem;
+      gap: var(--sd-space-1);
     }
 
     &__item {
@@ -35,80 +37,34 @@
       justify-content: center;
 
       svg + svg {
-        margin-left: -6px;
+        margin-left: calc(-1 * var(--sd-space-1));
       }
     }
 
     &__control {
-      display: inline-flex;
-      align-items: center;
+      @include sd-item(md);
+      @include sd-press;
       justify-content: center;
-      font-family: var(--font-sans, inherit);
-      font-weight: 500;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      color: rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      user-select: none;
-      box-sizing: border-box;
-      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+      min-width: var(--sd-item-h);
+      padding-inline: var(--sd-space-2);
+      font-variant-numeric: tabular-nums;
 
-      // Taglie ControlSize
-      &.sd-control--sm {
-        min-width: 28px;
-        height: 28px;
-        padding: 0 0.375rem;
-        font-size: 0.75rem;
+      &--sm {
+        min-height: var(--sd-item-h-sm);
+        min-width: var(--sd-item-h-sm);
       }
 
-      &.sd-control--md {
-        min-width: 34px;
-        height: 34px;
-        padding: 0 0.5rem;
-        font-size: 0.8125rem;
+      &--lg {
+        min-height: var(--sd-item-h-lg);
+        min-width: var(--sd-item-h-lg);
       }
 
-      &.sd-control--lg {
-        min-width: 40px;
-        height: 40px;
-        padding: 0 0.625rem;
-        font-size: 0.875rem;
-      }
-
-      &:hover:not(:disabled):not(.sd-pagination__control--disabled) {
-        background: rgba(255, 255, 255, 0.06);
-        color: #ffffff;
-        border-color: rgba(255, 255, 255, 0.2);
-      }
-
-      &:focus-visible {
-        outline: 2px solid rgba(168, 85, 247, 0.5);
-        outline-offset: 1px;
-      }
-
-      // Stato Attivo (pagina corrente selezionata)
       &--active {
-        background: rgba(168, 85, 247, 0.2);
-        color: #ffffff;
-        border-color: rgba(168, 85, 247, 0.55);
-        font-weight: 700;
-        box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
-
-        &:hover {
-          background: rgba(168, 85, 247, 0.28);
-          border-color: rgba(168, 85, 247, 0.75);
-        }
+        @include sd-selected;
       }
 
-      // Disabilitato (es. Prev su pagina 1)
-      &--disabled,
-      &:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-        pointer-events: none;
-        border-color: rgba(255, 255, 255, 0.04);
-        background: transparent;
+      &--disabled {
+        @include sd-disabled;
       }
     }
 
@@ -116,11 +72,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 28px;
-      height: 28px;
-      color: rgba(255, 255, 255, 0.35);
-      font-family: var(--font-mono, monospace);
-      font-size: 0.875rem;
+      min-width: var(--sd-item-h-sm);
+      height: var(--sd-item-h-sm);
+      color: var(--sd-text-subtle);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-sm);
       user-select: none;
     }
   }

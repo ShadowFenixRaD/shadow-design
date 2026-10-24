@@ -20,7 +20,7 @@ pub struct SingleMenuCtx {
 /// Contenitore per un singolo menu a tendina all'interno della [`Menubar`].
 #[component]
 pub fn MenubarMenu(props: MenubarMenuProps) -> Element {
-    let menu_id = crate::a11y::use_unique_id("sd-menu", props.id);
+    let menu_id = crate::a11y::use_unique_id("menubar-menu", props.id);
 
     use_context_provider(|| SingleMenuCtx {
         menu_id: menu_id.clone(),

@@ -95,9 +95,9 @@ pub struct PaginationControlProps {
 #[component]
 pub fn PaginationControl(props: PaginationControlProps) -> Element {
     let size_class = match props.size {
-        ControlSize::Sm => "sd-control--sm",
-        ControlSize::Md => "sd-control--md",
-        ControlSize::Lg => "sd-control--lg",
+        ControlSize::Sm => "sd-pagination__control--sm",
+        ControlSize::Md => "",
+        ControlSize::Lg => "sd-pagination__control--lg",
     };
     let active_class = if props.is_active {
         "sd-pagination__control--active"

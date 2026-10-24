@@ -69,7 +69,6 @@ pub fn BottomNavItem(props: BottomNavItemProps) -> Element {
         span { class: "sd-bottom-nav-item__icon-container",
             RenderSvgIcon { icon: props.icon.clone(), size: 20 }
             {badge_el}
-            span { class: "sd-bottom-nav-item__active-pill", "aria-hidden": "true" }
         }
         span { class: "sd-bottom-nav-item__label", "{props.label}" }
     };
@@ -101,7 +100,7 @@ pub fn BottomNavItem(props: BottomNavItemProps) -> Element {
         rsx! {
             button {
                 r#type: "button",
-                class: "sd-bottom-nav-item sd-bottom-nav-item--button {active_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
+                class: "sd-bottom-nav-item {active_class} {disabled_class} {base_override} {class_modifiers} {props.class}",
                 disabled: props.disabled,
                 "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {

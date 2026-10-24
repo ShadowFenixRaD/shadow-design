@@ -91,7 +91,7 @@ impl NavigationMenuItem {
     }
 }
 
-/// Barra di navigazione avanzata Mega-Menu per applicazioni complesse in stile shadcn/ui.
+/// Mega-menu navigation bar: a row of triggers, each opening a floating panel of link sections.
 #[component]
 pub fn NavigationMenu(
     items: Vec<NavigationMenuItem>,
@@ -104,37 +104,38 @@ pub fn NavigationMenu(
     let close_menu = move |_| active_index.set(None);
 
     rsx! {
-        div { class: "sd-nav-menu relative w-full {class}",
-            // Backdrop di chiusura quando un menu è aperto
+        div {
+            class: "sd-nav-menu {class}",
+            onkeydown: move |e: KeyboardEvent| {
+                if e.key() == Key::Escape && active_index().is_some() {
+                    e.prevent_default();
+                    active_index.set(None);
+                }
+            },
+            // Backdrop while a panel is open
             if active_index().is_some() {
                 div {
-                    class: "fixed inset-0 z-[985] bg-black/40 backdrop-blur-[2px] transition-opacity",
+                    class: "sd-nav-menu__backdrop",
                     onclick: close_menu,
                 }
             }
 
-            // Barra dei trigger orizzontale
-            nav { class: "relative z-[989] flex items-center gap-1 p-1 rounded-xl bg-zinc-950/80 border border-white/[0.08] backdrop-blur-md shadow-lg",
+            // Trigger bar
+            nav { class: "sd-nav-menu__bar",
                 for (idx, item) in items.iter().enumerate() {
                     {
                         let is_active = active_index() == Some(idx);
                         let lbl = item.label.clone();
-                        let trigger_cls = if is_active {
-                            "bg-white/[0.08] text-white shadow-inner border border-white/10"
-                        } else {
-                            "text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent"
-                        };
-                        let chevron_cls = if is_active {
-                            "rotate-180 text-purple-400"
-                        } else {
-                            "text-zinc-400"
-                        };
+                        let trigger_cls = if is_active { "sd-nav-menu__trigger sd-nav-menu__trigger--active" } else { "sd-nav-menu__trigger" };
+                        let chevron_cls = if is_active { "sd-nav-menu__chevron sd-nav-menu__chevron--open" } else { "sd-nav-menu__chevron" };
 
                         rsx! {
                             button {
                                 key: "nav-trigger-{idx}",
                                 r#type: "button",
-                                class: "flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer {trigger_cls}",
+                                class: "{trigger_cls}",
+                                "aria-haspopup": "true",
+                                "aria-expanded": "{is_active}",
                                 onclick: move |_| {
                                     if is_active {
                                         active_index.set(None);
@@ -146,7 +147,7 @@ pub fn NavigationMenu(
                                 Icon {
                                     kind: IconKind::ChevronDown,
                                     size: 14,
-                                    class: "transition-transform duration-200 {chevron_cls}",
+                                    class: "{chevron_cls}",
                                 }
                             }
                         }
@@ -154,69 +155,59 @@ pub fn NavigationMenu(
                 }
             }
 
-            // Pannello Mega-Menu fluttuante (viewport)
+            // Floating panel
             if let Some(idx) = active_index() {
                 if let Some(item) = items.get(idx) {
                     div {
-                        class: "sd-nav-menu__viewport absolute left-0 top-full mt-2 z-[990] w-full max-w-4xl p-6 rounded-2xl border border-white/[0.14] bg-zinc-950/95 shadow-2xl backdrop-blur-2xl animate-scale-in flex flex-col md:flex-row gap-6",
+                        class: "sd-nav-menu__viewport",
                         onclick: move |e| e.stop_propagation(),
 
-                            // Colonne sezioni link
-                            div { class: "flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6",
-                                for (sec_idx, sec) in item.sections.iter().enumerate() {
-                                    div { key: "sec-{sec_idx}", class: "flex flex-col gap-2",
-                                        if let Some(h) = &sec.heading {
-                                            span { class: "text-xs font-mono font-semibold uppercase tracking-wider text-purple-400/90 pb-1 border-b border-white/[0.06]",
-                                                "{h}"
-                                            }
-                                        }
+                        div { class: "sd-nav-menu__sections",
+                            for (sec_idx, sec) in item.sections.iter().enumerate() {
+                                div { key: "sec-{sec_idx}", class: "sd-nav-menu__section",
+                                    if let Some(h) = &sec.heading {
+                                        span { class: "sd-nav-menu__heading", "{h}" }
+                                    }
 
-                                        div { class: "flex flex-col gap-1",
-                                            for link in &sec.links {
-                                                {
-                                                    let l_item = link.clone();
-                                                    let icon_opt = link.icon;
-                                                    let title = link.title.clone();
-                                                    let desc_opt = link.description.clone();
-                                                    let badge_opt = link.badge.clone();
+                                    div { class: "sd-nav-menu__links",
+                                        for link in &sec.links {
+                                            {
+                                                let l_item = link.clone();
+                                                let icon_opt = link.icon;
+                                                let title = link.title.clone();
+                                                let desc_opt = link.description.clone();
+                                                let badge_opt = link.badge.clone();
 
-                                                    rsx! {
-                                                        button {
-                                                            key: "{title}",
-                                                            r#type: "button",
-                                                            class: "flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/[0.05] transition-colors text-left group cursor-pointer border border-transparent hover:border-white/[0.08]",
-                                                            onclick: {
-                                                                let item_clone = l_item.clone();
-                                                                move |_| {
-                                                                    if let Some(handler) = &on_select {
-                                                                        handler.call(item_clone.clone());
-                                                                    }
-                                                                    active_index.set(None);
+                                                rsx! {
+                                                    button {
+                                                        key: "{title}",
+                                                        r#type: "button",
+                                                        class: "sd-nav-menu__link",
+                                                        onclick: {
+                                                            let item_clone = l_item.clone();
+                                                            move |_| {
+                                                                if let Some(handler) = &on_select {
+                                                                    handler.call(item_clone.clone());
                                                                 }
-                                                            },
+                                                                active_index.set(None);
+                                                            }
+                                                        },
 
-                                                            if let Some(ik) = icon_opt {
-                                                                span { class: "p-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-zinc-400 group-hover:text-purple-300 group-hover:bg-purple-950/40 transition-colors shrink-0",
-                                                                    Icon { kind: ik, size: 16 }
+                                                        if let Some(ik) = icon_opt {
+                                                            span { class: "sd-nav-menu__link-icon",
+                                                                Icon { kind: ik, size: 16 }
+                                                            }
+                                                        }
+
+                                                        span { class: "sd-nav-menu__link-body",
+                                                            span { class: "sd-nav-menu__link-head",
+                                                                span { class: "sd-nav-menu__link-title", "{title}" }
+                                                                if let Some(b) = &badge_opt {
+                                                                    span { class: "sd-nav-menu__link-badge", "{b}" }
                                                                 }
                                                             }
-
-                                                            div { class: "flex flex-col min-w-0 flex-1",
-                                                                div { class: "flex items-center gap-2",
-                                                                    span { class: "text-sm font-semibold text-zinc-200 group-hover:text-white transition-colors truncate",
-                                                                        "{title}"
-                                                                    }
-                                                                    if let Some(b) = &badge_opt {
-                                                                        span { class: "px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30",
-                                                                            "{b}"
-                                                                        }
-                                                                    }
-                                                                }
-                                                                if let Some(d) = &desc_opt {
-                                                                    span { class: "text-xs text-zinc-400 line-clamp-1",
-                                                                        "{d}"
-                                                                    }
-                                                                }
+                                                            if let Some(d) = &desc_opt {
+                                                                span { class: "sd-nav-menu__link-desc", "{d}" }
                                                             }
                                                         }
                                                     }
@@ -226,37 +217,36 @@ pub fn NavigationMenu(
                                     }
                                 }
                             }
+                        }
 
-                            // Scheda di anteprima opzionale
-                            if let Some(prev) = &item.preview {
-                                div { class: "w-full md:w-64 p-4 rounded-xl border border-white/[0.08] bg-gradient-to-br from-purple-950/40 via-zinc-900 to-zinc-950 flex flex-col justify-between shrink-0",
-                                    if let Some(img_url) = &prev.image_url {
-                                        div { class: "w-full h-28 rounded-lg overflow-hidden mb-3 border border-white/10",
-                                            img { src: "{img_url}", class: "w-full h-full object-cover", alt: "{prev.title}" }
-                                        }
+                        if let Some(prev) = &item.preview {
+                            div { class: "sd-nav-menu__preview",
+                                if let Some(img_url) = &prev.image_url {
+                                    div { class: "sd-nav-menu__preview-image",
+                                        img { src: "{img_url}", alt: "{prev.title}" }
                                     }
+                                }
 
-                                    div { class: "flex flex-col gap-1.5",
-                                        span { class: "text-xs font-mono text-purple-400 font-bold", "{locale.navigation_featured}" }
-                                        h4 { class: "text-sm font-bold text-white", "{prev.title}" }
-                                        p { class: "text-xs text-zinc-400 leading-relaxed", "{prev.description}" }
-                                    }
+                                div { class: "sd-nav-menu__preview-text",
+                                    span { class: "sd-nav-menu__preview-label", "{locale.navigation_featured}" }
+                                    h4 { class: "sd-nav-menu__preview-title", "{prev.title}" }
+                                    p { class: "sd-nav-menu__preview-desc", "{prev.description}" }
+                                }
 
-                                    if let Some(cta) = &prev.cta_label {
-                                        button {
-                                            r#type: "button",
-                                            class: "mt-4 w-full py-2 px-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-md transition-colors cursor-pointer",
-                                            onclick: {
-                                                let cta_handler = prev.on_cta_click;
-                                                move |_| {
-                                                    if let Some(h) = &cta_handler {
-                                                        h.call(());
-                                                    }
-                                                    active_index.set(None);
+                                if let Some(cta) = &prev.cta_label {
+                                    button {
+                                        r#type: "button",
+                                        class: "sd-nav-menu__preview-cta",
+                                        onclick: {
+                                            let cta_handler = prev.on_cta_click;
+                                            move |_| {
+                                                if let Some(h) = &cta_handler {
+                                                    h.call(());
                                                 }
-                                            },
-                                            "{cta}"
-                                        }
+                                                active_index.set(None);
+                                            }
+                                        },
+                                        "{cta}"
                                     }
                                 }
                             }
@@ -266,3 +256,4 @@ pub fn NavigationMenu(
             }
         }
     }
+}

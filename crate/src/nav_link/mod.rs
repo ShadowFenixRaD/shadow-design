@@ -77,8 +77,6 @@ pub fn NavLink(props: NavLinkProps) -> Element {
     let class_modifiers = String::new();
 
     let active_class = if props.active { "sd-nav-link--active" } else { "" };
-    let disabled_class = if props.disabled { "sd-nav-link--disabled" } else { "" };
-    let open_class = if is_open { "sd-nav-link--open" } else { "" };
 
     let icon_el = if let Some(ref ic) = props.icon {
         rsx! {
@@ -128,7 +126,6 @@ pub fn NavLink(props: NavLinkProps) -> Element {
     };
 
     let main_content = rsx! {
-        span { class: "sd-nav-link__indicator", "aria-hidden": "true" }
         {icon_el}
         span { class: "sd-nav-link__body",
             span { class: "sd-nav-link__label", "{props.label}" }
@@ -169,7 +166,7 @@ pub fn NavLink(props: NavLinkProps) -> Element {
         rsx! {
             button {
                 r#type: "button",
-                class: "sd-nav-link__item sd-nav-link__item--button",
+                class: "sd-nav-link__item",
                 disabled: props.disabled,
                 "aria-current": if props.active { Some("page") } else { None },
                 onclick: move |evt| {
@@ -187,7 +184,7 @@ pub fn NavLink(props: NavLinkProps) -> Element {
 
     rsx! {
         div {
-            class: "sd-nav-link {active_class} {disabled_class} {open_class} {base_override} {class_modifiers} {props.class}",
+            class: "sd-nav-link {active_class} {base_override} {class_modifiers} {props.class}",
             {interactive_item}
             if has_children && is_open {
                 div { class: "sd-nav-link__children",

@@ -78,15 +78,9 @@ pub fn Pagination(props: PaginationProps) -> Element {
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
 
-    let size_class = match props.size {
-        ControlSize::Sm => "sd-pagination--sm",
-        ControlSize::Md => "sd-pagination--md",
-        ControlSize::Lg => "sd-pagination--lg",
-    };
-
     rsx! {
         nav {
-            class: "sd-pagination {size_class} {base_override} {class_modifiers} {props.class}",
+            class: "sd-pagination {base_override} {class_modifiers} {props.class}",
             "aria-label": "{locale.pagination_label}",
             ul { class: "sd-pagination__list",
                 // Pulsante Prima Pagina (se abilitato)
