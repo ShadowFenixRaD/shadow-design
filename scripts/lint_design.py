@@ -235,7 +235,7 @@ def main(argv: list[str]) -> int:
     for e in errors:
         print(e)
     n = len(errors)
-    print(f"lint_design: {n} violation{'s' if n != 1 else ''} in {len(scss)} scss + {len(rust)} rust files", file=sys.stderr)
+    print(f"lint_design: {n} violation{'s' if n != 1 else ''} in {len(scss)} scss + {len(rust)} library rust + {len(show)} showcase rust files", file=sys.stderr)
     return 1 if n else 0
 
 
