@@ -46,57 +46,30 @@ pub fn TextInput(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("input").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("input", &class);
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("input", glow);
-    #[cfg(feature = "theme")]
-    let error_class = if error.is_some() {
-        theme_val.input_border_class(true)
-    } else {
-        theme_val.input_border_class(false)
-    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) {
+    let glow_class = if glow == Some(true) {
         "sd-input--glow".to_string()
     } else {
         String::new()
     };
-    #[cfg(not(feature = "theme"))]
-    let error_class = if error.is_some() {
-        "sd-input--error"
-    } else {
-        ""
-    };
+
+    let error_class = if error.is_some() { "sd-input--error" } else { "" };
 
     let has_clear = clearable && !value().is_empty() && !disabled;
     let has_left = left_icon.is_some();
     let has_right = right_icon.is_some() || has_clear;
-    let is_left_custom = matches!(&left_icon, Some(SvgIcon::Custom(_)));
-    let is_right_custom = matches!(&right_icon, Some(SvgIcon::Custom(_)));
-    let left_pointer_style = if is_left_custom {
-        "pointer-events: auto;"
-    } else {
-        "pointer-events: none;"
-    };
-    let right_pointer_style = if is_right_custom {
-        "pointer-events: auto;"
-    } else {
-        "pointer-events: none;"
-    };
-
     let icon_class = match (has_left, has_right) {
-        (true, true) => "sd-input--has-both-icons",
+        (true, true) => "sd-input--has-left-icon sd-input--has-right-icon",
         (true, false) => "sd-input--has-left-icon",
         (false, true) => "sd-input--has-right-icon",
         (false, false) => "",
@@ -132,7 +105,6 @@ pub fn TextInput(
                     } else {
                         div {
                             class: "sd-input-icon sd-input-icon--left",
-                            style: "{left_pointer_style}",
                             RenderSvgIcon { icon: licon, size: 16 }
                         }
                     }
@@ -145,7 +117,7 @@ pub fn TextInput(
                     disabled,
                     "aria-invalid": if error.is_some() { "true" } else { "false" },
                     "aria-describedby": described_by.as_deref(),
-                    class: "sd-input {base_override} {icon_class} {error_class} {radius_class} {glow_class}",
+                    class: "sd-input {base_override} {icon_class} {error_class} {glow_class}",
                     oninput: move |e| {
                         *value.write() = e.value();
                     },
@@ -177,7 +149,6 @@ pub fn TextInput(
                     } else {
                         div {
                             class: "sd-input-icon sd-input-icon--right",
-                            style: "{right_pointer_style}",
                             RenderSvgIcon { icon: ricon, size: 16 }
                         }
                     }

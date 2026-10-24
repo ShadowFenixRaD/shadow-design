@@ -27,7 +27,7 @@ pub fn Rating(
     #[props(default)] class: String,
     #[props(default)] on_change: Option<EventHandler<f64>>,
 ) -> Element {
-    let rating_id = crate::a11y::use_unique_id("sd-rating", id);
+    let rating_id = crate::a11y::use_unique_id("rating", id);
     let mut hover_val: Signal<Option<f64>> = use_signal(|| None);
 
     let active_val = *value.read();
@@ -41,22 +41,11 @@ pub fn Rating(
     let base_override = theme_val.resolve_component_base("rating").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("rating", &class);
-    #[cfg(feature = "theme")]
-    let active_color_class = match theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-rating--violet",
-        crate::theme::PrimaryColor::Obsidian => "sd-rating--obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-rating--crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-rating--cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-rating--emerald",
-        _ => "sd-rating--violet",
-    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let active_color_class = "sd-rating--violet";
 
     let disabled_class = if disabled { "sd-rating--disabled" } else { "" };
     let readonly_class = if readonly { "sd-rating--readonly" } else { "" };
@@ -87,13 +76,14 @@ pub fn Rating(
             div {
                 id: "{rating_id}",
                 role: "slider",
-                "aria-label": label.as_deref().unwrap_or("Valutazione"),
+                "aria-label": label.clone().unwrap_or_else(|| crate::locale::use_locale().rating_label),
                 "aria-valuenow": "{active_val}",
                 "aria-valuemin": "0",
                 "aria-valuemax": "{count}",
                 "aria-readonly": if readonly { "true" } else { "false" },
+                "aria-disabled": if disabled { "true" } else { "false" },
                 tabindex: if disabled || readonly { "-1" } else { "0" },
-                class: "sd-rating {active_color_class} {disabled_class} {readonly_class} {base_override}",
+                class: "sd-rating {disabled_class} {readonly_class} {base_override}",
                 onmouseleave: move |_| {
                     if !readonly && !disabled {
                         hover_val.set(None);
@@ -138,7 +128,7 @@ pub fn Rating(
                         } else if is_half {
                             format!("url(#{rating_id}-grad-{i})")
                         } else {
-                            "rgba(255, 255, 255, 0.04)".to_string()
+                            "none".to_string()
                         };
 
                         let fill_state = if is_full {

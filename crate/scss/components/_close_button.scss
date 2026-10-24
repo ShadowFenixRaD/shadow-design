@@ -1,81 +1,51 @@
 // ==============================================================================
-// Shadow Design — CloseButton Component
+// Shadow Design — CloseButton (raised control, language.md §3.5)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-close-btn {
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.5rem;
-    border: 1px solid transparent;
-    cursor: pointer;
-    user-select: none;
-    outline: none;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-
-    &:active:not(:disabled) {
-      transform: scale(0.94);
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
+    padding: 0;
+    border-radius: var(--sd-radius-md);
+    line-height: 1;
+    @include sd-lit-fill(ghost);
+    @include sd-press;
 
     // Sizes
     &--sm {
-      width: 1.5rem;
-      height: 1.5rem;
+      width: var(--sd-control-xs);
+      height: var(--sd-control-xs);
+      border-radius: var(--sd-radius-sm);
     }
-
     &--md {
-      width: 2rem;
-      height: 2rem;
+      width: var(--sd-control-sm);
+      height: var(--sd-control-sm);
     }
-
     &--lg {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: var(--sd-control-md);
+      height: var(--sd-control-md);
     }
 
     // Variants
     &--subtle {
-      background: transparent;
-      color: #a1a1aa;
-
-      &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.08);
-        color: #ffffff;
-      }
+      @include sd-lit-fill(ghost);
     }
-
     &--filled {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #e4e4e7;
-      @include specular-top(0.06);
-
-      &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #ffffff;
-        border-color: rgba(168, 85, 247, 0.4);
-      }
+      @include sd-lit-fill(secondary);
     }
-
+    // For use inside fields: no fill or border on hover, only the colour changes.
     &--transparent {
-      background: transparent;
-      color: #71717a;
-
-      &:hover:not(:disabled) {
-        color: #f4f4f5;
+      @include sd-lit-fill(ghost);
+      color: var(--sd-text-subtle);
+      @include sd-hover {
+        background-color: transparent;
+        border-color: transparent;
+        color: var(--sd-text);
+        --sd-shadow-specular: #{$sd-shadow-none};
       }
     }
   }

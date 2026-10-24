@@ -1,28 +1,32 @@
 // ==============================================================================
-// Shadow Design — Slider & RangeSlider Styles
+// Shadow Design — Slider & RangeSlider (value fill on a well, language.md §3.11)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
+@use '../form_mixins' as *;
 
 @layer sd-components {
   .sd-slider-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    font-family: $font-sans;
+    @include sd-form-group;
+    gap: var(--sd-space-2);
     user-select: none;
   }
 
+  .sd-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sd-space-2);
+  }
+
   .sd-slider-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: $zinc-300;
+    @include sd-form-label;
   }
 
   .sd-slider-value-display {
-    font-size: 12px;
-    font-family: $font-mono;
-    color: $zinc-400;
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .sd-slider-container {
@@ -30,87 +34,109 @@
     display: flex;
     align-items: center;
     width: 100%;
-    height: 32px;
+    height: var(--sd-control-sm);
     box-sizing: border-box;
 
+    &.sd-slider--glow .sd-slider__bar {
+      --sd-shadow-glow: var(--sd-glow-md);
+    }
+
     &.sd-slider--disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+      @include sd-disabled;
 
       .sd-slider__native {
         cursor: not-allowed;
       }
+      .sd-slider__bar {
+        --sd-shadow-glow: #{$sd-shadow-none};
+      }
     }
 
-    &.sd-slider--glow {
-      .sd-slider__bar {
-        filter: brightness(1.2);
+    // Thumb feedback: hover, press, keyboard focus.
+    &:hover:where(:not(.sd-slider--disabled)) .sd-slider__thumb {
+      border-color: var(--sd-accent-strong);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      &:active:where(:not(.sd-slider--disabled)) .sd-slider__thumb {
+        transform: scale(0.92);
       }
     }
   }
 
+  // The native range input is invisible but owns pointer and keyboard input.
   .sd-slider__native {
+    appearance: none;
+    -webkit-appearance: none;
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
     margin: 0;
     padding: 0;
+    opacity: 0;
     cursor: pointer;
-    z-index: 10;
+    background: transparent;
+    z-index: 1;
+
+    // Range variant: two stacked inputs. The inputs ignore the pointer, only
+    // their thumbs receive it, so both thumbs stay reachable.
+    &--range {
+      pointer-events: none;
+
+      &::-webkit-slider-thumb {
+        pointer-events: auto;
+      }
+      &::-moz-range-thumb {
+        pointer-events: auto;
+      }
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: var(--sd-icon-lg);
+      height: var(--sd-icon-lg);
+      cursor: pointer;
+    }
+    &::-moz-range-thumb {
+      width: var(--sd-icon-lg);
+      height: var(--sd-icon-lg);
+      border: 0;
+      cursor: pointer;
+    }
+
+    &:focus-visible ~ .sd-slider__thumb-wrapper .sd-slider__thumb {
+      outline: 2px solid var(--sd-focus-ring);
+      outline-offset: 2px;
+    }
   }
 
+  // Track: a well, never white.
   .sd-slider__track {
     position: relative;
+    box-sizing: border-box;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background-color: rgba(255, 255, 255, 0.12);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
+    height: var(--sd-space-2);
+    border: 1px solid var(--sd-border-subtle);
+    border-radius: var(--sd-radius-full);
+    background-color: var(--sd-well);
+    @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
   }
 
+  // Value fill.
   .sd-slider__bar {
     position: absolute;
-    top: 0;
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.05s linear;
-
-    &--violet {
-      background-color: #a855f7;
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-    }
-
-    &--obsidian {
-      background-color: #e4e4e7;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    &--crimson {
-      background-color: #f43f5e;
-      box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
-    }
-
-    &--cyan {
-      background-color: #06b6d4;
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-    }
-
-    &--emerald {
-      background-color: #10b981;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-    }
+    top: -1px;
+    bottom: -1px;
+    border-radius: var(--sd-radius-full);
+    background-color: var(--sd-accent);
+    @include sd-shadow($sd-shadow-none, $sd-shadow-none, var(--sd-glow-sm));
   }
 
   .sd-slider__marks {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     pointer-events: none;
   }
 
@@ -120,24 +146,23 @@
     transform: translate(-50%, -50%);
     width: 4px;
     height: 4px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.3);
-    transition: all $duration-fast ease;
+    border-radius: var(--sd-radius-full);
+    background-color: var(--sd-border-hover);
+    @include sd-transition(background-color);
 
     &--active {
-      background-color: #ffffff;
-      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+      background-color: var(--sd-accent-fg);
     }
   }
 
   .sd-slider__mark-label {
     position: absolute;
-    top: 14px;
+    top: var(--sd-space-4);
     left: 50%;
     transform: translateX(-50%);
-    font-size: 10px;
-    font-family: $font-mono;
-    color: $zinc-500;
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
+    color: var(--sd-text-subtle);
     white-space: nowrap;
   }
 
@@ -146,20 +171,22 @@
     top: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 5;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
 
+  // Thumb: a pill (language.md §2).
   .sd-slider__thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 2px solid #a855f7;
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    box-sizing: border-box;
+    width: var(--sd-icon-lg);
+    height: var(--sd-icon-lg);
+    border: 2px solid var(--sd-accent);
+    border-radius: var(--sd-radius-full);
+    background-color: var(--sd-text);
     pointer-events: none;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    @include sd-shadow(var(--sd-specular), var(--sd-elev-1), $sd-shadow-none);
+    @include sd-transition(transform, border-color, outline-color);
   }
 }

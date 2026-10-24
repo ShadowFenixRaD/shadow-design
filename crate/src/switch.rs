@@ -29,8 +29,6 @@ pub fn Switch(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let track_checked_modifier = "sd-switch__track--checked".to_string();
-    #[cfg(feature = "theme")]
     let glow_modifier = if is_checked {
         theme_val.resolve_elevation_class("switch", glow)
     } else {
@@ -40,26 +38,22 @@ pub fn Switch(
     let base_override = theme_val.resolve_component_base("switch").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("switch", &class);
-
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let track_checked_modifier = "sd-switch__track--checked".to_string();
-    #[cfg(not(feature = "theme"))]
-    let glow_modifier = if is_checked && glow.unwrap_or(false) {
+    let glow_modifier = if is_checked && glow == Some(true) {
         "sd-switch__track--glow".to_string()
     } else {
         String::new()
     };
 
     let track_active_class = if is_checked {
-        format!("{track_checked_modifier} {glow_modifier}")
+        format!("sd-switch__track--checked {glow_modifier}")
     } else {
         String::new()
     };
-
     let thumb_active_class = if is_checked {
         "sd-switch__thumb--checked"
     } else {

@@ -73,13 +73,13 @@ pub fn CopyButton(
             if copied {
                 Icon { kind: IconKind::Check, size: 15 }
                 if !icon_only {
-                    span { class: "sd-copy-btn-label", "{copied_label}" }
+                    span { class: "sd-copy-btn__label", "{copied_label}" }
                 }
             } else {
                 Icon { kind: IconKind::Copy, size: 15 }
                 if let Some(lbl) = label {
                     if !icon_only {
-                        span { class: "sd-copy-btn-label", "{lbl}" }
+                        span { class: "sd-copy-btn__label", "{lbl}" }
                     }
                 }
             }

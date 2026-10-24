@@ -80,14 +80,6 @@ pub fn sanitize_pin_value(raw: &str, length: usize, numeric_only: bool) -> Strin
 pub fn PinInput(props: PinInputProps) -> Element {
     let group_id = use_unique_id("pin-input", None);
 
-    #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
-    #[cfg(feature = "theme")]
-    let theme_val = theme.read();
-    #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(not(feature = "theme"))]
-    let radius_class = "rounded-lg";
 
     let size_modifier = match props.size {
         ControlSize::Sm => "sd-pin-input--sm",
@@ -96,20 +88,18 @@ pub fn PinInput(props: PinInputProps) -> Element {
     };
 
     let error_modifier = if props.error { "sd-pin-input--error" } else { "" };
-    let disabled_modifier = if props.disabled { "sd-pin-input--disabled" } else { "" };
 
     let container_class = cx([
         "sd-pin-input",
         size_modifier,
         error_modifier,
-        disabled_modifier,
         props.class.as_deref().unwrap_or(""),
     ]);
 
     let aria_label = props
         .aria_label
         .clone()
-        .unwrap_or_else(|| "PIN code input".to_string());
+        .unwrap_or_else(|| crate::locale::use_locale().pin_input_label);
 
     let default_ph = props.placeholder.clone().unwrap_or_else(|| "○".to_string());
 
@@ -151,7 +141,6 @@ pub fn PinInput(props: PinInputProps) -> Element {
                     let filled_class = if is_filled { "sd-pin-input__cell--filled" } else { "" };
                     let cell_class = cx([
                         "sd-pin-input__cell",
-                        radius_class,
                         filled_class,
                     ]);
 
@@ -182,7 +171,7 @@ pub fn PinInput(props: PinInputProps) -> Element {
                             pattern: "{pattern}",
                             maxlength: "{props.length}",
                             autocomplete: "one-time-code",
-                            aria_label: format!("Digit {} of {}", i + 1, props.length),
+                            aria_label: crate::locale::use_locale().pin_digit_label.replace("{n}", &(i + 1).to_string()).replace("{total}", &props.length.to_string()),
                             aria_invalid: if props.error { "true" } else { "false" },
 
                             onclick: move |_| {

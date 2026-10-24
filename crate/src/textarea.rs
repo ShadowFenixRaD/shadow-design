@@ -63,8 +63,6 @@ pub fn Textarea(
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("textarea").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("textarea", &class);
@@ -75,8 +73,6 @@ pub fn Textarea(
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let radius_class = "";
     #[cfg(not(feature = "theme"))]
     let glow_class = if glow.unwrap_or(false) {
         "sd-textarea--glow".to_string()
@@ -116,18 +112,17 @@ pub fn Textarea(
         min_rows
     };
 
-    let resize_style = match (resize_width, resize_height) {
-        (true, true) => "resize: both;",
-        (true, false) => "resize: horizontal;",
-        (false, true) => "resize: vertical;",
-        (false, false) => "resize: none;",
+    let resize_class = match (resize_width, resize_height) {
+        (true, true) => "sd-textarea--resize-both",
+        (true, false) => "sd-textarea--resize-x",
+        (false, true) => "sd-textarea--resize-y",
+        (false, false) => "sd-textarea--resize-none",
     };
 
     let has_clear_btn = clearable && !text_val.is_empty() && !disabled && !readonly;
 
     let autosize_class = if autosize { "sd-textarea--autosize" } else { "" };
     let error_class = if error.is_some() { "sd-textarea--error" } else { "" };
-    let disabled_class = if disabled { "sd-textarea--disabled" } else { "" };
     let clear_padding_class = if has_clear_btn { "sd-textarea--has-clear" } else { "" };
 
     let is_at_limit = if let Some(max) = max_length {
@@ -148,8 +143,7 @@ pub fn Textarea(
                     id: "{textarea_id}",
                     "aria-invalid": if error.is_some() { "true" } else { "false" },
                     "aria-describedby": described_by.map(|s| s.as_str()),
-                    class: "sd-textarea {autosize_class} {error_class} {disabled_class} {clear_padding_class} {base_override} {radius_class} {glow_class}",
-                    style: "{resize_style}",
+                    class: "sd-textarea {autosize_class} {error_class} {resize_class} {clear_padding_class} {base_override} {glow_class}",
                     placeholder: placeholder.unwrap_or_default(),
                     disabled,
                     readonly,
@@ -168,7 +162,7 @@ pub fn Textarea(
                 if has_clear_btn {
                     CloseButton {
                         size: CloseButtonSize::Sm,
-                        variant: CloseButtonVariant::Subtle,
+                        variant: CloseButtonVariant::Transparent,
                         aria_label: locale.clear_text.clone(),
                         class: "sd-textarea-clear",
                         onclick: move |e: MouseEvent| {
@@ -199,7 +193,7 @@ pub fn Textarea(
                             if let Some(max) = max_length {
                                 "{char_count} / {max}"
                             } else {
-                                "{char_count} caratteri"
+                                "{char_count}"
                             }
                         }
                     }

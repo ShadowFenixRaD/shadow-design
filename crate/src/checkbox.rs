@@ -58,14 +58,14 @@ pub fn Checkbox(
         (None, None) => None,
     };
 
+    let is_active = is_checked || indeterminate;
+
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let active_color_class = "sd-checkbox__box--checked".to_string();
-    #[cfg(feature = "theme")]
-    let glow_class = if is_checked || indeterminate {
+    let glow_class = if is_active {
         theme_val.resolve_elevation_class("checkbox", glow)
     } else {
         String::new()
@@ -74,22 +74,18 @@ pub fn Checkbox(
     let base_override = theme_val.resolve_component_base("checkbox").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("checkbox", &class);
-
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let active_color_class = "sd-checkbox__box--checked".to_string();
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow == Some(true) || (glow.is_none() && (is_checked || indeterminate)) {
+    let glow_class = if is_active && glow == Some(true) {
         "sd-checkbox__box--glow".to_string()
     } else {
         String::new()
     };
-
-    let checked_class = if is_checked || indeterminate {
-        active_color_class.as_str()
+    let checked_class = if is_active {
+        "sd-checkbox__box--checked"
     } else {
         ""
     };
@@ -111,9 +107,10 @@ pub fn Checkbox(
         label {
             class: "sd-checkbox {base_override} {disabled_class} {class_modifiers} {class}",
             r#for: "{input_id}",
+            "aria-disabled": if disabled { "true" } else { "false" },
             input {
                 r#type: "checkbox",
-                class: "sd-visually-hidden",
+                class: "sd-checkbox__input",
                 id: "{input_id}",
                 checked: is_checked,
                 disabled: disabled,

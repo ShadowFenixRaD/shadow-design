@@ -1,6 +1,7 @@
 use crate::icon::{Icon, IconKind};
 #[cfg(feature = "theme")]
 use crate::theme::use_theme;
+use crate::button::{Button, ButtonSize, ButtonVariant};
 use dioxus::prelude::*;
 
 /// Rappresentazione pura, leggera e priva di dipendenze esterne per date di calendario.
@@ -252,11 +253,12 @@ pub fn Calendar(
         div { class: "sd-calendar {class}",
             // Header del calendario (controlli e titoli condizionali in base a view_mode)
             div { class: "sd-calendar-header",
-                button {
-                    r#type: "button",
-                    class: "sd-calendar-nav-btn",
+                Button {
+                    variant: ButtonVariant::Secondary,
+                    size: ButtonSize::Sm,
+                    class: "sd-calendar-nav-btn".to_string(),
+                    aria_label: locale.previous.clone(),
                     onclick: handle_prev,
-                    "aria-label": "{locale.previous}",
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
                 }
 
@@ -298,11 +300,12 @@ pub fn Calendar(
                     },
                 }
 
-                button {
-                    r#type: "button",
-                    class: "sd-calendar-nav-btn",
+                Button {
+                    variant: ButtonVariant::Secondary,
+                    size: ButtonSize::Sm,
+                    class: "sd-calendar-nav-btn".to_string(),
+                    aria_label: locale.next.clone(),
                     onclick: handle_next,
-                    "aria-label": "{locale.next}",
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
             }
@@ -324,7 +327,7 @@ pub fn Calendar(
                             {
                                 let day_num = days_in_prev_month - start_dow + i + 1;
                                 rsx! {
-                                    div { class: "sd-calendar-day sd-calendar-day--outside", "{day_num}" }
+                                    div { class: "sd-calendar-outside", "{day_num}" }
                                 }
                             }
                         }
@@ -340,9 +343,6 @@ pub fn Calendar(
                                 let rng_end = is_range_end(cell_date);
 
                                 let mut day_class = String::from("sd-calendar-day");
-                                if disabled {
-                                    day_class.push_str(" sd-calendar-day--disabled");
-                                }
                                 if is_sel || rng_start || rng_end {
                                     day_class.push_str(" sd-calendar-day--selected");
                                 } else if in_rng {
@@ -465,7 +465,8 @@ pub fn DatePicker(
     rsx! {
         div { class: "sd-date-picker-wrap {class}",
             div {
-                class: format!("sd-date-picker-input-box {}", if disabled { "sd-date-picker-input-box--disabled" } else { "" }),
+                class: if disabled { "sd-date-picker-input-box sd-date-picker-input-box--disabled" } else { "sd-date-picker-input-box" },
+                "aria-disabled": if disabled { "true" } else { "false" },
                 onclick: toggle_open,
                 Icon { kind: IconKind::Calendar, size: 16, class: "sd-date-picker-icon" }
                 input {
@@ -477,10 +478,12 @@ pub fn DatePicker(
                     class: "sd-date-picker-input",
                 }
                 if clearable && value.read().is_some() && !disabled {
-                    button {
-                        r#type: "button",
-                        class: "sd-date-picker-clear-btn",
-                        onclick: move |e| {
+                    Button {
+                        variant: ButtonVariant::Ghost,
+                        size: ButtonSize::Xs,
+                        class: "sd-date-picker-clear-btn".to_string(),
+                        aria_label: locale.clear_text.clone(),
+                        onclick: move |e: MouseEvent| {
                             e.stop_propagation();
                             value.set(None);
                         },
@@ -492,12 +495,10 @@ pub fn DatePicker(
             if *is_open.read() {
                 div {
                     class: "sd-date-picker-backdrop",
-                    style: "position: fixed; inset: 0; z-index: 995; background: transparent;",
                     onclick: move |_| is_open.set(false),
                 }
                 div {
                     class: "sd-date-picker-popup",
-                    style: "position: absolute; z-index: 996;",
                     onkeydown: move |e: KeyboardEvent| {
                         if e.key() == Key::Escape {
                             is_open.set(false);
@@ -541,7 +542,7 @@ pub fn DateRangePicker(
 
     let display_text = match (*start_date.read(), *end_date.read()) {
         (Some(s), Some(e)) => format!("{} — {}", s.format_it(), e.format_it()),
-        (Some(s), None) => format!("{} — Inizio...", s.format_it()),
+        (Some(s), None) => format!("{} — …", s.format_it()),
         _ => String::new(),
     };
 
@@ -575,7 +576,8 @@ pub fn DateRangePicker(
     rsx! {
         div { class: "sd-date-picker-wrap {class}",
             div {
-                class: format!("sd-date-picker-input-box {}", if disabled { "sd-date-picker-input-box--disabled" } else { "" }),
+                class: if disabled { "sd-date-picker-input-box sd-date-picker-input-box--disabled" } else { "sd-date-picker-input-box" },
+                "aria-disabled": if disabled { "true" } else { "false" },
                 onclick: move |_| {
                     if !disabled {
                         is_open.toggle();
@@ -591,10 +593,12 @@ pub fn DateRangePicker(
                     class: "sd-date-picker-input",
                 }
                 if (start_date.read().is_some() || end_date.read().is_some()) && !disabled {
-                    button {
-                        r#type: "button",
-                        class: "sd-date-picker-clear-btn",
-                        onclick: move |e| {
+                    Button {
+                        variant: ButtonVariant::Ghost,
+                        size: ButtonSize::Xs,
+                        class: "sd-date-picker-clear-btn".to_string(),
+                        aria_label: locale.clear_text.clone(),
+                        onclick: move |e: MouseEvent| {
                             e.stop_propagation();
                             start_date.set(None);
                             end_date.set(None);
@@ -605,7 +609,17 @@ pub fn DateRangePicker(
             }
 
             if *is_open.read() {
-                div { class: "sd-date-picker-popup",
+                div {
+                    class: "sd-date-picker-backdrop",
+                    onclick: move |_| is_open.set(false),
+                }
+                div {
+                    class: "sd-date-picker-popup",
+                    onkeydown: move |e: KeyboardEvent| {
+                        if e.key() == Key::Escape {
+                            is_open.set(false);
+                        }
+                    },
                     Calendar {
                         range: range_tuple,
                         on_select: handle_select,

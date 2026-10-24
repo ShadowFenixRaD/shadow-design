@@ -58,7 +58,7 @@ pub fn NumberInput(
     #[props(default)] on_change: Option<EventHandler<f64>>,
 ) -> Element {
     let locale = crate::locale::use_locale();
-    let input_id = crate::a11y::use_unique_id("sd-number-input", id);
+    let input_id = crate::a11y::use_unique_id("number-input", id);
     let help_id = if help_text.is_some() {
         Some(format!("{input_id}-help"))
     } else {
@@ -81,38 +81,22 @@ pub fn NumberInput(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("number_input").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("number_input", &class);
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("number_input", glow);
-    #[cfg(feature = "theme")]
-    let error_class = if error.is_some() {
-        theme_val.input_border_class(true)
-    } else {
-        theme_val.input_border_class(false)
-    };
-
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) {
+    let glow_class = if glow == Some(true) {
         "sd-number-input--glow".to_string()
     } else {
         String::new()
     };
-    #[cfg(not(feature = "theme"))]
-    let error_class = if error.is_some() {
-        "sd-number-input--error"
-    } else {
-        ""
-    };
+    let error_class = if error.is_some() { "sd-number-input--error" } else { "" };
 
     let current_val = *value.read();
     let display_str = format_number_string(current_val, precision);
@@ -144,8 +128,6 @@ pub fn NumberInput(
     };
 
     let disabled_class = if disabled { "sd-number-input--disabled" } else { "" };
-    let up_disabled_class = if !can_increment { "sd-number-input__stepper--disabled" } else { "" };
-    let down_disabled_class = if !can_decrement { "sd-number-input__stepper--disabled" } else { "" };
 
     let is_err = error.is_some();
 
@@ -164,7 +146,8 @@ pub fn NumberInput(
             }
 
             div {
-                class: "sd-number-input-container {base_override} {error_class} {radius_class} {glow_class} {disabled_class}",
+                class: "sd-number-input-container {base_override} {error_class} {glow_class} {disabled_class}",
+                "aria-disabled": if disabled { "true" } else { "false" },
 
                 if let Some(pref) = &prefix {
                     span { class: "sd-number-input__prefix", "{pref}" }
@@ -247,7 +230,7 @@ pub fn NumberInput(
                         tabindex: "-1",
                         disabled: !can_increment,
                         "aria-label": "{locale.number_increment}",
-                        class: "sd-number-input__stepper sd-number-input__stepper--up {up_disabled_class}",
+                        class: "sd-number-input__stepper sd-number-input__stepper--up",
                         onclick: move |e| {
                             e.stop_propagation();
                             do_increment();
@@ -259,7 +242,7 @@ pub fn NumberInput(
                         tabindex: "-1",
                         disabled: !can_decrement,
                         "aria-label": "{locale.number_decrement}",
-                        class: "sd-number-input__stepper sd-number-input__stepper--down {down_disabled_class}",
+                        class: "sd-number-input__stepper",
                         onclick: move |e| {
                             e.stop_propagation();
                             do_decrement();

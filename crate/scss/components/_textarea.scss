@@ -1,142 +1,95 @@
 // ==============================================================================
-// Shadow Design — Textarea & AutoResizeTextarea Styles
+// Shadow Design — Textarea & AutoResizeTextarea (recessed field, language.md §3.6)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
+@use '../form_mixins' as *;
 
 @layer sd-components {
-.sd-textarea-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  font-family: $font-sans;
-}
-
-.sd-textarea-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 500;
-  color: $zinc-300;
-  user-select: none;
-}
-
-.sd-textarea-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.sd-textarea {
-  width: 100%;
-  padding: 10px 14px;
-  background-color: #08080c;
-  color: $zinc-100;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: $radius-md;
-  font-family: $font-sans;
-  font-size: 14px;
-  line-height: 1.55;
-  outline: none;
-  box-sizing: border-box;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-  transition: border-color $duration-fast ease, box-shadow $duration-fast ease, background-color $duration-fast ease;
-
-  &::placeholder {
-    color: $zinc-600;
+  .sd-textarea-wrapper {
+    @include sd-form-group;
+    position: relative;
   }
 
-  &:focus {
-    border-color: rgba(168, 85, 247, 0.6);
-    background-color: $color-surface-2;
-    @include glow($violet-glow, 16px);
+  .sd-textarea-label {
+    @include sd-form-label;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
   }
 
-  &--autosize {
-    overflow-y: auto;
+  .sd-textarea-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
-  &--error {
-    border-color: rgba(244, 63, 94, 0.7);
-    &:focus {
-      border-color: #fb7185;
-      @include glow(rgba(244, 63, 94, 0.3), 16px);
+  .sd-textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--sd-space-3);
+    font-family: var(--sd-font-sans);
+    line-height: var(--sd-leading-normal);
+    @include sd-field(null, '&--error');
+
+    &--autosize {
+      overflow-y: auto;
+    }
+
+    &--resize-none {
+      resize: none;
+    }
+    &--resize-x {
+      resize: horizontal;
+    }
+    &--resize-y {
+      resize: vertical;
+    }
+    &--resize-both {
+      resize: both;
+    }
+
+    &--glow {
+      --sd-shadow-glow: var(--sd-glow-sm);
+    }
+
+    &--has-clear {
+      padding-right: var(--sd-space-10);
     }
   }
 
-  &--disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .sd-textarea-clear {
+    position: absolute;
+    top: var(--sd-space-2);
+    right: var(--sd-space-2);
   }
 
-  &--glow {
-    box-shadow: 0 0 20px $violet-glow, inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  .sd-textarea-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sd-space-2);
   }
 
-  &--has-clear {
-    padding-right: 36px;
-  }
-}
-
-.sd-textarea-clear {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: $radius-sm;
-  background: transparent;
-  border: none;
-  color: $zinc-400;
-  cursor: pointer;
-  padding: 0;
-  transition: all $duration-fast ease;
-
-  &:hover {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1);
+  .sd-textarea-error {
+    @include sd-form-error;
   }
 
-  &:active {
-    transform: scale(0.9);
+  .sd-textarea-help {
+    @include sd-form-help;
   }
-}
 
-.sd-textarea-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 2px;
-  font-size: 11px;
-}
+  .sd-textarea-counter {
+    margin-left: auto;
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
 
-.sd-textarea-error {
-  color: $color-danger;
-  font-weight: 500;
-}
-
-.sd-textarea-help {
-  color: $zinc-500;
-}
-
-.sd-textarea-counter {
-  margin-left: auto;
-  font-family: $font-mono;
-  font-size: 11px;
-  color: $zinc-500;
-  user-select: none;
-
-  &--limit {
-    color: #fb7185;
-    font-weight: 600;
+    &--limit {
+      color: var(--sd-danger-strong);
+    }
   }
-}
 }

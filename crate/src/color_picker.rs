@@ -328,14 +328,14 @@ pub fn format_color(rgba: &Rgba, format: ColorFormat, with_alpha: bool) -> Strin
 #[must_use]
 pub fn default_color_swatches() -> Vec<String> {
     vec![
-        "#a855f7".to_string(), // Vivid Violet (Primary)
-        "#6366f1".to_string(), // Indigo
-        "#06b6d4".to_string(), // Cyan
-        "#10b981".to_string(), // Emerald
-        "#f43f5e".to_string(), // Crimson
-        "#f59e0b".to_string(), // Amber
-        "#ec4899".to_string(), // Fuchsia
-        "#71717a".to_string(), // Obsidian Zinc
+        "#a855f7".to_string(), // Vivid Violet (Primary)  // sd-lint-allow: colour value data, not styling
+        "#6366f1".to_string(), // Indigo  // sd-lint-allow: colour value data, not styling
+        "#06b6d4".to_string(), // Cyan  // sd-lint-allow: colour value data, not styling
+        "#10b981".to_string(), // Emerald  // sd-lint-allow: colour value data, not styling
+        "#f43f5e".to_string(), // Crimson  // sd-lint-allow: colour value data, not styling
+        "#f59e0b".to_string(), // Amber  // sd-lint-allow: colour value data, not styling
+        "#ec4899".to_string(), // Fuchsia  // sd-lint-allow: colour value data, not styling
+        "#71717a".to_string(), // Obsidian Zinc  // sd-lint-allow: colour value data, not styling
     ]
 }
 
@@ -389,12 +389,6 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
     }));
     let hue_val = if hsv_s > 1.0 && hsv_v > 1.0 { hsv_h } else { *current_hue.read() };
 
-    #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
-    #[cfg(feature = "theme")]
-    let radius_class = theme.read().radius_scale.md();
-    #[cfg(not(feature = "theme"))]
-    let radius_class = "rounded-lg";
 
     let size_modifier = match props.size {
         ControlSize::Sm => "sd-color-picker--sm",
@@ -408,7 +402,6 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
         "sd-color-picker",
         size_modifier,
         disabled_modifier,
-        radius_class,
         props.class.as_deref().unwrap_or(""),
     ]);
 
@@ -544,7 +537,7 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                         value: "{current_str}",
                         disabled: props.disabled,
                         placeholder: match *active_format.read() {
-                            ColorFormat::Hex => "#000000",
+                            ColorFormat::Hex => "#000000",  // sd-lint-allow: colour value data, not styling
                             ColorFormat::Rgb => "rgb(0, 0, 0)",
                             ColorFormat::Hsl => "hsl(0, 0%, 0%)",
                         },
@@ -565,8 +558,8 @@ pub fn ColorPicker(props: ColorPickerProps) -> Element {
                     r#type: "button",
                     class: "sd-color-picker__format-btn",
                     disabled: props.disabled,
-                    title: "Cambia formato colore (HEX, RGB, HSL)",
-                    aria_label: "Format selector",
+                    title: "HEX / RGB / HSL",
+                    aria_label: crate::locale::use_locale().color_format_label,
                     onclick: move |_| {
                         let next = match *active_format.read() {
                             ColorFormat::Hex => ColorFormat::Rgb,
@@ -945,12 +938,6 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
     let mut is_open = use_signal(|| false);
     let input_id = use_unique_id("color-input", None);
 
-    #[cfg(feature = "theme")]
-    let theme = crate::theme::use_theme();
-    #[cfg(feature = "theme")]
-    let radius_class = theme.read().radius_scale.md();
-    #[cfg(not(feature = "theme"))]
-    let radius_class = "rounded-lg";
 
     let current_str = props.value.read().clone();
     let rgba = parse_color(&current_str);
@@ -973,8 +960,6 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
 
     let input_class = cx([
         "sd-color-input__field",
-        radius_class,
-        if has_error { "sd-color-input__field--error" } else { "" },
     ]);
 
     let mut val_text = props.value;
@@ -1002,7 +987,7 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
                     class: "sd-color-input__swatch-btn",
                     style: "background-color: {swatch_color};",
                     disabled: props.disabled,
-                    title: "Open color picker",
+                    title: crate::locale::use_locale().color_open_picker,
                     aria_haspopup: "dialog",
                     aria_expanded: if *is_open.read() { "true" } else { "false" },
                     onclick: move |_| {
@@ -1019,7 +1004,7 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
                     r#type: "text",
                     class: "{input_class}",
                     value: "{current_str}",
-                    placeholder: props.placeholder.as_deref().unwrap_or("#a855f7"),
+                    placeholder: props.placeholder.as_deref().unwrap_or("#a855f7"),  // sd-lint-allow: colour value data, not styling
                     disabled: props.disabled,
                     oninput: move |evt: FormEvent| {
                         let text = evt.value();
@@ -1039,8 +1024,8 @@ pub fn ColorInput(props: ColorInputProps) -> Element {
                 if props.clearable && !current_str.is_empty() && !props.disabled {
                     CloseButton {
                         size: CloseButtonSize::Sm,
-                        variant: CloseButtonVariant::Subtle,
-                        aria_label: "Clear color".to_string(),
+                        variant: CloseButtonVariant::Transparent,
+                        aria_label: crate::locale::use_locale().clear_text.clone(),
                         class: "sd-color-input__clear-btn",
                         onclick: move |_| {
                             val_clear.set(String::new());

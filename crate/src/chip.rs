@@ -132,9 +132,12 @@ pub fn Chip(props: ChipProps) -> Element {
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
-    let radius_class = theme.read().radius_scale.md();
+    let class_modifiers = {
+        let extra = props.class.as_deref().unwrap_or("");
+        theme.read().resolve_class_modifiers("chip", extra)
+    };
     #[cfg(not(feature = "theme"))]
-    let radius_class = "rounded-full";
+    let class_modifiers = String::new();
 
     let effective_size = group_ctx
         .and_then(|c| c.size)
@@ -166,15 +169,13 @@ pub fn Chip(props: ChipProps) -> Element {
     };
 
     let checked_modifier = if is_checked { "sd-chip--checked" } else { "" };
-    let disabled_modifier = if props.disabled { "sd-chip--disabled" } else { "" };
 
     let chip_class = cx([
         "sd-chip",
         size_modifier,
         variant_modifier,
         checked_modifier,
-        disabled_modifier,
-        radius_class,
+        class_modifiers.as_str(),
         props.class.as_deref().unwrap_or(""),
     ]);
 

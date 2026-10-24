@@ -43,7 +43,7 @@ pub fn RadioGroup(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
-    let group_id = crate::a11y::use_unique_id("sd-radio-group", id);
+    let group_id = crate::a11y::use_unique_id("radio-group", id);
     let name_str = name.clone().unwrap_or_else(|| group_id.clone());
 
     provide_context(RadioContext {
@@ -126,19 +126,15 @@ pub fn Radio(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let active_theme_class = match &theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-radio__circle--checked",
-        crate::theme::PrimaryColor::Obsidian => "sd-radio__circle--checked-obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-radio__circle--checked-crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-radio__circle--checked-cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-radio__circle--checked-emerald",
-        crate::theme::PrimaryColor::Custom { .. } => "sd-radio__circle--checked",
-    };
-
+    let base_override = theme_val.resolve_component_base("radio").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let class_modifiers = theme_val.resolve_class_modifiers("radio", &class);
     #[cfg(not(feature = "theme"))]
-    let active_theme_class = "sd-radio__circle--checked";
+    let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let class_modifiers = String::new();
 
-    let selected_class = if is_selected { active_theme_class } else { "" };
+    let selected_class = if is_selected { "sd-radio__circle--checked" } else { "" };
     let disabled_class = if is_disabled { "sd-radio--disabled" } else { "" };
 
     let value_for_click = value.clone();
@@ -156,7 +152,8 @@ pub fn Radio(
     rsx! {
         label {
             r#for: "{radio_id}",
-            class: "sd-radio {disabled_class} {class}",
+            class: "sd-radio {base_override} {disabled_class} {class_modifiers} {class}",
+            "aria-disabled": if is_disabled { "true" } else { "false" },
             onclick: {
                 let handle = handle_select;
                 move |_| {
@@ -171,7 +168,7 @@ pub fn Radio(
                 value: "{value}",
                 checked: is_selected,
                 disabled: is_disabled,
-                class: "sd-radio__input sr-only",
+                class: "sd-radio__input",
                 tabindex: "-1",
                 "aria-hidden": "true",
             }
@@ -225,48 +222,24 @@ pub fn RadioCard(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
+    let base_override = theme_val.resolve_component_base("radio_card").unwrap_or("");
     #[cfg(feature = "theme")]
-    let active_border_class = if is_selected {
-        match &theme_val.primary_color {
-            crate::theme::PrimaryColor::Violet => "sd-radio-card--selected-violet",
-            crate::theme::PrimaryColor::Obsidian => "sd-radio-card--selected-obsidian",
-            crate::theme::PrimaryColor::Crimson => "sd-radio-card--selected-crimson",
-            crate::theme::PrimaryColor::Cyan => "sd-radio-card--selected-cyan",
-            crate::theme::PrimaryColor::Emerald => "sd-radio-card--selected-emerald",
-            crate::theme::PrimaryColor::Custom { .. } => "sd-radio-card--selected-violet",
-        }
-    } else {
-        ""
-    };
-
+    let class_modifiers = theme_val.resolve_class_modifiers("radio_card", &class);
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
+    let base_override = "";
     #[cfg(not(feature = "theme"))]
-    let active_border_class = if is_selected { "sd-radio-card--selected-violet" } else { "" };
+    let class_modifiers = String::new();
 
+    let selected_card_class = if is_selected { "sd-radio-card--selected" } else { "" };
     let disabled_class = if is_disabled { "sd-radio-card--disabled" } else { "" };
-
     let val_click1 = value.clone();
     let val_click2 = value.clone();
-
-    #[cfg(feature = "theme")]
-    let active_theme_class = match &theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-radio__circle--checked",
-        crate::theme::PrimaryColor::Obsidian => "sd-radio__circle--checked-obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-radio__circle--checked-crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-radio__circle--checked-cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-radio__circle--checked-emerald",
-        crate::theme::PrimaryColor::Custom { .. } => "sd-radio__circle--checked",
-    };
-    #[cfg(not(feature = "theme"))]
-    let active_theme_class = "sd-radio__circle--checked";
-
-    let circle_selected_class = if is_selected { active_theme_class } else { "" };
+    let circle_selected_class = if is_selected { "sd-radio__circle--checked" } else { "" };
 
     rsx! {
         div {
-            class: "sd-radio-card {radius_class} {active_border_class} {disabled_class} {class}",
+            class: "sd-radio-card {base_override} {selected_card_class} {disabled_class} {class_modifiers} {class}",
+            "aria-disabled": if is_disabled { "true" } else { "false" },
             role: "radio",
             "aria-checked": "{is_selected}",
             tabindex: if is_disabled { "-1" } else { "0" },
@@ -300,18 +273,18 @@ pub fn RadioCard(
                 value: "{value}",
                 checked: is_selected,
                 disabled: is_disabled,
-                class: "sr-only",
+                class: "sd-radio-card__input",
             }
 
             div { class: "sd-radio-card__header",
-                div { class: "flex items-center gap-3",
+                div { class: "sd-radio-card__lead",
                     if let Some(ic) = icon {
                         span { class: "sd-radio-card__icon",
                             Icon { kind: ic, size: 20 }
                         }
                     }
 
-                    div { class: "flex flex-col",
+                    div { class: "sd-radio-card__text",
                         if let Some(t) = &title {
                             span { class: "sd-radio-card__title", "{t}" }
                         }
@@ -321,7 +294,7 @@ pub fn RadioCard(
                     }
                 }
 
-                div { class: "flex items-center gap-2",
+                div { class: "sd-radio-card__trail",
                     if let Some(b) = &badge {
                         span { class: "sd-radio-card__badge", "{b}" }
                     }

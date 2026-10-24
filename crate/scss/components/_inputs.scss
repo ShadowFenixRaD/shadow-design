@@ -1,146 +1,99 @@
 // ==============================================================================
-// Shadow Design — Input Styles
+// Shadow Design — TextInput (recessed field, language.md §3.6)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
+@use '../form_mixins' as *;
 
 @layer sd-components {
-.sd-input-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  font-family: $font-sans;
-}
-
-.sd-input-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: $zinc-300;
-  user-select: none;
-}
-
-.sd-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.sd-input {
-  width: 100%;
-  height: 42px;
-  background-color: #08080c;
-  color: $zinc-100;
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  border-radius: var(--sd-radius-md, $radius-md);
-  padding: 0 14px;
-  font-family: $font-sans;
-  font-size: 14px;
-  line-height: normal;
-  outline: none;
-  box-sizing: border-box;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all $duration-fast ease;
-
-  &::placeholder {
-    color: #8b8b94;
+  .sd-input-wrapper {
+    @include sd-form-group;
   }
 
-  &:focus {
-    border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
-    background-color: var(--sd-surface-2, $color-surface-2);
-    box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.35));
+  .sd-input-label {
+    @include sd-form-label;
+    user-select: none;
   }
 
-  &--error {
-    border-color: rgba(244, 63, 94, 0.7);
-    &:focus {
-      border-color: #fb7185;
-      box-shadow: 0 0 16px rgba(244, 63, 94, 0.35);
+  .sd-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .sd-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding-inline: var(--sd-space-3);
+    font-family: var(--sd-font-sans);
+    line-height: normal;
+    @include sd-field(md, '&--error');
+
+    &--glow {
+      --sd-shadow-glow: var(--sd-glow-sm);
+    }
+
+    // Room for the icons that sit inside the field.
+    &--has-left-icon {
+      padding-left: var(--sd-space-10);
+    }
+    &--has-right-icon {
+      padding-right: var(--sd-space-10);
     }
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  // Modificatori spaziali automatici per icone
-  &--has-left-icon {
-    padding-left: 42px !important;
-  }
-
-  &--has-right-icon {
-    padding-right: 42px !important;
-  }
-
-  &--has-both-icons {
-    padding-left: 42px !important;
-    padding-right: 42px !important;
-  }
-}
-
-// Icone vettoriali posizionate con precisione assoluta a metà altezza
-.sd-input-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: $zinc-400;
-  z-index: 10;
-  line-height: 1;
-  transition: color $duration-fast ease;
-
-  &--left {
-    left: 14px;
-    pointer-events: none;
-  }
-
-  &--right {
-    right: 14px;
-  }
-
-  &--interactive {
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    background: transparent;
-    border: none;
+  // Icons are centred on the field's height (inset 0 + auto margins).
+  .sd-input-icon {
+    position: absolute;
+    inset-block: 0;
+    margin-block: auto;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sd-icon-lg);
+    height: var(--sd-icon-lg);
     padding: 0;
-    margin: 0;
-    outline: none;
+    color: var(--sd-text-subtle);
+    line-height: 1;
+    @include sd-transition(color, opacity, transform);
 
-    &:hover {
-      color: #ffffff;
+    &--left {
+      left: var(--sd-space-3);
+      pointer-events: none;
     }
 
-    &:active {
-      transform: translateY(-50%) scale(0.88);
+    &--right {
+      right: var(--sd-space-3);
+    }
+
+    &--interactive {
+      pointer-events: auto;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      border-radius: var(--sd-radius-sm);
+      @include sd-press(0.9);
+      @include sd-focus-ring(1px);
+      @include sd-hover {
+        color: var(--sd-text);
+      }
+      #{$sd-disabled-states} {
+        @include sd-disabled;
+      }
+    }
+
+    svg {
+      display: block;
+      flex-shrink: 0;
     }
   }
 
-  svg {
-    display: block;
-    margin: auto;
-    flex-shrink: 0;
+  .sd-input-error {
+    @include sd-form-error;
+  }
+
+  .sd-input-help {
+    @include sd-form-help;
   }
 }
-
-.sd-input-error {
-  font-size: 11px;
-  color: $color-danger;
-  margin-top: 2px;
-  font-weight: 500;
-}
-
-.sd-input-help {
-  font-size: 11px;
-  color: $zinc-400;
-  margin-top: 2px;
-}
-}
-

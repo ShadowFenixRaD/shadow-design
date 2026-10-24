@@ -130,7 +130,6 @@ fn SelectOption(
     let item_val = item.value.clone();
     let item_disabled = item.disabled;
     let selected_class = if selected { "sd-select-item--selected" } else { "" };
-    let disabled_class = if item_disabled { "sd-select-item--disabled" } else { "" };
     let active_class = if active { "sd-select-item--active" } else { "" };
 
     use_effect(move || {
@@ -150,7 +149,7 @@ fn SelectOption(
             tabindex: "-1",
             "aria-selected": "{selected}",
             "aria-disabled": if item_disabled { "true" } else { "false" },
-            class: "sd-select-item {selected_class} {disabled_class} {active_class}",
+            class: "sd-select-item {selected_class} {active_class}",
             onmounted: move |m| opt_mount.set(Some(m.data())),
             onmousedown: move |e| e.prevent_default(),
             onclick: move |e| {
@@ -255,8 +254,6 @@ pub fn Select(
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("select").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("select", &class);
@@ -268,20 +265,13 @@ pub fn Select(
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) {
+    let glow_class = if glow == Some(true) {
         "sd-select-trigger--glow".to_string()
     } else {
         String::new()
     };
 
-    #[cfg(feature = "animation")]
-    let anim_class = crate::animation::Animations::DROPDOWN_ENTER;
-    #[cfg(not(feature = "animation"))]
-    let anim_class = "animate-dropdown-enter";
-
-    let select_id = crate::a11y::use_unique_id("sd-select", id);
+    let select_id = crate::a11y::use_unique_id("select", id);
     let label_id = format!("{select_id}-label");
     let desc_id = format!("{select_id}-desc");
     let err_id = format!("{select_id}-err");
@@ -311,7 +301,6 @@ pub fn Select(
 
     let open_trigger_class = if open { "sd-select-trigger--open" } else { "" };
     let error_trigger_class = if error.is_some() { "sd-select-trigger--error" } else { "" };
-    let disabled_trigger_class = if disabled { "sd-select-trigger--disabled" } else { "" };
     let open_container_class = if open { "sd-select-container--open" } else { "" };
 
     let q = search_query().trim().to_lowercase();
@@ -575,7 +564,7 @@ pub fn Select(
                     "aria-disabled": if disabled { "true" } else { "false" },
                     "aria-invalid": error.is_some(),
                     "aria-activedescendant": active_opt_id.as_deref(),
-                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {disabled_trigger_class} {base_override} {radius_class} {glow_class}",
+                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {base_override} {glow_class}",
                     onmounted: move |m| trigger_mount.set(Some(m.data())),
                     onclick: move |_| {
                         if !disabled {
@@ -596,7 +585,7 @@ pub fn Select(
                         class: "sd-select-actions",
                         if loading {
                             div {
-                                class: "sd-select-action-btn",
+                                class: "sd-select-spinner",
                                 Icon { kind: IconKind::Spinner, size: 14 }
                             }
                         } else {
@@ -639,7 +628,7 @@ pub fn Select(
                         role: "listbox",
                         id: "{listbox_id}",
                         "aria-labelledby": if label.is_some() { Some(label_id.as_str()) } else { None },
-                        class: "sd-select-menu {anim_class} {radius_class}",
+                        class: "sd-select-menu",
                         onclick: move |e| e.stop_propagation(),
 
                         if searchable {
@@ -862,8 +851,6 @@ pub fn MultiSelect(
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("select").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("select", &class);
@@ -875,20 +862,13 @@ pub fn MultiSelect(
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) {
+    let glow_class = if glow == Some(true) {
         "sd-select-trigger--glow".to_string()
     } else {
         String::new()
     };
 
-    #[cfg(feature = "animation")]
-    let anim_class = crate::animation::Animations::DROPDOWN_ENTER;
-    #[cfg(not(feature = "animation"))]
-    let anim_class = "animate-dropdown-enter";
-
-    let select_id = crate::a11y::use_unique_id("sd-multiselect", id);
+    let select_id = crate::a11y::use_unique_id("multiselect", id);
     let label_id = format!("{select_id}-label");
     let desc_id = format!("{select_id}-desc");
     let err_id = format!("{select_id}-err");
@@ -915,7 +895,6 @@ pub fn MultiSelect(
 
     let open_trigger_class = if open { "sd-select-trigger--open" } else { "" };
     let error_trigger_class = if error.is_some() { "sd-select-trigger--error" } else { "" };
-    let disabled_trigger_class = if disabled { "sd-select-trigger--disabled" } else { "" };
     let open_container_class = if open { "sd-select-container--open" } else { "" };
 
     let q = search_query().trim().to_lowercase();
@@ -1181,7 +1160,7 @@ pub fn MultiSelect(
                     "aria-disabled": if disabled { "true" } else { "false" },
                     "aria-invalid": error.is_some(),
                     "aria-activedescendant": active_opt_id.as_deref(),
-                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {disabled_trigger_class} {base_override} {radius_class} {glow_class}",
+                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {base_override} {glow_class}",
                     onmounted: move |m| trigger_mount.set(Some(m.data())),
                     onclick: move |_| {
                         if !disabled {
@@ -1252,7 +1231,7 @@ pub fn MultiSelect(
                         class: "sd-select-actions",
                         if loading {
                             div {
-                                class: "sd-select-action-btn",
+                                class: "sd-select-spinner",
                                 Icon { kind: IconKind::Spinner, size: 14 }
                             }
                         } else {
@@ -1296,7 +1275,7 @@ pub fn MultiSelect(
                         id: "{listbox_id}",
                         "aria-labelledby": if label.is_some() { Some(label_id.as_str()) } else { None },
                         "aria-multiselectable": "true",
-                        class: "sd-select-menu {anim_class} {radius_class}",
+                        class: "sd-select-menu",
                         onclick: move |e| e.stop_propagation(),
 
                         if searchable {
@@ -1491,8 +1470,6 @@ pub fn Combobox(
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("select").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("select", &class);
@@ -1504,20 +1481,13 @@ pub fn Combobox(
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) {
+    let glow_class = if glow == Some(true) {
         "sd-select-trigger--glow".to_string()
     } else {
         String::new()
     };
 
-    #[cfg(feature = "animation")]
-    let anim_class = crate::animation::Animations::DROPDOWN_ENTER;
-    #[cfg(not(feature = "animation"))]
-    let anim_class = "animate-dropdown-enter";
-
-    let combobox_id = crate::a11y::use_unique_id("sd-combobox", id);
+    let combobox_id = crate::a11y::use_unique_id("combobox", id);
     let input_id = format!("{combobox_id}-input");
     let desc_id = format!("{combobox_id}-desc");
     let err_id = format!("{combobox_id}-err");
@@ -1551,7 +1521,6 @@ pub fn Combobox(
 
     let open_trigger_class = if open { "sd-select-trigger--open" } else { "" };
     let error_trigger_class = if error.is_some() { "sd-select-trigger--error" } else { "" };
-    let disabled_trigger_class = if disabled { "sd-select-trigger--disabled" } else { "" };
     let open_container_class = if open { "sd-select-container--open" } else { "" };
 
     let key_items = filtered_items.clone();
@@ -1672,7 +1641,7 @@ pub fn Combobox(
                     active.set(None);
                 },
                 div {
-                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {disabled_trigger_class} {base_override} {radius_class} {glow_class}",
+                    class: "sd-select-trigger {open_trigger_class} {error_trigger_class} {base_override} {glow_class}",
                     input {
                         id: "{input_id}",
                         class: "sd-combobox-input",
@@ -1708,7 +1677,7 @@ pub fn Combobox(
                         class: "sd-select-actions",
                         if loading {
                             div {
-                                class: "sd-select-action-btn",
+                                class: "sd-select-spinner",
                                 Icon { kind: IconKind::Spinner, size: 14 }
                             }
                         } else {
@@ -1755,7 +1724,7 @@ pub fn Combobox(
                     div {
                         role: "listbox",
                         id: "{listbox_id}",
-                        class: "sd-select-menu {anim_class} {radius_class}",
+                        class: "sd-select-menu",
                         onclick: move |e| e.stop_propagation(),
                         for (idx, item) in filtered_items.iter().enumerate() {
                             {

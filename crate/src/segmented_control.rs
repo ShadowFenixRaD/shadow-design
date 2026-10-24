@@ -68,7 +68,6 @@ pub fn SegmentedControl(
 ) -> Element {
     let size_class = size.scss_class();
     let full_width_class = if full_width { "sd-segmented-control--full-width" } else { "" };
-    let disabled_class = if disabled { "sd-segmented-control--disabled" } else { "" };
 
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
@@ -76,21 +75,17 @@ pub fn SegmentedControl(
     let base_override = theme_val.resolve_component_base("segmented_control").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("segmented_control", &class);
-    #[cfg(feature = "theme")]
-    let radius = theme_val.radius_scale.sm();
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let radius = "";
 
     let current_val = value();
 
     rsx! {
         div {
-            class: "sd-segmented-control {size_class} {full_width_class} {disabled_class} {radius} {base_override} {class_modifiers} {class}",
+            class: "sd-segmented-control {size_class} {full_width_class} {base_override} {class_modifiers} {class}",
             role: "radiogroup",
 
             for option in options {
@@ -99,7 +94,6 @@ pub fn SegmentedControl(
                     let opt_val = option.value.clone();
                     let is_opt_disabled = disabled || option.disabled;
                     let active_class = if is_active { "sd-segmented-control__item--active" } else { "" };
-                    let opt_disabled_class = if is_opt_disabled { "sd-segmented-control__item--disabled" } else { "" };
 
                     rsx! {
                         button {
@@ -108,7 +102,7 @@ pub fn SegmentedControl(
                             role: "radio",
                             aria_checked: "{is_active}",
                             disabled: is_opt_disabled,
-                            class: "sd-segmented-control__item {active_class} {opt_disabled_class}",
+                            class: "sd-segmented-control__item {active_class}",
                             onclick: {
                                 let opt_val_click = opt_val.clone();
                                 move |_| {

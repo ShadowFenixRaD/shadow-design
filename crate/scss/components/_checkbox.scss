@@ -1,151 +1,121 @@
 // ==============================================================================
-// Shadow Design — Checkbox Styles
+// Shadow Design — Checkbox (toggle field, language.md §3.6)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
+@use '../form_mixins' as *;
 
 @layer sd-components {
-.sd-checkbox {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
-  font-family: $font-sans;
-
-  &--disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  input[type="checkbox"],
-  .sd-visually-hidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  &__indeterminate {
-    display: block;
-    width: 10px;
-    height: 2px;
-    background: currentColor;
-    border-radius: 9999px;
-  }
-
-  &__box {
+  .sd-checkbox {
+    // A fixed 24px column holds the box of every size, so labels of all sizes
+    // start at the same x.
+    display: inline-grid;
+    grid-template-columns: var(--sd-space-6) auto;
+    align-items: start;
+    column-gap: var(--sd-space-2);
     position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background-color: $color-surface-1;
-    border: 1px solid rgba(255, 255, 255, 0.34);
-    transition: all $duration-fast ease;
+    cursor: pointer;
+    user-select: none;
+    font-family: var(--sd-font-sans);
 
-    @include tactile-press(0.92);
+    // Disabled by prop, or by an ancestor <fieldset disabled> (the native control is :disabled).
+    &--disabled,
+    &:has(.sd-checkbox__input:disabled) {
+      @include sd-disabled;
 
-    // Misure
-    &--sm {
-      width: 16px;
-      height: 16px;
-      border-radius: var(--sd-radius-xs, 2px);
+      .sd-checkbox__box {
+        --sd-shadow-glow: #{$sd-shadow-none};
+      }
     }
 
-    &--md {
-      width: 20px;
-      height: 20px;
-      border-radius: var(--sd-radius-sm, 4px);
+    &__input {
+      @include sd-native-hidden;
     }
 
-    &--lg {
-      width: 24px;
-      height: 24px;
-      border-radius: var(--sd-radius-md, 6px);
+    &__box {
+      position: relative;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: var(--sd-space-5);
+      height: var(--sd-space-5);
+      background-color: var(--sd-well);
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-xs);
+      color: var(--sd-accent-fg);
+      @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
+      @include sd-transition(background-color, border-color, box-shadow, transform);
+      @include sd-press(0.92);
+
+      &--sm {
+        width: var(--sd-space-4);
+        height: var(--sd-space-4);
+      }
+      &--md {
+        width: var(--sd-space-5);
+        height: var(--sd-space-5);
+      }
+      &--lg {
+        width: var(--sd-space-6);
+        height: var(--sd-space-6);
+      }
+
+      &--checked {
+        background-color: var(--sd-accent);
+        border-color: var(--sd-accent);
+        --sd-shadow-specular: var(--sd-specular-strong);
+        --sd-shadow-glow: var(--sd-glow-sm);
+      }
+
+      // Opt-in stronger glow (only while checked).
+      &--glow {
+        --sd-shadow-glow: var(--sd-glow-md);
+      }
+
+      &--error {
+        border-color: var(--sd-danger-border);
+      }
     }
 
-    // Stati
-    &--checked {
-      background-color: var(--sd-accent, $violet-primary);
-      border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.6));
-      color: var(--sd-accent-fg, #ffffff);
-      @include specular-top(0.2);
+    &__indeterminate {
+      display: block;
+      width: var(--sd-space-2);
+      height: 2px;
+      background: currentColor;
+      border-radius: var(--sd-radius-full);
     }
 
-    &--checked-crimson {
-      background-color: #4c0519;
-      border-color: rgba(255, 23, 68, 0.6);
-      color: #ffffff;
-      @include specular-top(0.2);
+    @include sd-hover {
+      .sd-checkbox__box:not(.sd-checkbox__box--checked) {
+        border-color: var(--sd-border-hover);
+      }
     }
 
-    &--checked-cyan {
-      background-color: #083344;
-      border-color: rgba(0, 240, 255, 0.6);
-      color: #ffffff;
-      @include specular-top(0.2);
+    // Focus is shown on the box (the native input is visually hidden).
+    &__input:focus-visible + .sd-checkbox__box {
+      outline: 2px solid var(--sd-focus-ring);
+      outline-offset: 2px;
     }
 
-    &--checked-emerald {
-      background-color: #022c22;
-      border-color: rgba(0, 255, 157, 0.6);
-      color: #ffffff;
-      @include specular-top(0.2);
+    &__label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-height: var(--sd-space-5);
+      justify-content: center;
     }
 
-    &--checked-obsidian {
-      background-color: #18181b;
-      border-color: rgba(255, 255, 255, 0.4);
-      color: #ffffff;
-      @include specular-top(0.2);
+    &__title {
+      @include sd-form-label;
     }
 
-    &--glow {
-      box-shadow: 0 0 12px var(--sd-accent-glow, $violet-glow);
+    &__description {
+      @include sd-form-help;
     }
 
-    &--error {
-      border-color: $color-danger;
+    &__error-text {
+      @include sd-form-error;
     }
-  }
-
-  &:focus-within &__box,
-  &__box:focus-visible {
-    outline: 2px solid var(--sd-focus-ring, #c084fc);
-    outline-offset: 2px;
-  }
-
-  &__label {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  &__title {
-    font-size: 13px;
-    font-weight: 500;
-    color: $zinc-200;
-  }
-
-  &__description {
-    font-size: 11px;
-    color: $zinc-400;
-    line-height: 1.4;
-  }
-
-  &__error-text {
-    font-size: 11px;
-    color: $color-danger;
-    line-height: 1.4;
   }
 }
-}
-

@@ -1,463 +1,373 @@
 // ==============================================================================
-// Shadow Design — ColorPicker & ColorInput Styles
+// Shadow Design — ColorPicker & ColorInput
+// container (language.md §3.1) + recessed fields (§3.6) + value fills (§3.11)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
+@use '../form_mixins' as *;
+
+// Slider thumb: a pill. Written once per engine (the two cannot share a rule).
+@mixin _sd-color-thumb {
+  box-sizing: border-box;
+  width: var(--sd-icon-lg);
+  height: var(--sd-icon-lg);
+  border: 2px solid var(--sd-well);
+  border-radius: var(--sd-radius-full);
+  background-color: var(--sd-text);
+  cursor: grab;
+  @include sd-shadow(var(--sd-specular), var(--sd-elev-1), $sd-shadow-none);
+  @include sd-transition(transform, border-color);
+
+  &:hover {
+    border-color: var(--sd-accent);
+  }
+  &:active {
+    cursor: grabbing;
+  }
+}
 
 @layer sd-components {
   // ----------------------------------------------------------------------------
-  // ColorPicker standalone component
+  // ColorPicker (container)
   // ----------------------------------------------------------------------------
   .sd-color-picker {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 14px;
-    background-color: #0c0c12;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: var(--sd-radius-md, $radius-md);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(168, 85, 247, 0.15);
-    box-sizing: border-box;
-    width: 270px;
+    gap: var(--sd-space-3);
+    padding: var(--sd-space-4);
+    width: calc(var(--sd-space-10) * 6 + var(--sd-space-8));
+    font-family: var(--sd-font-sans);
     user-select: none;
+    @include sd-surface(1);
 
     &--sm {
-      width: 240px;
-      padding: 10px;
-      gap: 10px;
+      width: calc(var(--sd-space-10) * 6);
+      padding: var(--sd-space-3);
+      gap: var(--sd-space-2);
     }
-
+    &--md {
+      width: calc(var(--sd-space-10) * 6 + var(--sd-space-8));
+    }
     &--lg {
-      width: 310px;
-      padding: 18px;
-      gap: 14px;
+      width: calc(var(--sd-space-10) * 8 - var(--sd-space-2));
+      padding: var(--sd-space-5);
     }
 
     &--disabled {
-      opacity: 0.45;
-      pointer-events: none;
-      cursor: not-allowed;
+      @include sd-disabled;
     }
 
-    // 2D Saturation / Value Gradient Box
+    // 2D saturation / value area: a well.
     &__saturation {
       position: relative;
+      box-sizing: border-box;
       width: 100%;
-      height: 130px;
-      border-radius: var(--sd-radius-sm, $radius-sm);
+      height: calc(var(--sd-control-md) * 3 + var(--sd-space-2));
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-sm);
       cursor: crosshair;
       overflow: hidden;
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.14);
       user-select: none;
       touch-action: none;
+      @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
     }
-
     &__saturation-white {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to right, #ffffff, transparent);
+      background: linear-gradient(to right, #ffffff, transparent); // sd-lint-allow: colour-space gradient
       pointer-events: none;
     }
-
     &__saturation-black {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, #000000, transparent);
+      background: linear-gradient(to top, #000000, transparent); // sd-lint-allow: colour-space gradient
       pointer-events: none;
     }
-
     &__saturation-thumb {
       position: absolute;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9), inset 0 0 2px rgba(0, 0, 0, 0.6);
+      box-sizing: border-box;
+      width: var(--sd-icon-md);
+      height: var(--sd-icon-md);
+      border: 2px solid var(--sd-text);
+      border-radius: var(--sd-radius-full);
       transform: translate(-50%, -50%);
       pointer-events: none;
-      transition: box-shadow $duration-fast ease;
+      @include sd-shadow($sd-shadow-none, var(--sd-elev-1), $sd-shadow-none);
     }
 
-    // Header with color swatch preview, editable string and format switch
+    // Header: preview swatch, code field, format switch
     &__header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--sd-space-2);
     }
-
     &__preview {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--sd-radius-sm, $radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      flex-shrink: 0;
-      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
       position: relative;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      width: var(--sd-control-sm);
+      height: var(--sd-control-sm);
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-sm);
+      @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
     }
-
     &__code {
       flex: 1;
+      min-width: 0;
     }
-
     &__hex-input {
-      width: 100%;
-      height: 36px;
-      background-color: #08080c;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: var(--sd-radius-sm, $radius-sm);
-      color: $zinc-100;
-      font-family: $font-mono, monospace;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 0 10px;
-      outline: none;
       box-sizing: border-box;
+      width: 100%;
+      padding-inline: var(--sd-space-3);
       text-align: center;
-      transition: all $duration-fast ease;
-
-      &:focus {
-        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
-        box-shadow: 0 0 12px var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-      }
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-sm);
+      font-weight: 500;
+      @include sd-field(sm);
     }
-
     &__format-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: var(--sd-radius-xs, $radius-xs);
-      color: $zinc-300;
-      font-family: $font-mono, monospace;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 0 8px;
-      height: 36px;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all $duration-fast ease;
-
-      &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.14);
-        color: #ffffff;
-        border-color: rgba(255, 255, 255, 0.28);
-      }
+      min-height: var(--sd-control-sm);
+      padding-inline: var(--sd-space-3);
+      border-radius: var(--sd-radius-sm);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      @include sd-lit-fill(secondary);
+      @include sd-press;
     }
 
-    // Sliders
+    // Sliders: value-fill tracks
     &__sliders {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--sd-space-2);
     }
-
     &__slider-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--sd-space-2);
     }
-
     &__slider-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: $zinc-400;
-      width: 14px;
+      width: var(--sd-space-4);
       text-align: center;
-      font-family: $font-mono, monospace;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      font-weight: 600;
+      color: var(--sd-text-muted);
     }
-
     &__slider-value {
-      font-size: 11px;
-      font-weight: 500;
-      color: $zinc-400;
-      width: 36px;
+      width: var(--sd-space-10);
       text-align: right;
-      font-family: $font-mono, monospace;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      color: var(--sd-text-muted);
+      font-variant-numeric: tabular-nums;
     }
-
     &__range {
       flex: 1;
-      height: 10px;
-      border-radius: 5px;
+      box-sizing: border-box;
+      height: var(--sd-space-3);
+      margin: 0;
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-full);
       appearance: none;
       -webkit-appearance: none;
-      outline: none;
       cursor: pointer;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+      @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
+      @include sd-focus-ring;
 
       &::-webkit-slider-thumb {
         appearance: none;
         -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background-color: #ffffff;
-        border: 2px solid #08080c;
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
-        cursor: grab;
-        transition: transform $duration-fast ease;
-
-        &:active {
-          cursor: grabbing;
-          transform: scale(1.2);
-        }
+        @include _sd-color-thumb;
       }
-
       &::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background-color: #ffffff;
-        border: 2px solid #08080c;
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
-        cursor: grab;
-
-        &:active {
-          cursor: grabbing;
-          transform: scale(1.2);
-        }
+        @include _sd-color-thumb;
       }
 
       &--hue {
-        background: linear-gradient(
-          to right,
-          #ff0000 0%,
-          #ffff00 17%,
-          #00ff00 33%,
-          #00ffff 50%,
-          #0000ff 67%,
-          #ff00ff 83%,
-          #ff0000 100%
-        );
+        background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); // sd-lint-allow: hue spectrum
       }
-
       &--sat {
-        background: linear-gradient(to right, #6b7280 0%, #a855f7 100%);
+        background: linear-gradient(to right, var(--sd-text-subtle) 0%, var(--sd-accent) 100%);
       }
-
       &--light {
-        background: linear-gradient(to right, #000000 0%, #a855f7 50%, #ffffff 100%);
+        background: linear-gradient(to right, var(--sd-void) 0%, var(--sd-accent) 50%, var(--sd-text) 100%);
       }
-
       &--alpha {
-        background: linear-gradient(to right, transparent, #a855f7);
+        background: linear-gradient(to right, transparent, var(--sd-accent));
       }
-
       &--red {
-        background: linear-gradient(to right, #000000 0%, #ef4444 100%);
+        background: linear-gradient(to right, var(--sd-void) 0%, #ff0000 100%); // sd-lint-allow: channel colour
       }
-
       &--green {
-        background: linear-gradient(to right, #000000 0%, #22c55e 100%);
+        background: linear-gradient(to right, var(--sd-void) 0%, #00ff00 100%); // sd-lint-allow: channel colour
       }
-
       &--blue {
-        background: linear-gradient(to right, #000000 0%, #3b82f6 100%);
+        background: linear-gradient(to right, var(--sd-void) 0%, #0000ff 100%); // sd-lint-allow: channel colour
       }
     }
 
-    // Direct numeric channel inputs (RGB mode)
+    // Numeric channel fields (RGB mode)
     &__channels {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-top: 2px;
+      gap: var(--sd-space-2);
     }
-
     &__channel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: var(--sd-space-1);
     }
-
     &__channel-input {
-      width: 100%;
-      height: 28px;
-      background-color: #08080c;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: var(--sd-radius-xs, 4px);
-      color: $zinc-100;
-      font-family: $font-mono, monospace;
-      font-size: 12px;
-      text-align: center;
-      outline: none;
-      padding: 0 4px;
       box-sizing: border-box;
-      transition: all $duration-fast ease;
-
-      &:focus {
-        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
-        box-shadow: 0 0 8px var(--sd-accent-glow, rgba(168, 85, 247, 0.3));
-      }
+      width: 100%;
+      padding-inline: var(--sd-space-1);
+      text-align: center;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      @include sd-field(xs);
     }
-
     &__channel-label {
-      font-size: 10px;
-      color: $zinc-400;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
       font-weight: 600;
-      font-family: $font-mono, monospace;
+      color: var(--sd-text-muted);
     }
 
-    // Swatches grid
+    // Swatches
     &__swatches {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
-      gap: 6px;
-      padding-top: 4px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      gap: var(--sd-space-2);
+      padding-top: var(--sd-space-3);
+      border-top: 1px solid var(--sd-border-subtle);
     }
-
     &__swatch {
       width: 100%;
       aspect-ratio: 1;
-      border-radius: var(--sd-radius-xs, 4px);
-      border: 1px solid rgba(255, 255, 255, 0.22);
       padding: 0;
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-xs);
       cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-      transition: all $duration-fast ease;
-
-      &:hover:not(:disabled) {
-        transform: scale(1.18);
-        border-color: rgba(255, 255, 255, 0.6);
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
-        z-index: 1;
+      @include sd-shadow($sd-shadow-none, var(--sd-elev-1), $sd-shadow-none);
+      @include sd-transition(border-color, box-shadow, transform, opacity, outline-color);
+      @include sd-press;
+      @include sd-focus-ring(1px);
+      @include sd-hover {
+        border-color: var(--sd-border-hover);
+        --sd-shadow-elev: var(--sd-elev-2);
+      }
+      #{$sd-disabled-states} {
+        @include sd-disabled;
       }
 
-      &--active {
-        outline: 2px solid #ffffff;
+      // Selected swatch: ring + small glow.
+      &--active,
+      &--active:hover {
+        border-color: var(--sd-accent);
+        outline: 2px solid var(--sd-text);
         outline-offset: 1px;
-        transform: scale(1.12);
-        z-index: 2;
+        --sd-shadow-glow: var(--sd-glow-sm);
       }
+    }
+
+    // Floating inside the ColorInput popover: raised layer.
+    .sd-color-input__popover > & {
+      background-color: var(--sd-surface-2);
+      border-color: var(--sd-border-strong);
+      --sd-shadow-elev: var(--sd-elev-2);
+    }
+
+    // The container dims once; controls inside must not dim again.
+    &--disabled :disabled {
+      opacity: 1;
     }
   }
 
   // ----------------------------------------------------------------------------
-  // ColorInput form control
+  // ColorInput (recessed field with swatch trigger)
   // ----------------------------------------------------------------------------
   .sd-color-input {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
+    @include sd-form-group;
     position: relative;
-    font-family: $font-sans;
 
     &__label {
-      font-size: 13px;
-      font-weight: 500;
-      color: $zinc-300;
+      @include sd-form-label;
       user-select: none;
     }
 
+    // The container is the field: hover, focus-within and error act on the whole box.
     &__container {
-      position: relative;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
+      gap: var(--sd-space-2);
       width: 100%;
+      padding-inline: var(--sd-space-2);
+      @include sd-field(md, '.sd-color-input--error &');
     }
 
     &__swatch-btn {
-      position: absolute;
-      left: 8px;
-      width: 26px;
-      height: 26px;
-      border-radius: var(--sd-radius-sm, 5px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      cursor: pointer;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      width: var(--sd-control-xs);
+      height: var(--sd-control-xs);
       padding: 0;
-      z-index: 2;
-      box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
-      transition: transform $duration-fast ease, box-shadow $duration-fast ease;
-
-      &:hover:not(:disabled) {
-        transform: scale(1.08);
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-sm);
+      cursor: pointer;
+      @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
+      @include sd-transition(border-color, transform, box-shadow);
+      @include sd-press;
+      @include sd-focus-ring(1px);
+      @include sd-hover {
+        border-color: var(--sd-border-hover);
+      }
+      #{$sd-disabled-states} {
+        cursor: not-allowed;
       }
     }
 
     &__field {
-      width: 100%;
-      height: 42px;
-      background-color: #08080c;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: var(--sd-radius-md, $radius-md);
-      color: $zinc-100;
-      font-family: $font-mono, monospace;
-      font-size: 14px;
-      padding: 0 38px 0 44px;
-      outline: none;
-      box-sizing: border-box;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-      transition: all $duration-fast ease;
-
-      &:focus {
-        border-color: var(--sd-focus-ring, rgba(168, 85, 247, 0.65));
-        background-color: var(--sd-surface-2, $color-surface-2);
-        box-shadow: 0 0 16px var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-      }
-
-      &--error {
-        border-color: rgba(244, 63, 94, 0.7);
-
-        &:focus {
-          border-color: #fb7185;
-          box-shadow: 0 0 16px rgba(244, 63, 94, 0.4);
-        }
-      }
+      @include sd-field-bare;
+      flex: 1;
+      height: 100%;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-md);
     }
 
     &__clear-btn {
-      position: absolute;
-      right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      color: $zinc-400;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      z-index: 2;
-      transition: color $duration-fast ease;
-
-      &:hover {
-        color: #ffffff;
-      }
+      flex-shrink: 0;
     }
 
     &__desc-text {
-      font-size: 12px;
-      color: $zinc-500;
+      @include sd-form-help;
     }
-
     &__error-text {
-      font-size: 12px;
-      color: #fb7185;
+      @include sd-form-error;
     }
 
+    // Invisible click-catcher that closes the popover.
     &__backdrop {
       position: fixed;
       inset: 0;
-      z-index: 995;
+      z-index: z('popover-back');
       background: transparent;
     }
-
     &__popover {
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + var(--sd-space-2));
       left: 0;
-      z-index: 1000;
+      z-index: z('popover');
+      @include sd-animate(sd-pop-in, var(--sd-dur));
     }
 
     &--disabled {
-      opacity: 0.45;
-      pointer-events: none;
-      cursor: not-allowed;
+      @include sd-disabled;
     }
   }
 }

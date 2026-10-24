@@ -161,6 +161,8 @@ pub fn Dropzone(
         div {
             id: "{dropzone_id}",
             class: "{root_class}",
+            "aria-disabled": if disabled { "true" } else { "false" },
+            "aria-busy": if loading { "true" } else { "false" },
             ondragover: move |e| {
                 e.prevent_default();
                 if !disabled && !loading {
@@ -182,6 +184,7 @@ pub fn Dropzone(
                 id: "{dropzone_id}-input",
                 r#type: "file",
                 class: "sd-dropzone-input",
+                "aria-label": "{title}",
                 disabled: disabled || loading,
                 multiple: multiple,
                 accept: if accept_str.is_empty() { None } else { Some(accept_str.as_str()) },
@@ -217,19 +220,19 @@ pub fn Dropzone(
             div { class: "sd-dropzone-content",
                 if loading {
                     div { class: "sd-dropzone-icon sd-dropzone-icon--loading",
-                        Icon { kind: IconKind::Spinner, size: 36, class: "animate-spin text-purple-400" }
+                        Icon { kind: IconKind::Spinner, size: 36, class: "sd-dropzone-spin" }
                     }
                 } else if *is_rejected.read() {
                     div { class: "sd-dropzone-icon sd-dropzone-icon--reject",
-                        Icon { kind: IconKind::XCircle, size: 36, class: "text-rose-400" }
+                        Icon { kind: IconKind::XCircle, size: 36 }
                     }
                 } else if *is_dragging.read() {
                     div { class: "sd-dropzone-icon sd-dropzone-icon--active",
-                        Icon { kind: IconKind::Download, size: 36, class: "text-purple-300 animate-bounce" }
+                        Icon { kind: IconKind::Download, size: 36 }
                     }
                 } else {
                     div { class: "sd-dropzone-icon",
-                        Icon { kind: IconKind::Upload, size: 36, class: "text-zinc-400" }
+                        Icon { kind: IconKind::Upload, size: 36 }
                     }
                 }
 
@@ -239,9 +242,9 @@ pub fn Dropzone(
                         span { class: "sd-dropzone-desc", "{desc}" }
                     } else if !accept.is_empty() {
                         span { class: "sd-dropzone-desc",
-                            "Formati accettati: {accept.join(\", \")}"
+                            "{accept_str}"
                             if let Some(max_b) = max_size_bytes {
-                                " (Max {max_b / (1024 * 1024)} MB)"
+                                " · ≤ {max_b / (1024 * 1024)} MB"
                             }
                         }
                     }

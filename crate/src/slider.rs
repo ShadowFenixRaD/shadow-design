@@ -59,7 +59,7 @@ pub fn Slider(
     #[props(default)] class: String,
     #[props(default)] on_change: Option<EventHandler<f64>>,
 ) -> Element {
-    let slider_id = crate::a11y::use_unique_id("sd-slider", id);
+    let slider_id = crate::a11y::use_unique_id("slider", id);
     let mut is_hovered = use_signal(|| false);
 
     let current_val = *value.read();
@@ -75,24 +75,13 @@ pub fn Slider(
     let class_modifiers = theme_val.resolve_class_modifiers("slider", &class);
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("slider", glow);
-    #[cfg(feature = "theme")]
-    let accent_bar_class = match theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-slider__bar--violet",
-        crate::theme::PrimaryColor::Obsidian => "sd-slider__bar--obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-slider__bar--crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-slider__bar--cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-slider__bar--emerald",
-        _ => "sd-slider__bar--violet",
-    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) { "sd-slider--glow".to_string() } else { String::new() };
-    #[cfg(not(feature = "theme"))]
-    let accent_bar_class = "sd-slider__bar--violet";
+    let glow_class = if glow == Some(true) { "sd-slider--glow".to_string() } else { String::new() };
 
     let disabled_class = if disabled { "sd-slider--disabled" } else { "" };
 
@@ -110,7 +99,7 @@ pub fn Slider(
         div {
             class: "sd-slider-wrapper {class_modifiers} {class}",
             if let Some(lbl) = &label {
-                div { class: "flex items-center justify-between mb-1.5",
+                div { class: "sd-slider-header",
                     label {
                         r#for: "{slider_id}",
                         class: "sd-slider-label",
@@ -133,7 +122,7 @@ pub fn Slider(
                     max: "{max}",
                     step: "{step}",
                     value: "{current_val}",
-                    "aria-label": label.as_deref().unwrap_or("Slider"),
+                    "aria-label": label.clone().unwrap_or_else(|| crate::locale::use_locale().slider_label),
                     "aria-valuemin": "{min}",
                     "aria-valuemax": "{max}",
                     "aria-valuenow": "{current_val}",
@@ -149,7 +138,7 @@ pub fn Slider(
                 // Styled visual track
                 div { class: "sd-slider__track",
                     div {
-                        class: "sd-slider__bar {accent_bar_class}",
+                        class: "sd-slider__bar",
                         style: "width: {percent}%;",
                     }
                 }
@@ -210,7 +199,7 @@ pub fn RangeSlider(
     #[props(default)] on_change: Option<EventHandler<(f64, f64)>>,
 ) -> Element {
     let locale = crate::locale::use_locale();
-    let slider_id = crate::a11y::use_unique_id("sd-range-slider", id);
+    let slider_id = crate::a11y::use_unique_id("range-slider", id);
     let mut is_hovered = use_signal(|| false);
 
     let (val_min, val_max) = *value.read();
@@ -228,24 +217,13 @@ pub fn RangeSlider(
     let class_modifiers = theme_val.resolve_class_modifiers("slider", &class);
     #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("slider", glow);
-    #[cfg(feature = "theme")]
-    let accent_bar_class = match theme_val.primary_color {
-        crate::theme::PrimaryColor::Violet => "sd-slider__bar--violet",
-        crate::theme::PrimaryColor::Obsidian => "sd-slider__bar--obsidian",
-        crate::theme::PrimaryColor::Crimson => "sd-slider__bar--crimson",
-        crate::theme::PrimaryColor::Cyan => "sd-slider__bar--cyan",
-        crate::theme::PrimaryColor::Emerald => "sd-slider__bar--emerald",
-        _ => "sd-slider__bar--violet",
-    };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let glow_class = if glow.unwrap_or(false) { "sd-slider--glow".to_string() } else { String::new() };
-    #[cfg(not(feature = "theme"))]
-    let accent_bar_class = "sd-slider__bar--violet";
+    let glow_class = if glow == Some(true) { "sd-slider--glow".to_string() } else { String::new() };
 
     let disabled_class = if disabled { "sd-slider--disabled" } else { "" };
 
@@ -275,7 +253,7 @@ pub fn RangeSlider(
         div {
             class: "sd-slider-wrapper {class_modifiers} {class}",
             if let Some(lbl) = &label {
-                div { class: "flex items-center justify-between mb-1.5",
+                div { class: "sd-slider-header",
                     label {
                         r#for: "{slider_id}-min",
                         class: "sd-slider-label",
@@ -333,7 +311,7 @@ pub fn RangeSlider(
                 // Styled visual track
                 div { class: "sd-slider__track",
                     div {
-                        class: "sd-slider__bar {accent_bar_class}",
+                        class: "sd-slider__bar",
                         style: "left: {pct_min}%; width: {bar_width}%;",
                     }
                 }

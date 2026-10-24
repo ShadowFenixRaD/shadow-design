@@ -1,61 +1,37 @@
 // ==============================================================================
-// Shadow Design — CopyButton Component
+// Shadow Design — CopyButton (raised control, language.md §3.5)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-copy-btn {
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #d4d4d8;
-    cursor: pointer;
-    user-select: none;
-    outline: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-    @include specular-top(0.06);
+    gap: var(--sd-space-2);
+    min-height: var(--sd-control-sm);
+    padding-inline: var(--sd-space-3);
+    border-radius: var(--sd-radius-sm);
+    font-family: var(--sd-font-sans);
+    font-size: var(--sd-text-xs);
+    line-height: 1;
+    @include sd-lit-fill(secondary);
+    @include sd-press;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-    }
-
-    &:active {
-      transform: scale(0.96);
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
+    &__label {
+      white-space: nowrap;
+      line-height: 1;
     }
 
     &--icon-only {
-      padding: 0.375rem;
-      border-radius: 0.375rem;
+      width: var(--sd-control-sm);
+      justify-content: center;
+      padding-inline: 0;
     }
 
+    // Copied confirmation: soft success.
     &--copied {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: #34d399;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
-
-      &:hover {
-        background: rgba(16, 185, 129, 0.2);
-        color: #6ee7b7;
-      }
+      @include sd-lit-fill(success);
     }
-  }
-
-  .sd-copy-btn-label {
-    white-space: nowrap;
-    line-height: 1;
   }
 }

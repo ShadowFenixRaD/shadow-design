@@ -1,160 +1,91 @@
 // ==============================================================================
-// Shadow Design — Chip & ChipGroup Styles
+// Shadow Design — Chip & ChipGroup (item, always a pill; language.md §3.4, §3.7)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
-@keyframes sd-chip-check-in {
-  from {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 @layer sd-components {
-  // ----------------------------------------------------------------------------
-  // ChipGroup Container
-  // ----------------------------------------------------------------------------
   .sd-chip-group {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: var(--sd-space-2);
     box-sizing: border-box;
   }
 
-  // ----------------------------------------------------------------------------
-  // Chip Button Item
-  // ----------------------------------------------------------------------------
   .sd-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    @include sd-item(md, 2px);
+    @include sd-press;
     box-sizing: border-box;
-    font-family: $font-sans;
-    font-weight: 500;
+    justify-content: center;
+    gap: var(--sd-space-1);
+    min-height: var(--sd-control-sm);
+    padding-inline: var(--sd-space-3);
+    border-radius: var(--sd-radius-full); // a pill under every radius scale
+    font-family: var(--sd-font-sans);
     line-height: 1;
-    border-radius: 9999px;
-    cursor: pointer;
-    user-select: none;
-    outline: none;
-    text-decoration: none;
-    border: 1px solid transparent;
-    transition: all $duration-fast ease;
+    white-space: nowrap;
 
-    &:active:not(:disabled) {
-      transform: scale(0.96);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--sd-focus-ring, rgba(168, 85, 247, 0.7));
-      outline-offset: 2px;
-    }
-
-    // Size variants
+    // --- Sizes ------------------------------------------------------------------
     &--sm {
-      height: 26px;
-      padding: 0 10px;
-      font-size: 12px;
-      gap: 5px;
+      min-height: var(--sd-control-xs);
+      padding-inline: var(--sd-space-2);
+      font-size: var(--sd-text-xs);
     }
-
     &--md {
-      height: 32px;
-      padding: 0 14px;
-      font-size: 13px;
-      gap: 6px;
+      min-height: var(--sd-control-sm);
+      padding-inline: var(--sd-space-3);
+      font-size: var(--sd-text-sm);
     }
-
     &--lg {
-      height: 38px;
-      padding: 0 18px;
-      font-size: 14px;
-      gap: 8px;
+      min-height: var(--sd-control-md);
+      padding-inline: var(--sd-space-4);
+      gap: var(--sd-space-2);
+      font-size: var(--sd-text-md);
     }
 
-    // Visual Style Variants
-    // 1. Filled (Default)
+    // --- Variants: every chip is filled glass, only the depth differs -----------
     &--filled {
-      background-color: #0c0c12;
-      border-color: rgba(255, 255, 255, 0.14);
-      color: $zinc-300;
-
-      &:hover:not(:disabled) {
-        border-color: rgba(255, 255, 255, 0.32);
-        background-color: #14141e;
-        color: #ffffff;
-      }
-
-      &.sd-chip--checked {
-        background-color: var(--sd-accent, #a855f7);
-        border-color: rgba(255, 255, 255, 0.35);
-        color: #ffffff;
-        box-shadow: 0 0 14px var(--sd-accent-glow, rgba(168, 85, 247, 0.45));
+      background-color: var(--sd-surface-2);
+      border-color: var(--sd-border-strong);
+      @include sd-shadow(var(--sd-specular));
+      @include sd-hover {
+        background-color: var(--sd-surface-3);
+        border-color: var(--sd-border-hover);
+        color: var(--sd-text);
       }
     }
-
-    // 2. Outline
     &--outline {
-      background-color: transparent;
-      border-color: rgba(255, 255, 255, 0.18);
-      color: $zinc-400;
-
-      &:hover:not(:disabled) {
-        border-color: rgba(255, 255, 255, 0.38);
-        color: #ffffff;
-        background-color: rgba(255, 255, 255, 0.03);
-      }
-
-      &.sd-chip--checked {
-        border-color: var(--sd-accent, #a855f7);
-        color: #ffffff;
-        background-color: rgba(168, 85, 247, 0.12);
-        box-shadow: 0 0 12px var(--sd-accent-glow, rgba(168, 85, 247, 0.35));
+      background-color: var(--sd-surface-1);
+      border-color: var(--sd-border-strong);
+      @include sd-hover {
+        background-color: var(--sd-surface-2);
+        border-color: var(--sd-border-hover);
+        color: var(--sd-text);
       }
     }
-
-    // 3. Light
     &--light {
-      background-color: rgba(255, 255, 255, 0.04);
-      border-color: transparent;
-      color: $zinc-300;
-
-      &:hover:not(:disabled) {
-        background-color: rgba(255, 255, 255, 0.08);
-        color: #ffffff;
-      }
-
-      &.sd-chip--checked {
-        background-color: rgba(168, 85, 247, 0.22);
-        border-color: rgba(168, 85, 247, 0.45);
-        color: #ffffff;
-        box-shadow: 0 0 10px var(--sd-accent-glow, rgba(168, 85, 247, 0.25));
+      background-color: var(--sd-tint-1);
+      border-color: var(--sd-border);
+      @include sd-hover {
+        background-color: var(--sd-tint-2);
+        border-color: var(--sd-border-strong);
+        color: var(--sd-text);
       }
     }
-
-    // 4. Subtle
     &--subtle {
-      background-color: transparent;
+      background-color: var(--sd-tint-1);
       border-color: transparent;
-      color: $zinc-400;
-
-      &:hover:not(:disabled) {
-        background-color: rgba(255, 255, 255, 0.06);
-        color: #ffffff;
-      }
-
-      &.sd-chip--checked {
-        background-color: rgba(255, 255, 255, 0.12);
-        color: #ffffff;
+      @include sd-hover {
+        background-color: var(--sd-tint-2);
+        color: var(--sd-text);
       }
     }
 
-    // Icons
+    // Selected: after the variants so it wins over their hover rules.
+    &--checked {
+      @include sd-selected;
+    }
+
     &__icon {
       display: inline-flex;
       align-items: center;
@@ -162,7 +93,7 @@
       flex-shrink: 0;
 
       &--check {
-        animation: sd-chip-check-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        @include sd-animate(sd-zoom-in, var(--sd-dur-fast));
       }
     }
 
@@ -170,13 +101,6 @@
       display: inline-flex;
       align-items: center;
       line-height: normal;
-    }
-
-    // Disabled state
-    &--disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
     }
   }
 }

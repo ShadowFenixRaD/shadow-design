@@ -35,7 +35,7 @@ SCSS_RULES: list[tuple[str, re.Pattern[str], str]] = [
      "colour literal: use a token or rgba(var(--sd-*-rgb), a)"),
     ("static-var", re.compile(r"\$(?:violet|crimson|cyan|emerald|obsidian|zinc|color|radius|palette|success|danger|warning|info)\b[\w-]*"),
      "static SCSS colour/radius variable: use the runtime var(--sd-*) token"),
-    ("z-index", re.compile(r"z-index\s*:\s*(?!z\()(?!-?[01]\s*[;}])"),
+    ("z-index", re.compile(r"z-index\s*:\s*(?!\s)(?!z\()(?!-?[01]\s*[;}])"),
      "z-index must use z('<layer>') (only -1/0/1 allowed for local stacking)"),
     ("important", re.compile(r"!important"), "!important is forbidden (ADR-0004 §7)"),
     ("box-shadow", re.compile(r"(?<![\w-])box-shadow\s*:"),
@@ -48,9 +48,9 @@ SCSS_RULES: list[tuple[str, re.Pattern[str], str]] = [
      "keyframes live in _animations.scss (sd-* names)"),
     ("font-size", re.compile(r"font-size\s*:\s*[\d.]+(?:px|rem|em)"),
      "use var(--sd-text-*)"),
-    ("font-family", re.compile(r"font-family\s*:\s*(?!var\()"),
+    ("font-family", re.compile(r"font-family\s*:\s*(?!\s)(?!var\()"),
      "use var(--sd-font-sans) / var(--sd-font-mono)"),
-    ("radius", re.compile(r"border(?:-[a-z]+)*-radius\s*:\s*(?!var\()(?!0\s*[;}])(?!50%\s*[;}])(?!inherit)"),
+    ("radius", re.compile(r"border(?:-[a-z]+)*-radius\s*:\s*(?!\s)(?!var\()(?!0\s*[;}])(?!50%\s*[;}])(?!inherit)"),
      "use var(--sd-radius-*)"),
     ("media", re.compile(r"@media\s*\(\s*(?:min|max)-width"),
      "use @include bp-up(<bp>)"),
@@ -188,9 +188,12 @@ def lint_missing_classes(files: list[Path], css: set[str]) -> list[str]:
         cut = text.find("#[cfg(test)]")
         if cut != -1:
             text = text[:cut]
+        lines = text.splitlines()
         for no, _, s in rust_strings(text):
             if "{" in s:
                 continue
+            if 0 < no <= len(lines) and "use_unique_id(" in lines[no - 1]:
+                continue  # DOM id prefix, not a class
             for cls in re.findall(r"(?<![\w-])(sd-[a-z0-9_-]+)", s):
                 if cls.endswith("-") or cls in css:
                     continue

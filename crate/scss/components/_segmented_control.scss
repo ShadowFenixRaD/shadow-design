@@ -1,102 +1,54 @@
 // ==============================================================================
-// Shadow Design — SegmentedControl Styles
+// Shadow Design — SegmentedControl (track of items, language.md §3.4, §3.7)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-segmented-control {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    background-color: $color-surface-1;
-    border: $border-hairline;
-    border-radius: $radius-full;
-    position: relative;
-    user-select: none;
-    gap: 3px;
+    gap: var(--sd-space-1);
     max-width: 100%;
     box-sizing: border-box;
-    @include specular-top(0.04);
+    user-select: none;
+    @include sd-track;
 
-    &--sm {
-      padding: 2px;
-
-      .sd-segmented-control__item {
-        padding: 3px 8px;
-        font-size: 11px;
-      }
+    &--sm &__item {
+      min-height: var(--sd-item-h-sm);
+      padding-inline: var(--sd-space-2);
+      font-size: var(--sd-text-xs);
     }
-
-    &--md {
-      padding: 3px;
-
-      .sd-segmented-control__item {
-        padding: 5px 12px;
-        font-size: 12px;
-      }
+    &--md &__item {
+      min-height: var(--sd-item-h);
     }
-
-    &--lg {
-      padding: 4px;
-
-      .sd-segmented-control__item {
-        padding: 7px 14px;
-        font-size: 13px;
-      }
+    &--lg &__item {
+      min-height: var(--sd-item-h-lg);
+      padding-inline: var(--sd-space-4);
+      font-size: var(--sd-text-md);
     }
 
     &--full-width {
       display: flex;
       width: 100%;
-      max-width: 100%;
 
       .sd-segmented-control__item {
         flex: 1 1 0;
-        min-width: 0;
         justify-content: center;
       }
     }
 
-    &--disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
     &__item {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
       justify-content: center;
-      gap: 6px;
       min-width: 0;
-      border: 1px solid transparent;
-      background: transparent;
-      color: $zinc-400;
-      font-family: $font-sans;
-      font-weight: 500;
-      border-radius: $radius-full;
-      cursor: pointer;
+      font-family: var(--sd-font-sans);
       white-space: nowrap;
-      transition: all $duration-fast ease;
-      z-index: 1;
-      overflow: hidden;
+      @include sd-item(md);
+      @include sd-press(0.98);
 
-      &:hover:not(&--disabled) {
-        color: $zinc-200;
-        background-color: rgba(255, 255, 255, 0.04);
-      }
-
+      // Exactly one selected item; the weight never changes.
       &--active {
-        color: #ffffff !important;
-        background-color: #171722 !important;
-        border-color: rgba(168, 85, 247, 0.45) !important;
-        box-shadow: 0 0 16px rgba(107, 33, 168, 0.35);
-        font-weight: 600;
-      }
-
-      &--disabled {
-        opacity: 0.35;
-        cursor: not-allowed;
+        @include sd-selected;
       }
     }
 

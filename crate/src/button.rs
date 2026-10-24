@@ -94,51 +94,21 @@ pub fn Button(
     let full_class = if full_width { "sd-btn--full" } else { "" };
     let loading_class = if loading { "sd-btn--loading" } else { "" };
 
-    // DS-03: By default (glow is None), only filled emphasis variants glow
-    let should_glow_by_default = matches!(
-        variant,
-        ButtonVariant::Primary | ButtonVariant::Danger | ButtonVariant::Success
-    );
-    #[cfg(feature = "theme")]
-    let effective_glow = match glow {
-        Some(g) => Some(g),
-        None => {
-            if should_glow_by_default {
-                None
-            } else {
-                Some(false)
-            }
-        }
-    };
-
+    // With `theme`, only ComponentOverride is consulted; the result is the same
+    // static classes as without it unless an override is registered.
     #[cfg(feature = "theme")]
     let theme = crate::theme::use_theme();
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
-
-    // RS-05: Use theme_val.button_variant_classes(variant) as fallback
-    #[cfg(feature = "theme")]
-    let fallback_variant = theme_val.button_variant_classes(variant).to_string();
-
     #[cfg(feature = "theme")]
     let variant_class =
-        theme_val.resolve_variant_class("button", variant.name(), &fallback_variant);
-
+        theme_val.resolve_variant_class("button", variant.name(), variant.scss_class());
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("button").unwrap_or("");
-
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("button", &class);
-
     #[cfg(feature = "theme")]
-    let radius_class = match size {
-        ButtonSize::Xs | ButtonSize::Sm => theme_val.radius_scale.sm(),
-        ButtonSize::Md => theme_val.radius_scale.md(),
-        ButtonSize::Lg | ButtonSize::Xl => theme_val.radius_scale.lg(),
-    };
-
-    #[cfg(feature = "theme")]
-    let glow_class = theme_val.resolve_elevation_class("button", effective_glow);
+    let glow_class = theme_val.resolve_elevation_class("button", glow);
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -147,9 +117,7 @@ pub fn Button(
     #[cfg(not(feature = "theme"))]
     let variant_class = variant.scss_class().to_string();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if glow == Some(true) || (glow.is_none() && should_glow_by_default) {
+    let glow_class = if glow == Some(true) {
         "sd-btn--glow".to_string()
     } else {
         String::new()
@@ -163,7 +131,7 @@ pub fn Button(
     rsx! {
         button {
             r#type: "{btn_type}",
-            class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {loading_class} {radius_class} {glow_class} {class_modifiers} {class}",
+            class: "sd-btn {base_override} {variant_class} {size_class} {full_class} {loading_class} {glow_class} {class_modifiers} {class}",
             disabled: disabled,
             aria_label: aria_label,
             aria_pressed: aria_pressed.map(|p| p.to_string()),
@@ -185,11 +153,11 @@ pub fn Button(
                 span { class: "sd-visually-hidden", "{effective_loading_label}" }
             } else {
                 if let Some(licon) = left_icon {
-                    span { class: "sd-btn__icon sd-btn__icon--left", {licon} }
+                    span { class: "sd-btn__icon", {licon} }
                 }
                 span { class: "sd-btn__text", {children} }
                 if let Some(ricon) = right_icon {
-                    span { class: "sd-btn__icon sd-btn__icon--right", {ricon} }
+                    span { class: "sd-btn__icon", {ricon} }
                 }
             }
         }

@@ -1,332 +1,136 @@
 // ==============================================================================
-// Shadow Design — Button Styles
+// Shadow Design — Button (raised control, docs/design/language.md §3.5)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-.sd-btn {
-  appearance: none;
-  -webkit-appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: $font-sans;
-  font-weight: 500;
-  line-height: 1;
-  text-decoration: none;
-  text-align: center;
-  transition: all $duration-fast ease-in-out;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  outline: none;
-  border-style: solid;
-  border-width: 1px;
-  box-sizing: border-box;
-
-  @include tactile-press(0.97);
-
-  &:disabled, &[disabled], &[aria-disabled="true"] {
-    opacity: 0.45;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  &--loading {
-    opacity: 0.75;
-    cursor: wait;
-  }
-
-  // Dimensioni con padding confortevole
-  &--xs {
-    height: 26px;
-    padding: 0 10px;
-    font-size: 11px;
-    gap: 6px;
-    border-radius: $radius-sharp;
-  }
-
-  &--sm {
-    height: 32px;
-    padding: 0 14px;
-    font-size: 12px;
-    gap: 6px;
-    border-radius: $radius-sm;
-  }
-
-  &--md {
-    height: 40px;
-    padding: 0 18px;
-    font-size: 14px;
-    gap: 8px;
-    border-radius: $radius-md;
-  }
-
-  &--lg {
-    height: 48px;
-    padding: 0 24px;
-    font-size: 15px;
-    gap: 10px;
-    border-radius: $radius-lg;
-  }
-
-  &--xl {
-    height: 54px;
-    padding: 0 28px;
-    font-size: 16px;
-    font-weight: 600;
-    gap: 12px;
-    border-radius: $radius-lg;
-  }
-
-  &--full {
-    width: 100%;
-  }
-
-  // Varianti
-  &--primary {
-    @include lit-fill(#6b21a8, #3b0764);
-    color: #f3e8ff;
-    border-color: rgba(168, 85, 247, 0.45);
-
-    &:hover:not(:disabled):not([aria-disabled="true"]) {
-      background-image: linear-gradient(180deg, #7e22ce, #4c0519);
-      border-color: rgba(192, 132, 252, 0.7);
-      color: #ffffff;
-      box-shadow: 0 0 22px rgba(168, 85, 247, 0.4), 0 6px 22px rgba(59, 7, 100, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-  }
-
-  &--primary-crimson {
-    @include lit-fill(#881337, #4c0519);
-    color: #ffe4e6;
-    border-color: rgba(255, 23, 68, 0.45);
-
-    &:hover {
-      background-image: linear-gradient(180deg, #9f1239, #640722);
-      border-color: rgba(255, 82, 119, 0.75);
-      color: #ffffff;
-      box-shadow: 0 0 22px rgba(255, 23, 68, 0.45), 0 6px 22px rgba(76, 5, 25, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-  }
-
-  &--primary-cyan {
-    @include lit-fill(#0e7490, #083344);
-    color: #cffafe;
-    border-color: rgba(0, 240, 255, 0.45);
-
-    &:hover {
-      background-image: linear-gradient(180deg, #155e75, #083344);
-      border-color: rgba(128, 247, 255, 0.75);
-      color: #ffffff;
-      box-shadow: 0 0 22px rgba(0, 240, 255, 0.45), 0 6px 22px rgba(8, 51, 68, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-  }
-
-  &--primary-emerald {
-    @include lit-fill(#065f46, #022c22);
-    color: #d1fae5;
-    border-color: rgba(0, 255, 157, 0.45);
-
-    &:hover {
-      background-image: linear-gradient(180deg, #047857, #022c22);
-      border-color: rgba(110, 231, 183, 0.75);
-      color: #ffffff;
-      box-shadow: 0 0 22px rgba(0, 255, 157, 0.45), 0 6px 22px rgba(2, 44, 34, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-  }
-
-  &--primary-obsidian {
-    @include lit-fill(#27272a, #18181b);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.25);
-
-    &:hover {
-      background-image: linear-gradient(180deg, #3f3f46, #27272a);
-      border-color: rgba(255, 255, 255, 0.5);
-      color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 6px 22px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-  }
-
-  &__icon {
+  .sd-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    min-height: var(--sd-control-md);
+    padding-inline: var(--sd-space-4);
+    gap: var(--sd-space-2);
+    border-radius: var(--sd-radius-md);
+    font-family: var(--sd-font-sans);
+    font-size: var(--sd-text-md);
     line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
 
-    &--left {
-      margin-right: 0px;
+    // Base variant: secondary. Other variants come after, on modifiers.
+    @include sd-lit-fill(secondary);
+    @include sd-press;
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
     }
 
-    &--right {
-      margin-left: 0px;
+    &__text {
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    // --- Variants ---------------------------------------------------------------
+    &--primary {
+      @include sd-lit-fill(primary);
+    }
+    &--secondary {
+      @include sd-lit-fill(secondary);
+    }
+    &--outline {
+      @include sd-lit-fill(outline);
+    }
+    &--ghost {
+      @include sd-lit-fill(ghost);
+    }
+    &--danger {
+      @include sd-lit-fill(danger);
+    }
+    &--success {
+      @include sd-lit-fill(success);
+    }
+    &--warning {
+      @include sd-lit-fill(warning);
+    }
+
+    // --- Sizes ------------------------------------------------------------------
+    &--xs {
+      min-height: var(--sd-control-xs);
+      padding-inline: var(--sd-space-2);
+      gap: var(--sd-space-1);
+      font-size: var(--sd-text-2xs);
+      border-radius: var(--sd-radius-sm);
+    }
+    &--sm {
+      min-height: var(--sd-control-sm);
+      padding-inline: var(--sd-space-3);
+      gap: var(--sd-space-1);
+      font-size: var(--sd-text-xs);
+      border-radius: var(--sd-radius-sm);
+    }
+    &--md {
+      min-height: var(--sd-control-md);
+      padding-inline: var(--sd-space-4);
+      font-size: var(--sd-text-md);
+    }
+    &--lg {
+      min-height: var(--sd-control-lg);
+      padding-inline: var(--sd-space-6);
+      font-size: var(--sd-text-lg);
+    }
+    &--xl {
+      min-height: var(--sd-control-xl);
+      padding-inline: var(--sd-space-8);
+      gap: var(--sd-space-3);
+      font-size: var(--sd-text-lg);
+    }
+
+    &--full {
+      width: 100%;
+    }
+
+    // Opt-in glow (the primary variant already glows by default). Placed after
+    // the variants so it only re-assigns the slot; disabled clears it again.
+    &--glow {
+      --sd-shadow-glow: var(--sd-glow-md);
+    }
+
+    // Loading: still aria-disabled, but shows the wait cursor.
+    &--loading,
+    &--loading[aria-disabled='true'] {
+      cursor: wait;
     }
   }
 
-  &__text {
+  // Accessible button loading spinner
+  .sd-spinner {
     display: inline-flex;
     align-items: center;
-    line-height: 1;
-  }
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    transform-origin: center;
+    transform-box: fill-box;
+    @include sd-animate-essential(sd-spin, 800ms);
 
-  &--secondary {
-    background-color: $color-surface-2;
-    color: $zinc-200;
-    border-color: rgba(255, 255, 255, 0.20);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 10px rgba(0, 0, 0, 0.5);
-
-    &:hover {
-      background-color: $color-surface-3;
-      border-color: rgba(255, 255, 255, 0.35);
-      color: #ffffff;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 14px rgba(0, 0, 0, 0.65);
+    &__track {
+      opacity: 0.25;
     }
-  }
 
-  &--outline {
-    background-color: transparent;
-    color: $zinc-200;
-    border-color: rgba(255, 255, 255, 0.28);
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.38);
-      color: #ffffff;
+    &__arc {
+      opacity: 0.9;
     }
-  }
-
-  &--ghost {
-    background-color: transparent;
-    color: $zinc-400;
-    border-color: transparent;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.06);
-      color: #ffffff;
-    }
-  }
-
-  &--danger {
-    background-color: rgba(255, 23, 68, 0.16);
-    color: #ff859b;
-    border-color: rgba(255, 23, 68, 0.4);
-    box-shadow: 0 2px 12px rgba(76, 5, 25, 0.4);
-    @include specular-top(0.1);
-
-    &:hover {
-      background-color: rgba(255, 23, 68, 0.28);
-      border-color: rgba(255, 82, 119, 0.7);
-      color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 23, 68, 0.45), 0 4px 16px rgba(76, 5, 25, 0.6);
-    }
-  }
-
-  &--success {
-    background-color: rgba(0, 255, 157, 0.12);
-    color: #5dfcc3;
-    border-color: rgba(0, 255, 157, 0.4);
-    box-shadow: 0 2px 12px rgba(2, 44, 34, 0.4);
-    @include specular-top(0.1);
-
-    &:hover:not(:disabled):not([aria-disabled="true"]) {
-      background-color: rgba(0, 255, 157, 0.24);
-      border-color: rgba(52, 211, 153, 0.7);
-      color: #ffffff;
-      box-shadow: 0 0 20px rgba(0, 255, 157, 0.45), 0 4px 16px rgba(2, 44, 34, 0.6);
-    }
-  }
-
-  // Composed Glow Modifiers placed after variants (DS-03)
-  &--glow {
-    box-shadow: 0 0 22px var(--sd-accent-glow, $violet-glow), 0 4px 18px rgba(59, 7, 100, 0.6) !important;
-  }
-
-  &--glow-crimson {
-    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6) !important;
-  }
-
-  &--glow-cyan {
-    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6) !important;
-  }
-
-  &--glow-emerald {
-    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6) !important;
-  }
-
-  &--glow-obsidian {
-    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7) !important;
-  }
-
-  // Variant-color matched glow overrides
-  &--danger[class*="--glow"],
-  &--danger.sd-btn--glow {
-    box-shadow: 0 0 22px rgba(255, 23, 68, 0.55), 0 4px 18px rgba(76, 5, 25, 0.65) !important;
-  }
-
-  &--success[class*="--glow"],
-  &--success.sd-btn--glow {
-    box-shadow: 0 0 22px rgba(0, 255, 157, 0.55), 0 4px 18px rgba(2, 44, 34, 0.65) !important;
-  }
-
-  &--primary-crimson[class*="--glow"],
-  &--primary-crimson.sd-btn--glow {
-    box-shadow: 0 0 22px $crimson-glow, 0 4px 18px rgba(76, 5, 25, 0.6) !important;
-  }
-
-  &--primary-cyan[class*="--glow"],
-  &--primary-cyan.sd-btn--glow {
-    box-shadow: 0 0 22px $cyan-glow, 0 4px 18px rgba(8, 51, 68, 0.6) !important;
-  }
-
-  &--primary-emerald[class*="--glow"],
-  &--primary-emerald.sd-btn--glow {
-    box-shadow: 0 0 22px $emerald-glow, 0 4px 18px rgba(2, 44, 34, 0.6) !important;
-  }
-
-  &--primary-obsidian[class*="--glow"],
-  &--primary-obsidian.sd-btn--glow {
-    box-shadow: 0 0 18px $obsidian-glow, 0 4px 18px rgba(0, 0, 0, 0.7) !important;
-  }
-
-  &--secondary[class*="--glow"],
-  &--secondary.sd-btn--glow {
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.65) !important;
-  }
-
-  &--outline[class*="--glow"],
-  &--outline.sd-btn--glow {
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2) !important;
-  }
-
-  &--ghost[class*="--glow"],
-  &--ghost.sd-btn--glow {
-    box-shadow: 0 0 14px rgba(255, 255, 255, 0.15) !important;
   }
 }
-
-// Accessible Button Loading Spinner (DS-23)
-.sd-spinner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;
-  animation: sd-spin 0.8s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-  flex-shrink: 0;
-
-  &__track {
-    opacity: 0.25;
-  }
-
-  &__arc {
-    opacity: 0.9;
-  }
-}
-}
-
