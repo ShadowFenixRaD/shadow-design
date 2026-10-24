@@ -8,6 +8,7 @@ ADRs are **binding**. They record how this project does things, so that every co
 | [0002](0002-lit-glass-design-language.md) | One design language: Lit Glass | Accepted |
 | [0003](0003-runtime-tokens-and-theming.md) | Runtime CSS tokens are the only theming mechanism | Accepted |
 | [0004](0004-component-styling-contract.md) | Component styling contract | Accepted |
+| [0005](0005-three-type-roles.md) | Three type roles: Kanit, Onest, Source Code Pro | Accepted |
 
 ## Rules
 

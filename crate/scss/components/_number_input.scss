@@ -23,7 +23,7 @@
     width: 100%;
     height: var(--sd-control-md);
     overflow: hidden;
-    font-family: var(--sd-font-sans);
+    font-family: var(--sd-font-body);
     @include sd-field(md, '&.sd-number-input--error');
 
     &.sd-number-input--glow {
@@ -64,7 +64,7 @@
     font-variant-numeric: tabular-nums;
 
     &::placeholder {
-      font-family: var(--sd-font-sans);
+      font-family: var(--sd-font-body);
     }
   }
 

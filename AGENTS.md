@@ -140,7 +140,7 @@ document::Link { rel: "stylesheet", href: shadow_design::STYLES }
 | `_layers.scss` | Ordine dei cascade layer: `sd-reset, sd-base, sd-components, sd-utilities, sd-theme` |
 | `_tokens.scss` | **Token runtime** `--sd-*` su `:root` (layer `sd-base`) e classi `.sd-radius-sharp|medium|soft`. Fonte di verità: `docs/design/tokens.md` |
 | `_variables.scss` | Solo costanti SCSS di build (breakpoint `$bp`, palette per le utility). Vietate nei componenti |
-| `_fonts.scss` | Font face (Geist da Google Fonts; self-hosting rinviato, ADR-0003) |
+| `_fonts.scss` | Import Google Fonts dei tre ruoli: Kanit (titoli), Onest (testo), Source Code Pro (mono), ADR-0005. Self-hosting rinviato |
 | `_zindex.scss` | Mappa `$z-layers`, funzione `z($layer)` e classi `.z-layer-*` |
 | `_mixins.scss` | Ricette Lit Glass: `sd-surface`, `sd-shadow`, `sd-lit-fill`, `sd-field`, `sd-item`, `sd-selected`, `sd-semantic`, `sd-focus-ring`, `sd-transition`, `sd-press`, `sd-animate`, `sd-scrollbar`, `bp-up` |
 | `_reset.scss` | Preflight reset (`button`, `input`, `textarea`, `select`, …) |

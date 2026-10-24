@@ -102,7 +102,7 @@ Fill `--sd-<sem>-soft`, border `--sd-<sem>-border`, title and icon `--sd-<sem>-s
 Solid `--sd-accent` (or `--sd-<sem>` for semantic progress) with `--sd-glow-sm`. Tracks are `--sd-well` with `--sd-border-subtle`, and never white.
 
 ### 3.12 Text and labels
-Body text is `--sd-text-md` (14px). Uppercase section labels use `--sd-font-mono`, `--sd-text-2xs`, `letter-spacing: .08em` and `--sd-text-subtle`. Card and panel titles use `--sd-text-lg` at weight 600. Numbers in columns use `font-variant-numeric: tabular-nums`. Code uses `--sd-font-mono`, never bare `monospace`.
+Three roles (ADR-0005): **headings** (page and section headings, `Title`, titles of containers and floating layers, large metric values) use `--sd-font-heading` at `--sd-weight-heading`. **Body** (text, labels, buttons, items, fields, cells, badges) uses `--sd-font-body`. **Mono** (code, kbd, uppercase labels, numeric readouts) uses `--sd-font-mono`. Body text is `--sd-text-md` (14px). Uppercase section labels use `--sd-font-mono`, `--sd-text-2xs`, `letter-spacing: .08em` and `--sd-text-subtle`. Card and panel titles use `--sd-text-lg` in the heading role. Numbers in columns use `font-variant-numeric: tabular-nums`. Code uses `--sd-font-mono`, never bare `monospace`.
 
 ### 3.13 Data visualisation
 Series colours are `--sd-chart-1..8`, where `--sd-chart-1` is the accent. Grid lines use `--sd-border-subtle`, axis text `--sd-text-subtle` in `--sd-font-mono` at `--sd-text-2xs`. Chart tooltips are floating panels (3.2). Paint is set in SCSS classes or with `var(--sd-chart-n)` in SVG attributes, never hex in Rust.

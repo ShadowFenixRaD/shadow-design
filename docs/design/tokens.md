@@ -100,8 +100,10 @@ Classes `.sd-radius-sharp`, `.sd-radius-medium` and `.sd-radius-soft` set these.
 
 | Token | Value |
 | :-- | :-- |
-| `--sd-font-sans` | `'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` |
-| `--sd-font-mono` | `'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace` |
+| `--sd-font-heading` | `'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` (ADR-0005) |
+| `--sd-weight-heading` | `600` |
+| `--sd-font-body` | `'Onest', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` |
+| `--sd-font-mono` | `'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace` |
 | `--sd-text-2xs / xs / sm / md / lg / xl / 2xl / 3xl` | 11 / 12 / 13 / 14 / 16 / 18 / 22 / 28px |
 | `--sd-leading-tight / normal` | 1.25 / 1.5 |
 | Weights | 400 body · 500 controls, items, labels · 600 titles · 700 page headings only |

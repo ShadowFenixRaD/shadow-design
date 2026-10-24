@@ -1,8 +1,8 @@
 // ==============================================================================
-// Shadow Design — Typography & Geist Font Definitions
+// Shadow Design — Typography: Kanit (headings), Onest (body), Source Code Pro (mono) — ADR-0005
 // ==============================================================================
 
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap');
 
 @layer sd-base {
   .font-tabular,

@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  font-family: var(--sd-font-sans);
+  font-family: var(--sd-font-body);
 
   // Default and Contained share the container material: one panel, hairline dividers.
   &--default,
@@ -48,7 +48,7 @@
     width: 100%;
     padding-block: var(--sd-space-3);
     border-radius: 0;
-    font-family: var(--sd-font-sans);
+    font-family: var(--sd-font-body);
     font-size: var(--sd-text-md);
     color: var(--sd-text);
     text-align: left;

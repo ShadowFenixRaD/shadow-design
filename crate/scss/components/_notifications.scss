@@ -49,7 +49,7 @@
   gap: var(--sd-space-3);
   padding: var(--sd-space-3) var(--sd-space-4);
   box-sizing: border-box;
-  font-family: var(--sd-font-sans);
+  font-family: var(--sd-font-body);
 
   &--info { @include _toast-variant(info); }
   &--success { @include _toast-variant(success); }

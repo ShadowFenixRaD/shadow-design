@@ -43,7 +43,7 @@
     width: 100%;
     padding-block: var(--sd-space-1);
     padding-inline: var(--sd-space-3);
-    font-family: var(--sd-font-sans);
+    font-family: var(--sd-font-body);
     cursor: pointer;
     user-select: none;
     @include sd-field(md, '&--error');
@@ -140,7 +140,7 @@
     max-height: min(280px, 45vh);
     overflow-y: auto;
     padding: var(--sd-space-2);
-    font-family: var(--sd-font-sans);
+    font-family: var(--sd-font-body);
     @include sd-surface(2);
     @include sd-scrollbar;
     @include sd-animate(sd-pop-in, var(--sd-dur));
