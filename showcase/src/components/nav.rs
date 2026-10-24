@@ -83,7 +83,7 @@ pub const COMPONENTS: &[ComponentItem] = &[
         features: &["typography"],
         icon: IconKind::Code,
         keywords: "text heading kbd code geist font",
-        description: "Gerarchia tipografica Geist e blocchi codice.",
+        description: "Gerarchia tipografica Kanit, Onest e blocchi codice.",
     },
     ComponentItem {
         name: "Icons",

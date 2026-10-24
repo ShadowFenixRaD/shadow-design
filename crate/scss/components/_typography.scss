@@ -6,8 +6,8 @@
 @layer sd-components {
 .sd-heading {
   margin: 0;
-  font-family: var(--sd-font-body);
-  font-weight: 600;
+  font-family: var(--sd-font-heading);
+  font-weight: var(--sd-weight-heading);
   line-height: var(--sd-leading-tight);
   letter-spacing: -0.02em;
   color: var(--sd-text);

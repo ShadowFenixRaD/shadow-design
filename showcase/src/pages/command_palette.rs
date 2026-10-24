@@ -39,7 +39,7 @@ pub fn CommandPalettePage() -> Element {
             .with_icon(IconKind::Share2)
             .with_keywords(["clipboard", "share"]),
         CommandAction::new("settings", "Impostazioni Studio")
-            .with_description("Configura layout, font Geist e scala raggi")
+            .with_description("Configura layout, font Kanit e scala raggi")
             .with_category("Sistema")
             .with_shortcut("Ctrl+,")
             .with_icon(IconKind::Settings)

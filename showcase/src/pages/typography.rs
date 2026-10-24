@@ -42,7 +42,7 @@ Code { "cargo add shadow-design" }"#
         div { class: "sc-stack sc-stack--loose",
             PageHeader {
                 title: "Typography".to_string(),
-                description: "Componenti per gerarchia testuale, scorciatoie da tastiera e codice inline basati sui font Geist e Geist Mono.".to_string(),
+                description: "Componenti per gerarchia testuale, scorciatoie da tastiera e codice inline basati sui font Kanit, Onest e Source Code Pro.".to_string(),
             }
 
             FeatureBanner { feature_name: "typography" }
@@ -60,7 +60,7 @@ Code { "cargo add shadow-design" }"#
                             hr { class: "sc-control-divider" }
                             div { class: "sc-stack",
                                 Text { size: TextSize::Lg, "Paragrafo Large: eccellente leggibilità su display Retina ad alta densità." }
-                                Text { size: TextSize::Md, "Paragrafo Standard: progettato con il font Geist Sans per un'esperienza di lettura pulita ed essenziale." }
+                                Text { size: TextSize::Md, "Paragrafo Standard: progettato con il font Onest per un'esperienza di lettura pulita ed essenziale." }
                                 Text { size: TextSize::Sm, dimmed: true, "Testo attenuato (dimmed): ideale per note a piè di pagina e timestamp." }
                             }
                             hr { class: "sc-control-divider" }

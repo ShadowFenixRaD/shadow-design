@@ -102,7 +102,8 @@
   &__title {
     margin: 0;
     font-size: var(--sd-text-lg);
-    font-weight: 600;
+    font-family: var(--sd-font-heading);
+    font-weight: var(--sd-weight-heading);
     line-height: var(--sd-leading-tight);
     color: var(--sd-text);
   }

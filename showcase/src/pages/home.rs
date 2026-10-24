@@ -107,7 +107,7 @@ pub fn App() -> Element {
                         }
                         div { class: "sc-actions",
                             Badge { label: "Dioxus 0.7".to_string(), variant: BadgeVariant::Success, dot: true }
-                            Badge { label: "Geist Fonts".to_string(), variant: BadgeVariant::Default }
+                            Badge { label: "Kanit + Onest".to_string(), variant: BadgeVariant::Default }
                             Badge { label: "Native SVG".to_string(), variant: BadgeVariant::Default }
                             Badge { label: "SCSS nativo Dioxus".to_string(), variant: BadgeVariant::Default }
                         }

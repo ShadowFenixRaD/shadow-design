@@ -15,7 +15,7 @@ pub fn TransferListPage() -> Element {
 
     let target_items = use_signal(|| vec![
         TransferItem::new("6", "Zero Bloat Feature Flags").with_description("Modularità estrema Cargo"),
-        TransferItem::new("7", "Geist Typography Hierarchy").with_description("Font stack nitido dark"),
+        TransferItem::new("7", "Kanit Typography Hierarchy").with_description("Font stack nitido dark"),
     ]);
 
     let props = vec![
