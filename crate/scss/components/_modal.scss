@@ -1,38 +1,35 @@
 // ==============================================================================
-// Shadow Design — Modal Styles
+// Shadow Design — Modal (floating panel, raised-max; docs/design/language.md §3.2/3.3)
 // ==============================================================================
-@use '../variables' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
-@use '../animations' as *;
 
 @layer sd-components {
 .sd-modal-backdrop {
   position: fixed;
   inset: 0;
+  margin: 0;
   z-index: z('modal-back');
-  background-color: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  transition: all $duration-normal ease;
+  padding: var(--sd-space-4);
+  box-sizing: border-box;
+  background-color: var(--sd-scrim);
+  backdrop-filter: blur(var(--sd-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+  @include sd-animate(sd-fade-in, var(--sd-dur));
 }
 
 .sd-modal-dialog {
+  @include sd-surface(3);
+  @include sd-animate(sd-pop-in, var(--sd-dur));
   position: relative;
   z-index: z('modal');
   width: 100%;
   max-width: 520px;
-  background-color: #0d0d14;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--sd-radius-lg, $radius-lg);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-  font-family: $font-sans;
   box-sizing: border-box;
-  @include specular-top(0.1);
+  font-family: var(--sd-font-sans);
 
   &--sm { max-width: 400px; }
   &--md { max-width: 520px; }
@@ -40,60 +37,38 @@
   &--xl { max-width: 896px; }
   &--2xl { max-width: 1024px; }
 
-  &--glow {
-    box-shadow: 0 0 45px $violet-glow, 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-  }
+  &--glow { --sd-shadow-glow: var(--sd-glow-md); }
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    background-color: rgba(18, 18, 28, 0.8);
+    gap: var(--sd-space-3);
+    padding: var(--sd-space-3) var(--sd-space-4);
+    border-bottom: 1px solid var(--sd-border-subtle);
+    background-color: var(--sd-tint-1);
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
   }
 
   &__title {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: #ffffff;
+    margin: 0;
+    font-size: var(--sd-text-lg);
+    font-weight: 600;
+    color: var(--sd-text);
   }
 
-  &__close {
-    color: $zinc-400;
-    font-size: 14px;
-    padding: 6px;
-    border-radius: 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all $duration-fast ease;
-
-    &:hover {
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--sd-focus-ring, #c084fc);
-      outline-offset: 2px;
-    }
-  }
+  &__close { flex-shrink: 0; }
 
   &__body {
-    padding: 24px;
+    padding: var(--sd-space-4);
     max-height: calc(85vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;
-    color: $zinc-200;
+    color: var(--sd-text-muted);
+    font-size: var(--sd-text-md);
+    @include sd-scrollbar;
 
     &:has(.sd-select-container--open, .sd-dropdown-container--open) {
       overflow: visible;
@@ -101,4 +76,3 @@
   }
 }
 }
-

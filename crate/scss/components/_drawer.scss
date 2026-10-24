@@ -1,7 +1,6 @@
 // ==============================================================================
-// Shadow Design — Drawer Styles
+// Shadow Design — Drawer (raised-max, edge attached; docs/design/language.md §3.2/3.3)
 // ==============================================================================
-@use '../variables' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
 
@@ -9,102 +8,87 @@
 .sd-drawer-backdrop {
   position: fixed;
   inset: 0;
+  margin: 0;
   z-index: z('drawer-back');
-  background-color: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: all $duration-normal ease;
+  background-color: var(--sd-scrim);
+  backdrop-filter: blur(var(--sd-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+  @include sd-animate(sd-fade-in, var(--sd-dur));
 }
 
 .sd-drawer-panel {
+  @include sd-surface(3);
   position: fixed;
   inset-block: 0;
   z-index: z('drawer');
-  background-color: #0a0a0f;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
-  font-family: $font-sans;
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
+  border-radius: 0;
 
   &--left {
     left: 0;
-    border-right: $border-hairline;
+    border-left: none;
+    border-start-end-radius: var(--sd-radius-xl);
+    border-end-end-radius: var(--sd-radius-xl);
+    @include sd-animate(sd-slide-in-left, var(--sd-dur-slow));
   }
 
   &--right {
     right: 0;
-    border-left: $border-hairline;
+    border-right: none;
+    border-start-start-radius: var(--sd-radius-xl);
+    border-end-start-radius: var(--sd-radius-xl);
+    @include sd-animate(sd-slide-in-right, var(--sd-dur-slow));
   }
 
   &--sm {
     width: min(288px, 100vw);
-    @media (min-width: 640px) { width: 320px; }
+    @include bp-up(sm) { width: 320px; }
   }
 
   &--md {
     width: min(320px, 100vw);
-    @media (min-width: 640px) { width: 384px; }
+    @include bp-up(sm) { width: 384px; }
   }
 
   &--lg {
     width: min(384px, 100vw);
-    @media (min-width: 640px) { width: 512px; }
+    @include bp-up(sm) { width: 512px; }
   }
 
-  &--glow {
-    box-shadow: 0 0 40px $violet-glow, 0 25px 50px rgba(0, 0, 0, 0.9);
-  }
+  &--glow { --sd-shadow-glow: var(--sd-glow-md); }
 }
 
-.sd-drawer,
-.sd-drawer-panel {
+.sd-drawer {
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: $border-hairline-subtle;
-    background-color: #0e0e14;
+    gap: var(--sd-space-3);
+    padding: var(--sd-space-3) var(--sd-space-4);
+    border-bottom: 1px solid var(--sd-border-subtle);
+    background-color: var(--sd-tint-1);
   }
 
   &__title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -0.01em;
+    margin: 0;
+    font-size: var(--sd-text-lg);
+    font-weight: 600;
+    color: var(--sd-text);
   }
 
-  &__close {
-    padding: 6px;
-    color: $zinc-400;
-    border-radius: 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all $duration-fast ease;
-
-    &:hover {
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--sd-focus-ring, #c084fc);
-      outline-offset: 2px;
-    }
-  }
+  &__close { flex-shrink: 0; }
 
   &__body {
     flex: 1;
-    padding: 24px;
+    padding: var(--sd-space-4);
     overflow-y: auto;
-    color: $zinc-200;
+    color: var(--sd-text-muted);
+    font-size: var(--sd-text-md);
+    @include sd-scrollbar;
   }
 }
 }
-

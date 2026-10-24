@@ -76,6 +76,7 @@ pub fn SpeedDialAction(
     class: String,
 ) -> Element {
     let ctx = try_use_context::<SpeedDialContext>();
+    let aria_label = label.clone();
 
     let handle_click = move |e: MouseEvent| {
         e.stop_propagation();
@@ -94,6 +95,7 @@ pub fn SpeedDialAction(
             if let Some(l) = label {
                 span {
                     class: "sd-speed-dial-label",
+                    "aria-hidden": "true",
                     onclick: handle_click,
                     "{l}"
                 }
@@ -101,6 +103,7 @@ pub fn SpeedDialAction(
             button {
                 r#type: "button",
                 class: "sd-speed-dial-btn {class}",
+                "aria-label": aria_label,
                 onclick: handle_click,
                 Icon { kind: icon, size: 18 }
             }

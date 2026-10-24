@@ -288,6 +288,8 @@ pub fn CommandPalette(
             },
             div {
                 class: "sd-command-palette-dialog {class}",
+                role: "dialog",
+                "aria-modal": "true",
                 tabindex: "-1",
                 onclick: move |e| e.stop_propagation(),
 
@@ -313,7 +315,7 @@ pub fn CommandPalette(
                 }
 
                 // Lista delle azioni
-                div { class: "sd-command-palette-list",
+                div { class: "sd-command-palette-list", role: "listbox",
                     if filtered_actions.is_empty() {
                         div { class: "sd-command-palette-empty",
                             Icon { kind: IconKind::AlertCircle, size: 24 }
@@ -342,6 +344,8 @@ pub fn CommandPalette(
                                             div {
                                                 id: "sd-command-palette-item-{i}",
                                                 class: "{item_class}",
+                                                role: "option",
+                                                "aria-selected": "{is_active}",
                                                 onclick: {
                                                     let act = act_copy.clone();
                                                     move |_| handle_select(act.clone())

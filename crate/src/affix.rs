@@ -32,7 +32,7 @@ pub fn Affix(
     /// Minimum scroll offset in pixels required before the affix fades in.
     #[props(default)]
     scroll_threshold: Option<u32>,
-    /// Custom z-index. Defaults to 60.
+    /// Deprecated and ignored: stacking comes from the `z('affix')` layer in SCSS.
     #[props(default = 60)]
     z_index: u32,
     /// Additional CSS classes.
@@ -41,6 +41,7 @@ pub fn Affix(
     /// Affix content.
     children: Element,
 ) -> Element {
+    let _ = z_index;
     let mut is_visible = use_signal(|| scroll_threshold.is_none());
 
     if let Some(threshold) = scroll_threshold {
@@ -75,7 +76,6 @@ pub fn Affix(
     rsx! {
         div {
             class: "sd-affix {pos_class} {visibility_class} {class}",
-            style: "z-index: {z_index};",
             {children}
         }
     }

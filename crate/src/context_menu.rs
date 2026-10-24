@@ -68,6 +68,8 @@ pub fn ContextMenuContent(
     children: Element,
 ) -> Element {
     let mut ctx = use_context::<ContextMenuContext>();
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
     let is_open = *ctx.is_open.read();
 
     if !is_open {
@@ -75,18 +77,15 @@ pub fn ContextMenuContent(
     }
 
     let (x, y) = *ctx.coords.read();
-    let glow_class = if glow == Some(true) {
-        "sd-context-menu-content--glow"
-    } else {
-        ""
-    };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("context_menu").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("context_menu", glow);
     #[cfg(not(feature = "theme"))]
     let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow == Some(true) { "sd-context-menu--glow" } else { "" };
 
     rsx! {
         // Transparent backdrop to close menu on click outside
@@ -166,7 +165,7 @@ pub fn ContextMenuItem(
                     ctx.is_open.set(false);
                 }
             },
-            div { class: "flex items-center gap-2",
+            div { class: "sd-context-menu-item__main",
                 if let Some(ic) = icon {
                     Icon { kind: ic, size: 14 }
                 }
@@ -218,8 +217,8 @@ pub fn ContextMenuCheckboxItem(
                 }
                 ctx.is_open.set(false);
             },
-            div { class: "flex items-center gap-2",
-                span { class: "w-4 flex items-center justify-center text-purple-400",
+            div { class: "sd-context-menu-item__main",
+                span { class: "sd-context-menu-item__check",
                     if checked {
                         Icon { kind: IconKind::Check, size: 13 }
                     }

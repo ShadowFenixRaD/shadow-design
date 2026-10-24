@@ -66,7 +66,7 @@ pub fn Modal(
 
     let open = *is_open.read();
     let locale = use_locale();
-    let modal_id = crate::a11y::use_unique_id("sd-modal", id);
+    let modal_id = crate::a11y::use_unique_id("sd-modal", id); // sd-lint-allow: id prefix, not a class
     let title_id = format!("{modal_id}-title");
 
     crate::a11y::use_body_scroll_lock(is_open);
@@ -93,11 +93,6 @@ pub fn Modal(
         String::new()
     };
 
-    #[cfg(feature = "animation")]
-    let anim_class = crate::animation::Animations::MODAL_ENTER;
-    #[cfg(not(feature = "animation"))]
-    let anim_class = "animate-modal-enter";
-
     let close_btn_label = close_label.unwrap_or_else(|| locale.close.clone());
 
     rsx! {
@@ -122,7 +117,7 @@ pub fn Modal(
                 "aria-modal": "true",
                 "aria-labelledby": if title.is_some() { Some(title_id.as_str()) } else { None },
                 "aria-label": if title.is_none() { aria_label.as_deref() } else { None },
-                class: "sd-modal-dialog {size.unwrap_or_default().class_name()} {base_override} {glow_class} {anim_class} {class_modifiers} {class}",
+                class: "sd-modal-dialog {size.unwrap_or_default().class_name()} {base_override} {glow_class} {class_modifiers} {class}",
                 onmounted: move |m| {
                     let data = m.data();
                     spawn(async move {

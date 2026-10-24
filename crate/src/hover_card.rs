@@ -108,7 +108,7 @@ pub fn HoverCardTrigger(
 
     rsx! {
         div {
-            class: "sd-hovercard-trigger inline-flex cursor-pointer {class}",
+            class: "sd-hovercard-trigger {class}",
             onmouseenter: move |_| {
                 ctx.is_over_trigger.set(true);
                 let open_delay = ctx.open_delay;
@@ -149,6 +149,8 @@ pub fn HoverCardDropdown(
     children: Element,
 ) -> Element {
     let mut ctx = use_context::<HoverCardContext>();
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
     let is_open = *ctx.is_open.read();
 
     if !is_open {
@@ -156,11 +158,6 @@ pub fn HoverCardDropdown(
     }
 
     let pos_class = ctx.position.read().class_name();
-    let glow_class = if glow == Some(true) {
-        "sd-hovercard-dropdown--glow"
-    } else {
-        ""
-    };
 
     let style = if let Some(w) = *ctx.width.read() {
         format!("width: {w}px;")
@@ -169,11 +166,13 @@ pub fn HoverCardDropdown(
     };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("hover_card").unwrap_or("");
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("hover_card", glow);
     #[cfg(not(feature = "theme"))]
     let base_override = "";
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow == Some(true) { "sd-hover-card--glow" } else { "" };
 
     rsx! {
         div {

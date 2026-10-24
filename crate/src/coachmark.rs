@@ -52,14 +52,12 @@ pub fn Coachmark(
     let is_first = step <= 1;
     let is_last = step >= total_steps;
 
-    let glow_class = if glow == Some(true) {
-        "sd-coachmark--glow"
-    } else {
-        ""
-    };
-
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("coachmark", glow);
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow == Some(true) { "sd-coachmark--glow" } else { "" };
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("coachmark").unwrap_or("");
     #[cfg(not(feature = "theme"))]

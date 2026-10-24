@@ -1,95 +1,68 @@
 // ==============================================================================
-// Shadow Design — Toast & Notification Styles
+// Shadow Design — Toast & Notification (floating + semantic; language.md §3.2/3.10)
 // ==============================================================================
-@use '../variables' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
+
+@mixin _toast-variant($sem) {
+  @include sd-semantic($sem, $rail: true);
+  // A toast floats over content: keep it opaque, tint on top of the raised fill.
+  background-color: var(--sd-surface-2);
+  background-image: linear-gradient(var(--sd-#{$sem}-soft), var(--sd-#{$sem}-soft));
+}
 
 @layer sd-components {
 .sd-notification-container {
   position: fixed;
-  bottom: 12px;
-  right: 12px;
+  bottom: var(--sd-space-3);
+  right: var(--sd-space-3);
+  margin: 0;
   z-index: z('notification');
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: min(380px, calc(100vw - 24px));
+  gap: var(--sd-space-2);
+  width: min(380px, calc(100vw - 2 * var(--sd-space-3)));
   max-width: 380px;
   pointer-events: none;
 
-  @media (min-width: 640px) {
-    bottom: 20px;
-    right: 20px;
+  @include bp-up(sm) {
+    bottom: var(--sd-space-5);
+    right: var(--sd-space-5);
   }
 }
 
 .sd-notification-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sd-space-2);
   width: 100%;
 }
 
 .sd-toast {
+  @include sd-surface(2);
+  @include sd-animate(sd-slide-in-right, var(--sd-dur));
   pointer-events: auto;
   position: relative;
   overflow: hidden;
-  padding: 14px 16px 14px 19px;
-  background-color: #0e0e14;
-  border: $border-hairline;
-  border-radius: var(--sd-radius-md, $radius-md);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  font-family: $font-sans;
-  transition: all $duration-normal ease;
-  @include specular-top(0.1);
+  gap: var(--sd-space-3);
+  padding: var(--sd-space-3) var(--sd-space-4);
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
-    background: var(--sd-toast-accent, currentColor);
-    box-shadow: 0 0 12px var(--sd-toast-glow, transparent);
-  }
+  &--info { @include _toast-variant(info); }
+  &--success { @include _toast-variant(success); }
+  &--warning { @include _toast-variant(warning); }
+  &--danger { @include _toast-variant(danger); }
 
-  &--info {
-    --sd-toast-accent: #{$color-info};
-    --sd-toast-glow: rgba(168, 85, 247, 0.4);
-  }
-
-  &--success {
-    --sd-toast-accent: #{$color-success};
-    --sd-toast-glow: rgba(16, 185, 129, 0.4);
-  }
-
-  &--warning {
-    --sd-toast-accent: #{$color-warning};
-    --sd-toast-glow: rgba(245, 158, 11, 0.4);
-  }
-
-  &--danger {
-    --sd-toast-accent: #{$color-danger};
-    --sd-toast-glow: rgba(244, 63, 94, 0.4);
-  }
-
-  &--glow-info {
-    box-shadow: 0 0 24px rgba(168, 85, 247, 0.28), 0 16px 32px rgba(0, 0, 0, 0.85);
-  }
-
-  &--glow-success {
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.28), 0 16px 32px rgba(0, 0, 0, 0.85);
-  }
-
-  &--glow-warning {
-    box-shadow: 0 0 24px rgba(245, 158, 11, 0.28), 0 16px 32px rgba(0, 0, 0, 0.85);
-  }
-
+  // Opt-in glow (not emitted by default): semantic tint, scaled by GlowMode.
+  &--glow,
+  &--glow-info,
+  &--glow-success,
+  &--glow-warning,
   &--glow-danger {
-    box-shadow: 0 0 24px rgba(244, 63, 94, 0.32), 0 16px 32px rgba(0, 0, 0, 0.85);
+    --sd-shadow-glow: 0 0 22px -4px rgba(var(--sd-sem-rgb, var(--sd-accent-rgb)), calc(0.55 * var(--sd-glow-strength)));
   }
 
   &__icon {
@@ -98,11 +71,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    color: var(--sd-sem-strong);
 
-    &--info { color: #c084fc; }
-    &--success { color: #34d399; }
-    &--warning { color: #fbbf24; }
-    &--danger { color: #fb7185; }
+    &--info,
+    &--success,
+    &--warning,
+    &--danger { color: var(--sd-sem-strong); }
   }
 
   &__content {
@@ -114,39 +88,39 @@
   }
 
   &__title {
-    font-size: 13px;
+    font-size: var(--sd-text-sm);
     font-weight: 600;
-    color: #ffffff;
-    line-height: 1.3;
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-sem-strong);
   }
 
   &__body {
-    font-size: 12px;
-    color: $zinc-300;
-    line-height: 1.5;
+    font-size: var(--sd-text-xs);
+    line-height: var(--sd-leading-normal);
+    color: var(--sd-text-muted);
   }
 
   &__close {
     flex-shrink: 0;
-    padding: 4px;
-    color: $zinc-500;
-    border-radius: 6px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: -4px;
-    margin-top: -4px;
-    transition: all $duration-fast ease;
+    margin: calc(-1 * var(--sd-space-1)) calc(-1 * var(--sd-space-1)) 0 0;
+    padding: var(--sd-space-1);
+    border: 1px solid transparent;
+    border-radius: var(--sd-radius-sm);
+    background-color: transparent;
+    color: var(--sd-text-muted);
+    cursor: pointer;
+    line-height: 1;
+    @include sd-transition;
+    @include sd-focus-ring;
+    @include sd-press;
 
-    &:hover {
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.08);
+    @include sd-hover {
+      background-color: var(--sd-tint-1);
+      color: var(--sd-text);
     }
   }
 }
 }
-

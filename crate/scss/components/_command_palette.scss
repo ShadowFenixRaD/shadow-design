@@ -1,113 +1,100 @@
-@use '../variables' as *;
+// ==============================================================================
+// Shadow Design — CommandPalette (floating panel + items; language.md §3.2–3.4)
+// ==============================================================================
+@use '../zindex' as *;
 @use '../mixins' as *;
-
-// CommandPalette (Spotlight) Universal Quick Search Modal
 
 @layer sd-components {
 .sd-command-palette-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1050;
+  margin: 0;
+  z-index: z('command-palette');
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 15vh;
-  background-color: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  animation: sd-fade-in 0.15s ease-out;
+  padding: 15vh var(--sd-space-4) 0;
+  box-sizing: border-box;
+  background-color: var(--sd-scrim);
+  backdrop-filter: blur(var(--sd-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+  @include sd-animate(sd-fade-in, var(--sd-dur));
 }
 
 .sd-command-palette-dialog {
+  @include sd-surface(2);
+  @include sd-animate(sd-pop-in, var(--sd-dur));
   width: 100%;
   max-width: 620px;
-  background-color: #08080b;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(168, 85, 247, 0.15);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: sd-scale-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  font-family: var(--sd-font-sans);
 }
 
 .sd-command-palette-input-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: rgba(255, 255, 255, 0.02);
+  gap: var(--sd-space-3);
+  padding: var(--sd-space-3) var(--sd-space-4);
+  border-bottom: 1px solid var(--sd-border-subtle);
+  background-color: var(--sd-tint-1);
+}
 
-  .sd-command-palette-search-icon {
-    color: #a1a1aa;
-    flex-shrink: 0;
-  }
+.sd-command-palette-search-icon {
+  color: var(--sd-text-muted);
+  flex-shrink: 0;
+}
 
-  .sd-command-palette-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 15px;
-    color: #ffffff;
-    font-family: inherit;
+.sd-command-palette-input {
+  @include sd-field-bare;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--sd-text-lg);
+}
 
-    &::placeholder {
-      color: #71717a;
-    }
-  }
-
-  .sd-command-palette-badges {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-  }
+.sd-command-palette-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-1);
+  flex-shrink: 0;
 }
 
 .sd-command-palette-list {
   max-height: 380px;
   overflow-y: auto;
-  padding: 8px;
+  padding: var(--sd-space-2);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sd-space-1);
+  @include sd-scrollbar;
 }
 
 .sd-command-palette-group-title {
-  padding: 8px 12px 4px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: var(--sd-space-2) var(--sd-space-3) var(--sd-space-1);
+  font-family: var(--sd-font-mono);
+  font-size: var(--sd-text-2xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a1a1aa;
+  letter-spacing: 0.08em;
+  color: var(--sd-text-subtle);
 }
 
 .sd-command-palette-item {
-  display: flex;
-  align-items: center;
+  @include sd-item(lg);
   justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.12s ease;
-  user-select: none;
+  padding-block: var(--sd-space-2);
 
-  &:hover,
-  &--active {
-    background-color: rgba(168, 85, 247, 0.12);
-    border: 1px solid rgba(168, 85, 247, 0.25);
-  }
+  &--active { @include sd-selected(row); }
 
   &-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--sd-space-3);
     min-width: 0;
   }
 
   &-icon {
-    color: #c084fc;
+    color: var(--sd-accent-strong);
     flex-shrink: 0;
   }
 
@@ -118,25 +105,19 @@
   }
 
   &-title {
-    font-size: 13.5px;
+    @include text-truncate;
+    font-size: var(--sd-text-sm);
     font-weight: 500;
-    color: #f4f4f5;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--sd-text);
   }
 
   &-desc {
-    font-size: 11.5px;
-    color: #71717a;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    @include text-truncate;
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
   }
 
-  &-shortcut {
-    flex-shrink: 0;
-  }
+  &-shortcut { flex-shrink: 0; }
 }
 
 .sd-command-palette-empty {
@@ -144,28 +125,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 40px 16px;
-  color: #71717a;
-  font-size: 13px;
+  gap: var(--sd-space-2);
+  padding: var(--sd-space-10) var(--sd-space-4);
+  color: var(--sd-text-subtle);
+  font-size: var(--sd-text-sm);
 }
 
 .sd-command-palette-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
-  padding: 10px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background-color: rgba(0, 0, 0, 0.3);
-  font-size: 11px;
-  color: #71717a;
+  gap: var(--sd-space-4);
+  padding: var(--sd-space-2) var(--sd-space-4);
+  border-top: 1px solid var(--sd-border-subtle);
+  background-color: var(--sd-tint-1);
+  font-size: var(--sd-text-xs);
+  color: var(--sd-text-subtle);
 
   &-item {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--sd-space-1);
   }
 }
-
 }

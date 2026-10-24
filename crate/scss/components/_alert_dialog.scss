@@ -1,103 +1,81 @@
 // ==============================================================================
-// Shadow Design — AlertDialog Component
+// Shadow Design — AlertDialog (raised-max; docs/design/language.md §3.2/3.3)
 // ==============================================================================
-@use '../variables' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-alert-dialog-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: z('modal-back');
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    animation: sd-alert-dialog-fade 0.15s ease-out;
+.sd-alert-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  z-index: z('modal-back');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sd-space-4);
+  box-sizing: border-box;
+  background-color: var(--sd-scrim);
+  backdrop-filter: blur(var(--sd-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--sd-backdrop-blur));
+  @include sd-animate(sd-fade-in, var(--sd-dur));
+}
+
+.sd-alert-dialog {
+  @include sd-surface(3);
+  @include sd-animate(sd-pop-in, var(--sd-dur));
+  position: relative;
+  z-index: z('modal');
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--sd-space-5);
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
+
+  &--glow { --sd-shadow-glow: var(--sd-glow-md); }
+
+  &__extra { margin-bottom: var(--sd-space-5); }
+}
+
+.sd-alert-dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sd-control-lg);
+  height: var(--sd-control-lg);
+  margin-bottom: var(--sd-space-4);
+  border-radius: var(--sd-radius-full);
+
+  &--destructive {
+    @include sd-semantic(danger);
+    color: var(--sd-sem-strong);
   }
 
-  .sd-alert-dialog {
-    position: relative;
-    z-index: z('modal');
-    width: 100%;
-    max-width: 28rem;
-    padding: 1.5rem;
-    background-color: #0c0c0e;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 1rem;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
-    animation: sd-alert-dialog-scale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    @include specular-top(0.08);
-
-    &--glow {
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(239, 68, 68, 0.25);
-    }
-  }
-
-  .sd-alert-dialog-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 9999px;
-    margin-bottom: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-
-    &--destructive {
-      background-color: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.3);
-      box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
-    }
-
-    &--primary {
-      background-color: rgba(168, 85, 247, 0.12);
-      color: #c084fc;
-      border-color: rgba(168, 85, 247, 0.3);
-      box-shadow: 0 0 16px rgba(168, 85, 247, 0.2);
-    }
-  }
-
-  .sd-alert-dialog-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-    line-height: 1.35;
-  }
-
-  .sd-alert-dialog-desc {
-    font-size: 0.875rem;
-    color: #a1a1aa;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
-  }
-
-  .sd-alert-dialog-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.75rem;
+  &--primary {
+    @include sd-semantic(accent);
+    color: var(--sd-sem-strong);
   }
 }
 
-@keyframes sd-alert-dialog-fade {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+.sd-alert-dialog-title {
+  margin: 0 0 var(--sd-space-2);
+  font-size: var(--sd-text-lg);
+  font-weight: 600;
+  line-height: var(--sd-leading-tight);
+  color: var(--sd-text);
 }
 
-@keyframes sd-alert-dialog-scale {
-  0% {
-    opacity: 0;
-    transform: scale(0.94) translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
+.sd-alert-dialog-desc {
+  margin: 0 0 var(--sd-space-5);
+  font-size: var(--sd-text-md);
+  line-height: var(--sd-leading-normal);
+  color: var(--sd-text-muted);
+}
+
+.sd-alert-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sd-space-3);
+}
 }

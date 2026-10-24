@@ -1,201 +1,123 @@
 // ==============================================================================
-// Shadow Design — SpeedDial & FAB Component
+// Shadow Design — SpeedDial & FAB (lit controls; docs/design/language.md §3.5)
 // ==============================================================================
-@use '../variables' as *;
 @use '../zindex' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-speed-dial {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    gap: 0.75rem;
+.sd-speed-dial {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--sd-space-3);
 
-    &--open {
-      z-index: 56;
-    }
+  &--open { z-index: z('speed-dial'); }
 
-    &--fixed {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: z('speed-dial');
-    }
-
-    &--up {
-      flex-direction: column-reverse;
-    }
-
-    &--down {
-      flex-direction: column;
-    }
-
-    &--left {
-      flex-direction: row-reverse;
-    }
-
-    &--right {
-      flex-direction: row;
-    }
-  }
-
-  .sd-speed-dial-backdrop {
+  &--fixed {
     position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: transparent;
+    bottom: var(--sd-space-8);
+    right: var(--sd-space-8);
+    z-index: z('speed-dial');
   }
 
-  .sd-fab {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, #9333ea, #6b21a8);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.4);
-    cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background 0.2s ease;
-    @include specular-top(0.12);
-
-    &:hover {
-      transform: scale(1.06);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 28px rgba(168, 85, 247, 0.6);
-    }
-
-    &:active {
-      transform: scale(0.96);
-    }
-
-    &--open {
-      transform: rotate(45deg);
-
-      &:hover {
-        transform: rotate(45deg) scale(1.06);
-      }
-    }
-
-    &--open-custom {
-      transform: none;
-
-      &:hover {
-        transform: scale(1.06);
-      }
-    }
-  }
-
-  .sd-speed-dial-actions {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    animation: sd-speed-dial-fade 0.15s ease-out;
-
-    .sd-speed-dial--up & {
-      flex-direction: column-reverse;
-    }
-
-    .sd-speed-dial--down & {
-      flex-direction: column;
-    }
-
-    .sd-speed-dial--left & {
-      flex-direction: row-reverse;
-    }
-
-    .sd-speed-dial--right & {
-      flex-direction: row;
-    }
-  }
-
-  .sd-speed-dial-action-item {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-  }
-
-  .sd-speed-dial-btn {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 9999px;
-    background: #18181b;
-    color: #e4e4e7;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-    cursor: pointer;
-    transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-
-    &:hover {
-      background: #27272a;
-      color: #ffffff;
-      border-color: rgba(168, 85, 247, 0.4);
-      transform: scale(1.08);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(168, 85, 247, 0.3);
-    }
-  }
-
-  .sd-speed-dial-label {
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #e4e4e7;
-    background: #18181b;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-    user-select: none;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-    &:hover {
-      background: #27272a;
-      color: #ffffff;
-      border-color: rgba(168, 85, 247, 0.4);
-    }
-
-    .sd-speed-dial--up &,
-    .sd-speed-dial--down & {
-      position: absolute;
-      right: calc(100% + 0.625rem);
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .sd-speed-dial--left &,
-    .sd-speed-dial--right & {
-      position: absolute;
-      bottom: calc(100% + 0.5rem);
-      left: 50%;
-      transform: translateX(-50%);
-    }
-  }
+  &--up { flex-direction: column-reverse; }
+  &--down { flex-direction: column; }
+  &--left { flex-direction: row-reverse; }
+  &--right { flex-direction: row; }
 }
 
-@keyframes sd-speed-dial-fade {
-  0% {
-    opacity: 0;
-    transform: scale(0.85);
+.sd-speed-dial-backdrop {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  z-index: 0;
+  background: transparent;
+}
+
+// Primary action: the one lit-fill primary of the speed dial.
+.sd-fab {
+  @include sd-lit-fill(primary);
+  @include sd-press;
+  @include sd-transition(rotate);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sd-control-xl);
+  height: var(--sd-control-xl);
+  padding: 0;
+  border-radius: var(--sd-radius-full);
+
+  &--open { rotate: 45deg; }
+  &--open-custom { rotate: none; }
+}
+
+.sd-speed-dial-actions {
+  @include sd-animate(sd-pop-in, var(--sd-dur));
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+
+  .sd-speed-dial--up & { flex-direction: column-reverse; }
+  .sd-speed-dial--down & { flex-direction: column; }
+  .sd-speed-dial--left & { flex-direction: row-reverse; }
+  .sd-speed-dial--right & { flex-direction: row; }
+}
+
+.sd-speed-dial-action-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sd-control-lg);
+  height: var(--sd-control-lg);
+}
+
+.sd-speed-dial-btn {
+  @include sd-lit-fill(secondary);
+  @include sd-press;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sd-control-lg);
+  height: var(--sd-control-lg);
+  padding: 0;
+  border-radius: var(--sd-radius-full);
+}
+
+.sd-speed-dial-label {
+  @include sd-lit-fill(secondary);
+  @include sd-press;
+  padding: 0 var(--sd-space-3);
+  min-height: var(--sd-control-xs);
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--sd-radius-md);
+  font-size: var(--sd-text-xs);
+  white-space: nowrap;
+  user-select: none;
+
+  .sd-speed-dial--up &,
+  .sd-speed-dial--down & {
+    position: absolute;
+    right: calc(100% + var(--sd-space-2));
+    top: 50%;
+    translate: 0 -50%;
   }
-  100% {
-    opacity: 1;
-    transform: none;
+
+  .sd-speed-dial--left &,
+  .sd-speed-dial--right & {
+    position: absolute;
+    bottom: calc(100% + var(--sd-space-2));
+    left: 50%;
+    translate: -50% 0;
   }
+}
 }

@@ -71,7 +71,7 @@ pub fn Drawer(
 
     let open = *is_open.read();
     let locale = use_locale();
-    let drawer_id = crate::a11y::use_unique_id("sd-drawer", id);
+    let drawer_id = crate::a11y::use_unique_id("sd-drawer", id); // sd-lint-allow: id prefix, not a class
     let title_id = format!("{drawer_id}-title");
 
     crate::a11y::use_body_scroll_lock(is_open);
@@ -96,17 +96,6 @@ pub fn Drawer(
         "sd-drawer-panel--glow".to_string()
     } else {
         String::new()
-    };
-
-    #[cfg(feature = "animation")]
-    let anim_class = match position {
-        DrawerPosition::Left => crate::animation::Animations::DRAWER_LEFT,
-        DrawerPosition::Right => crate::animation::Animations::DRAWER_RIGHT,
-    };
-    #[cfg(not(feature = "animation"))]
-    let anim_class = match position {
-        DrawerPosition::Left => "animate-drawer-slide-left",
-        DrawerPosition::Right => "animate-drawer-slide-right",
     };
 
     let pos_class = match position {
@@ -138,7 +127,7 @@ pub fn Drawer(
                 "aria-modal": "true",
                 "aria-labelledby": if title.is_some() { Some(title_id.as_str()) } else { None },
                 "aria-label": if title.is_none() { aria_label.as_deref() } else { None },
-                class: "sd-drawer-panel {base_override} {pos_class} {size_class} {glow_class} {anim_class} {class_modifiers} {class}",
+                class: "sd-drawer-panel {base_override} {pos_class} {size_class} {glow_class} {class_modifiers} {class}",
                 onmounted: move |m| {
                     let data = m.data();
                     spawn(async move {

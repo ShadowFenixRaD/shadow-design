@@ -17,7 +17,7 @@ pub fn AlertDialog(
     /// Label for the cancellation button. Defaults to the locale `cancel` string.
     #[props(default)]
     cancel_label: String,
-    /// Whether the action is destructive (renders danger styling and crimson glow). Defaults to true.
+    /// Whether the action is destructive (renders danger styling). Defaults to true.
     #[props(default = true)]
     is_destructive: bool,
     /// Optional custom icon. Defaults to [`IconKind::AlertTriangle`].
@@ -40,6 +40,8 @@ pub fn AlertDialog(
     children: Option<Element>,
 ) -> Element {
     let locale = crate::locale::use_locale();
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
     let confirm_label = if confirm_label.is_empty() { locale.confirm.clone() } else { confirm_label };
     let cancel_label = if cancel_label.is_empty() { locale.cancel.clone() } else { cancel_label };
     let is_open = *opened.read();
@@ -50,11 +52,10 @@ pub fn AlertDialog(
 
     let dialog_icon = icon.unwrap_or(IconKind::AlertTriangle);
 
-    let glow_class = if glow == Some(true) || (glow.is_none() && is_destructive) {
-        "sd-alert-dialog--glow"
-    } else {
-        ""
-    };
+    #[cfg(feature = "theme")]
+    let glow_class = theme_val.resolve_elevation_class("alert_dialog", glow);
+    #[cfg(not(feature = "theme"))]
+    let glow_class = if glow == Some(true) { "sd-alert-dialog--glow" } else { "" };
 
     let icon_variant_class = if is_destructive {
         "sd-alert-dialog-icon--destructive"
@@ -77,8 +78,6 @@ pub fn AlertDialog(
     };
 
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("alert_dialog").unwrap_or("");
     #[cfg(not(feature = "theme"))]
     let base_override = "";
@@ -99,7 +98,7 @@ pub fn AlertDialog(
                 p { class: "sd-alert-dialog-desc", "{description}" }
 
                 if let Some(ch) = children {
-                    div { class: "mb-6", {ch} }
+                    div { class: "sd-alert-dialog__extra", {ch} }
                 }
 
                 div { class: "sd-alert-dialog-actions",

@@ -252,23 +252,6 @@ fn NotificationToast(item: NotificationItem, on_dismiss: EventHandler<()>) -> El
     let default_icon = item.variant.default_icon();
     let prefix = item.variant.prefix();
 
-    #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
-    let glow_class = if theme_val.is_component_glow_enabled("notification", None) {
-        item.variant.glow_class()
-    } else {
-        ""
-    };
-
-    #[cfg(not(feature = "theme"))]
-    let glow_class = item.variant.glow_class();
-
-    #[cfg(feature = "animation")]
-    let anim_class = crate::animation::Animations::TOAST_ENTER;
-    #[cfg(not(feature = "animation"))]
-    let anim_class = "animate-toast-enter";
-
     let mut timer_started = use_signal(|| false);
 
     use_effect(move || {
@@ -293,7 +276,7 @@ fn NotificationToast(item: NotificationItem, on_dismiss: EventHandler<()>) -> El
 
     rsx! {
         div {
-            class: "sd-toast {variant_class} {glow_class} {anim_class}",
+            class: "sd-toast {variant_class}",
             onmouseenter: move |_| is_paused.set(true),
             onmouseleave: move |_| is_paused.set(false),
             onfocusin: move |_| is_paused.set(true),

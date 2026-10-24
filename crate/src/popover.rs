@@ -124,7 +124,7 @@ pub fn PopoverTrigger(
 
     rsx! {
         div {
-            class: "sd-popover-trigger inline-flex cursor-pointer {class}",
+            class: "sd-popover-trigger {class}",
             "aria-haspopup": "dialog",
             "aria-expanded": "{*ctx.opened.read()}",
             onclick: move |_| {
@@ -149,6 +149,8 @@ pub fn PopoverDropdown(
     children: Element,
 ) -> Element {
     let mut ctx = use_context::<PopoverContext>();
+    #[cfg(feature = "theme")]
+    let theme_val = crate::theme::use_theme()();
     let is_open = *ctx.opened.read();
 
     if !is_open {
@@ -158,12 +160,10 @@ pub fn PopoverDropdown(
     let pos_class = ctx.position.read().class_name();
     let effective_glow = glow.or(ctx.glow);
     #[cfg(feature = "theme")]
-    let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
     let glow_class = theme_val.resolve_elevation_class("popover", effective_glow);
     #[cfg(not(feature = "theme"))]
     let glow_class = if effective_glow == Some(true) {
-        "sd-popover-dropdown--glow"
+        "sd-popover--glow"
     } else {
         ""
     };

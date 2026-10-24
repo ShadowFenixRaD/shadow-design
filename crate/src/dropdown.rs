@@ -79,7 +79,7 @@ pub fn Dropdown(
         String::new()
     };
 
-    let dropdown_id = crate::a11y::use_unique_id("sd-dropdown", id);
+    let dropdown_id = crate::a11y::use_unique_id("sd-dropdown", id); // sd-lint-allow: id prefix, not a class
     let trigger_id = format!("{dropdown_id}-trigger");
     let menu_id = format!("{dropdown_id}-menu");
 
