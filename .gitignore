@@ -13,3 +13,6 @@
 # Graphify cache & temporary files
 graphify-out/cache/
 *.tmp
+
+# Nix dev shell: tool locali al progetto (graphify venv)
+.tools/
