@@ -227,8 +227,8 @@ pub fn story() -> Story {
                     .emit(Emit::Template("description: Some(\"{v}\".to_string())")),
                 Control::text("placeholder", "Placeholder", "Scegli un framework")
                     .emit(Emit::Template("placeholder: Some(\"{v}\".to_string())")),
-                Control::bool("searchable", "Ricerca", true),
-                Control::bool("clearable", "Azzerabile", true),
+                Control::bool("searchable", "Ricerca", true).emit(Emit::Template("searchable: true")),
+                Control::bool("clearable", "Azzerabile", true).emit(Emit::Template("clearable: true")),
                 Control::bool("creatable", "Creabile", false),
                 Control::bool("disabled", "Disabilitato", false),
                 Control::bool("loading", "Loading", false),
