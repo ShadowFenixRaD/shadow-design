@@ -9,6 +9,7 @@ ADRs are **binding**. They record how this project does things, so that every co
 | [0003](0003-runtime-tokens-and-theming.md) | Runtime CSS tokens are the only theming mechanism | Accepted |
 | [0004](0004-component-styling-contract.md) | Component styling contract | Accepted |
 | [0005](0005-three-type-roles.md) | Three type roles: Kanit, Onest, Source Code Pro | Accepted |
+| [0006](0006-showcase-as-data-driven-docs.md) | The showcase is data-driven documentation built from the library | Accepted |
 
 ## Rules
 

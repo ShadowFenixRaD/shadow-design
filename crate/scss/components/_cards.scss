@@ -133,7 +133,9 @@
   &__footer,
   &__body button,
   &__body a:not(.sd-card__link),
-  &__body input,
+  // Visually hidden native inputs of toggles stay `position: absolute` (sd-native-hidden),
+  // or they take a grid column and squeeze the label to one word per line.
+  &__body input:not(.sd-checkbox__input, .sd-radio__input, .sd-radio-card__input),
   &__body [role="button"] {
     position: relative;
     z-index: 1;

@@ -1,116 +1,74 @@
+//! Icons: every `IconKind` as a static tile with a copy button (REVAMP §2.4).
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
-use crate::components::clipboard::copy_text;
-use crate::components::{ControlGroup, PageHeader, Playground, PropRow, ShowcaseTabs};
+
+use crate::story::sections::SectionHead;
+
+const USAGE_CODE: &str = r#"Icon { kind: IconKind::Sparkles, size: 20 }
+
+// Inside components that take an icon:
+TextInput { value, left_icon: Some(SvgIcon::kind(IconKind::Search)) }
+Button { left_icon: Some(rsx! { Icon { kind: IconKind::Check, size: 15 } }), "Salva" }"#;
 
 #[component]
 pub fn IconsPage() -> Element {
     let search = use_signal(String::new);
-    let icon_size = use_signal(|| 20.0f64);
-    let mut toast = use_notification();
+    let size = use_signal(|| 20.0f64);
+    let q = search().trim().to_lowercase();
+    let icons: Vec<IconKind> = IconKind::ALL.iter().copied().filter(|k| k.name().to_lowercase().contains(&q)).collect();
+    let px = size() as u32;
+    let total = IconKind::ALL.len();
+    let shown = icons.len();
 
-    let search_term = search().to_lowercase();
-    let filtered_icons: Vec<IconKind> = IconKind::ALL
-        .iter()
-        .copied()
-        .filter(|k| k.name().to_lowercase().contains(&search_term))
-        .collect();
+    rsx! {
+        document::Title { "Icons · Shadow Design" }
+        div { class: "sc-story",
+            header { class: "sc-story__head",
+                span { class: "sc-eyebrow", "Fondamenta · feature icon" }
+                h1 { class: "sc-title", "Icons" }
+                p { class: "sc-lede",
+                    "{total} icone SVG native con tratto 1.5, senza dipendenze. Ereditano il colore del testo e si ridimensionano con size."
+                }
+            }
 
-    let code_snippet = r#"Icon {
-    kind: IconKind::Sparkles,
-    size: 20,
-}"#;
-
-    let props_rows = vec![
-        PropRow {
-            name: "kind",
-            r#type: "IconKind",
-            default: "-",
-            description: "Variante geometrica vettoriale nitida da 1.5px stroke (50 icone integrate a zero dipendenze).",
-        },
-        PropRow {
-            name: "size",
-            r#type: "usize",
-            default: "16",
-            description: "Dimensione in pixel (larghezza e altezza) del viewport SVG.",
-        },
-        PropRow {
-            name: "class",
-            r#type: "String",
-            default: "\"\"",
-            description: "Classi CSS aggiuntive applicate all'elemento <svg>.",
-        },
-    ];
-
-    let preview = rsx! {
-        div { class: "sc-stack sc-stack--loose",
-            Playground {
-                stage_start: true,
-                stage: rsx! {
-                    div { class: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 w-full",
-                        for icon in filtered_icons {
-                            Button {
-                                key: "{icon.name()}",
-                                variant: ButtonVariant::Secondary,
-                                size: ButtonSize::Sm,
-                                full_width: true,
-                                left_icon: rsx! { Icon { kind: icon, size: icon_size() as u32 } },
-                                onclick: move |_| {
-                                    let name = icon.name();
-                                    let s = icon_size() as u32;
-                                    let snippet = format!("Icon {{ kind: IconKind::{name}, size: {s} }}");
-                                    spawn(async move {
-                                        let ok = copy_text(&snippet).await;
-                                        if ok {
-                                            toast.show_with_title(
-                                                format!("Copiato IconKind::{name}"),
-                                                "Snippet RSX copiato negli appunti",
-                                                NotificationVariant::Success,
-                                            );
-                                        }
-                                    });
-                                },
-                                "{icon.name()}"
+            section { class: "sc-section",
+                div { class: "sc-icon-tools",
+                    TextInput {
+                        value: search,
+                        label: Some("Cerca".to_string()),
+                        placeholder: Some("Check, Chevron, Lock…".to_string()),
+                        left_icon: Some(SvgIcon::kind(IconKind::Search)),
+                        clearable: true,
+                    }
+                    div { class: "sc-knob",
+                        div { class: "sc-knob__row",
+                            span { class: "sc-eyebrow", "Dimensione" }
+                            span { class: "sc-readout", "{px}px" }
+                        }
+                        Slider { value: size, min: 12.0, max: 48.0, step: 2.0, show_tooltip: false }
+                    }
+                }
+                span { class: "sc-hint", "{shown} di {total} icone" }
+                SimpleGrid { cols: 2, sm: Some(3), md: Some(4), lg: Some(6), spacing: GridSpacing::Sm,
+                    for icon in icons {
+                        div { key: "{icon.name()}", class: "sc-icon-tile-static",
+                            div { class: "sc-icon-tile-static__glyph",
+                                Icon { kind: icon, size: px }
+                            }
+                            span { class: "sc-icon-tile-static__name", "{icon.name()}" }
+                            CopyButton {
+                                value: format!("IconKind::{}", icon.name()),
+                                icon_only: true,
+                                aria_label: format!("Copia IconKind::{}", icon.name()),
                             }
                         }
                     }
-                },
-                controls: rsx! {
-                    ControlGroup { label: "Cerca".to_string(),
-                        TextInput {
-                            value: search,
-                            placeholder: "Cerca icona (es. Check, Chevron, User)...".to_string(),
-                            left_icon: SvgIcon::Kind(IconKind::Search),
-                        }
-                    }
-                    ControlGroup { label: "Size: {icon_size()}px".to_string(),
-                        Slider { value: icon_size, min: 12.0, max: 48.0, step: 1.0 }
-                    }
-                },
-            }
-
-            Card {
-                title: "SvgIcon::Custom Example".to_string(),
-                subtitle: "Shadow Design supporta anche icone SVG customizzate con il tipo polimorfico SvgIcon.".to_string(),
-                div { class: "sc-actions",
-                    span { class: "sc-accent-text", Icon { kind: IconKind::Sparkles, size: 24 } }
-                    span { class: "sc-success-text", Icon { kind: IconKind::CheckCircle, size: 24 } }
-                    span { class: "sc-info-text", Icon { kind: IconKind::Code, size: 24 } }
                 }
             }
-        }
-    };
 
-    rsx! {
-        div { class: "sc-stack sc-stack--loose",
-            PageHeader {
-                title: "Icon".to_string(),
-                description: "Suite completa di 50 icone geometriche native vettoriali con stroke a 1.5px e zero dipendenze esterne.".to_string(),
-            }
-            ShowcaseTabs {
-                preview: preview,
-                code: code_snippet.to_string(),
-                props: props_rows,
+            section { class: "sc-section",
+                SectionHead { eyebrow: "Uso", title: "Icon e SvgIcon" }
+                CodeBlock { code: USAGE_CODE.to_string(), language: "rsx", with_line_numbers: false }
             }
         }
     }

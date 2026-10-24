@@ -89,23 +89,28 @@
 .gap-12  { gap: 48px; }
 
 // Space between (Y & X) & Dividers (DS-22)
-.space-y-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0px; }
-.space-y-0\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 2px; }
-.space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 4px; }
-.space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 6px; }
-.space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 8px; }
-.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 10px; }
-.space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 12px; }
-.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 16px; }
-.space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 20px; }
-.space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 24px; }
-.space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 32px; }
-.space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: 40px; }
+// Fixed overlay roots (language.md §3.3: modal, drawer, alert dialog and command palette
+// backdrops, plus the edge-attached drawer panel) are `position: fixed` and must not inherit
+// a margin from a layout parent. This layer outranks sd-components, so their own `margin: 0`
+// cannot win; they are excluded from the sibling selector instead.
+$sd-space-skip: '[hidden], .sd-modal-backdrop, .sd-drawer-backdrop, .sd-drawer-panel, .sd-alert-dialog-backdrop, .sd-command-palette-backdrop';
+.space-y-0 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 0px; }
+.space-y-0\.5 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 2px; }
+.space-y-1 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 4px; }
+.space-y-1\.5 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 6px; }
+.space-y-2 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 8px; }
+.space-y-2\.5 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 10px; }
+.space-y-3 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 12px; }
+.space-y-4 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 16px; }
+.space-y-5 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 20px; }
+.space-y-6 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 24px; }
+.space-y-8 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 32px; }
+.space-y-10 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-top: 40px; }
 
-.space-x-1 > :not([hidden]) ~ :not([hidden]) { margin-left: 4px; }
-.space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 8px; }
-.space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 12px; }
-.space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 16px; }
+.space-x-1 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-left: 4px; }
+.space-x-2 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-left: 8px; }
+.space-x-3 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-left: 12px; }
+.space-x-4 > :not([hidden]) ~ :not(#{$sd-space-skip}) { margin-left: 16px; }
 
 .divide-y > :not([hidden]) ~ :not([hidden]) {
   border-top-width: 1px;

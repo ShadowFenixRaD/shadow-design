@@ -1,90 +1,124 @@
-use crate::components::{Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
+//! Typography: the three type roles of ADR-0005 side by side, with specimens and the
+//! `Heading` / `Text` / `Kbd` / `Code` components.
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
+use crate::story::sections::SectionHead;
+
+#[derive(Clone, Copy, PartialEq)]
+struct Role {
+    family: &'static str,
+    token: &'static str,
+    role: &'static str,
+    usage: &'static str,
+    specimen_class: &'static str,
+}
+
+const ROLES: [Role; 3] = [
+    Role {
+        family: "Kanit",
+        token: "--sd-font-heading · --sd-weight-heading",
+        role: "Titoli",
+        usage: "Titoli di pagina e sezione, Title, titoli di card, modali, popover e toast, metriche grandi.",
+        specimen_class: "sc-specimen sc-specimen--heading",
+    },
+    Role {
+        family: "Onest",
+        token: "--sd-font-body",
+        role: "Testo e controlli",
+        usage: "Tutto ciò che si legge o si usa: testo, etichette, pulsanti, voci, campi, celle, badge.",
+        specimen_class: "sc-specimen sc-specimen--body",
+    },
+    Role {
+        family: "Source Code Pro",
+        token: "--sd-font-mono",
+        role: "Codice ed etichette",
+        usage: "Codice, kbd, etichette maiuscole di sezione, valori numerici in tabella, assi dei grafici.",
+        specimen_class: "sc-specimen sc-specimen--mono",
+    },
+];
+
+const HEADINGS_CODE: &str = r#"Heading { order: HeadingOrder::H1, "Operazioni di rete" }
+Heading { order: HeadingOrder::H2, "Nodi attivi" }
+Heading { order: HeadingOrder::H3, "edge-07 · Milano" }
+Heading { order: HeadingOrder::H4, "Peer collegati" }"#;
+
+const TEXT_CODE: &str = r#"Text { size: TextSize::Lg, "Vetro nero illuminato dall'alto." }
+Text { size: TextSize::Md, "Il corpo del testo è Onest a 14px." }
+Text { size: TextSize::Sm, dimmed: true, "Metadati e didascalie in --sd-text-muted." }"#;
+
+const INLINE_CODE: &str = r#"Kbd { "Ctrl" } Kbd { "K" }
+Code { "cargo add shadow-design" }"#;
+
 #[component]
 pub fn TypographyPage() -> Element {
-    let props = vec![
-        PropRow {
-            name: "order",
-            r#type: "HeadingOrder (H1..H6)",
-            default: "HeadingOrder::H1",
-            description: "Livello semantico del titolo con tracking ottico calibrato",
-        },
-        PropRow {
-            name: "size",
-            r#type: "TextSize (Xs..Xl)",
-            default: "TextSize::Md",
-            description: "Scala dimensionale del corpo del testo",
-        },
-        PropRow {
-            name: "dimmed",
-            r#type: "bool",
-            default: "false",
-            description: "Applica il colore attenuato per metadati e spiegazioni",
-        },
-    ];
-
-    let code_snippet = r#"// Intestazioni con gerarchia ottica:
-Heading { order: HeadingOrder::H1, "Heading di Primo Livello" }
-Heading { order: HeadingOrder::H3, "Sottotitolo di Sezione" }
-
-// Testo con varianti di dimensione:
-Text { size: TextSize::Md, "Testo normale per descrizioni e paragrafi." }
-Text { size: TextSize::Sm, dimmed: true, "Metadato o etichetta secondaria attenuata." }
-
-// Badge di tasti di scelta rapida e codice inline:
-Kbd { "⌘K" }
-Code { "cargo add shadow-design" }"#
-        .to_string();
-
     rsx! {
-        div { class: "sc-stack sc-stack--loose",
-            PageHeader {
-                title: "Typography".to_string(),
-                description: "Componenti per gerarchia testuale, scorciatoie da tastiera e codice inline basati sui font Kanit, Onest e Source Code Pro.".to_string(),
+        document::Title { "Typography · Shadow Design" }
+        div { class: "sc-story",
+            header { class: "sc-story__head",
+                span { class: "sc-eyebrow", "Fondamenta · feature typography" }
+                h1 { class: "sc-title", "Typography" }
+                p { class: "sc-lede",
+                    "Tre famiglie, ognuna con un ruolo (ADR-0005). I titoli non usano mai il corpo e i controlli non usano mai il titolo."
+                }
             }
 
-            FeatureBanner { feature_name: "typography" }
-
-            ShowcaseTabs {
-                preview: rsx! {
-                    Stage { start: true, wide: true,
-                        div { class: "sc-stack sc-stack--loose w-full",
-                            div { class: "sc-stack",
-                                Heading { order: HeadingOrder::H1, "Titolo H1 Display" }
-                                Heading { order: HeadingOrder::H2, "Titolo H2 Section" }
-                                Heading { order: HeadingOrder::H3, "Titolo H3 Card" }
-                                Heading { order: HeadingOrder::H4, "Titolo H4 Subsection" }
-                            }
-                            hr { class: "sc-control-divider" }
-                            div { class: "sc-stack",
-                                Text { size: TextSize::Lg, "Paragrafo Large: eccellente leggibilità su display Retina ad alta densità." }
-                                Text { size: TextSize::Md, "Paragrafo Standard: progettato con il font Onest per un'esperienza di lettura pulita ed essenziale." }
-                                Text { size: TextSize::Sm, dimmed: true, "Testo attenuato (dimmed): ideale per note a piè di pagina e timestamp." }
-                            }
-                            hr { class: "sc-control-divider" }
-                            div { class: "sc-actions",
-                                div { class: "sc-actions",
-                                    span { class: "sc-muted-text", "Scorciatoia:" }
-                                    Kbd { "⌘" }
-                                    Kbd { "K" }
-                                }
-                                div { class: "sc-actions",
-                                    span { class: "sc-muted-text", "Salva:" }
-                                    Kbd { "Ctrl" }
-                                    Kbd { "S" }
-                                }
-                                div { class: "sc-actions",
-                                    span { class: "sc-muted-text", "Comando:" }
-                                    Code { "dx serve --hot-reload" }
-                                }
+            section { class: "sc-section",
+                SectionHead { eyebrow: "Ruoli", title: "Kanit, Onest, Source Code Pro" }
+                div { class: "sc-token-grid sc-token-grid--3",
+                    for r in ROLES {
+                        Card { key: "{r.family}", title: Some(r.role.to_string()), subtitle: Some(r.token.to_string()),
+                            div { class: "sc-role",
+                                span { class: "{r.specimen_class}", "{r.family}" }
+                                span { class: "{r.specimen_class} sc-specimen--glyphs", "Aa Bb 0123 — àèìòù" }
+                                p { class: "sc-muted-text", "{r.usage}" }
                             }
                         }
                     }
-                },
-                code: code_snippet,
-                props: props,
+                }
+            }
+
+            section { class: "sc-section",
+                SectionHead {
+                    eyebrow: "Heading",
+                    title: "Gerarchia dei titoli",
+                    desc: Some("Kanit a peso 600, interlinea --sd-leading-tight."),
+                }
+                Card {
+                    Stack { gap: SpacingToken::Sm,
+                        Heading { order: HeadingOrder::H1, "Operazioni di rete" }
+                        Heading { order: HeadingOrder::H2, "Nodi attivi" }
+                        Heading { order: HeadingOrder::H3, "edge-07 · Milano" }
+                        Heading { order: HeadingOrder::H4, "Peer collegati" }
+                    }
+                }
+                CodeBlock { code: HEADINGS_CODE.to_string(), language: "rsx", with_line_numbers: false }
+            }
+
+            section { class: "sc-section",
+                SectionHead { eyebrow: "Text", title: "Corpo del testo", desc: Some("Onest; tre livelli di colore, mai più tenui.") }
+                Card {
+                    Stack { gap: SpacingToken::Sm,
+                        Text { size: TextSize::Lg, "Vetro nero illuminato dall'alto." }
+                        Text { size: TextSize::Md, "Il corpo del testo è Onest a 14px." }
+                        Text { size: TextSize::Sm, dimmed: true, "Metadati e didascalie in --sd-text-muted." }
+                    }
+                }
+                CodeBlock { code: TEXT_CODE.to_string(), language: "rsx", with_line_numbers: false }
+            }
+
+            section { class: "sc-section",
+                SectionHead { eyebrow: "Kbd e Code", title: "Scorciatoie e codice in linea" }
+                Card {
+                    Group { gap: SpacingToken::Md, align: AlignItems::Center,
+                        Group { gap: SpacingToken::Xs, align: AlignItems::Center,
+                            Kbd { "Ctrl" }
+                            Kbd { "K" }
+                        }
+                        Code { "cargo add shadow-design" }
+                    }
+                }
+                CodeBlock { code: INLINE_CODE.to_string(), language: "rsx", with_line_numbers: false }
             }
         }
     }

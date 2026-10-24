@@ -1,0 +1,39 @@
+# ADR-0006: The showcase is data-driven documentation built from the library
+
+- Status: Accepted (accepted by maintainer delegation, 2026-10-24)
+- Date: 2026-10-24
+
+## Context
+
+The showcase (`showcase/`) documents 85 feature-gated components. A survey on 2026-10-24 (89 routes, 116 screenshots) measured how it is built and how it sells the library:
+
+- 90 hand-written page files (14.3k lines) that all repeat one skeleton: `PageHeader` + `FeatureBanner` + a three-tab `ShowcaseTabs` panel (Playground / Codice RSX / API Props). 87 of 90 pages use it, whether the component is `Divider` or `Select`.
+- 521 `PropRow` literals and ~90 code snippets typed by hand. The snippet shows one fixed configuration, so the live playground and the code it claims to show drift apart; nothing checks them.
+- Adding a page touches four shared files (`pages/mod.rs`, the `use` list in `main.rs`, the 89-variant `enum Route`, `COMPONENTS` in `nav.rs`), which blocks parallel work and produced inconsistent names ("Tabs Component", "Notification / Toast System").
+- The chrome mixes library components with hand-rolled interactive markup (`button.sc-search`, `button.sc-swatch`, raw `<input type=color>`), and the theme toolbar occupies a third of a phone screen.
+- Nothing shows components in a real composition: the home page renders no component at all (text, an 80-chip tag cloud and two code blocks), every component page is a lone widget in a 56rem column, the 10 chart types hide behind a dropdown, and the five presets are never shown side by side. The library's strongest argument, "one hex re-themes everything", is only visible if you click the toolbar.
+
+The maintainer's goal: "we need to demonstrate better how good this library and theme is". The library itself is out of scope here (ADR-0002..0005 govern it); this ADR governs how the showcase is built.
+
+## Decision
+
+1. **One `Story` per component, one template.** Every component is documented by exactly one declarative `Story` value (`showcase/src/story/schema.rs`: slug, name, category, Cargo features, icon, tagline, keywords, status, optional `Playground`, `Example`s, `PropGroup`s, Lit Glass `Recipe`, accessibility notes, related slugs). Stories live in `showcase/src/stories/<slug>.rs`, one file each, and expose `pub fn story() -> Story`. A single page component, `StoryPage`, renders every story with the same anatomy (header, live playground with generated code, examples gallery, recipe and accessibility notes, props, related, previous/next). No per-component page components exist. A story file may contain private `#[component]` helpers for its examples, nothing else.
+
+2. **Routing and navigation are derived from the registry.** `stories/mod.rs` lists the 85 `story` functions in `ALL`; `story/registry.rs` builds the static list once (`LazyLock`) and answers `find(slug)`, `by_category`, `neighbours`. The `Route` enum has one dynamic variant `StoryPage { slug }` at `/:slug`, so every existing component URL (`/buttons`, `/date-picker`, …) keeps working, plus the static non-component routes and a catch-all `NotFound`. Sidebar, mobile drawer, search palette, home category grid, prev/next links and the Cargo feature counters are all computed from the registry. Unit tests in `registry.rs` enforce: unique slugs, every `related` slug resolves, every feature exists in `crate/Cargo.toml`, and every non-stub story has a playground or at least two examples.
+
+3. **The chrome is built only from library components.** Header, theme menu, sidebar, drawer, search, playground knobs, code views, props tables, example cards, breadcrumbs, badges, tabs, buttons, toasts: all are library components (`Button`, `Popover`, `Drawer`, `CommandPalette`, `SegmentedControl`, `Switch`, `Slider`, `TextInput`, `ColorInput`, `Select`, `Tabs`, `Table`, `CodeBlock`, `Collapsible`, `Breadcrumbs`, `Badge`, `Tooltip`, `Kbd`, …) plus the Dioxus router primitives `Link`/`Outlet` carrying library classes (`sd-sidebar-link`). The showcase never writes an interactive element by hand (`button`, `input`, `select`, `a` with behaviour). Hand-written markup is limited to static layout (`div`, `section`, `header`, `p`, `span`) styled by `.sc-*` classes in `showcase/assets/showcase.scss`, which use `--sd-*` tokens and the library mixins only: no colour literals, no colour utilities (the `--showcase` lint), no z-index numbers. Display sizes that the token scale does not provide (the hero title) are derived with `calc()` from a token, never written as raw px. Static tiles never look clickable (ADR-0002 rule 3).
+
+4. **Code samples cannot drift.** (a) The playground code is **generated** from the knob state by `story/knobs.rs` on every render: each `Control` declares how it appears in code (`Emit::Always`, `Emit::IfChanged`, `Emit::Template`, `Emit::Skip`), so flipping a knob changes both the live component and the code, and the changed line is highlighted. (b) The Cargo snippet is generated from `Story.features` and `shadow_design::VERSION`. (c) An `Example` is a pair `{ code, render }` declared side by side in the same story file; the migration checklist requires the two to match, and a story is not "Stable" until a reviewer has diffed them. Hand-typed props tables remain (deferred: deriving them from rustdoc needs a library change, see Consequences).
+
+5. **Non-component pages must render the library, not describe it.** The home page is a live product scene (a dashboard composed from `AppShell`-style layout, metric cards with sparklines, an area chart, a data table and toasts), a "preset wall" that shows the five accents simultaneously through nested `ThemeProvider`s, the real feature counters, and the install snippet. The Theme Builder stays (fixed layout bugs). `Tokens` (new, `/tokens`) renders every `--sd-*` token group live with the three radius scales and three glow modes side by side. `Typography` and `Icons` keep their routes and are restyled on the shared section vocabulary. No page is a wall of text or a tag cloud; every claim ("zero bloat", "one hex") is shown by a rendered component or a number computed from the registry.
+
+6. **Copy and voice.** Showcase copy is Italian; identifiers, code and token names are English. Story names are the Rust component name (`Button`, `Select`, `DataTable`), never decorated ("Component", "System", "(Mesh)"). Rustdoc stays English (unchanged).
+
+## Consequences
+
+- Removed: `showcase/src/components/{showcase_tabs,props_table,banner,controls}.rs`, the 85 per-component page files, the hand-written `use pages::{…}` list and the 89-variant `Route`. Adding a component to the showcase is now one new file plus one line in `stories/mod.rs`.
+- Three engineers can migrate stories in parallel: the scaffolding phase creates every `stories/<slug>.rs` as a `Story::stub(...)` and registers it, so later work edits only the story's own file (and deletes its legacy page under `showcase/legacy/`). No shared file is touched during migration.
+- The template imposes the same anatomy on `Divider` and on `Select`; sections with no data collapse, so small components get a short page rather than an empty frame.
+- Props tables are still typed by hand (duplicated knowledge). Deferred, needs its own ADR and a library change: a `PropsDoc` derive or a build-time rustdoc JSON scrape that the showcase can read.
+- The showcase lint stays as is (`--showcase`: no colour utilities, no hex). Structural rules that it cannot see (chrome built from library components, no hand-rolled interactive markup) are enforced by `cargo test -p showcase` (registry tests) and by review against `docs/showcase/REVAMP.md` §7.
+- Library bugs that the survey exposed on exactly the components the showcase must sell (open `Select` menu stacking, `DatePicker` popup clipping, truncated `SegmentedControl` labels) are not fixed here. They are listed in `REVAMP.md` §8 as library proposals.

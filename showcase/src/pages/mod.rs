@@ -1,179 +1,37 @@
-pub mod accordion;
-pub mod alerts;
-pub mod animation;
-pub mod app_shell;
-pub mod aspect_ratio;
-pub mod attachment_cards;
-pub mod avatars;
-pub mod badges;
-pub mod buttons;
-pub mod cards;
-pub mod chat;
-pub mod checkbox;
-pub mod dividers;
-pub mod grid;
-pub mod group;
-pub mod stack;
-pub mod center;
-pub mod drawer;
-pub mod dropdown;
-pub mod home;
-pub mod icons;
-pub mod inputs;
-pub mod lists;
-pub mod modals;
-pub mod navbar;
-pub mod notifications;
-pub mod progress;
-pub mod segmented_controls;
-pub mod select;
-pub mod skeletons;
-pub mod switch;
-pub mod tabs;
-pub mod textarea;
-pub mod theme_builder;
-pub mod tooltip;
-pub mod trees;
-pub mod number_input;
-pub mod radio;
-pub mod slider;
-pub mod rating;
-pub mod pin_input;
-pub mod color_picker;
-pub mod chip;
-pub mod typography;
-pub mod spoiler;
-pub mod timelines;
-pub mod tables;
-pub mod scroll_area;
-pub mod breadcrumbs;
-pub mod pagination;
-pub mod nav_link;
-pub mod bottom_navigation;
-pub mod stepper;
-pub mod menubar;
-pub mod popover;
-pub mod hover_card;
-pub mod context_menu;
-pub mod alert_dialog;
-pub mod coachmark;
-pub mod speed_dial;
-pub mod affix;
-pub mod burger;
-pub mod close_button;
-pub mod copy_button;
-pub mod indicator;
-pub mod highlight;
-pub mod loading_overlay;
-pub mod fieldset;
-pub mod marquee_selection;
-pub mod keytip;
-pub mod form;
-pub mod reactive_hooks;
-pub mod command_palette;
-pub mod date_picker;
-pub mod dropzone;
-pub mod resizable;
-pub mod carousel;
-pub mod virtual_list;
-pub mod code_highlight;
-pub mod charts;
-pub mod rich_text;
-pub mod document_card;
-pub mod masonry;
-pub mod media_card;
-pub mod navigation_menu;
-pub mod overflow_set;
-pub mod transfer_list;
-pub mod facepile;
-pub mod activity_feed;
+//! Non-component pages (REVAMP §2.4) and the foundation table used by sidebar, search and home.
+mod home;
+mod icons;
+mod not_found;
+mod theme_builder;
+mod tokens;
+mod typography;
 
-pub use accordion::AccordionPage;
-pub use alerts::AlertsPage;
-pub use animation::AnimationsPage;
-pub use app_shell::AppShellPage;
-pub use aspect_ratio::AspectRatioPage;
-pub use attachment_cards::AttachmentCardsPage;
-pub use avatars::AvatarsPage;
-pub use badges::BadgesPage;
-pub use buttons::ButtonsPage;
-pub use cards::CardsPage;
-pub use chat::ChatPage;
-pub use checkbox::CheckboxPage;
-pub use dividers::DividersPage;
-pub use grid::GridPage;
-pub use group::GroupPage;
-pub use stack::StackPage;
-pub use center::CenterPage;
-pub use drawer::DrawerPage;
-pub use dropdown::DropdownPage;
 pub use home::Home;
 pub use icons::IconsPage;
-pub use inputs::InputsPage;
-pub use lists::ListsPage;
-pub use modals::ModalsPage;
-pub use navbar::NavbarDemoPage;
-pub use notifications::NotificationsPage;
-pub use progress::ProgressPage;
-pub use segmented_controls::SegmentedControlsPage;
-pub use select::SelectPage;
-pub use skeletons::SkeletonsPage;
-pub use switch::SwitchPage;
-pub use tabs::TabsPage;
-pub use textarea::TextareaPage;
+pub use not_found::NotFound;
 pub use theme_builder::ThemeBuilderPage;
-pub use tooltip::TooltipPage;
-pub use trees::TreesPage;
-pub use number_input::NumberInputPage;
-pub use radio::RadioPage;
-pub use slider::SliderPage;
-pub use rating::RatingPage;
-pub use pin_input::PinInputPage;
-pub use color_picker::ColorPickerPage;
-pub use chip::ChipPage;
+pub use tokens::TokensPage;
 pub use typography::TypographyPage;
-pub use spoiler::SpoilerPage;
-pub use timelines::TimelinesPage;
-pub use tables::TablesPage;
-pub use scroll_area::ScrollAreaPage;
-pub use breadcrumbs::BreadcrumbsPage;
-pub use pagination::PaginationPage;
-pub use nav_link::NavLinkPage;
-pub use bottom_navigation::BottomNavigationPage;
-pub use stepper::StepperPage;
-pub use menubar::MenubarPage;
-pub use popover::PopoverPage;
-pub use hover_card::HoverCardPage;
-pub use context_menu::ContextMenuPage;
-pub use alert_dialog::AlertDialogPage;
-pub use coachmark::CoachmarkPage;
-pub use speed_dial::SpeedDialPage;
-pub use affix::AffixPage;
-pub use burger::BurgerPage;
-pub use close_button::CloseButtonPage;
-pub use copy_button::CopyButtonPage;
-pub use indicator::IndicatorPage;
-pub use highlight::HighlightPage;
-pub use loading_overlay::LoadingOverlayPage;
-pub use fieldset::FieldsetPage;
-pub use marquee_selection::MarqueeSelectionPage;
-pub use keytip::KeytipPage;
-pub use form::FormValidationPage;
-pub use reactive_hooks::ReactiveHooksPage;
-pub use command_palette::CommandPalettePage;
-pub use date_picker::DatePickerPage;
-pub use dropzone::DropzonePage;
-pub use resizable::ResizablePage;
-pub use carousel::CarouselPage;
-pub use virtual_list::VirtualListPage;
-pub use code_highlight::CodeHighlightPage;
-pub use charts::ChartsPage;
-pub use rich_text::RichTextPage;
-pub use document_card::DocumentCardPage;
-pub use masonry::MasonryPage;
-pub use media_card::MediaCardPage;
-pub use navigation_menu::NavigationMenuPage;
-pub use overflow_set::OverflowSetPage;
-pub use transfer_list::TransferListPage;
-pub use facepile::FacepilePage;
-pub use activity_feed::ActivityFeedPage;
+
+use crate::Route;
+use shadow_design::prelude::IconKind;
+
+pub struct FoundationPage {
+    pub name: &'static str,
+    pub route: Route,
+    pub icon: IconKind,
+    pub blurb: &'static str,
+}
+
+pub const FOUNDATION: &[FoundationPage] = &[
+    FoundationPage { name: "Panoramica", route: Route::Home {}, icon: IconKind::Sparkles, blurb: "Scene reali, preset e installazione." },
+    FoundationPage {
+        name: "Theme Builder",
+        route: Route::ThemeBuilderPage {},
+        icon: IconKind::Palette,
+        blurb: "Progetta il tema e copia il codice Rust.",
+    },
+    FoundationPage { name: "Tokens", route: Route::TokensPage {}, icon: IconKind::Layers, blurb: "Ogni variabile --sd-* resa dal vivo." },
+    FoundationPage { name: "Typography", route: Route::TypographyPage {}, icon: IconKind::Code, blurb: "Kanit, Onest, Source Code Pro." },
+    FoundationPage { name: "Icons", route: Route::IconsPage {}, icon: IconKind::Search, blurb: "Icone SVG native, stroke 1.5." },
+];

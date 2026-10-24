@@ -1,5 +1,6 @@
 // ==============================================================================
-// Showcase chrome (.sc-*). Tokens only (--sd-*): no colour literals, no hex.
+// Showcase chrome (.sc-*), ADR-0006 §3. Tokens (--sd-*) and library mixins only:
+// no colour literals, no numeric z-index, no raw px font sizes.
 //
 // Layer choice: `sc-showcase` is appended AFTER the library layers
 // (sd-reset .. sd-theme). The showcase is the consumer of the library, so its
@@ -15,24 +16,34 @@
     --sc-header-h: 3.5rem;
     --sc-sidebar-w: 16rem;
     --sc-sidebar-w-collapsed: 4.25rem;
-    --sc-page-w: 56rem;
+    --sc-page-w: 72rem;
+    --sc-page-w-wide: 80rem;
+    --sc-section-gap: var(--sd-space-10);
   }
 
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
   // Shell
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
+  .sc-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-width: 0;
+  }
+
   .sc-topbar {
     position: sticky;
     top: 0;
     // z-order comes from the library class .z-layer-header on the element
     display: flex;
     align-items: center;
-    gap: var(--sd-space-3);
+    gap: var(--sd-space-2);
     height: var(--sc-header-h);
     padding-inline: var(--sd-space-3);
     border-bottom: 1px solid var(--sd-border);
     background-color: var(--sd-void);
     @include bp-up(sm) {
+      gap: var(--sd-space-3);
       padding-inline: var(--sd-space-6);
     }
   }
@@ -44,8 +55,8 @@
     min-width: 0;
     color: var(--sd-text);
     text-decoration: none;
-    @include sd-focus-ring;
     border-radius: var(--sd-radius-md);
+    @include sd-focus-ring;
 
     &__logo {
       height: 2rem;
@@ -56,13 +67,14 @@
     &__text {
       display: flex;
       flex-direction: column;
-      line-height: 1.1;
+      line-height: var(--sd-leading-tight);
       min-width: 0;
     }
 
     &__name {
+      font-family: var(--sd-font-heading);
+      font-weight: var(--sd-weight-heading);
       font-size: var(--sd-text-lg);
-      font-weight: 600;
       white-space: nowrap;
     }
 
@@ -83,24 +95,15 @@
     flex: 1;
   }
 
-  // Version badge: hidden on small screens, the sidebar footer repeats it.
-  .sc-hide-below-lg {
-    display: none;
-    @include bp-up(lg) {
-      display: inline-flex;
-    }
+  .sc-kbd-hint {
+    margin-inline-start: var(--sd-space-1);
   }
 
-  .sc-hide-below-xl {
+  // Breakpoint visibility helpers.
+  .sc-hide-below-sm {
     display: none;
-    @include bp-up(xl) {
-      display: flex;
-    }
-  }
-
-  .sc-hide-xl {
-    @include bp-up(xl) {
-      display: none;
+    @include bp-up(sm) {
+      display: inline;
     }
   }
 
@@ -111,86 +114,17 @@
     }
   }
 
-  // Search trigger: a field-like button that opens the palette.
-  .sc-search {
-    @include sd-field(sm);
+  .sc-hide-below-lg {
+    display: none;
+    @include bp-up(lg) {
+      display: inline-flex;
+    }
+  }
+
+  .sc-only-below-md {
     display: inline-flex;
-    align-items: center;
-    gap: var(--sd-space-2);
-    padding-inline: var(--sd-space-3);
-    color: var(--sd-text-muted);
-    font-size: var(--sd-text-sm);
-    cursor: pointer;
-    @include sd-transition;
-    @include sd-focus-ring;
-    @include sd-press(0.98);
-
-    &__label {
+    @include bp-up(md) {
       display: none;
-      @include bp-up(sm) {
-        display: inline;
-      }
-    }
-  }
-
-  // Theme toolbar: fixed-width segments so nothing shifts when a value changes.
-  .sc-toolbar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--sd-space-3);
-
-    &__group {
-      display: flex;
-      align-items: center;
-      gap: var(--sd-space-2);
-    }
-
-    &__seg {
-      flex: none;
-      &--radius { width: 13rem; }
-      &--glow { width: 15rem; }
-    }
-
-    &__swatches {
-      display: flex;
-      align-items: center;
-      gap: var(--sd-space-2);
-      min-width: 8.5rem;
-    }
-  }
-
-  // Second toolbar row, shown under the top bar below the xl breakpoint.
-  .sc-toolrow {
-    padding: var(--sd-space-2) var(--sd-space-3);
-    border-bottom: 1px solid var(--sd-border);
-    background-color: var(--sd-surface-1);
-    @include bp-up(sm) {
-      padding-inline: var(--sd-space-6);
-    }
-    @include bp-up(xl) {
-      display: none;
-    }
-  }
-
-  .sc-swatch {
-    width: 1.25rem;
-    height: 1.25rem;
-    padding: 0;
-    flex: none;
-    border-radius: var(--sd-radius-full);
-    border: 1px solid var(--sd-border-strong);
-    cursor: pointer;
-    @include sd-shadow;
-    @include sd-transition;
-    @include sd-focus-ring;
-    @include sd-hover {
-      border-color: var(--sd-border-hover);
-    }
-
-    &--active {
-      border-color: var(--sd-text);
-      --sd-shadow-glow: var(--sd-glow-sm);
     }
   }
 
@@ -198,7 +132,7 @@
     flex: 1;
     display: flex;
     width: 100%;
-    max-width: 80rem;
+    max-width: 100rem;
     margin-inline: auto;
     min-width: 0;
   }
@@ -228,7 +162,7 @@
     }
   }
 
-  // The same navigation inside the mobile Drawer.
+  // The same navigation inside the mobile Drawer, with its filter field on top.
   .sc-sidebar-drawer {
     display: flex;
     flex-direction: column;
@@ -245,17 +179,13 @@
       display: flex;
       align-items: center;
       gap: var(--sd-space-2);
+      margin: 0 0 var(--sd-space-1);
       padding-inline: var(--sd-space-3);
-      margin-bottom: var(--sd-space-1);
       font-family: var(--sd-font-mono);
       font-size: var(--sd-text-2xs);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--sd-text-subtle);
-
-      &--accent {
-        color: var(--sd-accent-strong);
-      }
     }
 
     &__sep {
@@ -263,37 +193,47 @@
       margin-block: var(--sd-space-1);
       border-top: 1px solid var(--sd-border-subtle);
     }
+
+    &__empty {
+      margin: 0;
+      padding-inline: var(--sd-space-3);
+    }
   }
 
-  .sc-theme-card {
-    @include sd-surface(1);
-    margin-top: auto;
-    padding: var(--sd-space-3);
+  .sc-sidebar--collapsed .sd-sidebar-link {
+    justify-content: center;
+    padding-inline: 0;
     width: 100%;
-    font-size: var(--sd-text-xs);
+  }
 
-    &__row {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--sd-space-2);
+  .sc-sidebar .sd-sidebar-link,
+  .sc-sidebar-drawer .sd-sidebar-link {
+    text-decoration: none;
+  }
+
+  // "Tema attivo" card at the bottom of the sidebar (a library Card).
+  .sc-theme-card {
+    margin-top: auto;
+    width: 100%;
+
+    &__rows {
+      margin: 0;
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: var(--sd-space-1) var(--sd-space-3);
       font-family: var(--sd-font-mono);
-      color: var(--sd-text-subtle);
+      font-size: var(--sd-text-xs);
 
-      strong {
-        font-weight: 500;
-        color: var(--sd-text);
+      dt {
+        color: var(--sd-text-subtle);
       }
-    }
 
-    &__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--sd-space-2);
-      padding-bottom: var(--sd-space-2);
-      border-bottom: 1px solid var(--sd-border-subtle);
-      color: var(--sd-text);
-      font-weight: 500;
+      dd {
+        margin: 0;
+        text-align: right;
+        color: var(--sd-text);
+        overflow-wrap: anywhere;
+      }
     }
   }
 
@@ -306,120 +246,25 @@
     }
   }
 
-  // Every page shares one width. The root element of a page may carry a layout
-  // utility such as max-w-4xl, it is neutralised here on purpose.
+  // Every page shares one column; the home page is wider.
   .sc-page {
     width: 100%;
     max-width: var(--sc-page-w);
+    margin-inline: auto;
 
     > * {
       max-width: none;
     }
   }
 
-  .sc-page-header {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sd-space-2);
-    margin-bottom: var(--sd-space-6);
+  .sc-page--wide {
+    max-width: var(--sc-page-w-wide);
   }
 
-  .sc-page-title {
-    margin: 0;
-    font-size: var(--sd-text-2xl);
-    font-weight: 700;
-    line-height: var(--sd-leading-tight);
-    color: var(--sd-text);
-    overflow-wrap: anywhere;
-  }
-
-  .sc-page-desc {
-    margin: 0;
-    font-size: var(--sd-text-md);
-    line-height: var(--sd-leading-normal);
-    color: var(--sd-text-muted);
-    max-width: 44rem;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Showcase panel (tabs: Playground / Codice / API) and playground vocabulary
-  // ---------------------------------------------------------------------------
-  .sc-panel {
-    @include sd-surface(1);
-    overflow: visible; // floating menus must not be clipped (AGENTS.md §4)
-
-    &__head {
-      padding: var(--sd-space-3) var(--sd-space-4);
-      background-color: var(--sd-tint-1);
-      border-bottom: 1px solid var(--sd-border-subtle);
-      border-top-left-radius: inherit;
-      border-top-right-radius: inherit;
-      overflow-x: auto;
-    }
-
-    &__body {
-      padding: var(--sd-space-4);
-      @include bp-up(sm) {
-        padding: var(--sd-space-6);
-      }
-    }
-  }
-
-  .sc-playground {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sd-space-6);
-    align-items: start;
-    @include bp-up(lg) {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    }
-  }
-
-  // Demo stage: static, flat-lit, centred. Never reacts to the pointer.
-  .sc-stage {
-    @include sd-surface(1);
-    border-radius: var(--sd-radius-md);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--sd-space-4);
-    min-height: 9rem;
-    padding: var(--sd-space-6);
-    min-width: 0;
-
-    &--start {
-      align-items: stretch;
-      justify-content: flex-start;
-    }
-
-    &--wide {
-      grid-column: 1 / -1;
-    }
-  }
-
-  .sc-controls {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sd-space-4);
-    min-width: 0;
-  }
-
-  .sc-control {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--sd-space-2);
-    min-width: 0;
-    max-width: 100%;
-
-    > .sd-segmented-control {
-      max-width: 100%;
-      overflow-x: auto;
-    }
-  }
-
-  .sc-control-label {
+  // ===========================================================================
+  // Type
+  // ===========================================================================
+  .sc-eyebrow {
     font-family: var(--sd-font-mono);
     font-size: var(--sd-text-2xs);
     letter-spacing: 0.08em;
@@ -427,19 +272,345 @@
     color: var(--sd-text-subtle);
   }
 
-  .sc-control-row {
+  .sc-title {
+    margin: 0;
+    font-family: var(--sd-font-heading);
+    font-weight: 700;
+    font-size: var(--sd-text-2xl);
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+    overflow-wrap: anywhere;
+  }
+
+  .sc-display {
+    @extend .sc-title;
+    // Display size derived from the scale (ADR-0006 §3): never a raw px.
+    font-size: calc(var(--sd-text-3xl) * 1.5);
+    @include bp-up(lg) {
+      font-size: calc(var(--sd-text-3xl) * 1.85);
+    }
+  }
+
+  .sc-lede {
+    margin: 0;
+    font-size: var(--sd-text-md);
+    line-height: var(--sd-leading-normal);
+    color: var(--sd-text-muted);
+    max-width: 44rem;
+  }
+
+  .sc-lede--lg {
+    font-size: var(--sd-text-lg);
+  }
+
+  .sc-hint {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+  }
+
+  .sc-readout {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-accent-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sc-num {
+    font-family: var(--sd-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Coloured text without colour utilities.
+  .sc-accent-text { color: var(--sd-accent-strong); }
+  .sc-muted-text { color: var(--sd-text-muted); }
+  .sc-subtle-text { color: var(--sd-text-subtle); }
+  .sc-success-text { color: var(--sd-success-strong); }
+  .sc-warning-text { color: var(--sd-warning-strong); }
+  .sc-danger-text { color: var(--sd-danger-strong); }
+  .sc-info-text { color: var(--sd-info-strong); }
+  .sc-mono { font-family: var(--sd-font-mono); }
+
+  .sc-counter {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+    font-variant-numeric: tabular-nums;
+
+    strong {
+      font-weight: 500;
+      color: var(--sd-accent-strong);
+    }
+  }
+
+  // ===========================================================================
+  // Sections
+  // ===========================================================================
+  .sc-story,
+  .sc-home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sc-section-gap);
+    min-width: 0;
+  }
+
+  .sc-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-6);
+    min-width: 0;
+  }
+
+  .sc-section__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-1);
+  }
+
+  .sc-section__head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sd-space-3);
+  }
+
+  .sc-section__title {
+    margin: 0;
+    font-family: var(--sd-font-heading);
+    font-weight: var(--sd-weight-heading);
+    font-size: var(--sd-text-xl);
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+  }
+
+  .sc-section__desc {
+    margin: 0;
+    font-size: var(--sd-text-sm);
+    color: var(--sd-text-muted);
+  }
+
+  // Generic layout helpers kept for stories.
+  .sc-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-stack--loose {
+    gap: var(--sd-space-6);
+  }
+
+  .sc-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--sd-space-2) var(--sd-space-6);
+    gap: var(--sd-space-2);
   }
 
-  .sc-control-divider {
-    height: 0;
+  .sc-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sd-space-3);
+  }
+
+  .sc-card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    @include bp-up(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > * {
+      min-width: 0;
+      height: 100%;
+    }
+
+    &--3 {
+      @include bp-up(lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  }
+
+  .sc-list {
     margin: 0;
-    border: 0;
-    border-top: 1px solid var(--sd-border-subtle);
-    align-self: stretch;
+    padding-left: var(--sd-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+    color: var(--sd-text-muted);
+    font-size: var(--sd-text-sm);
+  }
+
+  // ===========================================================================
+  // Story head
+  // ===========================================================================
+  .sc-story__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+  }
+
+  .sc-story__title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--sd-space-4);
+  }
+
+  .sc-story__title-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+    flex: 1;
+    min-width: min(16rem, 100%);
+  }
+
+  .sc-story__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sd-space-2);
+  }
+
+  .sc-story__cargo {
+    max-width: 56rem;
+    min-width: 0;
+  }
+
+  // Static icon square (story head, home cards). Never interactive.
+  .sc-icon-tile {
+    @include sd-surface(1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--sd-control-lg);
+    height: var(--sd-control-lg);
+    color: var(--sd-accent-strong);
+  }
+
+  // ===========================================================================
+  // Playground
+  // ===========================================================================
+  .sc-playground {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-6);
+    align-items: start;
+    @include bp-up(lg) {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+
+  .sc-playground__stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-playground__knobs {
+    @include sd-surface(1);
+    padding: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-knobs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+  }
+
+  .sc-knobs__flags {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: var(--sd-space-3) var(--sd-space-4);
+  }
+
+  .sc-knob {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+    min-width: 0;
+  }
+
+  .sc-knob__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sd-space-2);
+  }
+
+  // Stage: static, flat-lit, never reacts to the pointer. Overflow visible so menus escape.
+  // Children are laid out with gap only (never margins), so fixed-position overlays
+  // rendered inside a stage cannot inherit a layout offset (language.md §3.3).
+  .sc-stage {
+    @include sd-surface(1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sd-space-4);
+    min-height: 12rem;
+    padding: var(--sd-space-6);
+    min-width: 0;
+    overflow: visible;
+
+    &--start {
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    &--form {
+      align-items: center;
+
+      > * {
+        width: 100%;
+        max-width: 24rem;
+      }
+    }
+
+    &--fill {
+      align-items: stretch;
+      justify-content: flex-start;
+      min-height: 20rem;
+      padding: var(--sd-space-4);
+    }
+  }
+
+  // ===========================================================================
+  // Examples
+  // ===========================================================================
+  .sc-examples {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    @include bp-up(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  .sc-example--full {
+    grid-column: 1 / -1;
+  }
+
+  .sc-example__stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-3);
+    min-height: 6rem;
+    min-width: 0;
+    justify-content: center;
   }
 
   // Static layout tile for grid/group/stack/masonry/center/aspect-ratio demos.
@@ -488,89 +659,40 @@
     background-color: var(--sd-well);
   }
 
-  // ---------------------------------------------------------------------------
-  // Text helpers (coloured text without colour utilities)
-  // ---------------------------------------------------------------------------
-  .sc-accent-text { color: var(--sd-accent-strong); }
-  .sc-muted-text { color: var(--sd-text-muted); }
-  .sc-subtle-text { color: var(--sd-text-subtle); }
-  .sc-success-text { color: var(--sd-success-strong); }
-  .sc-warning-text { color: var(--sd-warning-strong); }
-  .sc-danger-text { color: var(--sd-danger-strong); }
-  .sc-info-text { color: var(--sd-info-strong); }
-  .sc-mono { font-family: var(--sd-font-mono); }
-
-  .sc-counter {
-    font-family: var(--sd-font-mono);
-    font-size: var(--sd-text-xs);
-    color: var(--sd-text-subtle);
-    font-variant-numeric: tabular-nums;
-
-    strong {
-      font-weight: 500;
-      color: var(--sd-accent-strong);
+  // ===========================================================================
+  // Notes, props, related, prev/next
+  // ===========================================================================
+  .sc-notes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    @include bp-up(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .sc-section-title {
+  .sc-dl {
     margin: 0;
-    font-size: var(--sd-text-lg);
-    font-weight: 600;
-    line-height: var(--sd-leading-tight);
-    color: var(--sd-text);
-  }
-
-  .sc-kbd {
-    display: inline-block;
-    padding: 1px var(--sd-space-1);
-    border: 1px solid var(--sd-border-subtle);
-    border-radius: var(--sd-radius-xs);
-    background-color: var(--sd-tint-3);
-    color: var(--sd-text-muted);
-    font-family: var(--sd-font-mono);
-    font-size: var(--sd-text-2xs);
-    line-height: 1.4;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Feature banner, props table
-  // ---------------------------------------------------------------------------
-  .sc-banner {
-    @include sd-surface(1);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
     gap: var(--sd-space-2) var(--sd-space-4);
-    margin-bottom: var(--sd-space-6);
-    padding: var(--sd-space-3) var(--sd-space-4);
     font-size: var(--sd-text-sm);
 
-    &__label {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--sd-space-2);
-      font-family: var(--sd-font-mono);
-      font-size: var(--sd-text-2xs);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--sd-accent-strong);
+    dt {
+      @extend .sc-eyebrow;
+      padding-top: var(--sd-space-1);
     }
 
-    &__code {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--sd-space-2);
-      min-width: 0;
-      overflow-wrap: anywhere;
+    dd {
+      margin: 0;
+      color: var(--sd-text-muted);
     }
+  }
 
-    &__hint {
-      font-family: var(--sd-font-mono);
-      font-size: var(--sd-text-xs);
-      color: var(--sd-text-subtle);
-    }
+  .sc-dl__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sd-space-1);
   }
 
   .sc-props {
@@ -583,79 +705,168 @@
     &__desc { color: var(--sd-text-muted); line-height: var(--sd-leading-normal); }
   }
 
-  // ---------------------------------------------------------------------------
-  // Home and theme builder
-  // ---------------------------------------------------------------------------
-  .sc-card-grid {
+  .sc-related {
     display: grid;
-
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--sd-space-4);
+    gap: var(--sd-space-2);
     @include bp-up(md) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    > * {
-      min-width: 0;
-      height: 100%;
-    }
-
-    &--3 {
-      @include bp-up(lg) {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    @include bp-up(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  .sc-stack {
+  .sc-prevnext {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sd-space-3);
+    padding-top: var(--sd-space-6);
+    border-top: 1px solid var(--sd-border-subtle);
+  }
+
+  // ===========================================================================
+  // Theme menu & swatches
+  // ===========================================================================
+  .sc-swatches {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sd-space-1);
+  }
+
+  .sc-swatch {
+    padding-inline: var(--sd-space-1);
+  }
+
+  .sc-swatch--active .sc-dot {
+    outline: 2px solid var(--sd-text);
+    outline-offset: 2px;
+  }
+
+  .sc-dot {
+    display: inline-block;
+    width: var(--sd-icon-md);
+    height: var(--sd-icon-md);
+    border-radius: var(--sd-radius-full);
+    border: 1px solid var(--sd-border-strong);
+    flex: none;
+  }
+
+  .sc-dot--accent {
+    margin-inline-end: var(--sd-space-1);
+    background-color: var(--sd-accent);
+    @include sd-shadow($glow: var(--sd-glow-sm));
+  }
+
+  .sc-theme-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    width: 18rem;
+    max-width: calc(100vw - var(--sd-space-8));
+  }
+
+  .sc-theme-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-3);
+  }
+
+  // ===========================================================================
+  // Home
+  // ===========================================================================
+  .sc-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-8);
+    align-items: center;
+    @include bp-up(lg) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  .sc-hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-5);
+    min-width: 0;
+  }
+
+  .sc-hero__swatches {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+  }
+
+  .sc-scene {
+    @include sd-surface(1);
+    padding: var(--sd-space-3);
+    min-width: 0;
+    overflow: visible;
+    @include bp-up(sm) {
+      padding: var(--sd-space-4);
+    }
+
+    &--hero {
+      min-height: 30rem;
+    }
+  }
+
+  .sc-preset-wall {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 16rem;
+    gap: var(--sd-space-4);
+    padding-bottom: var(--sd-space-2);
+    @include bp-up(lg) {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-columns: auto;
+    }
+  }
+
+  .sc-preset-tile {
+    height: 100%;
+    min-width: 0;
+  }
+
+  .sc-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sd-space-4);
+    @include bp-up(md) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .sc-stat {
+    text-align: center;
+  }
+
+  .sc-stat__value {
+    display: block;
+    font-family: var(--sd-font-heading);
+    font-weight: var(--sd-weight-heading);
+    font-size: var(--sd-text-3xl);
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  // ===========================================================================
+  // Scenes (scenes/*.rs)
+  // ===========================================================================
+  .sc-scene-body {
     display: flex;
     flex-direction: column;
     gap: var(--sd-space-4);
     min-width: 0;
   }
 
-  .sc-stack--loose {
-    gap: var(--sd-space-6);
-  }
-
-  .sc-hero {
-    @include sd-surface(1);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--sd-space-4);
-    padding: var(--sd-space-6);
-    @include bp-up(sm) {
-      padding: var(--sd-space-8);
-    }
-
-    &__title {
-      margin: 0;
-      font-size: var(--sd-text-3xl);
-      font-weight: 700;
-      line-height: var(--sd-leading-tight);
-      color: var(--sd-text);
-    }
-  }
-
-  .sc-list {
-    margin: 0;
-    padding-left: var(--sd-space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--sd-space-2);
-    color: var(--sd-text-muted);
-    font-size: var(--sd-text-sm);
-  }
-
-  .sc-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sd-space-2);
-  }
-
-  .sc-title-row {
+  .sc-scene__head,
+  .sc-scene__foot {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -663,97 +874,380 @@
     gap: var(--sd-space-3);
   }
 
-  // Theme builder
-  .sc-builder-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sd-space-8);
-    @include bp-up(lg) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  .sc-tabs-head {
-    margin-bottom: var(--sd-space-4);
-    overflow-x: auto;
-  }
-
-  .sc-tabs-body {
+  .sc-scene__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-1);
     min-width: 0;
   }
 
-  .sc-token {
-    display: flex;
-    gap: var(--sd-space-3);
-    align-items: stretch;
-    padding: var(--sd-space-3);
-    border: 1px solid var(--sd-border);
-    border-radius: var(--sd-radius-md);
-    background-color: var(--sd-surface-1);
+  .sc-scene__title {
+    font-family: var(--sd-font-heading);
+    font-weight: var(--sd-weight-heading);
+    font-size: var(--sd-text-lg);
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+  }
 
-    &__swatch {
-      flex: none;
-      width: 3.5rem;
-      border: 1px solid var(--sd-border-strong);
-      border-radius: var(--sd-radius-sm);
-    }
+  .sc-metric {
+    min-width: 0;
 
+    // Text above, sparkline below: the card never squeezes the value to one word per line.
     &__body {
       display: flex;
       flex-direction: column;
-      gap: var(--sd-space-1);
-      flex: 1;
-      min-width: 0;
-      font-size: var(--sd-text-xs);
+      gap: var(--sd-space-2);
     }
 
-    &__inputs {
+    &__text {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-1);
+      min-width: 0;
+    }
+
+    &__spark {
+      max-width: 100%;
+    }
+
+    &__value {
+      font-family: var(--sd-font-heading);
+      font-weight: var(--sd-weight-heading);
+      font-size: var(--sd-text-2xl);
+      line-height: var(--sd-leading-tight);
+      color: var(--sd-text);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .sc-settings {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+
+    &--split {
+      @include bp-up(lg) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  .sc-inbox {
+    min-width: 0;
+
+    &__row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-1);
+      min-width: 0;
+      flex: 1;
+    }
+
+    &__line {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: var(--sd-space-2);
-      margin-top: var(--sd-space-1);
+      min-width: 0;
+    }
 
-      .sd-input {
-        flex: 1;
-        min-width: 0;
+    &__from {
+      font-weight: 500;
+      color: var(--sd-text-muted);
+
+      &--unread {
+        color: var(--sd-text);
+      }
+    }
+
+    &__subject {
+      color: var(--sd-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__preview {
+      margin: 0;
+      font-size: var(--sd-text-sm);
+      color: var(--sd-text-subtle);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .sc-auth {
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: auto;
+
+    &--compact {
+      max-width: 24rem;
+    }
+
+    &__pin {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-2);
+    }
+  }
+
+  // ===========================================================================
+  // Tokens, typography, icons pages
+  // ===========================================================================
+  .sc-token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: var(--sd-space-3);
+
+    > * {
+      min-width: 0;
+    }
+
+    &--2 {
+      grid-template-columns: minmax(0, 1fr);
+      @include bp-up(md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    &--3 {
+      grid-template-columns: minmax(0, 1fr);
+      @include bp-up(md) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
   }
 
-  .sc-color-input {
-    flex: none;
-    width: var(--sd-control-md);
-    height: var(--sd-control-md);
-    padding: 0;
-    border: 1px solid var(--sd-border-strong);
-    border-radius: var(--sd-radius-md);
-    background: transparent;
-    cursor: pointer;
-    @include sd-focus-ring;
-  }
+  // Static token tile: swatch painted with the token, name, resolved value.
+  .sc-token-chip {
+    @include sd-surface(1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-1);
+    padding: var(--sd-space-3);
+    min-width: 0;
 
-  .sc-textarea {
-    width: 100%;
-    min-height: 6rem;
-  }
+    &__swatch {
+      display: block;
+      height: var(--sd-control-md);
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-sm);
+      margin-bottom: var(--sd-space-1);
+    }
 
-}
-
-@layer sc-showcase {
-  .sc-only-below-md {
-    @include bp-up(md) {
-      display: none;
+    &__name {
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text);
+      overflow-wrap: anywhere;
     }
   }
 
-  .sc-sidebar--collapsed .sd-sidebar-link {
-    justify-content: center;
-    padding-inline: 0;
-    width: 100%;
+  .sc-scope-tile {
+    height: 100%;
+    min-width: 0;
   }
 
-  .sc-sidebar .sd-sidebar-link,
-  .sc-sidebar-drawer .sd-sidebar-link {
-    text-decoration: none;
+  // Surfaces: five nested boxes, one per level.
+  .sc-nest {
+    min-width: 0;
+  }
+
+  .sc-nest__box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-3);
+    padding: var(--sd-space-3);
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-lg);
+    min-width: 0;
+    @include bp-up(sm) {
+      padding: var(--sd-space-4);
+    }
+  }
+
+  .sc-nest__label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sd-space-2);
+  }
+
+  .sc-ruler {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sd-space-6);
+
+    &__row {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--sd-space-2);
+      flex-wrap: wrap;
+    }
+
+    &__bar {
+      display: block;
+      width: var(--sd-space-1);
+      border-radius: var(--sd-radius-full);
+      background-color: var(--sd-border-strong);
+    }
+  }
+
+  .sc-type-scale {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-3);
+
+    &__row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sd-space-1);
+      align-items: baseline;
+      @include bp-up(md) {
+        grid-template-columns: 12rem minmax(0, 1fr);
+        gap: var(--sd-space-4);
+      }
+    }
+
+    &__sample {
+      color: var(--sd-text);
+      line-height: var(--sd-leading-tight);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .sc-role {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-3);
+  }
+
+  .sc-specimen {
+    font-size: var(--sd-text-3xl);
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+
+    &--heading {
+      font-family: var(--sd-font-heading);
+      font-weight: var(--sd-weight-heading);
+    }
+
+    &--body {
+      font-family: var(--sd-font-body);
+    }
+
+    &--mono {
+      font-family: var(--sd-font-mono);
+    }
+
+    &--glyphs {
+      font-size: var(--sd-text-lg);
+      color: var(--sd-text-muted);
+    }
+  }
+
+  .sc-icon-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    align-items: end;
+    @include bp-up(md) {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+  }
+
+  // Icon grid tile: static (it never looks clickable); only its CopyButton acts.
+  .sc-icon-tile-static {
+    @include sd-surface(1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sd-space-2);
+    padding: var(--sd-space-3);
+    min-width: 0;
+    cursor: default;
+
+    &__glyph {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3.5rem;
+      color: var(--sd-text);
+    }
+
+    &__name {
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      color: var(--sd-text-subtle);
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  // ===========================================================================
+  // Theme builder
+  // ===========================================================================
+  .sc-builder-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-8);
+    align-items: start;
+    @include bp-up(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    // Grid children must be allowed to shrink, or long labels squeeze siblings.
+    > * {
+      min-width: 0;
+    }
+  }
+
+  .sc-builder-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    padding-top: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-builder-presets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sd-space-3);
+      padding-top: var(--sd-space-3);
+      border-top: 1px solid var(--sd-border-subtle);
+    }
+  }
+
+  // Lets a Checkbox/Switch label take the free width and wrap normally instead of
+  // being squeezed to one word per line.
+  .sc-wrap-label {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+
+  .sc-builder-preview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    align-items: stretch;
+
+    > * {
+      min-width: 0;
+    }
   }
 }
