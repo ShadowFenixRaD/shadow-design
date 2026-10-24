@@ -35,8 +35,7 @@ impl UseClipboard {
                     } else {
                         const ta = document.createElement("textarea");
                         ta.value = text;
-                        ta.style.position = "fixed";
-                        ta.style.left = "-9999px";
+                        ta.setAttribute("style", "position:fixed;left:-9999px");
                         document.body.appendChild(ta);
                         ta.select();
                         ok = document.execCommand("copy");

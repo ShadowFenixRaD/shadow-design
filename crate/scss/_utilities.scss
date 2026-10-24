@@ -1,10 +1,7 @@
 // ==============================================================================
 // Shadow Design — Pure SCSS Universal Utility Engine (Zero-Tailwind Architecture)
 // ==============================================================================
-@use 'sass:math';
 @use 'sass:map';
-@use 'sass:color';
-@use 'variables' as *;
 @use 'zindex' as *;
 
 @layer sd-utilities {
@@ -322,13 +319,25 @@ $spacers: (
 // ------------------------------------------------------------------------------
 // 6. Typography & Text Styles (DS-08, DS-22, DS-29)
 // ------------------------------------------------------------------------------
-.font-sans  { font-family: $font-sans; }
-.font-mono  { font-family: $font-mono; }
+.font-sans  { font-family: var(--sd-font-sans); }
+.font-mono  { font-family: var(--sd-font-mono); }
 
 .text-\[9px\]   { font-size: 9px; line-height: 12px; }
 .text-\[10px\]  { font-size: 10px; line-height: 14px; }
 .text-\[11px\]  { font-size: 11px; line-height: 15px; }
 .text-\[13px\]  { font-size: 13px; line-height: 18px; }
+
+$type-scale: (
+  'xs':   (size: 0.75rem, line-height: 1rem),
+  'sm':   (size: 0.875rem, line-height: 1.25rem),
+  'base': (size: 1rem, line-height: 1.5rem),
+  'md':   (size: 1rem, line-height: 1.5rem),
+  'lg':   (size: 1.125rem, line-height: 1.75rem),
+  'xl':   (size: 1.25rem, line-height: 1.75rem),
+  '2xl':  (size: 1.5rem, line-height: 2rem),
+  '3xl':  (size: 1.875rem, line-height: 2.25rem),
+  '4xl':  (size: 2.25rem, line-height: 2.5rem)
+);
 
 @each $name, $scale in $type-scale {
   .text-#{$name} {
@@ -367,129 +376,29 @@ $spacers: (
 .truncate         { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .border-collapse  { border-collapse: collapse; }
 
-// ------------------------------------------------------------------------------
-// 7. Colors (Text, Backgrounds, Borders) Generati da Palette (DS-21)
-// ------------------------------------------------------------------------------
-.text-white      { color: #ffffff; }
-.text-black      { color: #000000; }
-.bg-black        { background-color: #000000; }
-.bg-white        { background-color: #ffffff; }
-.bg-transparent  { background-color: transparent; }
-
-// Loop generatore palette
-@each $family, $shades in $palette {
-  @each $step, $color in $shades {
-    .text-#{$family}-#{$step} { color: $color; }
-    .bg-#{$family}-#{$step}   { background-color: $color; }
-    .border-#{$family}-#{$step} { border-color: $color; }
-    .border-l-#{$family}-#{$step} { border-left-color: $color; }
-    .hover\:bg-#{$family}-#{$step}:hover { background-color: $color; }
-    .hover\:text-#{$family}-#{$step}:hover { color: $color; }
-
-    // Generazione classi opacità /alpha
-    @each $alpha in $alphas {
-      $a-dec: math.div($alpha, 100);
-      .bg-#{$family}-#{$step}\/#{$alpha} {
-        background-color: color.change($color, $alpha: $a-dec);
-      }
-      .border-#{$family}-#{$step}\/#{$alpha} {
-        border-color: color.change($color, $alpha: $a-dec);
-      }
-    }
-  }
-}
-
-// Opacità arbitrarie / specifiche su bianco e nero
-.bg-white\/\[0\.02\] { background-color: rgba(255, 255, 255, 0.02); }
-.bg-white\/\[0\.03\] { background-color: rgba(255, 255, 255, 0.03); }
-.bg-white\/\[0\.04\] { background-color: rgba(255, 255, 255, 0.04); }
-.bg-white\/\[0\.06\] { background-color: rgba(255, 255, 255, 0.06); }
-.bg-white\/\[0\.08\] { background-color: rgba(255, 255, 255, 0.08); }
-.bg-white\/10        { background-color: rgba(255, 255, 255, 0.10); }
-
-.bg-black\/60        { background-color: rgba(0, 0, 0, 0.6); }
-.bg-black\/80        { background-color: rgba(0, 0, 0, 0.8); }
-
-.hover\:bg-white\/\[0\.02\]:hover { background-color: rgba(255, 255, 255, 0.02); }
-.hover\:bg-white\/\[0\.04\]:hover { background-color: rgba(255, 255, 255, 0.04); }
-.hover\:bg-white\/\[0\.06\]:hover { background-color: rgba(255, 255, 255, 0.06); }
-.hover\:bg-white\/\[0\.08\]:hover { background-color: rgba(255, 255, 255, 0.08); }
-.hover\:text-white:hover { color: #ffffff; }
-.hover\:text-zinc-100:hover { color: $zinc-100; }
-.hover\:text-zinc-200:hover { color: $zinc-200; }
-
-// Palette theme swatches
-.bg-\[\#a855f7\] { background-color: #a855f7; }
-.bg-\[\#ffffff\] { background-color: #ffffff; }
-.bg-\[\#ff1744\] { background-color: #ff1744; }
-.bg-\[\#00f0ff\] { background-color: #00f0ff; }
-.bg-\[\#00ff9d\] { background-color: #00ff9d; }
-
-.shadow-\[0_0_6px_\#a855f7\] { box-shadow: 0 0 6px #a855f7; }
-.shadow-\[0_0_6px_\#ffffff\] { box-shadow: 0 0 6px #ffffff; }
-.shadow-\[0_0_6px_\#ff1744\] { box-shadow: 0 0 6px #ff1744; }
-.shadow-\[0_0_6px_\#00f0ff\] { box-shadow: 0 0 6px #00f0ff; }
-.shadow-\[0_0_6px_\#00ff9d\] { box-shadow: 0 0 6px #00ff9d; }
-.shadow-\[inset_0_1px_0_0_rgba\(255\,255\,255\,0\.06\)\] { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); }
-.drop-shadow-\[0_0_8px_rgba\(168\,85\,247\,0\.5\)\] { filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); }
-.shadow-black\/80 { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8); }
-
-.text-yellow-300 { color: #fde047; }
-.text-purple-200\/90 { color: rgba(233, 213, 255, 0.9); }
-
-// Superfici specifiche e optical depth
-.bg-\[\#030305\] { background-color: #030305; }
-.bg-\[\#060608\] { background-color: #060608; }
-.bg-\[\#07070b\] { background-color: #07070b; }
-.bg-\[\#07070a\]\/90 { background-color: rgba(7, 7, 10, 0.9); }
-.bg-\[\#09090d\] { background-color: #09090d; }
-.bg-\[\#0a0a0f\] { background-color: #0a0a0f; }
-.bg-\[\#0c0c12\] { background-color: #0c0c12; }
-.bg-\[\#0c0c12\]\/80 { background-color: rgba(12, 12, 18, 0.8); }
-.bg-\[\#0c0c12\]\/90 { background-color: rgba(12, 12, 18, 0.9); }
-.bg-\[\#0d0d14\] { background-color: #0d0d14; }
-.bg-\[\#0e0e14\] { background-color: #0e0e14; }
-.bg-\[\#0e0e1a\] { background-color: #0e0e1a; }
-.bg-\[\#0b1410\] { background-color: #0b1410; }
-.bg-\[\#111118\] { background-color: #111118; }
-.bg-\[\#12121c\] { background-color: #12121c; }
-.bg-\[\#141208\] { background-color: #141208; }
-.bg-\[\#14141c\] { background-color: #14141c; }
-.bg-\[\#170a0e\] { background-color: #170a0e; }
-
 // Borders base & opacità corrette (DS-21: border-white/10 = 0.10)
-.border          { border: 1px solid rgba(255, 255, 255, 0.15); }
-.border-t        { border-top: 1px solid rgba(255, 255, 255, 0.15); }
-.border-b        { border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
-.border-l        { border-left: 1px solid rgba(255, 255, 255, 0.15); }
-.border-r        { border-right: 1px solid rgba(255, 255, 255, 0.15); }
+.border          { border: 1px solid var(--sd-border); }
+.border-t        { border-top: 1px solid var(--sd-border); }
+.border-b        { border-bottom: 1px solid var(--sd-border); }
+.border-l        { border-left: 1px solid var(--sd-border); }
+.border-r        { border-right: 1px solid var(--sd-border); }
 .border-l-4      { border-left-width: 4px; }
 .border-none     { border: none; }
 
-.border-white    { border-color: #ffffff; }
-.border-white\/10 { border-color: rgba(255, 255, 255, 0.10); }
-.border-white\/15 { border-color: rgba(255, 255, 255, 0.15); }
-.border-white\/20 { border-color: rgba(255, 255, 255, 0.20); }
-.border-white\/\[0\.04\] { border-color: rgba(255, 255, 255, 0.04); }
-.border-white\/\[0\.05\] { border-color: rgba(255, 255, 255, 0.05); }
-.border-white\/\[0\.06\] { border-color: rgba(255, 255, 255, 0.06); }
-.border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.08); }
-.border-white\/\[0\.1\]   { border-color: rgba(255, 255, 255, 0.10); }
-.border-white\/\[0\.14\]  { border-color: rgba(255, 255, 255, 0.14); }
 
 // Corner Radii
 .rounded         { border-radius: 4px; }
-.rounded-sm      { border-radius: $radius-sharp; }
+.rounded-sm      { border-radius: var(--sd-radius-xs); }
 .rounded-md      { border-radius: 6px; }
 .rounded-lg      { border-radius: 8px; }
-.rounded-xl      { border-radius: $radius-md; }
-.rounded-2xl     { border-radius: $radius-lg; }
-.rounded-full    { border-radius: $radius-full; }
+.rounded-xl      { border-radius: var(--sd-radius-md); }
+.rounded-2xl     { border-radius: var(--sd-radius-lg); }
+.rounded-full    { border-radius: var(--sd-radius-full); }
 
-.rounded-t-xl    { border-top-left-radius: $radius-md; border-top-right-radius: $radius-md; }
-.rounded-b-xl    { border-bottom-left-radius: $radius-md; border-bottom-right-radius: $radius-md; }
-.rounded-t-2xl   { border-top-left-radius: $radius-lg; border-top-right-radius: $radius-lg; }
-.rounded-b-2xl   { border-bottom-left-radius: $radius-lg; border-bottom-right-radius: $radius-lg; }
+.rounded-t-xl    { border-top-left-radius: var(--sd-radius-md); border-top-right-radius: var(--sd-radius-md); }
+.rounded-b-xl    { border-bottom-left-radius: var(--sd-radius-md); border-bottom-right-radius: var(--sd-radius-md); }
+.rounded-t-2xl   { border-top-left-radius: var(--sd-radius-lg); border-top-right-radius: var(--sd-radius-lg); }
+.rounded-b-2xl   { border-bottom-left-radius: var(--sd-radius-lg); border-bottom-right-radius: var(--sd-radius-lg); }
 
 // ------------------------------------------------------------------------------
 // 8. Shadows, Blur & Effects
@@ -506,10 +415,10 @@ $spacers: (
 .backdrop-blur-md { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
 // Transforms & Transitions
-.transition-all       { transition: all $duration-normal ease; }
-.transition-colors    { transition: color $duration-fast ease, background-color $duration-fast ease, border-color $duration-fast ease; }
-.transition-transform { transition: transform $duration-fast ease; }
-.transition-opacity   { transition: opacity $duration-fast ease; }
+.transition-all       { transition: all var(--sd-dur) ease; }
+.transition-colors    { transition: color var(--sd-dur-fast) ease, background-color var(--sd-dur-fast) ease, border-color var(--sd-dur-fast) ease; }
+.transition-transform { transition: transform var(--sd-dur-fast) ease; }
+.transition-opacity   { transition: opacity var(--sd-dur-fast) ease; }
 .duration-150         { transition-duration: 150ms; }
 .duration-200         { transition-duration: 200ms; }
 
@@ -596,7 +505,6 @@ $spacers: (
 .min-h-\[360px\] { min-height: 360px; }
 .min-w-\[280px\] { min-width: 280px; }
 .bg-white\/\[0\.01\] { background-color: rgba(255, 255, 255, 0.01); }
-.border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.12); }
 .decoration-purple-500\/50 { text-decoration-color: rgba(168, 85, 247, 0.5); }
 
 // ------------------------------------------------------------------------------
@@ -635,7 +543,6 @@ $spacers: (
 .object-contain { object-fit: contain; }
 .opacity-0 { opacity: 0; }
 .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
-.placeholder-zinc-500::placeholder { color: $zinc-500; }
 .resize-none { resize: none; }
 .resize-y { resize: vertical; }
 .ring-black { box-shadow: 0 0 0 2px #000000; }
@@ -674,8 +581,6 @@ $spacers: (
 .border-blue-500\/30 { border-color: rgba(59, 130, 246, 0.3); }
 .border-l-2 { border-left-width: 2px; }
 .border-transparent { border-color: transparent; }
-.border-white\/5 { border-color: rgba(255, 255, 255, 0.05); }
-.border-white\/\[0\.10\] { border-color: rgba(255, 255, 255, 0.10); }
 
 .text-blue-200 { color: #bfdbfe; }
 .text-blue-300 { color: #93c5fd; }

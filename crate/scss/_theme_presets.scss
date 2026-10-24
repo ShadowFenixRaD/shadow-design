@@ -33,22 +33,6 @@
     color: var(--sd-accent-strong);
   }
 
-  // Theme::resolve_elevation_class("card", Some(true)).
-  // LEGACY bridge — moves to components/_cards.scss with the card migration.
-  .sd-card--glow {
-    border-color: var(--sd-accent-border);
-    box-shadow: var(--sd-specular), var(--sd-elev-1), var(--sd-glow-md);
-  }
-
-  // Explicit `glow: true` modifiers handed out by Theme fields for components
-  // whose partial has no --glow rule yet. Slot-only: they take effect once the
-  // partial uses sd-shadow. LEGACY bridge — move into the partial on migration.
-  .sd-input--glow,
-  .sd-alert--glow,
-  .sd-toast--glow {
-    --sd-shadow-glow: var(--sd-glow-sm);
-  }
-
   // ----------------------------------------------------------------------------
   // 3. Application shell (Theme::root / header / sidebar / sidebar_link /
   //    content / surface / panel / banner) and showcase toolbar helpers.
@@ -64,7 +48,7 @@
 
   .sd-header {
     border-bottom: 1px solid var(--sd-border);
-    background-color: rgba(3, 3, 5, 0.85);
+    background-color: color-mix(in srgb, var(--sd-void) 85%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     @include sd-shadow(var(--sd-specular), var(--sd-elev-1));

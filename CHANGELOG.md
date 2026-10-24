@@ -7,6 +7,27 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ## [Unreleased]
 
+### 🎨 Migrazione Lit Glass completata (ADR-0002, ADR-0003, ADR-0004)
+Tutti i componenti della libreria e lo showcase condividono un unico linguaggio visivo: superfici a livelli, bordi hairline, glow sottile (opt-in, scalato da `GlowMode`), nessun effetto solo-hover, stati interattivi/non interattivi distinguibili, focus ring unico. Gli stili di componente usano solo mixin e token `--sd-*`; il linter `scripts/lint_design.py` (hook pre-commit) fa rispettare le regole.
+
+- Moduli di stile condivisi: `_form_mixins.scss` per i controlli di form; `showcase/assets/showcase.scss` sostituisce `critical.css` per il chrome dello showcase (`.sc-*`).
+- Rimossi i residui legacy: mixin `specular-top`/`focus-ring`/`glow`/`lit-fill`/… e funzione `specular()`, `_variables.scss`, alias CSS (`--sd-primary-color`, `--color-void`, `--font-sans`, …), bridge `.sd-card--glow`/`.sd-input--glow`/… in `_theme_presets.scss`, utility cromatiche/palette, keyframe e `.animate-*` legacy (le utility `animate-*` restano, riscritte sui keyframe `sd-*` e rispettano `prefers-reduced-motion` senza `!important`).
+- `Card`: `hover_glow` equivale a `glow: Some(true)`; la variante `Interactive` non emette più classi, l'interattività deriva da `onclick`/`href` (`sd-card--actionable`). `Badge` primary senza glow di default.
+- `TransferList` usa markup BEM proprio (nessun `Checkbox`/`Input` di libreria); `Slider` sostituisce l'input range nativo nello showcase.
+- Nuovi campi `Locale`: `slider_label`, `rating_label`, `pin_input_label`, `pin_digit_label`, `color_format_label`, `color_open_picker` (più i campi aggiunti dalle fasi precedenti).
+- Lo showcase è interamente in italiano tramite `LocaleProvider` (`Locale::italian()`).
+- Nuovi token `--sd-code-*` per la sintassi (vedi `docs/design/tokens.md`).
+
+### ⚠️ Breaking changes
+- Rimosso il preset Cartoon (`Theme::cartoon()`, `_preset_cartoon.scss`).
+- Rimossi `ElevationStyle::HardBlock` e `ElevationStyle::SoftElevated`.
+- Rimosse le classi per-preset dei componenti (`*--primary-<preset>`, `*--glow-<preset>`, `*--checked-<preset>`, …): il colore arriva dai token accento.
+- `RadiusScale::sm()/md()/lg()` restituiscono `""`; usare `RadiusScale::class()`.
+- I bottoni `danger`/`success` sono soft-tinted (non più pieni); l'altezza standard dei campi è 40px.
+- Rimossi `Theme::alert_title_*` (campi) e `Theme::alert_title_classes()` e i metodi helper `AlertVariant::{title_class, icon_color_class, glow_class}`.
+- Aggiunti campi pubblici a `Locale` (costruzione con struct literal da aggiornare).
+- Lo showcase usa `LocaleProvider` con `Locale::italian()`.
+
 ### ⚠️ Breaking — fondamenta Lit Glass (ADR-0002, ADR-0003, ADR-0004)
 - Rimossi `Theme::cartoon()`, `ElevationStyle::HardBlock` e `ElevationStyle::SoftElevated` (anche come varianti serde). `ElevationStyle::Flat` ora azzera il glow.
 - Il tema scrive solo variabili CSS: `ThemeProvider` applica `sd-theme sd-radius-* sd-glow-*` e le variabili accento/superfici inline; niente più `<style>` globale `:root`, `sd-theme-{prefix}`, `data-sd-theme` né classi per-preset (`*-crimson`, `*-cyan`, `*--primary-custom`, …).

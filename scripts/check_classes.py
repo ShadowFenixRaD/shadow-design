@@ -32,17 +32,25 @@ def compile_scss():
     if res.returncode != 0:
         print(f"Error compiling SCSS:\n{res.stderr}")
         sys.exit(1)
+    # Showcase chrome (.sc-*) is a second stylesheet.
+    cmd = sass_command() + ["--no-source-map", "showcase/assets/showcase.scss", "target/compiled_showcase.css"]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f"Error compiling showcase SCSS:\n{res.stderr}")
+        sys.exit(1)
 
 def extract_selectors():
-    with open("target/compiled_styles.css", "r", encoding="utf-8") as f:
-        content = f.read()
+    content = ""
+    for css in ("target/compiled_styles.css", "target/compiled_showcase.css"):
+        with open(css, "r", encoding="utf-8") as f:
+            content += f.read()
     # Find all class selectors
     raw_classes = re.findall(r'\.([a-zA-Z0-9_\-\\\/\[\]\.\:\#\(\)\,]+)', content)
     unescaped = set()
     for c in raw_classes:
         # Strip pseudo-classes like :hover, :active, :focus, ::before
         base = re.split(r'(?<!\\):', c)[0]
-        clean = base.replace('\\', '')
+        clean = base.replace('\\', '').rstrip(',')
         unescaped.add(clean)
     return unescaped
 

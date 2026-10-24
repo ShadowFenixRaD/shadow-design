@@ -1,7 +1,8 @@
+@use 'mixins' as *;
+
 // ==============================================================================
 // Shadow Design — Motion, Keyframes & Animation System
 // ==============================================================================
-@use 'variables' as *;
 
 // --- Keyframes Universali con Namespacing sd-* (DS-24) ---
 
@@ -15,10 +16,6 @@
   0% { opacity: 1; }
   100% { opacity: 0; }
 }
-
-// Compatibilità
-@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
 
 // 2. Slide Animations
 @keyframes sd-slide-in-right {
@@ -77,100 +74,6 @@
   }
 }
 
-// 4. Modal Pop Entrance
-@keyframes sd-modal-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-// 5. Toast Entry & Exit
-@keyframes sd-toast-enter {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 16px, 0) scale(0.96);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-@keyframes sd-toast-exit {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(32px, 0, 0) scale(0.92);
-  }
-}
-
-// 6. Dropdown Reveal
-@keyframes sd-dropdown-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.96) translateY(-6px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-// 7. Drawer Sliders
-@keyframes sd-drawer-slide-left {
-  0% { transform: translate3d(-100%, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes sd-drawer-slide-right {
-  0% { transform: translate3d(100%, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-// 8. Glow Pulses (accent-driven, scaled by --sd-glow-strength)
-@keyframes sd-pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 16px rgba(var(--sd-accent-rgb), calc(0.25 * var(--sd-glow-strength, 1)));
-  }
-  50% {
-    box-shadow: 0 0 34px rgba(var(--sd-accent-rgb), calc(0.6 * var(--sd-glow-strength, 1)));
-  }
-}
-
-// 9. Spinner Rotate
-@keyframes sd-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-// 10. Indeterminate Progress Bar
-@keyframes sd-indeterminate-slide {
-  0% {
-    transform: translateX(-125%);
-  }
-  100% {
-    transform: translateX(275%);
-  }
-}
-
-// Legacy Aliases
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 16px rgba(168, 85, 247, 0.25); } 50% { box-shadow: 0 0 34px rgba(168, 85, 247, 0.60); } }
-
-@keyframes sd-tactile-press {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(0.93); }
-  100% { transform: scale(1); }
-}
-
 // ==============================================================================
 // Lit Glass keyframes (docs/design/language.md §5). Components never declare
 // their own keyframes: run these through `@include sd-animate(...)` or
@@ -193,6 +96,11 @@
 //   sd-pulse                  opacity pulse (decorative)
 //   sd-breathe                scale pulse for live dots (decorative)     sd-pulse-p2p
 // ==============================================================================
+
+@keyframes sd-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 @keyframes sd-pop-in {
   0% {
@@ -258,43 +166,9 @@
   50% { opacity: 0.5; }
 }
 
-// --- Classi Utility di Animazione racchiuse in @layer sd-utilities (DS-24) ---
-@layer sd-utilities {
-  .animate-fade-in         { animation: sd-fade-in 350ms $ease-tactile forwards; }
-  .animate-fade-out        { animation: sd-fade-out 250ms ease-in forwards; }
-  .animate-slide-in-right  { animation: sd-slide-in-right 400ms $ease-tactile forwards; }
-  .animate-slide-in-left   { animation: sd-slide-in-left 400ms $ease-tactile forwards; }
-  .animate-slide-in-bottom { animation: sd-slide-in-bottom 400ms $ease-tactile forwards; }
-  .animate-slide-in-top    { animation: sd-slide-in-top 400ms $ease-tactile forwards; }
-  .animate-scale-in        { animation: sd-scale-in 350ms $ease-tactile forwards; }
-  .animate-pulse-glow      { animation: sd-pulse-glow 2.4s ease-in-out infinite; }
-  .animate-spin            { animation: sd-spin 0.8s linear infinite; transform-origin: center; }
-  .animate-tactile-press   { animation: sd-tactile-press 400ms $ease-tactile forwards; }
-
-  // Component Dedicated Animations
-  .animate-toast-enter     { animation: sd-toast-enter $duration-normal $ease-tactile forwards; }
-  .animate-toast-exit      { animation: sd-toast-exit $duration-fast ease-in forwards; }
-  .animate-modal-enter     { animation: sd-modal-enter $duration-normal $ease-tactile forwards; }
-  .animate-dropdown-enter  { animation: sd-dropdown-enter 180ms $ease-tactile forwards; }
-  .animate-drawer-left,
-  .animate-drawer-slide-left  { animation: sd-drawer-slide-left 350ms $ease-tactile forwards; }
-  .animate-drawer-right,
-  .animate-drawer-slide-right { animation: sd-drawer-slide-right 350ms $ease-tactile forwards; }
-  .animate-indeterminate   { animation: sd-indeterminate-slide 1.5s ease-in-out infinite; }
-
-  // Micro-transizioni tattili
-  .tactile-press {
-    transition: transform $duration-fast $ease-tactile;
-    @media (prefers-reduced-motion: no-preference) {
-      &:active {
-        transform: scale(0.97);
-      }
-    }
-  }
-
-  // Supporto Prefers-Reduced-Motion (A11Y-15) — le demo con .sd-motion-demo rimangono sempre attive
-  
-// Bounce & Pulse Utilities
+// --- Animation utilities (public `animation` feature, AnimationVariant) -------
+// Thin wrappers over the Lit Glass keyframes above, so every animation honours
+// prefers-reduced-motion through the sd-animate mixins (no !important).
 @keyframes sd-bounce {
   0%, 100% {
     transform: translateY(-25%);
@@ -306,55 +180,34 @@
   }
 }
 
+@layer sd-utilities {
+  .animate-fade-in         { @include sd-animate(sd-fade-in); }
+  .animate-fade-out        { @include sd-animate(sd-fade-out); }
+  .animate-slide-in-right  { @include sd-animate(sd-slide-in-right); }
+  .animate-slide-in-left   { @include sd-animate(sd-slide-in-left); }
+  .animate-slide-in-bottom { @include sd-animate(sd-slide-in-bottom); }
+  .animate-slide-in-top    { @include sd-animate(sd-slide-in-top); }
+  .animate-scale-in        { @include sd-animate(sd-scale-in); }
+  .animate-pulse-glow,
+  .animate-pulse           { @include sd-animate(sd-pulse, 2s, ease-in-out, infinite); }
+  .animate-bounce          { @include sd-animate(sd-bounce, 1s, linear, infinite); }
+  .animate-spin            { @include sd-animate-essential(sd-spin, 800ms); transform-origin: center; }
+  .animate-indeterminate   { @include sd-animate-essential(sd-indeterminate, 1.5s, var(--sd-ease)); }
 
-.animate-bounce {
-  animation: sd-bounce 1s infinite;
-}
+  // Component-flavoured aliases map onto the shared floating-layer keyframes.
+  .animate-modal-enter,
+  .animate-dropdown-enter  { @include sd-animate(sd-pop-in); }
+  .animate-toast-enter     { @include sd-animate(sd-slide-in-bottom); }
+  .animate-toast-exit      { @include sd-animate(sd-fade-out); }
+  .animate-drawer-left,
+  .animate-drawer-slide-left  { @include sd-animate(sd-slide-in-left); }
+  .animate-drawer-right,
+  .animate-drawer-slide-right { @include sd-animate(sd-slide-in-right); }
 
-.animate-pulse {
-  animation: sd-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .animate-fade-in:not(.sd-motion-demo),
-    .animate-slide-in-right:not(.sd-motion-demo),
-    .animate-slide-in-left:not(.sd-motion-demo),
-    .animate-slide-in-bottom:not(.sd-motion-demo),
-    .animate-slide-in-top:not(.sd-motion-demo),
-    .animate-scale-in:not(.sd-motion-demo),
-    .animate-modal-enter:not(.sd-motion-demo),
-    .animate-toast-enter:not(.sd-motion-demo),
-    .animate-toast-exit:not(.sd-motion-demo),
-    .animate-dropdown-enter:not(.sd-motion-demo),
-    .animate-drawer-left:not(.sd-motion-demo),
-    .animate-drawer-right:not(.sd-motion-demo),
-    .animate-drawer-slide-left:not(.sd-motion-demo),
-    .animate-drawer-slide-right:not(.sd-motion-demo),
-    .animate-tactile-press:not(.sd-motion-demo),
-    .sd-tab-panel:not(.sd-motion-demo) {
-      animation-duration: 1ms !important;
-      animation-iteration-count: 1 !important;
-    }
-
-    .animate-bounce:not(.sd-motion-demo),
-    .animate-pulse:not(.sd-motion-demo),
-    .animate-pulse-glow:not(.sd-motion-demo),
-    .sd-badge__dot-ping:not(.sd-motion-demo) {
-      animation: none !important;
-    }
-
-    .animate-spin:not(.sd-motion-demo) {
-      animation-duration: 1.5s !important;
-    }
-
-    .tactile-press:active:not(.sd-motion-demo),
-    .sd-card--interactive:hover:not(.sd-motion-demo) {
-      transform: none !important;
-    }
-
-    * {
-      transition-duration: 1ms !important;
-      scroll-behavior: auto !important;
-    }
+  // Tactile press: scale on :active (reduced-motion safe).
+  .animate-tactile-press,
+  .tactile-press {
+    @include sd-transition;
+    @include sd-press;
   }
 }

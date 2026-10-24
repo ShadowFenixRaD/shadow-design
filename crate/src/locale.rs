@@ -187,6 +187,18 @@ pub struct Locale {
     pub toggle_suggestions: String,
     /// Full month names, January first (12 entries).
     pub months: Vec<String>,
+    /// Single-thumb slider fallback accessible label.
+    pub slider_label: String,
+    /// Rating fallback accessible label.
+    pub rating_label: String,
+    /// Pin input group accessible label.
+    pub pin_input_label: String,
+    /// Pin input digit label; placeholders `{n}` and `{total}`.
+    pub pin_digit_label: String,
+    /// Color picker format switch accessible label.
+    pub color_format_label: String,
+    /// Color input swatch button title.
+    pub color_open_picker: String,
     /// Two-letter weekday headers, Monday first (7 entries).
     pub weekdays_short: Vec<String>,
     /// Three-letter weekday abbreviations, Monday first (7 entries).
@@ -302,6 +314,12 @@ impl Locale {
             menubar_label: "Main menu bar".to_string(),
             card_link: "Card link".to_string(),
             toggle_suggestions: "Toggle suggestions".to_string(),
+            slider_label: "Slider".to_string(),
+            rating_label: "Rating".to_string(),
+            pin_input_label: "PIN code input".to_string(),
+            pin_digit_label: "Digit {n} of {total}".to_string(),
+            color_format_label: "Format selector".to_string(),
+            color_open_picker: "Open color picker".to_string(),
             months: vec!["January".to_string(), "February".to_string(), "March".to_string(), "April".to_string(), "May".to_string(), "June".to_string(), "July".to_string(), "August".to_string(), "September".to_string(), "October".to_string(), "November".to_string(), "December".to_string()],
             weekdays_short: vec!["Mo".to_string(), "Tu".to_string(), "We".to_string(), "Th".to_string(), "Fr".to_string(), "Sa".to_string(), "Su".to_string()],
             weekdays_abbr: vec!["Mon".to_string(), "Tue".to_string(), "Wed".to_string(), "Thu".to_string(), "Fri".to_string(), "Sat".to_string(), "Sun".to_string()],
@@ -410,6 +428,12 @@ impl Locale {
             menubar_label: "Barra dei menu principale".to_string(),
             card_link: "Link della card".to_string(),
             toggle_suggestions: "Mostra o nascondi suggerimenti".to_string(),
+            slider_label: "Cursore".to_string(),
+            rating_label: "Valutazione".to_string(),
+            pin_input_label: "Inserimento codice PIN".to_string(),
+            pin_digit_label: "Cifra {n} di {total}".to_string(),
+            color_format_label: "Selettore formato".to_string(),
+            color_open_picker: "Apri selettore colore".to_string(),
             months: vec!["Gennaio".to_string(), "Febbraio".to_string(), "Marzo".to_string(), "Aprile".to_string(), "Maggio".to_string(), "Giugno".to_string(), "Luglio".to_string(), "Agosto".to_string(), "Settembre".to_string(), "Ottobre".to_string(), "Novembre".to_string(), "Dicembre".to_string()],
             weekdays_short: vec!["Lu".to_string(), "Ma".to_string(), "Me".to_string(), "Gi".to_string(), "Ve".to_string(), "Sa".to_string(), "Do".to_string()],
             weekdays_abbr: vec!["Lun".to_string(), "Mar".to_string(), "Mer".to_string(), "Gio".to_string(), "Ven".to_string(), "Sab".to_string(), "Dom".to_string()],

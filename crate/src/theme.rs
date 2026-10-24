@@ -547,10 +547,6 @@ pub struct Theme {
     pub alert_success: String,
     pub alert_warning: String,
     pub alert_danger: String,
-    pub alert_title_info: String,
-    pub alert_title_success: String,
-    pub alert_title_warning: String,
-    pub alert_title_danger: String,
 
     // Level 2: per-component and per-class overrides.
     pub components: HashMap<String, ComponentOverride>,
@@ -801,10 +797,6 @@ impl Theme {
             alert_success: "sd-alert--success".to_string(),
             alert_warning: "sd-alert--warning".to_string(),
             alert_danger: "sd-alert--danger".to_string(),
-            alert_title_info: "sd-alert__title--info".to_string(),
-            alert_title_success: "sd-alert__title--success".to_string(),
-            alert_title_warning: "sd-alert__title--warning".to_string(),
-            alert_title_danger: "sd-alert__title--danger".to_string(),
 
             components: HashMap::new(),
             class_overrides: HashMap::new(),
@@ -988,17 +980,6 @@ impl Theme {
             AlertVariant::Success => &self.alert_success,
             AlertVariant::Warning => &self.alert_warning,
             AlertVariant::Danger => &self.alert_danger,
-        }
-    }
-
-    #[cfg(feature = "alert")]
-    #[must_use]
-    pub fn alert_title_classes(&self, variant: AlertVariant) -> &str {
-        match variant {
-            AlertVariant::Info => &self.alert_title_info,
-            AlertVariant::Success => &self.alert_title_success,
-            AlertVariant::Warning => &self.alert_title_warning,
-            AlertVariant::Danger => &self.alert_title_danger,
         }
     }
 
