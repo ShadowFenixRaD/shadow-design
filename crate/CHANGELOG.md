@@ -9,6 +9,100 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ---
 
+## [0.5.0] — 2026-10-24
+
+Massiva release architetturale che porta Shadow Design a uno standard enterprise per Dioxus 0.7, introducendo **8 nuovi Epic completi** con oltre 35 componenti aggiuntivi: layout primitives responsive, overlay fluttuanti avanzati, micro-interazioni tattili, engine reattivo di hooks e form validation, estensioni complesse di tooling, suite completa di data visualization SVG nativa, rich content e navigazione collaborativa di livello avanzato.
+
+### 🚀 Nuove Funzionalità & Componenti UI
+
+#### 📐 Layout Primitives & Contenitori (Epic #9)
+- **Grid & SimpleGrid (`grid`)**: Griglia responsive a 12 colonne con breakpoint mobili/desktop, gap tokenizzato e subcomponente `GridCol`. `SimpleGrid` per griglie auto-adattive a colonne uguali.
+- **Group (`group`)**: Primitiva layout Flexbox orizzontale con wrapping configurabile, allineamento, giustificazione ed espansione controllata (`grow`).
+- **Stack (`stack`)**: Primitiva Flexbox verticale per impilare componenti con spaziatura tokenizzata e allineamento semantico.
+- **AspectRatio (`aspect_ratio`)**: Contenitore a rapporto di forma bloccato per prevenire Cumulative Layout Shift (CLS) con preset standard (16:9, 4:3, 1:1, 21:9, 9:16).
+- **Center (`center`)**: Utility container per il centraggio bidirezionale assoluto in modalità block o inline.
+
+#### 🪟 Floating Overlays & Menu Contestuali (Epic #7)
+- **Popover (`popover`)**: Pannello fluttuante ancorato al trigger con 12 allineamenti geometrici, freccia integrata, dismiss su click esterno ed Escape (`Popover`, `PopoverTrigger`, `PopoverDropdown`).
+- **HoverCard (`hover_card`)**: Card di anteprima ricca su hover con delay di apertura/chiusura configurabili e persistenza su interazione del contenuto.
+- **ContextMenu (`context_menu`)**: Menu contestuale azionato da click destro del mouse alle coordinate precise del puntatore, con scorciatoie da tastiera e checkbox/radio items.
+- **AlertDialog & ConfirmDialog (`alert_dialog`)**: Dialoghi bloccanti con focus trapping e backdrop per azioni distruttive irreversibili o conferme critiche.
+- **Coachmark & TeachingBubble (`coachmark`)**: Guide passo-passo ancorate a specifici elementi DOM per onboarding utente con indicatori di avanzamento e navigazione interattiva.
+- **SpeedDial & FAB (`speed_dial`)**: Floating Action Button ad espansione radiale/lineare a 4 direzioni per raggruppare azioni veloci secondarie.
+- **Affix & BackToTop (`affix`)**: Contenitori fluttuanti in overlay agganciati alle coordinate dello schermo con attivazione a soglia di scroll e pulsante fluido `BackToTop`.
+
+#### ✨ Micro-Interazioni Tattili (Epic #13)
+- **Burger (`burger`)**: Icona animata a tre linee con transizione fluida verso lo stato Close/X per menu mobili.
+- **CloseButton (`close_button`)**: Pulsante universale di chiusura accessibile con varianti cromatiche e feedback tattile.
+- **CopyButton (`copy_button`)**: Pulsante di copia rapida negli appunti con feedback visivo temporizzato integrato.
+- **Indicator (`indicator`)**: Badge di notifica sovrapposto agli elementi con posizionamento a 9 quadranti, processing glow pulse e dot compatto.
+- **Highlight (`highlight`)**: Evidenziatore di testo reattivo per query di ricerca con styling tematico.
+- **LoadingOverlay (`loading_overlay`)**: Velatura di caricamento con spinner e blur backdrop per sezioni asincrone.
+- **Fieldset (`fieldset`)**: Raggruppamento form semantico con bordo coordinato e legenda personalizzabile.
+- **MarqueeSelection (`marquee_selection`)**: Rettangolo di selezione elastico su coordinate del cursore con pointer capture e collision detection.
+- **Keytip (`keytip`)**: Suggerimenti visivi delle scorciatoie da tastiera fluttuanti per navigazione rapida senza mouse.
+
+#### ⚡ Reactive Utilities & Form Engine (Epic #14)
+- **Form & UseForm (`form`)**: Engine completo di form validation con validatori composabili (Required, Email, MinLength, MaxLength, Pattern, Custom), stato reattivo e gestione dinamica degli errori.
+- **Reactive Hooks (`hooks`)**:
+  - `use_clipboard`: Gestione asincrona degli appunti con auto-reset temporizzato affidabile.
+  - `use_debounced_signal`: Debounce atomico thread-safe ad alte prestazioni per input ad alta frequenza.
+  - `use_hotkey`: Ascolto scorciatoie da tastiera globali o locali con modifier keys.
+  - `use_idle`: Rilevamento inattività utente con timeout configurabile.
+  - `use_intersection_observer`: Lazy loading e trigger di visibilità viewport.
+  - `use_local_storage`: Persistenza reattiva sincronizzata nello storage del browser.
+  - `use_media_query`: Ascolto dinamico delle media query CSS responsive.
+  - `use_window_scroll`: Coordinate di scroll window reattive e controllo programmatico fluido.
+  - `use_click_outside`: Rilevamento click al di fuori dei confini di un elemento.
+
+#### 🛠️ Estensioni Complesse & Tooling (Epic #8)
+- **CommandPalette (`command_palette`)**: Palette di comando in overlay (Ctrl+K) con ricerca fuzzy, raggruppamento comandi, icone e navigazione globale da tastiera.
+- **DatePicker & CalendarView (`date_picker`)**: Calendario completo con navigazione mese/anno, supporto anni bisestili, range selection e localizzazione.
+- **Dropzone (`dropzone`)**: Area di upload file drag-and-drop con anteprime, validazione mime-type e indicatore di caricamento.
+- **Resizable (`resizable`)**: Splitter di pannelli ridimensionabili orizzontali e verticali con pointer drag engine e proporzioni flessibili.
+- **Carousel (`carousel`)**: Slider multimediale a scorrimento con transizioni animate, controlli di navigazione e indicatori dot.
+- **VirtualList (`virtual_list`)**: Virtualizzazione di liste massive ad alto rendimento con rendering esclusivo degli elementi visibili nel viewport.
+- **CodeHighlight (`code_highlight`)**: Visualizzatore di codice sorgente con tokenizer sintattico multi-linguaggio e numerazione righe.
+
+#### 📊 Native SVG Charts Suite (Epic #10)
+- **Chart Primitives (`chart`)**: `ChartContainer`, `ChartTooltip` dinamico con hit-testing, `ChartLegend` e griglie responsive `ChartGrid`.
+- **AreaChart & LineChart**: Curve lineari e spline con riempimento a gradiente neon e supporto multi-serie.
+- **BarChart**: Grafici a barre orizzontali e verticali con barre raggruppate o sovrapposte.
+- **PieChart & DonutChart**: Grafici a torta e ciambella con calcoli trigonometrici nativi degli archi SVG.
+- **RadarChart**: Grafici radar per benchmarking multidimensionale e analisi competenze.
+- **ScatterChart & BubbleChart**: Distribuzione a coordinate cartesiane con scaling dinamico del raggio dei punti.
+- **Sparkline**: Micro-grafici compatti per dashboard metriche e card di telemetria.
+- **GaugeChart & RadialBar**: Indicatori a tachimetro e barre radiali per avanzamento percentuale e soglie.
+- **Heatmap & CalendarHeatmap**: Mappe di calore matriciali e griglia di attivita annuale stile GitHub.
+
+#### 📰 Rich Content & Media (Epic #11)
+- **RichTextEditor (`rich_text`)**: Editor di testo ricco WYSIWYG con conversione bidirezionale Markdown/HTML, barra degli strumenti contestuale e scorciatoie di formattazione.
+- **DocumentCard (`document_card`)**: Card interattiva per allegati e documenti con anteprime, badge di formato file e azioni rapide.
+- **MasonryGrid (`masonry`)**: Layout a mosaico asimmetrico dinamico a colonne indipendenti con Lightbox modale integrato per immagini.
+- **MediaCard (`media_card`)**: Scheda multimediale ad aspect-ratio fisso con overlay di testo e hover lift tattile.
+
+#### 🧭 Navigazione Avanzata & Tooling Collaborativo (Epic #12)
+- **NavigationMenu (`navigation_menu`)**: Menu di navigazione orizzontale di livello enterprise con mega-menu a comparsa multi-colonna e card in anteprima.
+- **OverflowSet & ResponsiveToolbar (`overflow_set`)**: Toolbar intelligente che rileva la larghezza del contenitore e sposta automaticamente le azioni eccedenti in un dropdown "Altro".
+- **TransferList (`transfer_list`)**: Selettore a doppia colonna per lo spostamento di elementi tra liste (Sorgente/Destinazione) con ricerca e azioni bulk.
+- **Facepile (`facepile`)**: Cluster di avatar sovrapposti con indicatori di stato/presenza e contatore overflow (+N).
+- **ActivityFeed (`activity_feed`)**: Timeline collaborativa ricca per eventi, audit log, commenti e risposte inline.
+
+### 🎨 Design System SCSS & Polish
+- Completamento dell integrazione SCSS con moduli BEM dedicati per ogni nuovo componente in `crate/scss/components/`.
+- Refactoring globale dei selettori e layering Z-index standardizzato in `_zindex.scss`.
+- Nuove icone SVG native in `IconKind` (Plus, Search, Calendar, Upload, Chart, ecc.).
+- Centralizzazione della costante `VERSION` reattiva tramite macro `env!("CARGO_PKG_VERSION")`.
+
+### 🐛 Correzioni & Ottimizzazioni
+- **Resizable**: Risolto il panic di corruzione degli hook slot Dioxus rimuovendo chiamate annidate a `use_unique_id` all interno di `use_signal`.
+- **CommandPalette**: Resa globale la navigazione da tastiera tramite event listener nativo su `window`.
+- **Hooks**: Eliminati cicli infiniti di re-render montando i listener DOM una sola volta con `use_hook` e timer browser.
+- **Audit Statico & WAI-ARIA**: Allineati attributi di accessibilità ARIA (`role`, `aria-expanded`, `aria-selected`, `aria-invalid`) su tutti i controlli form e overlay.
+
+
+---
+
 ## [0.4.0] — 2026-10-20
 
 Release monumentale che estende radicalmente la libreria introducendo **20 nuovi componenti UI e feature modulari** ad alte prestazioni per Dioxus 0.7, una suite avanzata per form, controlli continui, visualizzazione dati, layout master a 5 zone, navigazione ricca e una profonda riorganizzazione semantica dello Showcase.
