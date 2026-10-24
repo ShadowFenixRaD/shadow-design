@@ -1,16 +1,16 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    ChoicePicker, DemoCell, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn GridPage() -> Element {
-    let mut selected_gutter = use_signal(|| GridSpacing::Md);
-    let mut selected_align = use_signal(|| GridAlign::Stretch);
-    let mut selected_justify = use_signal(|| GridJustify::Start);
-    let mut simple_cols = use_signal(|| 3u8);
+    let selected_gutter = use_signal(|| GridSpacing::Md);
+    let selected_align = use_signal(|| GridAlign::Stretch);
+    let selected_justify = use_signal(|| GridJustify::Start);
+    let simple_cols = use_signal(|| 3u8);
 
     let props = vec![
         PropRow {
@@ -74,10 +74,10 @@ Grid {
     gutter: GridSpacing::Md,
     align: GridAlign::Stretch,
     GridCol { span: 12, md: 8,
-        div { class: "p-4 rounded-xl bg-purple-950/40 border border-purple-800/40 text-purple-200", "Colonna Principale (Span 8 su Desktop)" }
+        DemoCell { label: "Colonna Principale (Span 8 su Desktop)".to_string(), accent: true }
     }
     GridCol { span: 12, md: 4,
-        div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10 text-zinc-300", "Sidebar Laterale (Span 4 su Desktop)" }
+        DemoCell { label: "Sidebar Laterale (Span 4 su Desktop)".to_string() }
     }
 }
 
@@ -86,156 +86,107 @@ SimpleGrid {
     cols: 3,
     spacing: GridSpacing::Md,
     sm: 1, md: 2, lg: 3,
-    div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10", "Card A" }
-    div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10", "Card B" }
-    div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10", "Card C" }
+    DemoCell { label: "Cella A".to_string() }
+    DemoCell { label: "Cella B".to_string() }
+    DemoCell { label: "Cella C".to_string() }
 }"#
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Grid & SimpleGrid" }
-                Text { dimmed: true, size: TextSize::Sm, "Sistemi strutturali responsive a 12 colonne (Grid / GridCol) e a colonne equivalenti auto-bilanciate (SimpleGrid) con gutter tokenizzato e breakpoint standard." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Grid & SimpleGrid".to_string(),
+                description: "Sistemi strutturali responsive a 12 colonne (Grid / GridCol) e a colonne equivalenti auto-bilanciate (SimpleGrid) con gutter tokenizzato e breakpoint standard.".to_string(),
             }
 
             FeatureBanner { feature_name: "grid" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6 w-full",
-                        // Sezione 1: Grid 12 Colonne
-                        div { class: "space-y-3",
-                            div { class: "flex items-center justify-between",
-                                span { class: "text-xs font-mono uppercase tracking-wider text-purple-400 font-semibold", "1. Grid a 12 Colonne con Span e Offset" }
-                                span { class: "text-[11px] font-mono text-zinc-500", "Gutter: {selected_gutter():?}" }
-                            }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                div { class: "sc-title-row",
+                                    span { class: "sc-section-title", "1. Grid a 12 Colonne con Span e Offset" }
+                                    span { class: "sc-subtle-text sc-mono", "Gutter: {selected_gutter():?}" }
+                                }
 
-                            Grid {
-                                gutter: selected_gutter(),
-                                align: selected_align(),
-                                justify: selected_justify(),
-                                GridCol { span: 12, md: 8,
-                                    div { class: "p-4 rounded-xl bg-purple-950/40 border border-purple-800/40 flex flex-col justify-center text-center",
-                                        span { class: "text-xs font-mono text-purple-200 font-bold", "Span: 12 (Mobile) / 8 (Desktop)" }
-                                        span { class: "text-[11px] text-purple-400/80", "Contenuto principale ad alta larghezza" }
+                                Grid {
+                                    gutter: selected_gutter(),
+                                    align: selected_align(),
+                                    justify: selected_justify(),
+                                    GridCol { span: 12, md: 8,
+                                        DemoCell { label: Some("Span: 12 (Mobile) / 8 (Desktop)".into()), accent: true }
+                                    }
+                                    GridCol { span: 12, md: 4,
+                                        DemoCell { label: Some("Span: 12 / 4".into()) }
+                                    }
+                                    GridCol { span: 6, md: 4,
+                                        DemoCell { label: Some("Colonna 1 (Span 4)".into()), short: true }
+                                    }
+                                    GridCol { span: 6, md: 4,
+                                        DemoCell { label: Some("Colonna 2 (Span 4)".into()), short: true }
+                                    }
+                                    GridCol { span: 12, md: 4,
+                                        DemoCell { label: Some("Colonna 3 (Span 4)".into()), short: true }
+                                    }
+                                    GridCol { span: 12, md: 6, offset: 3,
+                                        DemoCell { label: Some("Span 6 con Offset 3 (Centrato su 12 col)".into()), short: true }
                                     }
                                 }
-                                GridCol { span: 12, md: 4,
-                                    div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10 flex flex-col justify-center text-center",
-                                        span { class: "text-xs font-mono text-zinc-300 font-bold", "Span: 12 / 4" }
-                                        span { class: "text-[11px] text-zinc-500", "Aside contestuale" }
-                                    }
-                                }
-                                GridCol { span: 6, md: 4,
-                                    div { class: "p-3 rounded-lg bg-white/[0.03] border border-white/10 text-center text-xs font-mono text-zinc-400", "Colonna 1 (Span 4)" }
-                                }
-                                GridCol { span: 6, md: 4,
-                                    div { class: "p-3 rounded-lg bg-white/[0.03] border border-white/10 text-center text-xs font-mono text-zinc-400", "Colonna 2 (Span 4)" }
-                                }
-                                GridCol { span: 12, md: 4,
-                                    div { class: "p-3 rounded-lg bg-white/[0.03] border border-white/10 text-center text-xs font-mono text-zinc-400", "Colonna 3 (Span 4)" }
-                                }
-                                GridCol { span: 12, md: 6, offset: 3,
-                                    div { class: "p-3 rounded-lg bg-purple-900/20 border border-purple-500/30 text-center text-xs font-mono text-purple-300", "Span 6 con Offset 3 (Centrato su 12 col)" }
-                                }
-                            }
-                        }
 
-                        // Sezione 2: SimpleGrid Auto-Layout
-                        div { class: "space-y-3 pt-4 border-t border-white/[0.08]",
-                            div { class: "flex items-center justify-between",
-                                span { class: "text-xs font-mono uppercase tracking-wider text-purple-400 font-semibold", "2. SimpleGrid a Colonne Equivalenti" }
-                                span { class: "text-[11px] font-mono text-zinc-500", "Cols attive: {simple_cols()}" }
-                            }
+                                hr { class: "sc-control-divider" }
+                                div { class: "sc-title-row",
+                                    span { class: "sc-section-title", "2. SimpleGrid a Colonne Equivalenti" }
+                                    span { class: "sc-subtle-text sc-mono", "Cols attive: {simple_cols()}" }
+                                }
 
-                            SimpleGrid {
-                                cols: simple_cols(),
-                                spacing: selected_gutter(),
-                                sm: 1,
-                                md: simple_cols(),
-                                for i in 1..=6 {
-                                    div { class: "p-4 rounded-xl bg-zinc-900/60 border border-white/10 flex flex-col gap-1 items-center justify-center text-center shadow-sm",
-                                        span { class: "w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono text-xs flex items-center justify-center font-bold", "{i}" }
-                                        span { class: "text-xs font-semibold text-white", "Modulo #{i}" }
-                                        span { class: "text-[10px] text-zinc-500 font-mono", "Equal 1/{simple_cols()} fr" }
+                                SimpleGrid {
+                                    cols: simple_cols(),
+                                    spacing: selected_gutter(),
+                                    sm: 1,
+                                    md: simple_cols(),
+                                    for i in 1..=6 {
+                                        DemoCell { key: "{i}", index: Some(i), label: Some(format!("Modulo #{i}")) }
                                     }
                                 }
                             }
-                        }
-                        // Sezione 3: Configurator / Controlli Interattivi
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-4",
-                            span { class: "text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold block", "Controlli Interattivi Playground" }
-                            div { class: "space-y-4",
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Gutter Spaziatura" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for s in [GridSpacing::None, GridSpacing::Xs, GridSpacing::Sm, GridSpacing::Md, GridSpacing::Lg, GridSpacing::Xl] {
-                                            button {
-                                                class: if selected_gutter() == s {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_gutter.set(s),
-                                                "{s:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Allineamento Verticale" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for a in [GridAlign::Start, GridAlign::Center, GridAlign::End, GridAlign::Stretch] {
-                                            button {
-                                                class: if selected_align() == a {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_align.set(a),
-                                                "{a:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Giustificazione Orizzontale" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for j in [GridJustify::Start, GridJustify::Center, GridJustify::End, GridJustify::SpaceBetween, GridJustify::SpaceAround] {
-                                            button {
-                                                class: if selected_justify() == j {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_justify.set(j),
-                                                "{j:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Colonne SimpleGrid" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for c in [1u8, 2, 3, 4, 6] {
-                                            button {
-                                                class: if simple_cols() == c {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| simple_cols.set(c),
-                                                "{c} Colonne"
-                                            }
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Gutter Spaziatura".to_string(),
+                                options: [GridSpacing::None, GridSpacing::Xs, GridSpacing::Sm, GridSpacing::Md, GridSpacing::Lg, GridSpacing::Xl]
+                                    .iter()
+                                    .map(|s| (*s, format!("{s:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_gutter,
                             }
-                        }
+                            ChoicePicker {
+                                label: "Allineamento Verticale".to_string(),
+                                options: [GridAlign::Start, GridAlign::Center, GridAlign::End, GridAlign::Stretch]
+                                    .iter()
+                                    .map(|a| (*a, format!("{a:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_align,
+                            }
+                            ChoicePicker {
+                                label: "Giustificazione Orizzontale".to_string(),
+                                options: [GridJustify::Start, GridJustify::Center, GridJustify::End, GridJustify::SpaceBetween, GridJustify::SpaceAround]
+                                    .iter()
+                                    .map(|j| (*j, format!("{j:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_justify,
+                            }
+                            ChoicePicker {
+                                label: "Colonne SimpleGrid".to_string(),
+                                options: [1u8, 2, 3, 4, 6]
+                                    .iter()
+                                    .map(|c| (*c, format!("{c} Colonne")))
+                                    .collect::<Vec<_>>(),
+                                value: simple_cols,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

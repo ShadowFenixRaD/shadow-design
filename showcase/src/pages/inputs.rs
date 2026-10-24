@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn InputsPage() -> Element {
@@ -87,69 +87,55 @@ TextInput {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "TextInput" }
-                Text { dimmed: true, size: TextSize::Sm, "Campi di testo ad alta precisione con binding reattivo Dioxus 0.7, icone vettoriali SvgIcon premibili (on_left_icon_click / on_right_icon_click) con adattamento spaziale automatico e clear button nativo." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "TextInput".to_string(),
+                description: "Campi di testo ad alta precisione con binding reattivo Dioxus 0.7, icone vettoriali SvgIcon premibili (on_left_icon_click / on_right_icon_click) con adattamento spaziale automatico e clear button nativo.".to_string(),
             }
 
             FeatureBanner { feature_name: "input" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Inputs
-                        div { class: "space-y-4",
-                            TextInput {
-                                value: username,
-                                label: "Nome Utente".to_string(),
-                                placeholder: "Inserisci username...".to_string(),
-                                clearable: true,
-                                left_icon: Some(IconKind::Terminal.into()),
-                                help_text: "Identificatore univoco per l'account".to_string(),
-                            }
-
-                            TextInput {
-                                value: search_query,
-                                label: "Ricerca Rapida".to_string(),
-                                placeholder: "Filtra componenti...".to_string(),
-                                clearable: true,
-                                left_icon: Some(IconKind::Search.into()),
-                            }
-
-                            TextInput {
-                                value: email,
-                                label: "Indirizzo Email".to_string(),
-                                placeholder: "dev@shadowfenix.org".to_string(),
-                                error: if email().is_empty() { Some("L'email è un campo obbligatorio".to_string()) } else { None },
-                            }
-                        }
-
-                        // State Telemetry
-                        div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-3 font-mono text-xs shadow-inner",
-                            p { class: "text-zinc-400 font-semibold uppercase text-[10px] tracking-wider", "Stato Reattivo Signal:" }
-                            div { class: "p-3 rounded-lg bg-black/60 border border-white/[0.04] space-y-1.5",
-                                div { class: "text-purple-300",
-                                    span { class: "text-zinc-500", "username = " }
-                                    "\"{username}\""
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                TextInput {
+                                    value: username,
+                                    label: "Nome Utente".to_string(),
+                                    placeholder: "Inserisci username...".to_string(),
+                                    clearable: true,
+                                    left_icon: Some(IconKind::Terminal.into()),
+                                    help_text: "Identificatore univoco per l'account".to_string(),
                                 }
-                                div { class: "text-cyan-300",
-                                    span { class: "text-zinc-500", "search_query = " }
-                                    "\"{search_query}\""
+                                TextInput {
+                                    value: search_query,
+                                    label: "Ricerca Rapida".to_string(),
+                                    placeholder: "Filtra componenti...".to_string(),
+                                    clearable: true,
+                                    left_icon: Some(IconKind::Search.into()),
                                 }
-                                div { class: "text-emerald-300",
-                                    span { class: "text-zinc-500", "email = " }
-                                    "\"{email}\""
-                                }
-                                div { class: "text-yellow-300",
-                                    span { class: "text-zinc-500", "show_password = " }
-                                    "{show_password}"
+                                TextInput {
+                                    value: email,
+                                    label: "Indirizzo Email".to_string(),
+                                    placeholder: "dev@shadowfenix.org".to_string(),
+                                    error: if email().is_empty() { Some("L'email è un campo obbligatorio".to_string()) } else { None },
                                 }
                             }
-                            span { class: "text-[11px] text-zinc-500 block leading-normal",
+                        },
+                        controls: rsx! {
+                            span { class: "sc-control-label", "Stato reattivo Signal" }
+                            div { class: "sc-stack sc-mono",
+                                Counter { label: "username".to_string(), value: format!("\"{}\"", username()) }
+                                Counter { label: "search_query".to_string(), value: format!("\"{}\"", search_query()) }
+                                Counter { label: "email".to_string(), value: format!("\"{}\"", email()) }
+                                Counter { label: "show_password".to_string(), value: show_password().to_string() }
+                            }
+                            span { class: "sc-page-desc",
                                 "Ogni modifica digitata e ogni click sull'icona della password aggiorna istantaneamente lo stato reattivo."
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -160,7 +146,7 @@ TextInput {
             Card {
                 title: "Esempio Avanzato: Campo Password con Toggle Visibilità".to_string(),
                 subtitle: "Supporto nativo a livello libreria per icone premibili reattive con on_right_icon_click".to_string(),
-                div { class: "max-w-md space-y-3",
+                div { class: "sc-stack",
                     TextInput {
                         value: password,
                         label: "Password di Accesso".to_string(),

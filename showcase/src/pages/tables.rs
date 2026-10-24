@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{CheckControl, Playground, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct PeerRecord {
@@ -42,7 +42,7 @@ pub fn TablesPage() -> Element {
         DataTableColumn::new("name", "Nome Dispositivo", |r: &PeerRecord| {
             let name = r.name;
             rsx! {
-                span { class: "font-semibold text-zinc-100", "{name}" }
+                strong { "{name}" }
             }
         })
         .with_sort_by(|r: &PeerRecord| r.name),
@@ -67,16 +67,13 @@ pub fn TablesPage() -> Element {
         .with_sort_by(|r: &PeerRecord| r.latency),
         DataTableColumn::new("status", "Stato", |r: &PeerRecord| {
             let st = r.status;
-            let (dot_color, text_color) = match st {
-                "Online" => ("bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]", "text-emerald-300"),
-                "Syncing" => ("bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.5)]", "text-purple-300"),
-                _ => ("bg-zinc-600", "text-zinc-500"),
+            let variant = match st {
+                "Online" => BadgeVariant::Success,
+                "Syncing" => BadgeVariant::Primary,
+                _ => BadgeVariant::Default,
             };
             rsx! {
-                div { class: "inline-flex items-center gap-2",
-                    span { class: "w-2 h-2 rounded-full {dot_color}" }
-                    span { class: "text-xs font-mono {text_color}", "{st}" }
-                }
+                Badge { variant, label: st.to_string(), dot: true }
             }
         })
         .with_width("120px")
@@ -165,60 +162,40 @@ pub fn TablesPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Table & DataTable" }
-                Text { dimmed: true, size: TextSize::Sm, "Tabelle semantiche responsive ad alte prestazioni con ordinamento interattivo, paginazione, overlay di caricamento e righe selezionabili." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Table & DataTable".to_string(),
+                description: "Tabelle semantiche responsive ad alte prestazioni con ordinamento interattivo, paginazione, overlay di caricamento e righe selezionabili.".to_string(),
             }
 
             FeatureBanner { feature_name: "table" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        // Live DataTable
-                        DataTable {
-                            data: all_records,
-                            columns: columns,
-                            page: Some(page),
-                            page_size: 4,
-                            sort_key: Some(sort_key),
-                            sort_direction: Some(sort_direction),
-                            striped: striped(),
-                            bordered: bordered(),
-                            hoverable: hoverable(),
-                            compact: compact(),
-                            loading: loading(),
-                        }
-
-                        // Controls
-                        div { class: "p-5 rounded-xl bg-zinc-950/60 border border-white/[0.08] flex flex-wrap gap-6 items-center text-xs text-zinc-300",
-                            Checkbox {
-                                checked: striped,
-                                label: "Righe Alternate (Striped)".to_string(),
-                                size: CheckboxSize::Sm,
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            DataTable {
+                                data: all_records,
+                                columns: columns,
+                                page: Some(page),
+                                page_size: 4,
+                                sort_key: Some(sort_key),
+                                sort_direction: Some(sort_direction),
+                                striped: striped(),
+                                bordered: bordered(),
+                                hoverable: hoverable(),
+                                compact: compact(),
+                                loading: loading(),
                             }
-                            Checkbox {
-                                checked: bordered,
-                                label: "Bordi Celle (Bordered)".to_string(),
-                                size: CheckboxSize::Sm,
-                            }
-                            Checkbox {
-                                checked: hoverable,
-                                label: "Hover Righe".to_string(),
-                                size: CheckboxSize::Sm,
-                            }
-                            Checkbox {
-                                checked: compact,
-                                label: "Compatta (Compact)".to_string(),
-                                size: CheckboxSize::Sm,
-                            }
-                            Checkbox {
-                                checked: loading,
-                                label: "Stato di Caricamento (Loading)".to_string(),
-                                size: CheckboxSize::Sm,
-                            }
-                        }
+                        },
+                        controls: rsx! {
+                            CheckControl { label: "Righe alternate (Striped)".to_string(), checked: striped }
+                            CheckControl { label: "Bordi celle (Bordered)".to_string(), checked: bordered }
+                            CheckControl { label: "Hover righe".to_string(), checked: hoverable }
+                            CheckControl { label: "Compatta (Compact)".to_string(), checked: compact }
+                            CheckControl { label: "Stato di caricamento (Loading)".to_string(), checked: loading }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -226,9 +203,9 @@ pub fn TablesPage() -> Element {
             }
 
             // Sezione Primitivi Semplici Table
-            div { class: "space-y-4 pt-4 border-t border-white/[0.06]",
-                Heading { order: HeadingOrder::H3, "Costruzione con Primitive Semantiche" }
-                Text { dimmed: true, size: TextSize::Sm, "Uso diretto dei componenti Table, TableHeader, TableBody, TableRow e TableCell per layout personalizzati." }
+            div { class: "sc-stack",
+                h2 { class: "sc-section-title", "Costruzione con primitive semantiche" }
+                p { class: "sc-page-desc", "Uso diretto dei componenti Table, TableHeader, TableBody, TableRow e TableCell per layout personalizzati." }
 
                 Table {
                     striped: true,

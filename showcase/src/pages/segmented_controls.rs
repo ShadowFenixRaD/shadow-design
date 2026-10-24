@@ -1,13 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, ControlRow, Counter, Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn SegmentedControlsPage() -> Element {
     let storage_val = use_signal(|| "sqlite".to_string());
     let crypto_val = use_signal(|| "pq".to_string());
-    let mut selected_size = use_signal(|| SegmentedControlSize::Md);
+    let selected_size = use_signal(|| SegmentedControlSize::Md);
     let is_full_width = use_signal(|| false);
     let is_disabled = use_signal(|| false);
 
@@ -70,21 +70,20 @@ SegmentedControl {
     ];
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "SegmentedControl" }
-                Text { dimmed: true, size: TextSize::Sm, "Selettore orizzontale a segmenti tattile ad alta precisione con animazione scorrevole e micro-glow del tema attivo." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "SegmentedControl".to_string(),
+                description: "Selettore orizzontale a segmenti tattile ad alta precisione con animazione scorrevole e micro-glow del tema attivo.".to_string(),
             }
 
             FeatureBanner { feature_name: "segmented_control" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
-                        // Live Preview
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 min-h-[200px] shadow-inner max-w-full overflow-hidden",
-                            div { class: "w-full max-w-full flex flex-col items-center gap-2 overflow-x-auto py-1",
-                                span { class: "text-[11px] font-mono text-zinc-400", "Modalità Storage: [{storage_val}]" }
+                    Playground {
+                        stage: rsx! {
+                            div { class: "sc-stack w-full items-center",
+                                Counter { label: "Modalità storage".to_string(), value: storage_val() }
                                 SegmentedControl {
                                     options: storage_options,
                                     value: storage_val,
@@ -92,10 +91,8 @@ SegmentedControl {
                                     full_width: is_full_width(),
                                     disabled: is_disabled(),
                                 }
-                            }
-
-                            div { class: "w-full max-w-full flex flex-col items-center gap-2 pt-2 border-t border-white/[0.06] overflow-x-auto py-1",
-                                span { class: "text-[11px] font-mono text-zinc-400", "Suite Crittografica: [{crypto_val}]" }
+                                hr { class: "sc-control-divider w-full" }
+                                Counter { label: "Suite crittografica".to_string(), value: crypto_val() }
                                 SegmentedControl {
                                     options: crypto_options,
                                     value: crypto_val,
@@ -104,43 +101,23 @@ SegmentedControl {
                                     disabled: is_disabled(),
                                 }
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Dimensione SegmentedControl:" }
-                                div { class: "flex gap-2",
-                                    for s in [SegmentedControlSize::Sm, SegmentedControlSize::Md, SegmentedControlSize::Lg] {
-                                        button {
-                                            r#type: "button",
-                                            class: if selected_size() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| selected_size.set(s),
-                                            match s {
-                                                SegmentedControlSize::Sm => "SM",
-                                                SegmentedControlSize::Md => "MD",
-                                                SegmentedControlSize::Lg => "LG",
-                                            }
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Dimensione SegmentedControl".to_string(),
+                                options: vec![
+                                    (SegmentedControlSize::Sm, "SM".to_string()),
+                                    (SegmentedControlSize::Md, "MD".to_string()),
+                                    (SegmentedControlSize::Lg, "LG".to_string()),
+                                ],
+                                value: selected_size,
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
-                                Checkbox {
-                                    checked: is_full_width,
-                                    label: Some("Larghezza Piena (Full Width)".to_string()),
-                                }
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: Some("Disabilitato (Disabled)".to_string()),
-                                }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Larghezza piena".to_string(), checked: is_full_width }
+                                ToggleControl { label: "Disabilitato".to_string(), checked: is_disabled }
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use shadow_design::dropzone::FileMetadata;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn DropzonePage() -> Element {
@@ -70,17 +70,17 @@ pub fn DropzonePage() -> Element {
     let mut last_selected_file = use_signal(|| None::<String>);
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Dropzone" }
-                Text { dimmed: true, size: TextSize::Sm, "Area interattiva di caricamento file tramite Drag-and-Drop o selezione da file manager, con feedback visivo di hover e reject." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Dropzone".to_string(),
+                description: "Area interattiva di caricamento file tramite Drag-and-Drop o selezione da file manager, con feedback visivo di hover e reject.".to_string(),
             }
 
             FeatureBanner { feature_name: "dropzone" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
+                    div { class: "sc-stack",
                         Dropzone {
                             accept: vec![".png".into(), ".jpg".into(), ".pdf".into(), ".rs".into()],
                             max_size_bytes: Some(15 * 1024 * 1024),
@@ -96,49 +96,43 @@ pub fn DropzonePage() -> Element {
                             },
                         }
 
-                        // Banner notifica ultimo file selezionato
                         if let Some(name) = last_selected_file.read().as_ref() {
-                            div { class: "p-3.5 rounded-xl border border-purple-500/40 bg-purple-950/30 flex items-center justify-between text-xs font-mono shadow-[0_0_15px_rgba(168,85,247,0.15)]",
-                                div { class: "flex items-center gap-2.5",
-                                    Icon { kind: IconKind::CheckCircle, size: 16, class: "text-emerald-400 flex-shrink-0" }
-                                    span { class: "text-zinc-400", "File selezionato:" }
-                                    span { class: "text-purple-300 font-bold", "{name}" }
-                                }
-                                Badge { label: "Caricato", variant: BadgeVariant::Success, dot: true }
+                            Alert {
+                                variant: AlertVariant::Success,
+                                title: "File selezionato".to_string(),
+                                "{name}"
                             }
                         }
 
-                        // Lista file caricati
-                        div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                            div { class: "flex items-center justify-between",
-                                span { class: "text-xs font-mono text-zinc-300 font-semibold uppercase tracking-wider", "File Caricati ({uploaded_files.read().len()})" }
+                        Card { title: "File Caricati ({uploaded_files.read().len()})".to_string(),
+                            div { class: "sc-stack",
                                 if !uploaded_files.read().is_empty() {
-                                    button {
-                                        r#type: "button",
-                                        class: "text-[11px] font-mono text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer",
-                                        onclick: move |_| {
-                                            uploaded_files.set(Vec::new());
-                                            last_selected_file.set(None);
-                                        },
-                                        "Svuota Elenco"
+                                    div { class: "sc-actions",
+                                        Button {
+                                            size: ButtonSize::Xs,
+                                            variant: ButtonVariant::Ghost,
+                                            onclick: move |_| {
+                                                uploaded_files.set(Vec::new());
+                                                last_selected_file.set(None);
+                                            },
+                                            "Svuota Elenco"
+                                        }
                                     }
                                 }
-                            }
-                            if uploaded_files.read().is_empty() {
-                                p { class: "text-xs text-zinc-600 font-mono py-2", "Nessun file presente." }
-                            } else {
-                                div { class: "space-y-2",
-                                    for (i, file) in uploaded_files.read().iter().enumerate() {
-                                        div {
-                                            key: "{i}",
-                                            class: "flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.04] text-xs font-mono",
-                                            div { class: "flex items-center gap-3 min-width-0 truncate",
-                                                Icon { kind: IconKind::Paperclip, size: 14, class: "text-purple-400 flex-shrink-0" }
-                                                span { class: "text-zinc-200 truncate", "{file.name}" }
-                                            }
-                                            div { class: "flex items-center gap-4 flex-shrink-0",
-                                                span { class: "text-zinc-500 text-[11px]", "{file.format_size()}" }
-                                                Icon { kind: IconKind::CheckCircle, size: 14, class: "text-emerald-400" }
+                                if uploaded_files.read().is_empty() {
+                                    p { class: "sc-subtle-text sc-mono", "Nessun file presente." }
+                                } else {
+                                    div { class: "sc-list",
+                                        for (i, file) in uploaded_files.read().iter().enumerate() {
+                                            div { key: "{i}", class: "sc-title-row",
+                                                span { class: "sc-actions",
+                                                    Icon { kind: IconKind::Paperclip, size: 14 }
+                                                    span { "{file.name}" }
+                                                }
+                                                span { class: "sc-actions",
+                                                    span { class: "sc-subtle-text sc-mono", "{file.format_size()}" }
+                                                    span { class: "sc-success-text", Icon { kind: IconKind::CheckCircle, size: 14 } }
+                                                }
                                             }
                                         }
                                     }

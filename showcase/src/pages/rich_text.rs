@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn RichTextPage() -> Element {
@@ -52,17 +52,17 @@ RichTextEditor {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "RichTextEditor" }
-                Text { dimmed: true, size: TextSize::Sm, "Editor di testo ricco con motore duale WYSIWYG + Markdown, toolbar modulare componibile e zero dipendenze JavaScript esterne." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "RichTextEditor".to_string(),
+                description: "Editor di testo ricco con motore duale WYSIWYG + Markdown, toolbar modulare componibile e zero dipendenze JavaScript esterne.".to_string(),
             }
 
             FeatureBanner { feature_name: "rich_text" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] shadow-inner",
+                    div { class: "w-full",
                         RichTextEditor {
                             value: editor_value,
                             placeholder: "Digita qualcosa o usa la toolbar...".to_string(),

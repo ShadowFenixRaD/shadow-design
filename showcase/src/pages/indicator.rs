@@ -1,13 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn IndicatorPage() -> Element {
-    let mut selected_pos = use_signal(|| IndicatorPosition::TopEnd);
-    let mut selected_color = use_signal(|| IndicatorColor::Violet);
-    let mut processing = use_signal(|| true);
+    let selected_pos = use_signal(|| IndicatorPosition::TopEnd);
+    let selected_color = use_signal(|| IndicatorColor::Violet);
+    let processing = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -54,111 +56,73 @@ pub fn IndicatorPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Indicator" }
-                Text { dimmed: true, size: TextSize::Sm, "Punto di stato o badge contatore ancorato agli angoli di qualsiasi elemento (avatar, pulsanti, icone) con supporto per onda radar pulsante." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Indicator".to_string(),
+                description: "Punto di stato o badge contatore ancorato agli angoli di qualsiasi elemento (avatar, pulsanti, icone) con supporto per onda radar pulsante.".to_string(),
             }
 
             FeatureBanner { feature_name: "indicator" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 py-16 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-8 shadow-inner min-h-[340px]",
-                        div { class: "flex items-center gap-4 flex-wrap justify-center",
-                            div { class: "flex items-center gap-2",
-                                span { class: "text-xs text-zinc-400 font-mono", "Posizione:" }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == IndicatorPosition::TopEnd { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_pos.set(IndicatorPosition::TopEnd),
-                                    "TopEnd"
+                    Playground {
+                        stage: rsx! {
+                            div { class: "sc-actions",
+                                Indicator {
+                                    position: *selected_pos.read(),
+                                    color: IndicatorColor::Emerald,
+                                    processing: *processing.read(),
+                                    Avatar {
+                                        name: "Christian Torbidone".to_string(),
+                                        size: AvatarSize::Lg,
+                                    }
                                 }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == IndicatorPosition::TopStart { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_pos.set(IndicatorPosition::TopStart),
-                                    "TopStart"
-                                }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == IndicatorPosition::BottomEnd { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_pos.set(IndicatorPosition::BottomEnd),
-                                    "BottomEnd"
-                                }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == IndicatorPosition::BottomStart { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_pos.set(IndicatorPosition::BottomStart),
-                                    "BottomStart"
-                                }
-                            }
 
-                            div { class: "flex items-center gap-2",
-                                span { class: "text-xs text-zinc-400 font-mono", "Colore:" }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_color.read() == IndicatorColor::Violet { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_color.set(IndicatorColor::Violet),
-                                    "Violet"
+                                Indicator {
+                                    position: *selected_pos.read(),
+                                    color: IndicatorColor::Rose,
+                                    label: Some("3".to_string()),
+                                    Button {
+                                        variant: ButtonVariant::Secondary,
+                                        "Messaggi"
+                                    }
                                 }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_color.read() == IndicatorColor::Cyan { "bg-cyan-950/80 text-cyan-200 border-cyan-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_color.set(IndicatorColor::Cyan),
-                                    "Cyan"
-                                }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_color.read() == IndicatorColor::Amber { "bg-amber-950/80 text-amber-200 border-amber-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| selected_color.set(IndicatorColor::Amber),
-                                    "Amber"
-                                }
-                            }
 
-                            div { class: "flex items-center gap-2",
-                                span { class: "text-xs text-zinc-400 font-mono", "Onda Radar:" }
-                                button {
-                                    r#type: "button",
-                                    class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *processing.read() { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                    onclick: move |_| processing.toggle(),
-                                    if *processing.read() { "Attiva" } else { "Spenta" }
+                                Indicator {
+                                    position: *selected_pos.read(),
+                                    color: *selected_color.read(),
+                                    processing: *processing.read(),
+                                    Button {
+                                        variant: ButtonVariant::Primary,
+                                        left_icon: rsx! { Icon { kind: IconKind::Info, size: 16 } },
+                                        "Notifiche"
+                                    }
                                 }
                             }
-                        }
-
-                        div { class: "flex items-center gap-8 flex-wrap justify-center p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]",
-                            Indicator {
-                                position: *selected_pos.read(),
-                                color: IndicatorColor::Emerald,
-                                processing: *processing.read(),
-                                Avatar {
-                                    name: "Christian Torbidone".to_string(),
-                                    size: AvatarSize::Lg,
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Posizione".to_string(),
+                                options: vec![
+                                    (IndicatorPosition::TopEnd, "TopEnd".to_string()),
+                                    (IndicatorPosition::TopStart, "TopStart".to_string()),
+                                    (IndicatorPosition::BottomEnd, "BottomEnd".to_string()),
+                                    (IndicatorPosition::BottomStart, "BottomStart".to_string()),
+                                ],
+                                value: selected_pos,
                             }
-
-                            Indicator {
-                                position: *selected_pos.read(),
-                                color: IndicatorColor::Rose,
-                                label: Some("3".to_string()),
-                                Button {
-                                    variant: ButtonVariant::Secondary,
-                                    "Messaggi"
-                                }
+                            ChoicePicker {
+                                label: "Colore".to_string(),
+                                options: vec![
+                                    (IndicatorColor::Violet, "Violet".to_string()),
+                                    (IndicatorColor::Cyan, "Cyan".to_string()),
+                                    (IndicatorColor::Amber, "Amber".to_string()),
+                                ],
+                                value: selected_color,
                             }
-
-                            Indicator {
-                                position: *selected_pos.read(),
-                                color: *selected_color.read(),
-                                processing: *processing.read(),
-                                Button {
-                                    variant: ButtonVariant::Primary,
-                                    left_icon: rsx! { Icon { kind: IconKind::Info, size: 16 } },
-                                    "Notifiche"
-                                }
-                            }
-                        }
+                            ToggleControl { label: "Onda Radar".to_string(), checked: processing }
+                        },
                     }
                 },
                 code: code_snippet,

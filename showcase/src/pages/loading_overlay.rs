@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, FeatureBanner, PageHeader, Playground, ToggleControl, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn LoadingOverlayPage() -> Element {
-    let mut visible = use_signal(|| true);
-    let mut blur_px = use_signal(|| 3u32);
+    let visible = use_signal(|| true);
+    let blur_px = use_signal(|| 4u32);
 
     let props = vec![
         PropRow {
@@ -52,58 +52,48 @@ pub fn LoadingOverlayPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "LoadingOverlay" }
-                Text { dimmed: true, size: TextSize::Sm, "Strato semitrasparente in overlay con spinner circolare animato e sfocatura ottica per isolare e disabilitare sezioni durante operazioni asincrone." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "LoadingOverlay".to_string(),
+                description: "Strato semitrasparente in overlay con spinner circolare animato e sfocatura ottica per isolare e disabilitare sezioni durante operazioni asincrone.".to_string(),
             }
 
             FeatureBanner { feature_name: "loading_overlay" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                        div { class: "flex items-center gap-3 flex-wrap",
-                            button {
-                                r#type: "button",
-                                class: "px-3 py-1.5 text-xs font-mono rounded-lg border border-purple-500/50 bg-purple-950/80 text-purple-200 transition-all cursor-pointer hover:bg-purple-900",
-                                onclick: move |_| visible.toggle(),
-                                if visible() { "Disattiva Overlay" } else { "Attiva Overlay" }
-                            }
-                            button {
-                                r#type: "button",
-                                class: "px-3 py-1.5 text-xs font-mono rounded-lg border border-white/[0.06] bg-white/[0.04] text-zinc-300 transition-all cursor-pointer",
-                                onclick: move |_| {
-                                    let next = if blur_px() >= 6 { 0 } else { blur_px() + 2 };
-                                    blur_px.set(next);
-                                },
-                                "Blur: {blur_px()}px"
-                            }
-                        }
-
-                        div { class: "max-w-md mx-auto w-full",
-                            LoadingOverlay {
-                                visible: visible(),
-                                blur_px: blur_px(),
-                                description: Some("Sincronizzazione archivio...".to_string()),
-                                div { class: "p-6 rounded-xl border border-white/[0.06] bg-zinc-950/60 space-y-4",
-                                    h4 { class: "text-sm font-semibold text-zinc-200", "Pannello Operativo" }
-                                    p { class: "text-xs text-zinc-400 leading-relaxed", "Questo modulo include parametri e pulsanti la cui interazione viene inibita mentre l'overlay è visibile." }
-                                    div { class: "flex gap-2 pt-2",
-                                        Button {
-                                            variant: ButtonVariant::Primary,
-                                            size: ButtonSize::Sm,
-                                            "Invia Task"
-                                        }
-                                        Button {
-                                            variant: ButtonVariant::Outline,
-                                            size: ButtonSize::Sm,
-                                            "Annulla"
+                    Playground {
+                        stage: rsx! {
+                            div { class: "w-full",
+                                LoadingOverlay {
+                                    visible: visible(),
+                                    blur_px: blur_px(),
+                                    description: Some("Sincronizzazione archivio...".to_string()),
+                                    Card { title: "Pannello Operativo".to_string(),
+                                        div { class: "sc-stack",
+                                            p { class: "sc-page-desc", "Questo modulo include parametri e pulsanti la cui interazione viene inibita mentre l'overlay è visibile." }
+                                            div { class: "sc-actions",
+                                                Button { variant: ButtonVariant::Primary, size: ButtonSize::Sm, "Invia Task" }
+                                                Button { variant: ButtonVariant::Outline, size: ButtonSize::Sm, "Annulla" }
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ToggleControl { label: "Overlay attivo".to_string(), checked: visible }
+                            ChoicePicker {
+                                label: "Sfocatura (px)".to_string(),
+                                options: vec![
+                                    (0u32, "0".to_string()),
+                                    (2u32, "2".to_string()),
+                                    (4u32, "4".to_string()),
+                                    (6u32, "6".to_string()),
+                                ],
+                                value: blur_px,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

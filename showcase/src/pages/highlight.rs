@@ -1,12 +1,14 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ControlGroup, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn HighlightPage() -> Element {
     let query = use_signal(|| "shadow".to_string());
-    let mut case_sensitive = use_signal(|| false);
+    let case_sensitive = use_signal(|| false);
     let sample_text = "Shadow Design è una suite di componenti modulari per Dioxus 0.7. L'architettura Shadow garantisce micro-interazioni tattili, zero-bloat e stile cyberpunk.";
 
     let props = vec![
@@ -50,41 +52,36 @@ pub fn HighlightPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Highlight" }
-                Text { dimmed: true, size: TextSize::Sm, "Evidenzia visivamente occorrenze di testo o query di ricerca tramite tag <mark> integrati con supporto case-insensitive e stili ad alto contrasto." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Highlight".to_string(),
+                description: "Evidenzia visivamente occorrenze di testo o query di ricerca tramite tag <mark> integrati con supporto case-insensitive e stili ad alto contrasto.".to_string(),
             }
 
             FeatureBanner { feature_name: "highlight" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                        div { class: "flex items-center gap-4 flex-wrap",
-                            div { class: "flex-1 min-w-[200px]",
-                                TextInput {
-                                    value: query,
-                                    placeholder: "Cerca nel testo...",
-                                }
-                            }
-                            button {
-                                r#type: "button",
-                                class: format!("px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if case_sensitive() { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| case_sensitive.toggle(),
-                                "Case Sensitive"
-                            }
-                        }
-
-                        div { class: "p-5 rounded-lg bg-white/[0.02] border border-white/[0.06]",
-                            p { class: "text-sm text-zinc-300 leading-relaxed font-sans",
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            p { class: "sc-muted-text",
                                 Highlight {
                                     text: sample_text.to_string(),
                                     query: query(),
                                     case_sensitive: case_sensitive(),
                                 }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ControlGroup { label: "Ricerca".to_string(),
+                                TextInput {
+                                    value: query,
+                                    placeholder: "Cerca nel testo...",
+                                }
+                            }
+                            ToggleControl { label: "Case Sensitive".to_string(), checked: case_sensitive }
+                        },
                     }
                 },
                 code: code_snippet,

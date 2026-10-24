@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn MasonryPage() -> Element {
@@ -62,17 +62,17 @@ pub fn MasonryPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "MasonryGrid & ImageList" }
-                Text { dimmed: true, size: TextSize::Sm, "Griglia a cascata in stile Pinterest con altezze eterogenee distribuite fluidamente e visualizzatore Lightbox modale integrato." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "MasonryGrid & ImageList".to_string(),
+                description: "Griglia a cascata in stile Pinterest con altezze eterogenee distribuite fluidamente e visualizzatore Lightbox modale integrato.".to_string(),
             }
 
             FeatureBanner { feature_name: "masonry" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08]",
+                    div { class: "sc-demo-frame w-full",
                         ImageList {
                             items: sample_items,
                             cols: ResponsiveCols::responsive(1, 2, 3, 3, 3),

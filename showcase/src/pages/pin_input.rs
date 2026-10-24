@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, ControlRow, Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+    ToggleControl,
+};
 
 #[component]
 pub fn PinInputPage() -> Element {
@@ -13,12 +16,12 @@ pub fn PinInputPage() -> Element {
 
     // Interactive playground controls
     let playground_val = use_signal(|| "13".to_string());
-    let mut play_len = use_signal(|| 4usize);
+    let play_len = use_signal(|| 4usize);
     let play_mask = use_signal(|| false);
     let play_numeric = use_signal(|| true);
     let play_disabled = use_signal(|| false);
     let play_error = use_signal(|| false);
-    let mut play_size = use_signal(|| ControlSize::Md);
+    let play_size = use_signal(|| ControlSize::Md);
 
     let props = vec![
         PropRow {
@@ -111,14 +114,10 @@ PinInput {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "PinInput / InputOTP" }
-                Text { dimmed: true, size: TextSize::Sm,
-                    "Componente tattile per l'inserimento di codici PIN, token 2FA e OTP a caselle multiple. "
-                    "Supporta avanzamento automatico del focus su digitazione, cancellazione con backspace, "
-                    "distribuzione rapida di paste/autofill su più celle, mascheramento password e filtro numerico."
-                }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "PinInput / InputOTP".to_string(),
+                description: "Inserimento di codici PIN, token 2FA e OTP a caselle multiple, con avanzamento automatico del focus, backspace, paste/autofill su più celle, mascheramento e filtro numerico.".to_string(),
             }
 
             FeatureBanner { feature_name: "pin_input" }
@@ -127,104 +126,63 @@ PinInput {
                 props: props,
                 code: code_snippet,
                 preview: rsx! {
-                    div { class: "space-y-8",
-                        // Live Playground
-                        Card {
-                            div { class: "p-6 space-y-6",
-                                Heading { order: HeadingOrder::H3, "Live Playground" }
-
-                                div { class: "flex flex-wrap gap-4 items-center p-4 bg-zinc-950/60 rounded-lg border border-white/5",
-                                    div { class: "flex items-center gap-1.5",
-                                        span { class: "text-xs text-zinc-400 mr-2", "Lunghezza:" }
-                                        for len in [4, 6, 8] {
-                                            button {
-                                                r#type: "button",
-                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
-                                                    if *play_len.read() == len { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                                onclick: move |_| play_len.set(len),
-                                                "{len} cifre"
-                                            }
-                                        }
-                                    }
-
-                                    div { class: "flex items-center gap-1.5",
-                                        span { class: "text-xs text-zinc-400 mr-2", "Dimensione:" }
-                                        for (s, name) in [
-                                            (ControlSize::Sm, "Sm"),
-                                            (ControlSize::Md, "Md"),
-                                            (ControlSize::Lg, "Lg"),
-                                        ] {
-                                            button {
-                                                r#type: "button",
-                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
-                                                    if *play_size.read() == s { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                                onclick: move |_| play_size.set(s),
-                                                "{name}"
-                                            }
-                                        }
-                                    }
-
-                                    Checkbox {
-                                        checked: play_mask,
-                                        label: "Maschera (password)".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-
-                                    Checkbox {
-                                        checked: play_numeric,
-                                        label: "Solo Numeri".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-
-                                    Checkbox {
-                                        checked: play_error,
-                                        label: "Errore".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-
-                                    Checkbox {
-                                        checked: play_disabled,
-                                        label: "Disabilitato".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                }
-
-                                div { class: "flex flex-col items-center justify-center p-8 bg-black/40 rounded-xl border border-white/10 gap-4",
+                    div { class: "sc-stack sc-stack--loose",
+                        Playground {
+                            stage: rsx! {
+                                div { class: "sc-stack items-center",
                                     PinInput {
                                         value: playground_val,
-                                        length: *play_len.read(),
-                                        mask: *play_mask.read(),
-                                        numeric_only: *play_numeric.read(),
-                                        disabled: *play_disabled.read(),
-                                        error: *play_error.read(),
-                                        size: *play_size.read(),
+                                        length: play_len(),
+                                        mask: play_mask(),
+                                        numeric_only: play_numeric(),
+                                        disabled: play_disabled(),
+                                        error: play_error(),
+                                        size: play_size(),
                                     }
-
-                                    div { class: "text-xs text-zinc-400 font-mono mt-2",
-                                        "Valore live: "
-                                        span { class: "text-purple-400 font-bold", "\"{playground_val}\"" }
-                                    }
+                                    Counter { label: "Valore live".to_string(), value: format!("\"{}\"", playground_val()) }
                                 }
-                            }
+                            },
+                            controls: rsx! {
+                                ChoicePicker {
+                                    label: "Lunghezza".to_string(),
+                                    options: vec![
+                                        (4usize, "4 cifre".to_string()),
+                                        (6usize, "6 cifre".to_string()),
+                                        (8usize, "8 cifre".to_string()),
+                                    ],
+                                    value: play_len,
+                                }
+                                ChoicePicker {
+                                    label: "Dimensione".to_string(),
+                                    options: vec![
+                                        (ControlSize::Sm, "Sm".to_string()),
+                                        (ControlSize::Md, "Md".to_string()),
+                                        (ControlSize::Lg, "Lg".to_string()),
+                                    ],
+                                    value: play_size,
+                                }
+                                hr { class: "sc-control-divider" }
+                                ControlRow {
+                                    ToggleControl { label: "Maschera (password)".to_string(), checked: play_mask }
+                                    ToggleControl { label: "Solo numeri".to_string(), checked: play_numeric }
+                                    ToggleControl { label: "Errore".to_string(), checked: play_error }
+                                    ToggleControl { label: "Disabilitato".to_string(), checked: play_disabled }
+                                }
+                            },
                         }
 
-                        // Standard Cases
-                        div { class: "grid grid-cols-1 md:grid-cols-2 gap-6",
+                        div { class: "sc-card-grid",
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "Autenticazione 2FA (6 Cifre)" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Inserisci il codice di sicurezza a 6 cifre ricevuto sul tuo dispositivo authenticator."
-                                    }
-                                    div { class: "py-2",
-                                        PinInput {
-                                            value: otp_6,
-                                            length: 6,
-                                            numeric_only: true,
-                                            on_complete: move |val: String| {
-                                                complete_msg.set(format!("Codice {} validato con successo!", val));
-                                            },
-                                        }
+                                title: "Autenticazione 2FA (6 cifre)".to_string(),
+                                subtitle: "Inserisci il codice di sicurezza a 6 cifre ricevuto sul tuo dispositivo authenticator.".to_string(),
+                                div { class: "sc-stack",
+                                    PinInput {
+                                        value: otp_6,
+                                        length: 6,
+                                        numeric_only: true,
+                                        on_complete: move |val: String| {
+                                            complete_msg.set(format!("Codice {} validato con successo!", val));
+                                        },
                                     }
                                     if !complete_msg.read().is_empty() {
                                         Alert {
@@ -237,75 +195,39 @@ PinInput {
                             }
 
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "PIN Mascherato (4 Cifre)" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Ideale per codice bancomat o PIN di sblocco con mascheramento caratteri."
+                                title: "PIN mascherato (4 cifre)".to_string(),
+                                subtitle: "Ideale per codice bancomat o PIN di sblocco con mascheramento caratteri.".to_string(),
+                                div { class: "sc-stack",
+                                    PinInput {
+                                        value: masked_pin,
+                                        length: 4,
+                                        mask: true,
+                                        numeric_only: true,
+                                        size: ControlSize::Lg,
                                     }
-                                    div { class: "py-2",
-                                        PinInput {
-                                            value: masked_pin,
-                                            length: 4,
-                                            mask: true,
-                                            numeric_only: true,
-                                            size: ControlSize::Lg,
-                                        }
-                                    }
-                                    div { class: "text-xs text-zinc-500 font-mono",
-                                        "Valore memorizzato: {masked_pin}"
-                                    }
+                                    Counter { label: "Valore memorizzato".to_string(), value: masked_pin() }
                                 }
                             }
 
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "Codice Voucher Alfanumerico" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Accetta sia lettere che numeri per coupon, codici attivazione e ticket."
+                                title: "Codice voucher alfanumerico".to_string(),
+                                subtitle: "Accetta sia lettere che numeri per coupon, codici attivazione e ticket.".to_string(),
+                                div { class: "sc-stack",
+                                    PinInput {
+                                        value: alpha_code,
+                                        length: 5,
+                                        numeric_only: false,
+                                        placeholder: Some("•".to_string()),
                                     }
-                                    div { class: "py-2",
-                                        PinInput {
-                                            value: alpha_code,
-                                            length: 5,
-                                            numeric_only: false,
-                                            placeholder: Some("•".to_string()),
-                                        }
-                                    }
-                                    div { class: "text-xs text-zinc-500 font-mono",
-                                        "Valore: {alpha_code}"
-                                    }
+                                    Counter { label: "Valore".to_string(), value: alpha_code() }
                                 }
                             }
 
-                            Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "Scala Dimensioni (Sm / Md / Lg)" }
-                                    div { class: "space-y-4",
-                                        div { class: "flex items-center gap-3",
-                                            span { class: "w-8 text-xs text-zinc-400", "Sm" }
-                                            PinInput {
-                                                value: pin_4,
-                                                length: 4,
-                                                size: ControlSize::Sm,
-                                            }
-                                        }
-                                        div { class: "flex items-center gap-3",
-                                            span { class: "w-8 text-xs text-zinc-400", "Md" }
-                                            PinInput {
-                                                value: pin_4,
-                                                length: 4,
-                                                size: ControlSize::Md,
-                                            }
-                                        }
-                                        div { class: "flex items-center gap-3",
-                                            span { class: "w-8 text-xs text-zinc-400", "Lg" }
-                                            PinInput {
-                                                value: pin_4,
-                                                length: 4,
-                                                size: ControlSize::Lg,
-                                            }
-                                        }
-                                    }
+                            Card { title: "Scala dimensioni (Sm / Md / Lg)".to_string(),
+                                div { class: "sc-stack",
+                                    PinInput { value: pin_4, length: 4, size: ControlSize::Sm }
+                                    PinInput { value: pin_4, length: 4, size: ControlSize::Md }
+                                    PinInput { value: pin_4, length: 4, size: ControlSize::Lg }
                                 }
                             }
                         }

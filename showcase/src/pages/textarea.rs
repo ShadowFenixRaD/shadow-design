@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, Playground, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn TextareaPage() -> Element {
@@ -133,72 +133,58 @@ Textarea {
     let auto_lines = auto_note().lines().count().max(1);
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Textarea" }
-                Text { dimmed: true, size: TextSize::Sm, "Aree di testo multilinea ad alta precisione con espansione verticale dinamica proporzionale al contenuto (AutoResizeTextarea), ridimensionamento manuale configurabile (resize_width, resize_height), conteggio caratteri, cancellazione rapida (clearable) e supporto al tema Mantine." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Textarea".to_string(),
+                description: "Aree di testo multilinea ad alta precisione con espansione verticale dinamica proporzionale al contenuto (AutoResizeTextarea), ridimensionamento manuale configurabile (resize_width, resize_height), conteggio caratteri, cancellazione rapida (clearable) e supporto al tema Mantine.".to_string(),
             }
 
             FeatureBanner { feature_name: "textarea" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Controls
-                        div { class: "space-y-6",
-                            // 1. Standard Textarea con contatore e clearable
-                            Textarea {
-                                value: bio,
-                                label: Some("Biografia Utente".to_string()),
-                                placeholder: Some("Scrivi una breve introduzione...".to_string()),
-                                help_text: Some("Massimo 200 caratteri ammessi".to_string()),
-                                show_count: true,
-                                max_length: Some(200),
-                                clearable: true,
-                            }
-
-                            // 2. AutoResizeTextarea dinamica
-                            AutoResizeTextarea {
-                                value: auto_note,
-                                label: Some("Appunti Live (AutoResizeTextarea)".to_string()),
-                                placeholder: Some("Aggiungi righe per vedere l'espansione automatica dell'altezza...".to_string()),
-                                help_text: Some("Minimo 2 righe, si adatta fedelmente al testo senza spazio morto".to_string()),
-                                min_rows: 2,
-                                max_rows: Some(6),
-                                clearable: true,
-                            }
-
-                            // 3. Textarea per messaggio commit
-                            Textarea {
-                                value: commit_msg,
-                                label: Some("Messaggio di Commit / Release".to_string()),
-                                min_rows: 2,
-                                show_count: true,
-                                max_length: Some(72),
-                            }
-                        }
-
-                        // State Telemetry
-                        div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-4 font-mono text-xs shadow-inner",
-                            p { class: "text-zinc-400 font-semibold uppercase text-[10px] tracking-wider", "Stato Reattivo Signal:" }
-                            div { class: "p-3 rounded-lg bg-black/60 border border-white/[0.04] space-y-2.5",
-                                div { class: "text-purple-300",
-                                     span { class: "text-zinc-500", "bio.len = " }
-                                    "{bio_chars} / 200"
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                Textarea {
+                                    value: bio,
+                                    label: Some("Biografia Utente".to_string()),
+                                    placeholder: Some("Scrivi una breve introduzione...".to_string()),
+                                    help_text: Some("Massimo 200 caratteri ammessi".to_string()),
+                                    show_count: true,
+                                    max_length: Some(200),
+                                    clearable: true,
                                 }
-                                div { class: "text-cyan-300",
-                                     span { class: "text-zinc-500", "auto_note.lines = " }
-                                    "{auto_lines} righe calcolate"
+                                AutoResizeTextarea {
+                                    value: auto_note,
+                                    label: Some("Appunti Live (AutoResizeTextarea)".to_string()),
+                                    placeholder: Some("Aggiungi righe per vedere l'espansione automatica dell'altezza...".to_string()),
+                                    help_text: Some("Minimo 2 righe, si adatta fedelmente al testo senza spazio morto".to_string()),
+                                    min_rows: 2,
+                                    max_rows: Some(6),
+                                    clearable: true,
                                 }
-                                div { class: "text-emerald-300",
-                                     span { class: "text-zinc-500", "commit_msg = " }
-                                    "\"{commit_msg}\""
+                                Textarea {
+                                    value: commit_msg,
+                                    label: Some("Messaggio di Commit / Release".to_string()),
+                                    min_rows: 2,
+                                    show_count: true,
+                                    max_length: Some(72),
                                 }
                             }
-                            span { class: "text-[11px] text-zinc-500 block leading-normal",
+                        },
+                        controls: rsx! {
+                            span { class: "sc-control-label", "Stato reattivo Signal" }
+                            div { class: "sc-stack sc-mono",
+                                Counter { label: "bio.len".to_string(), value: format!("{bio_chars} / 200") }
+                                Counter { label: "auto_note.lines".to_string(), value: format!("{auto_lines} righe calcolate") }
+                                Counter { label: "commit_msg".to_string(), value: format!("\"{}\"", commit_msg()) }
+                            }
+                            span { class: "sc-page-desc",
                                 "La digitazione aggiorna istantaneamente lo stato reattivo e ricalcola le righe visibili in tempo reale senza flickering."
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -209,7 +195,7 @@ Textarea {
             Card {
                 title: "Ridimensionamento Manuale (Resize Width & Height)".to_string(),
                 subtitle: "Parametri opzionali 'resize_width' e 'resize_height' per abilitare il trascinamento manuale dall'angolo in basso a destra".to_string(),
-                div { class: "grid grid-cols-1 md:grid-cols-2 gap-6 pt-2",
+                div { class: "sc-card-grid",
                     Textarea {
                         value: height_only_text,
                         label: Some("Resize Solo Altezza (resize_height: true)".to_string()),
@@ -232,7 +218,7 @@ Textarea {
             Card {
                 title: "Stati di Validazione ed Eccezioni".to_string(),
                 subtitle: "Comportamento visivo con stato disabilitato, sola lettura ed errore di validazione".to_string(),
-                div { class: "grid grid-cols-1 md:grid-cols-3 gap-6 pt-2",
+                div { class: "sc-card-grid sc-card-grid--3",
                     Textarea {
                         value: readonly_text,
                         label: Some("Sola Lettura (Readonly)".to_string()),

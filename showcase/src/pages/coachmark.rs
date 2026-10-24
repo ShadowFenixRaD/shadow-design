@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn CoachmarkPage() -> Element {
@@ -86,20 +86,20 @@ Coachmark {
     };
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Coachmark / TeachingBubble" }
-                Text { dimmed: true, size: TextSize::Sm, "Bolla di guida passo-passo ancorata a elementi specifici per onboarding utenti, con puntatore, pulsanti Avanti/Indietro e contatore di step." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Coachmark / TeachingBubble".to_string(),
+                description: "Bolla di guida passo-passo ancorata a elementi specifici per onboarding utenti, con puntatore, pulsanti Avanti/Indietro e contatore di step.".to_string(),
             }
 
             FeatureBanner { feature_name: "coachmark" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-10 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner",
+                    Stage {
                         if !*is_tour_active.read() {
-                            div { class: "text-center space-y-3 py-6",
-                                p { class: "text-xs text-zinc-400", "Il tour guidato è stato completato o chiuso." }
+                            div { class: "sc-stack items-center text-center",
+                                p { class: "sc-muted-text", "Il tour guidato è stato completato o chiuso." }
                                 Button {
                                     variant: ButtonVariant::Primary,
                                     left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 15 } },

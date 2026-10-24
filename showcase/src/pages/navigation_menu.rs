@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn NavigationMenuPage() -> Element {
@@ -88,27 +88,25 @@ pub fn NavigationMenuPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "NavigationMenu (Mega-Menu)" }
-                Text { dimmed: true, size: TextSize::Sm, "Barra di navigazione per applicazioni ad elevata complessità con pannelli a discesa a larghezza estesa, suddivisi in più colonne con schede di anteprima incorporate." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "NavigationMenu (Mega-Menu)".to_string(),
+                description: "Barra di navigazione per applicazioni ad elevata complessità con pannelli a discesa a larghezza estesa, suddivisi in più colonne con schede di anteprima incorporate.".to_string(),
             }
 
             FeatureBanner { feature_name: "navigation_menu" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-8 rounded-2xl bg-zinc-950/70 border border-white/[0.08] min-h-[360px] flex flex-col justify-between",
-                        NavigationMenu {
-                            items: menu_items,
-                            on_select: move |item: NavigationLinkItem| {
-                                selected_link.set(item.title);
-                            },
-                        }
-
-                        div { class: "mt-12 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-zinc-400 flex items-center justify-between",
-                            span { "Ultimo link cliccato:" }
-                            span { class: "text-purple-400 font-bold", "{selected_link()}" }
+                    Stage { start: true, wide: true,
+                        div { class: "sc-stack w-full",
+                            NavigationMenu {
+                                items: menu_items,
+                                on_select: move |item: NavigationLinkItem| {
+                                    selected_link.set(item.title);
+                                },
+                            }
+                            Counter { label: "Ultimo link cliccato".to_string(), value: selected_link() }
                         }
                     }
                 },

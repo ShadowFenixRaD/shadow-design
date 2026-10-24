@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn DocumentCardPage() -> Element {
@@ -54,17 +54,17 @@ pub fn DocumentCardPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "DocumentCard" }
-                Text { dimmed: true, size: TextSize::Sm, "Scheda ricca per la visualizzazione di documenti, allegati e file con thumbnail preview, badge cromatici di formato e barra azioni rapide in hover." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "DocumentCard".to_string(),
+                description: "Scheda ricca per la visualizzazione di documenti, allegati e file con thumbnail preview, badge cromatici di formato e barra azioni rapide in hover.".to_string(),
             }
 
             FeatureBanner { feature_name: "document_card" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 sm:grid-cols-2 gap-6 w-full p-4",
+                    div { class: "sc-card-grid",
                         DocumentCard {
                             file_name: "Architettura-Shadow-Design-v2.pdf".to_string(),
                             file_type: "PDF".to_string(),

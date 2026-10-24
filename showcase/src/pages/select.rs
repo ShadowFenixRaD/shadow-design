@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, PropsTable, ShowcaseTabs};
+use crate::components::{ChoicePicker, Counter, Playground, FeatureBanner, PageHeader, PropRow, PropsTable, ShowcaseTabs};
 
 #[component]
 pub fn SelectPage() -> Element {
@@ -12,7 +12,7 @@ pub fn SelectPage() -> Element {
     let disabled_select_val = use_signal(|| Some("1".to_string()));
     let error_select_val = use_signal(|| None::<String>);
     let loading_select_val = use_signal(|| None::<String>);
-    let mut active_api_tab = use_signal(|| 0usize);
+    let active_api_tab = use_signal(|| 0usize);
 
     let frameworks_data = vec![
         SelectItem::new("dioxus", "Dioxus 0.7")
@@ -275,99 +275,78 @@ Combobox {
         .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Select, MultiSelect & Combobox" }
-                Text { dimmed: true, size: TextSize::Sm, "Selettori a discesa singoli e multipli ad alte prestazioni con ricerca live, chip dismissabili, raggruppamento opzioni, creazione dinamica di valori (creatable) e completamento automatico Combobox con piena conformità WAI-ARIA." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Select, MultiSelect & Combobox".to_string(),
+                description: "Selettori a discesa singoli e multipli ad alte prestazioni con ricerca live, chip dismissabili, raggruppamento opzioni, creazione dinamica di valori (creatable) e completamento automatico Combobox con piena conformità WAI-ARIA.".to_string(),
             }
 
             FeatureBanner { feature_name: "select" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Demo Controlli
-                        div { class: "space-y-6",
-                            // 1. Select Singolo
-                            Select {
-                                data: frameworks_data,
-                                value: selected_framework,
-                                label: Some("Framework di Riferimento".to_string()),
-                                description: Some("Seleziona il framework primario per il tuo stack tecnologico".to_string()),
-                                placeholder: Some("Seleziona un framework...".to_string()),
-                                searchable: true,
-                                clearable: true,
-                            }
-
-                            // 2. Select Raggruppato con Creatable
-                            Select {
-                                data: grouped_roles_data,
-                                value: selected_role,
-                                label: Some("Ruolo Operativo (Con Categorie & Creatable)".to_string()),
-                                description: Some("Le voci sono organizzate per dipartimento. Digita per cercare o creare un ruolo custom.".to_string()),
-                                placeholder: Some("Scegli un ruolo o digitane uno nuovo...".to_string()),
-                                searchable: true,
-                                clearable: true,
-                                creatable: true,
-                            }
-
-                            // 3. MultiSelect con Chip e Limite
-                            MultiSelect {
-                                data: skills_data,
-                                values: selected_skills,
-                                label: Some("Competenze Tecniche (MultiSelect)".to_string()),
-                                description: Some("Seleziona più tag o creane di nuovi premendo invio".to_string()),
-                                placeholder: Some("Aggiungi competenze...".to_string()),
-                                searchable: true,
-                                clearable: true,
-                                creatable: true,
-                                max_selected_display: Some(4),
-                            }
-
-                            // 4. Combobox Autocomplete
-                            Combobox {
-                                data: themes_data,
-                                value: combobox_val,
-                                label: Some("Combobox (Input Autocomplete)".to_string()),
-                                description: Some("Digita liberamente o clicca la freccia a destra per vedere i suggerimenti".to_string()),
-                                placeholder: Some("Digita il nome di un preset...".to_string()),
-                                clearable: true,
-                            }
-                        }
-
-                        // Telemetria Stato Reattivo
-                        div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-4 font-mono text-xs shadow-inner",
-                            p { class: "text-zinc-400 font-semibold uppercase text-[10px] tracking-wider", "Stato Reattivo Signal:" }
-                            div { class: "p-3 rounded-lg bg-black/60 border border-white/[0.04] space-y-2.5",
-                                div { class: "text-purple-300",
-                                    span { class: "text-zinc-500", "selected_framework = " }
-                                    if let Some(v) = selected_framework() {
-                                        "Some(\"{v}\")"
-                                    } else {
-                                        "None"
-                                    }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                Select {
+                                    data: frameworks_data,
+                                    value: selected_framework,
+                                    label: Some("Framework di Riferimento".to_string()),
+                                    description: Some("Seleziona il framework primario per il tuo stack tecnologico".to_string()),
+                                    placeholder: Some("Seleziona un framework...".to_string()),
+                                    searchable: true,
+                                    clearable: true,
                                 }
-                                div { class: "text-cyan-300",
-                                    span { class: "text-zinc-500", "selected_role = " }
-                                    if let Some(v) = selected_role() {
-                                        "Some(\"{v}\")"
-                                    } else {
-                                        "None"
-                                    }
+                                Select {
+                                    data: grouped_roles_data,
+                                    value: selected_role,
+                                    label: Some("Ruolo Operativo (Con Categorie & Creatable)".to_string()),
+                                    description: Some("Le voci sono organizzate per dipartimento. Digita per cercare o creare un ruolo custom.".to_string()),
+                                    placeholder: Some("Scegli un ruolo o digitane uno nuovo...".to_string()),
+                                    searchable: true,
+                                    clearable: true,
+                                    creatable: true,
                                 }
-                                div { class: "text-emerald-300",
-                                    span { class: "text-zinc-500", "selected_skills = " }
-                                    "{selected_skills():?}"
+                                MultiSelect {
+                                    data: skills_data,
+                                    values: selected_skills,
+                                    label: Some("Competenze Tecniche (MultiSelect)".to_string()),
+                                    description: Some("Seleziona più tag o creane di nuovi premendo invio".to_string()),
+                                    placeholder: Some("Aggiungi competenze...".to_string()),
+                                    searchable: true,
+                                    clearable: true,
+                                    creatable: true,
+                                    max_selected_display: Some(4),
                                 }
-                                div { class: "text-amber-300",
-                                    span { class: "text-zinc-500", "combobox_val = " }
-                                    "\"{combobox_val}\""
+                                Combobox {
+                                    data: themes_data,
+                                    value: combobox_val,
+                                    label: Some("Combobox (Input Autocomplete)".to_string()),
+                                    description: Some("Digita liberamente o clicca la freccia a destra per vedere i suggerimenti".to_string()),
+                                    placeholder: Some("Digita il nome di un preset...".to_string()),
+                                    clearable: true,
                                 }
                             }
-                            span { class: "text-[11px] text-zinc-500 block leading-normal",
+                        },
+                        controls: rsx! {
+                            span { class: "sc-control-label", "Stato reattivo Signal" }
+                            div { class: "sc-stack sc-mono",
+                                Counter {
+                                    label: "selected_framework".to_string(),
+                                    value: selected_framework().map(|v| format!("Some(\"{v}\")")).unwrap_or_else(|| "None".to_string()),
+                                }
+                                Counter {
+                                    label: "selected_role".to_string(),
+                                    value: selected_role().map(|v| format!("Some(\"{v}\")")).unwrap_or_else(|| "None".to_string()),
+                                }
+                                Counter { label: "selected_skills".to_string(), value: format!("{:?}", selected_skills()) }
+                                Counter { label: "combobox_val".to_string(), value: format!("\"{}\"", combobox_val()) }
+                            }
+                            span { class: "sc-page-desc",
                                 "La selezione o cancellazione di opzioni, sia singole che multiple, si riflette all'istante nei rispettivi Signal<Option<String>> e Signal<Vec<String>>."
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -378,21 +357,16 @@ Combobox {
             Card {
                 title: "Specifiche Parametri API per Componente".to_string(),
                 subtitle: "Tabelle dettagliate dei parametri per Select, MultiSelect, Combobox e SelectItem builder".to_string(),
-                div { class: "space-y-4 pt-2",
-                    div { class: "flex flex-wrap gap-2 border-b border-white/[0.06] pb-3",
-                        for (idx, name) in ["Select", "MultiSelect", "Combobox", "SelectItem (Builder)"].into_iter().enumerate() {
-                            button {
-                                key: "{name}",
-                                r#type: "button",
-                                class: if active_api_tab() == idx {
-                                    "px-3 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 text-xs font-mono font-bold cursor-pointer"
-                                } else {
-                                    "px-3 py-1 rounded bg-white/[0.02] hover:bg-white/[0.06] text-zinc-400 hover:text-white border border-white/[0.06] text-xs font-mono cursor-pointer transition-colors"
-                                },
-                                onclick: move |_| active_api_tab.set(idx),
-                                "{name}"
-                            }
-                        }
+                div { class: "sc-stack",
+                    ChoicePicker {
+                        label: "Componente".to_string(),
+                        options: vec![
+                            (0usize, "Select".to_string()),
+                            (1usize, "MultiSelect".to_string()),
+                            (2usize, "Combobox".to_string()),
+                            (3usize, "SelectItem (Builder)".to_string()),
+                        ],
+                        value: active_api_tab,
                     }
 
                     match active_api_tab() {
@@ -408,7 +382,7 @@ Combobox {
             Card {
                 title: "Stati Particolari: Disabilitato, Errore e Loading".to_string(),
                 subtitle: "Supporto integrato a feedback visivo e stati transitori".to_string(),
-                div { class: "grid grid-cols-1 md:grid-cols-3 gap-6 pt-2",
+                div { class: "sc-card-grid sc-card-grid--3",
                     Select {
                         data: vec![SelectItem::new("1", "Opzione")],
                         value: disabled_select_val,

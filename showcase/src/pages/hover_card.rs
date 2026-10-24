@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn HoverCardPage() -> Element {
@@ -36,22 +36,20 @@ pub fn HoverCardPage() -> Element {
     open_delay: 150,
     close_delay: 200,
     HoverCardTrigger {
-        span { class: "text-purple-400 font-semibold cursor-pointer underline underline-offset-4",
-            "@shadowfenix"
-        }
+        Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, "@shadowfenix" }
     }
     HoverCardDropdown {
-        div { class: "flex items-start gap-3.5",
+        div { class: "sc-actions",
             Avatar {
                 name: "Shadow Fenix".to_string(),
                 size: AvatarSize::Md,
             }
-            div { class: "space-y-1.5 flex-1 min-w-0",
-                div { class: "flex items-center justify-between",
-                    h4 { class: "font-bold text-sm text-white", "Shadowfenix RaD" }
+            div { class: "sc-stack",
+                div { class: "sc-title-row",
+                    h4 { class: "sc-section-title", "Shadowfenix RaD" }
                     Badge { label: "Core Team".to_string(), variant: BadgeVariant::Primary, pill: true }
                 }
-                p { class: "text-xs text-zinc-400", "Ecosistema di componenti ad alte prestazioni per Dioxus 0.7." }
+                p { class: "sc-muted-text", "Ecosistema di componenti ad alte prestazioni per Dioxus 0.7." }
             }
         }
     }
@@ -59,55 +57,49 @@ pub fn HoverCardPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "HoverCard" }
-                Text { dimmed: true, size: TextSize::Sm, "Scheda di preview contestuale ricca attivata al passaggio del cursore (hover) con ritardi configurabili e persistenza su interazione." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "HoverCard".to_string(),
+                description: "Scheda di preview contestuale ricca attivata al passaggio del cursore (hover) con ritardi configurabili e persistenza su interazione.".to_string(),
             }
 
             FeatureBanner { feature_name: "hover_card" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 py-20 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 text-center shadow-inner min-h-[400px]",
-                        p { class: "text-xs text-zinc-400 max-w-md",
+                    Stage {
+                        p { class: "sc-muted-text",
                             "Passa il cursore sulla menzione sottostante per visualizzare l'anteprima del profilo. Il card rimane interattivo consentendo di cliccare pulsanti o link al suo interno."
                         }
 
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center gap-2 text-sm text-zinc-300",
-                            span { "Sviluppato con passione da" }
+                        div { class: "sc-actions",
+                            span { class: "sc-muted-text", "Sviluppato con passione da" }
                             HoverCard {
                                 open_delay: 100,
                                 close_delay: 200,
                                 HoverCardTrigger {
-                                    span { class: "text-purple-400 font-bold hover:text-purple-300 underline underline-offset-4 decoration-purple-500/50 cursor-pointer transition-colors",
-                                        "@shadowfenix"
-                                    }
+                                    Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, "@shadowfenix" }
                                 }
                                 HoverCardDropdown {
-                                    div { class: "flex items-start gap-3.5 p-1 text-left",
+                                    div { class: "sc-actions",
                                         Avatar {
                                             name: "Shadow Fenix".to_string(),
                                             size: AvatarSize::Md,
                                         }
-                                        div { class: "space-y-1.5 flex-1 min-w-0",
-                                            div { class: "flex items-center justify-between gap-2",
-                                                h4 { class: "font-bold text-sm text-white", "Shadowfenix RaD" }
+                                        div { class: "sc-stack",
+                                            div { class: "sc-title-row",
+                                                h4 { class: "sc-section-title", "Shadowfenix RaD" }
                                                 Badge { label: "Verified".to_string(), variant: BadgeVariant::Primary, pill: true }
                                             }
-                                            p { class: "text-xs text-zinc-400 leading-relaxed",
+                                            p { class: "sc-muted-text",
                                                 "Laboratorio di ricerca e sviluppo specializzato in architetture Rust & Dioxus web/desktop."
                                             }
-                                            div { class: "pt-2 flex items-center gap-3 text-[11px] font-mono text-zinc-500",
-                                                span { strong { class: "text-zinc-200", "50+" } " componenti" }
-                                                span { "•" }
-                                                span { strong { class: "text-zinc-200", "100%" } " pure SCSS" }
-                                            }
+                                            p { class: "sc-subtle-text sc-mono", "50+ componenti • 100% pure SCSS" }
                                         }
                                     }
                                 }
                             }
-                            span { "per la community Rust." }
+                            span { class: "sc-muted-text", "per la community Rust." }
                         }
                     }
                 },

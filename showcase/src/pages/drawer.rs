@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn DrawerPage() -> Element {
@@ -57,17 +57,17 @@ Drawer {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Drawer Component" }
-                Text { dimmed: true, size: TextSize::Sm, "Pannello scorrevole laterale con backdrop oscurato, chiusura al click esterno e larghezza scalabile." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Drawer Component".to_string(),
+                description: "Pannello scorrevole laterale con backdrop oscurato, chiusura al click esterno e larghezza scalabile.".to_string(),
             }
 
             FeatureBanner { feature_name: "drawer" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] shadow-inner flex flex-wrap items-center justify-center gap-4",
+                    Stage {
                         Button {
                             variant: ButtonVariant::Primary,
                             left_icon: rsx! { Icon { kind: IconKind::Settings, size: 15 } },
@@ -92,9 +92,10 @@ Drawer {
                 title: "Impostazioni Sistema".to_string(),
                 position: DrawerPosition::Right,
                 size: DrawerSize::Md,
-                div { class: "space-y-6 text-xs text-zinc-300",
-                    p { "Configura i parametri del runtime e della connettività cluster." }
-                    div { class: "space-y-4 pt-3 border-t border-white/[0.06]",
+                div { class: "sc-stack",
+                    p { class: "sc-muted-text", "Configura i parametri del runtime e della connettività cluster." }
+                    hr { class: "sc-control-divider" }
+                    div { class: "sc-stack",
                         Switch {
                             checked: gzip_enabled,
                             label: "Compressione Gzip Automatica".to_string(),
@@ -106,7 +107,7 @@ Drawer {
                             description: "Stampa logs dettagliati nella console".to_string(),
                         }
                     }
-                    div { class: "pt-4 border-t border-white/[0.06] flex justify-end gap-2",
+                    div { class: "sc-actions",
                         Button {
                             size: ButtonSize::Sm,
                             variant: ButtonVariant::Primary,
@@ -123,9 +124,9 @@ Drawer {
                 title: "Navigazione Rapida".to_string(),
                 position: DrawerPosition::Left,
                 size: DrawerSize::Sm,
-                div { class: "space-y-4 text-xs text-zinc-300",
-                    p { "Menu laterale scorrevole ideale per viewport mobile o navigazioni secondarie." }
-                    div { class: "flex flex-col gap-1.5 pt-2",
+                div { class: "sc-stack",
+                    p { class: "sc-muted-text", "Menu laterale scorrevole ideale per viewport mobile o navigazioni secondarie." }
+                    div { class: "sc-stack",
                         Button { variant: ButtonVariant::Ghost, "Dashboard Principale" }
                         Button { variant: ButtonVariant::Ghost, "Metriche Cluster" }
                         Button { variant: ButtonVariant::Ghost, "Documentazione API" }

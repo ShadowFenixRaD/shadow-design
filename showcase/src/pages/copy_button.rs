@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn CopyButtonPage() -> Element {
@@ -48,29 +48,31 @@ pub fn CopyButtonPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "CopyButton" }
-                Text { dimmed: true, size: TextSize::Sm, "Pulsante di interazione con la clipboard di sistema, con feedback visivo temporizzato 'Copiato!' e transizione fluida all'icona di spunta." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "CopyButton".to_string(),
+                description: "Pulsante di interazione con la clipboard di sistema, con feedback visivo temporizzato 'Copiato!' e transizione fluida all'icona di spunta.".to_string(),
             }
 
             FeatureBanner { feature_name: "copy_button" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 py-16 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-8 shadow-inner min-h-[320px]",
-                        div { class: "p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-between gap-4 max-w-md w-full shadow-lg",
-                            div { class: "flex items-center gap-2 text-xs font-mono text-zinc-300",
-                                span { class: "text-purple-400 select-none", "$" }
-                                span { "{sample_code}" }
-                            }
-                            CopyButton {
-                                value: sample_code.clone(),
-                                label: Some("Copia".to_string()),
+                    Stage {
+                        Card { class: "w-full max-w-md",
+                            div { class: "sc-title-row",
+                                span { class: "sc-mono",
+                                    span { class: "sc-accent-text", "$ " }
+                                    "{sample_code}"
+                                }
+                                CopyButton {
+                                    value: sample_code.clone(),
+                                    label: Some("Copia".to_string()),
+                                }
                             }
                         }
 
-                        div { class: "flex items-center gap-4 flex-wrap justify-center",
+                        div { class: "sc-actions",
                             CopyButton {
                                 value: "https://shadowfenix.net".to_string(),
                                 label: Some("Copia Link".to_string()),

@@ -1,18 +1,20 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, ControlRow, Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn ColorPickerPage() -> Element {
-    let picker_color = use_signal(|| "#a855f7".to_string());
+    let picker_color = use_signal(|| "#a855f7".to_string());  // sd-lint-allow: runtime data value, not styling
     let alpha_color = use_signal(|| "rgba(168, 85, 247, 0.85)".to_string());
-    let input_color = use_signal(|| "#06b6d4".to_string());
-    let brand_color = use_signal(|| "#10b981".to_string());
+    let input_color = use_signal(|| "#06b6d4".to_string());  // sd-lint-allow: runtime data value, not styling
+    let brand_color = use_signal(|| "#10b981".to_string());  // sd-lint-allow: runtime data value, not styling
 
     // Playground state
-    let play_color = use_signal(|| "#a855f7".to_string());
-    let mut play_format = use_signal(|| ColorFormat::Hex);
+    let play_color = use_signal(|| "#a855f7".to_string());  // sd-lint-allow: runtime data value, not styling
+    let play_format = use_signal(|| ColorFormat::Hex);
     let play_alpha = use_signal(|| true);
     let play_disabled = use_signal(|| false);
 
@@ -61,7 +63,7 @@ pub fn ColorPickerPage() -> Element {
         },
     ];
 
-    let code_snippet = r##"let mut primary_color = use_signal(|| "#a855f7".to_string());
+    let code_snippet = r##"let mut primary_color = use_signal(|| "#a855f7".to_string());  // sd-lint-allow: runtime data value, not styling
 
 // Standalone ColorPicker
 ColorPicker {
@@ -83,14 +85,10 @@ ColorInput {
     let cur_play_str = play_color.read().clone();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "ColorPicker & ColorInput" }
-                Text { dimmed: true, size: TextSize::Sm,
-                    "Strumenti avanzati per la selezione e regolazione cromatica. Includono slider hue arcobaleno a 360°, "
-                    "slider saturazione e luminosità HSL, canale alpha per la trasparenza, palette swatch tematica e "
-                    "form control ColorInput con popup popover ancorato."
-                }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "ColorPicker & ColorInput".to_string(),
+                description: "Strumenti avanzati per la selezione e regolazione cromatica. Includono slider hue a 360°, slider saturazione e luminosità HSL, canale alpha per la trasparenza, palette swatch tematica e form control ColorInput con popup popover ancorato.".to_string(),
             }
 
             FeatureBanner { feature_name: "color_picker" }
@@ -99,131 +97,73 @@ ColorInput {
                 props: props,
                 code: code_snippet,
                 preview: rsx! {
-                    div { class: "space-y-8",
-                        // Live Playground
-                        Card {
-                            div { class: "p-6 space-y-6",
-                                Heading { order: HeadingOrder::H3, "Live Playground" }
-
-                                div { class: "flex flex-wrap gap-4 items-center p-4 bg-zinc-950/60 rounded-lg border border-white/5",
-                                    div { class: "flex items-center gap-1.5",
-                                        span { class: "text-xs text-zinc-400 mr-2", "Formato:" }
-                                        for (fmt, name) in [
-                                            (ColorFormat::Hex, "HEX"),
-                                            (ColorFormat::Rgb, "RGB"),
-                                            (ColorFormat::Hsl, "HSL"),
-                                        ] {
-                                            button {
-                                                r#type: "button",
-                                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}",
-                                                    if *play_format.read() == fmt { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                                onclick: move |_| play_format.set(fmt),
-                                                "{name}"
-                                            }
-                                        }
-                                    }
-
-                                    Checkbox {
-                                        checked: play_alpha,
-                                        label: "Canale Alpha (Trasparenza)".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-
-                                    Checkbox {
-                                        checked: play_disabled,
-                                        label: "Disabilitato".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
+                    div { class: "sc-stack sc-stack--loose",
+                        Playground {
+                            stage: rsx! {
+                                ColorPicker {
+                                    value: play_color,
+                                    format: *play_format.read(),
+                                    with_alpha: *play_alpha.read(),
+                                    disabled: *play_disabled.read(),
                                 }
-
-                                div { class: "grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-items-center p-6 bg-black/40 rounded-xl border border-white/10",
-                                    ColorPicker {
-                                        value: play_color,
-                                        format: *play_format.read(),
-                                        with_alpha: *play_alpha.read(),
-                                        disabled: *play_disabled.read(),
-                                    }
-
-                                    div { class: "flex flex-col items-center gap-4 w-full max-w-xs",
-                                        div {
-                                            class: "w-full h-32 rounded-xl border border-white/15 shadow-2xl flex items-center justify-center transition-all",
-                                            style: "background-color: {cur_play_str}; box-shadow: 0 0 30px {cur_play_str};",
-                                            span { class: "px-3 py-1.5 rounded bg-black/70 backdrop-blur text-white font-mono text-sm font-bold border border-white/20",
-                                                "{cur_play_str}"
-                                            }
-                                        }
-                                        div { class: "text-xs text-zinc-400 font-mono text-center",
-                                            "Aggiornamento live in tempo reale"
-                                        }
-                                    }
+                                Counter { label: "Valore".to_string(), value: cur_play_str.to_string() }
+                            },
+                            controls: rsx! {
+                                ChoicePicker {
+                                    label: "Formato".to_string(),
+                                    options: vec![
+                                        (ColorFormat::Hex, "HEX".to_string()),
+                                        (ColorFormat::Rgb, "RGB".to_string()),
+                                        (ColorFormat::Hsl, "HSL".to_string()),
+                                    ],
+                                    value: play_format,
                                 }
-                            }
+                                ControlRow {
+                                    ToggleControl { label: "Canale Alpha (Trasparenza)".to_string(), checked: play_alpha }
+                                    ToggleControl { label: "Disabilitato".to_string(), checked: play_disabled }
+                                }
+                            },
                         }
 
-                        // ColorInput Showcase
-                        div { class: "grid grid-cols-1 md:grid-cols-2 gap-6",
+                        div { class: "sc-card-grid",
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "ColorInput Form Control" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Campo di testo sincronizzato con un pulsante swatch che apre il selettore colore in overlay."
-                                    }
-                                    div { class: "py-2",
-                                        ColorInput {
-                                            value: input_color,
-                                            label: "Colore Primario".to_string(),
-                                            description: "Fai click sul riquadro colore per modificare il valore".to_string(),
-                                            clearable: true,
-                                        }
-                                    }
+                                title: "ColorInput Form Control".to_string(),
+                                subtitle: "Campo di testo sincronizzato con un pulsante swatch che apre il selettore colore in overlay.".to_string(),
+                                ColorInput {
+                                    value: input_color,
+                                    label: "Colore Primario".to_string(),
+                                    description: "Fai click sul riquadro colore per modificare il valore".to_string(),
+                                    clearable: true,
                                 }
                             }
 
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "ColorInput con Trasparenza Alpha" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Supporta valori RGBA con cursore di opacità e rendering a scacchiera."
-                                    }
-                                    div { class: "py-2",
-                                        ColorInput {
-                                            value: alpha_color,
-                                            label: "Sfondo Overlay".to_string(),
-                                            with_alpha: true,
-                                            format: ColorFormat::Rgb,
-                                        }
-                                    }
+                                title: "ColorInput con Trasparenza Alpha".to_string(),
+                                subtitle: "Supporta valori RGBA con cursore di opacità e rendering a scacchiera.".to_string(),
+                                ColorInput {
+                                    value: alpha_color,
+                                    label: "Sfondo Overlay".to_string(),
+                                    with_alpha: true,
+                                    format: ColorFormat::Rgb,
                                 }
                             }
 
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "Stato di Errore" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Evidenziazione perimetrale di validazione per palette e contrasti non conformi."
-                                    }
-                                    div { class: "py-2",
-                                        ColorInput {
-                                            value: brand_color,
-                                            label: "Colore Non Conforme".to_string(),
-                                            error: Some("Il contrasto con lo sfondo è inferiore a 4.5:1 (WCAG AA)".to_string()),
-                                        }
-                                    }
+                                title: "Stato di Errore".to_string(),
+                                subtitle: "Evidenziazione perimetrale di validazione per palette e contrasti non conformi.".to_string(),
+                                ColorInput {
+                                    value: brand_color,
+                                    label: "Colore Non Conforme".to_string(),
+                                    error: Some("Il contrasto con lo sfondo è inferiore a 4.5:1 (WCAG AA)".to_string()),
                                 }
                             }
 
                             Card {
-                                div { class: "p-6 space-y-4",
-                                    Heading { order: HeadingOrder::H4, "Standalone ColorPicker Hex" }
-                                    Text { dimmed: true, size: TextSize::Sm,
-                                        "Utilizzabile inline in barre degli strumenti, editor grafici e dashboard."
-                                    }
-                                    div { class: "flex justify-center py-2",
-                                        ColorPicker {
-                                            value: picker_color,
-                                            size: ControlSize::Sm,
-                                        }
-                                    }
+                                title: "Standalone ColorPicker Hex".to_string(),
+                                subtitle: "Utilizzabile inline in barre degli strumenti, editor grafici e dashboard.".to_string(),
+                                ColorPicker {
+                                    value: picker_color,
+                                    size: ControlSize::Sm,
                                 }
                             }
                         }

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn CarouselPage() -> Element {
@@ -54,7 +54,7 @@ Carousel {
     with_indicators: true,
 
     CarouselSlide {
-        div { class: "p-8 rounded-xl bg-zinc-950 border border-purple-500/20 text-center",
+        div { class: "sc-demo-cell",
             "Scheda con padding dai bordi"
         }
     }
@@ -76,23 +76,20 @@ Carousel {
     let image_slide = use_signal(|| 0usize);
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Carousel" }
-                Text { dimmed: true, size: TextSize::Sm, "Slider a carosello interattivo per schede informative con spaziatura protetta o gallerie immagini full-bleed edge-to-edge." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Carousel".to_string(),
+                description: "Slider a carosello interattivo per schede informative con spaziatura protetta o gallerie immagini full-bleed edge-to-edge.".to_string(),
             }
 
             FeatureBanner { feature_name: "carousel" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-10 shadow-inner",
-                        // 1. Carosello Contenuto & Schede con Padding Protetto
-                        div { class: "space-y-3",
-                            div { class: "flex items-center justify-between",
-                                span { class: "text-xs font-mono text-zinc-300 font-semibold uppercase tracking-wider", "1. Carosello Schede con Spaziatura Protetta (padded = true)" }
-                                span { class: "text-[11px] font-mono text-purple-400", "Spazio protetto per controlli e indicatori" }
-                            }
+                    div { class: "sc-stack sc-stack--loose",
+                        Card {
+                            title: "1. Carosello Schede con Spaziatura Protetta (padded = true)".to_string(),
+                            subtitle: "Spazio protetto per controlli e indicatori".to_string(),
                             Carousel {
                                 slide_count: 3,
                                 active_index: Some(active_slide),
@@ -100,38 +97,34 @@ Carousel {
                                 r#loop: true,
                                 with_controls: true,
                                 with_indicators: true,
-                                class: "border border-white/[0.06] bg-zinc-950/40",
 
                                 CarouselSlide {
-                                    div { class: "p-8 rounded-xl bg-gradient-to-br from-purple-950/50 via-zinc-950 to-black border border-purple-500/20 flex flex-col items-center justify-center text-center space-y-3",
-                                        span { class: "px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-[10px] font-mono text-purple-300 font-bold", "Preset 1 / 3" }
-                                        h3 { class: "text-base font-bold text-white", "Estetica Pure SCSS Ultraviolet" }
-                                        p { class: "text-xs text-zinc-400 max-w-md", "Nero profondo con accenti viola scuro, specular highlight e glow per un look d'impatto." }
+                                    div { class: "sc-stack items-center text-center p-8",
+                                        Badge { label: "Preset 1 / 3".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Estetica Pure SCSS Ultraviolet" }
+                                        p { class: "sc-muted-text", "Nero profondo con accenti viola scuro, specular highlight e glow per un look d'impatto." }
                                     }
                                 }
                                 CarouselSlide {
-                                    div { class: "p-8 rounded-xl bg-gradient-to-br from-cyan-950/50 via-zinc-950 to-black border border-cyan-500/20 flex flex-col items-center justify-center text-center space-y-3",
-                                        span { class: "px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-mono text-cyan-300 font-bold", "Preset 2 / 3" }
-                                        h3 { class: "text-base font-bold text-white", "Modularità Cargo Zero-Bloat" }
-                                        p { class: "text-xs text-zinc-400 max-w-md", "Ogni componente è racchiuso in una feature flag indipendente senza codice superfluo." }
+                                    div { class: "sc-stack items-center text-center p-8",
+                                        Badge { label: "Preset 2 / 3".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Modularità Cargo Zero-Bloat" }
+                                        p { class: "sc-muted-text", "Ogni componente è racchiuso in una feature flag indipendente senza codice superfluo." }
                                     }
                                 }
                                 CarouselSlide {
-                                    div { class: "p-8 rounded-xl bg-gradient-to-br from-emerald-950/50 via-zinc-950 to-black border border-emerald-500/20 flex flex-col items-center justify-center text-center space-y-3",
-                                        span { class: "px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 font-bold", "Preset 3 / 3" }
-                                        h3 { class: "text-base font-bold text-white", "Dioxus 0.7 Signal Architecture" }
-                                        p { class: "text-xs text-zinc-400 max-w-md", "Reattività istantanea a 60 FPS con transizioni cubic-bezier e zero overhead." }
+                                    div { class: "sc-stack items-center text-center p-8",
+                                        Badge { label: "Preset 3 / 3".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Dioxus 0.7 Signal Architecture" }
+                                        p { class: "sc-muted-text", "Reattività istantanea a 60 FPS con transizioni cubic-bezier e zero overhead." }
                                     }
                                 }
                             }
                         }
 
-                        // 2. Carosello Immagini Full-Bleed (Senza Spazio con i Bordi)
-                        div { class: "space-y-3",
-                            div { class: "flex items-center justify-between",
-                                span { class: "text-xs font-mono text-zinc-300 font-semibold uppercase tracking-wider", "2. Carosello Immagini Full-Bleed (padded = false, flush)" }
-                                span { class: "text-[11px] font-mono text-cyan-400", "A tutto schermo / Edge-to-Edge" }
-                            }
+                        Card {
+                            title: "2. Carosello Immagini Full-Bleed (padded = false, flush)".to_string(),
+                            subtitle: "A tutto schermo / Edge-to-Edge".to_string(),
                             Carousel {
                                 slide_count: 3,
                                 active_index: Some(image_slide),
@@ -139,36 +132,26 @@ Carousel {
                                 r#loop: true,
                                 with_controls: true,
                                 with_indicators: true,
-                                class: "border border-white/[0.1] rounded-xl overflow-hidden shadow-2xl",
 
                                 CarouselSlide {
-                                    div { class: "relative h-64 w-full bg-gradient-to-r from-purple-900 via-indigo-950 to-black flex items-end p-6",
-                                        div { class: "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" }
-                                        div { class: "relative z-10 space-y-1",
-                                            span { class: "text-[10px] font-mono text-purple-400 font-bold uppercase tracking-wider", "Scena Ottica 01" }
-                                            h4 { class: "text-sm font-bold text-white", "Nebulosa Ultraviolet & Dark Cyberpunk" }
-                                            p { class: "text-xs text-zinc-300", "Rendering a tutto bordo senza margini per gallerie fotografiche e banner d'impatto." }
-                                        }
+                                    div { class: "sc-stack items-center text-center p-8 h-64 justify-center",
+                                        Badge { label: "Scena Ottica 01".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Nebulosa Ultraviolet & Dark Cyberpunk" }
+                                        p { class: "sc-muted-text", "Rendering a tutto bordo senza margini per gallerie fotografiche e banner d'impatto." }
                                     }
                                 }
                                 CarouselSlide {
-                                    div { class: "relative h-64 w-full bg-gradient-to-r from-cyan-900 via-blue-950 to-black flex items-end p-6",
-                                        div { class: "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" }
-                                        div { class: "relative z-10 space-y-1",
-                                            span { class: "text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider", "Scena Ottica 02" }
-                                            h4 { class: "text-sm font-bold text-white", "Matrice Spaziale Neon Cyan" }
-                                            p { class: "text-xs text-zinc-300", "Controlli traslucidi con backdrop blur sovrapposti direttamente sull'immagine." }
-                                        }
+                                    div { class: "sc-stack items-center text-center p-8 h-64 justify-center",
+                                        Badge { label: "Scena Ottica 02".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Matrice Spaziale Neon Cyan" }
+                                        p { class: "sc-muted-text", "Controlli traslucidi con backdrop blur sovrapposti direttamente sull'immagine." }
                                     }
                                 }
                                 CarouselSlide {
-                                    div { class: "relative h-64 w-full bg-gradient-to-r from-emerald-900 via-teal-950 to-black flex items-end p-6",
-                                        div { class: "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" }
-                                        div { class: "relative z-10 space-y-1",
-                                            span { class: "text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider", "Scena Ottica 03" }
-                                            h4 { class: "text-sm font-bold text-white", "Architettura Monolitica Emerald" }
-                                            p { class: "text-xs text-zinc-300", "Transizione fluida dello slider a 60 FPS con indicatore di progresso espanso." }
-                                        }
+                                    div { class: "sc-stack items-center text-center p-8 h-64 justify-center",
+                                        Badge { label: "Scena Ottica 03".to_string(), variant: BadgeVariant::Primary }
+                                        h3 { class: "sc-section-title", "Architettura Monolitica Emerald" }
+                                        p { class: "sc-muted-text", "Transizione fluida dello slider a 60 FPS con indicatore di progresso espanso." }
                                     }
                                 }
                             }

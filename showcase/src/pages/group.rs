@@ -1,15 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    ChoicePicker, DemoCell, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn GroupPage() -> Element {
-    let mut selected_gap = use_signal(|| SpacingToken::Md);
-    let mut selected_align = use_signal(|| AlignItems::Center);
-    let mut selected_justify = use_signal(|| JustifyContent::Start);
+    let selected_gap = use_signal(|| SpacingToken::Md);
+    let selected_align = use_signal(|| AlignItems::Center);
+    let selected_justify = use_signal(|| JustifyContent::Start);
     let wrap = use_signal(|| true);
     let grow = use_signal(|| false);
 
@@ -65,19 +65,19 @@ pub fn GroupPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Group" }
-                Text { dimmed: true, size: TextSize::Sm, "Primitiva Flexbox orizzontale ad alta ergonomia. Gestisce allineamento, giustificazione, spaziatura tokenizzata uniforme e ritorno a capo automatico senza codice CSS boilerplate." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Group".to_string(),
+                description: "Primitiva Flexbox orizzontale ad alta ergonomia. Gestisce allineamento, giustificazione, spaziatura tokenizzata uniforme e ritorno a capo automatico senza codice CSS boilerplate.".to_string(),
             }
 
             FeatureBanner { feature_name: "group" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6 w-full",
-                        // Live Group Container
-                        div { class: "p-6 rounded-2xl bg-zinc-950/80 border border-white/[0.08] min-h-[140px] flex items-center justify-center",
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
                             Group {
                                 gap: selected_gap(),
                                 align: selected_align(),
@@ -90,79 +90,38 @@ pub fn GroupPage() -> Element {
                                 Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, "Ghost" }
                                 Badge { label: "Mesh Online".to_string(), variant: BadgeVariant::Success, dot: true }
                                 Badge { label: "Kyber-1024".to_string(), variant: BadgeVariant::Primary }
-                                div { class: "px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-xs font-mono text-zinc-300", "Custom Box" }
+                                DemoCell { label: Some("Custom Box".into()), short: true }
                             }
-                        }
-
-                        // Configurator Controls
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-4",
-                            span { class: "text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold block", "Controlli Interattivi Playground" }
-                            div { class: "space-y-4",
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Spaziatura (Gap)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for s in [SpacingToken::None, SpacingToken::Xs, SpacingToken::Sm, SpacingToken::Md, SpacingToken::Lg, SpacingToken::Xl] {
-                                            button {
-                                                class: if selected_gap() == s {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_gap.set(s),
-                                                "{s:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Allineamento (AlignItems)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for a in [AlignItems::Start, AlignItems::Center, AlignItems::End, AlignItems::Stretch, AlignItems::Baseline] {
-                                            button {
-                                                class: if selected_align() == a {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_align.set(a),
-                                                "{a:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Giustificazione (JustifyContent)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for j in [JustifyContent::Start, JustifyContent::Center, JustifyContent::End, JustifyContent::SpaceBetween, JustifyContent::SpaceAround, JustifyContent::SpaceEvenly] {
-                                            button {
-                                                class: if selected_justify() == j {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_justify.set(j),
-                                                "{j:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div { class: "flex items-center gap-6 pt-2 border-t border-white/[0.06]",
-                                    Checkbox {
-                                        checked: wrap,
-                                        label: "Wrap (Ritorno a capo automatico)".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: grow,
-                                        label: "Grow (Espansione uniforme elementi)".to_string(),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Spaziatura (Gap)".to_string(),
+                                options: [SpacingToken::None, SpacingToken::Xs, SpacingToken::Sm, SpacingToken::Md, SpacingToken::Lg, SpacingToken::Xl]
+                                    .iter()
+                                    .map(|s| (*s, format!("{s:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_gap,
                             }
-                        }
+                            ChoicePicker {
+                                label: "Allineamento (AlignItems)".to_string(),
+                                options: [AlignItems::Start, AlignItems::Center, AlignItems::End, AlignItems::Stretch, AlignItems::Baseline]
+                                    .iter()
+                                    .map(|a| (*a, format!("{a:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_align,
+                            }
+                            ChoicePicker {
+                                label: "Giustificazione (JustifyContent)".to_string(),
+                                options: [JustifyContent::Start, JustifyContent::Center, JustifyContent::End, JustifyContent::SpaceBetween, JustifyContent::SpaceAround, JustifyContent::SpaceEvenly]
+                                    .iter()
+                                    .map(|j| (*j, format!("{j:?}")))
+                                    .collect::<Vec<_>>(),
+                                value: selected_justify,
+                            }
+                            hr { class: "sc-control-divider" }
+                            ToggleControl { label: "Wrap (Ritorno a capo automatico)".to_string(), checked: wrap }
+                            ToggleControl { label: "Grow (Espansione uniforme elementi)".to_string(), checked: grow }
+                        },
                     }
                 },
                 code: code_snippet,

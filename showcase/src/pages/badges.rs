@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, ControlGroup, ControlRow, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn BadgesPage() -> Element {
-    let mut selected_variant = use_signal(|| BadgeVariant::Primary);
+    let selected_variant = use_signal(|| BadgeVariant::Primary);
     let is_pill = use_signal(|| true);
     let has_dot = use_signal(|| true);
     let enable_glow = use_signal(|| false);
@@ -59,19 +61,18 @@ pub fn BadgesPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Badge" }
-                Text { dimmed: true, size: TextSize::Sm, "Etichette di stato e indicatori a pillola con supporto a micro-pulsazioni e forme rettangolari o arrotondate." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Badge".to_string(),
+                description: "Etichette di stato e indicatori a pillola con supporto a micro-pulsazioni e forme rettangolari o arrotondate.".to_string(),
             }
 
             FeatureBanner { feature_name: "badge" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
-                        // Live Preview
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex items-center justify-center min-h-[140px] shadow-inner",
+                    Playground {
+                        stage: rsx! {
                             Badge {
                                 label: badge_text(),
                                 variant: selected_variant(),
@@ -79,55 +80,33 @@ pub fn BadgesPage() -> Element {
                                 dot: has_dot(),
                                 glow: if enable_glow() { Some(true) } else { None },
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Testo Etichetta:" }
+                        },
+                        controls: rsx! {
+                            ControlGroup { label: "Testo Etichetta".to_string(),
                                 TextInput {
                                     value: badge_text,
                                     placeholder: "Testo badge...".to_string(),
                                 }
                             }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Semantica:" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for v in [BadgeVariant::Default, BadgeVariant::Primary, BadgeVariant::Success, BadgeVariant::Warning, BadgeVariant::Danger, BadgeVariant::Outline] {
-                                        button {
-                                            key: "{v:?}",
-                                            r#type: "button",
-                                            class: if selected_variant() == v {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                            },
-                                            onclick: move |_| selected_variant.set(v),
-                                            "{v:?}"
-                                        }
-                                    }
-                                }
+                            ChoicePicker {
+                                label: "Variante Semantica".to_string(),
+                                options: vec![
+                                    (BadgeVariant::Default, "Default".to_string()),
+                                    (BadgeVariant::Primary, "Primary".to_string()),
+                                    (BadgeVariant::Success, "Success".to_string()),
+                                    (BadgeVariant::Warning, "Warning".to_string()),
+                                    (BadgeVariant::Danger, "Danger".to_string()),
+                                    (BadgeVariant::Outline, "Outline".to_string()),
+                                ],
+                                value: selected_variant,
                             }
-
-                            div { class: "grid grid-cols-2 gap-3 pt-2 border-t border-white/[0.06]",
-                                Checkbox {
-                                    checked: is_pill,
-                                    label: Some("Forma a Pillola".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: has_dot,
-                                    label: Some("Dot Pulsante".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: enable_glow,
-                                    label: Some("Micro-Glow Semantico".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Forma a Pillola".to_string(), checked: is_pill }
+                                ToggleControl { label: "Dot Pulsante".to_string(), checked: has_dot }
+                                ToggleControl { label: "Micro-Glow Semantico".to_string(), checked: enable_glow }
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -138,8 +117,8 @@ pub fn BadgesPage() -> Element {
             Card {
                 title: "Varianti Semantiche e Forme".to_string(),
                 subtitle: "Anteprima comparativa di tutti gli stati e combinazioni grafiche".to_string(),
-                div { class: "space-y-4",
-                    div { class: "flex flex-wrap items-center gap-2.5",
+                div { class: "sc-stack",
+                    div { class: "sc-actions",
                         Badge { label: "Default".to_string(), variant: BadgeVariant::Default }
                         Badge { label: "Primary".to_string(), variant: BadgeVariant::Primary }
                         Badge { label: "Success".to_string(), variant: BadgeVariant::Success }
@@ -147,7 +126,8 @@ pub fn BadgesPage() -> Element {
                         Badge { label: "Danger".to_string(), variant: BadgeVariant::Danger }
                         Badge { label: "Outline".to_string(), variant: BadgeVariant::Outline }
                     }
-                    div { class: "flex flex-wrap items-center gap-2.5 pt-3 border-t border-white/[0.06]",
+                    hr { class: "sc-control-divider" }
+                    div { class: "sc-actions",
                         Badge { label: "Offline".to_string(), variant: BadgeVariant::Default, pill: true, dot: true }
                         Badge { label: "Processing".to_string(), variant: BadgeVariant::Primary, pill: true, dot: true }
                         Badge { label: "Operational".to_string(), variant: BadgeVariant::Success, pill: true, dot: true }

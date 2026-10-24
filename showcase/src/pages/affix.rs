@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn AffixPage() -> Element {
-    let mut selected_pos = use_signal(|| AffixPosition::BottomRight);
+    let selected_pos = use_signal(|| AffixPosition::BottomRight);
 
     let props = vec![
         PropRow {
@@ -53,38 +55,21 @@ BackToTop {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Affix & BackToTop" }
-                Text { dimmed: true, size: TextSize::Sm, "Contenitore fisso in overlay a coordinate assolute dello schermo con attivazione condizionale allo scroll e componente rapido BackToTop." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Affix & BackToTop".to_string(),
+                description: "Contenitore fisso in overlay a coordinate assolute dello schermo con attivazione condizionale allo scroll e componente rapido BackToTop.".to_string(),
             }
 
             FeatureBanner { feature_name: "affix" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 text-center shadow-inner",
-                        p { class: "text-xs text-zinc-400 max-w-md",
-                            "Il componente Affix fissa qualsiasi elemento a una posizione della viewport. Il pulsante BackToTop rileva lo scroll verticale della pagina ed effettua uno scroll fluido verso l'alto."
-                        }
-
-                        div { class: "flex items-center gap-2 flex-wrap justify-center",
-                            span { class: "text-xs text-zinc-400 mr-2 font-mono", "Angolo:" }
-                            button {
-                                r#type: "button",
-                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == AffixPosition::BottomRight { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| selected_pos.set(AffixPosition::BottomRight),
-                                "Bottom-Right"
+                    Playground {
+                        stage: rsx! {
+                            p { class: "sc-muted-text",
+                                "Il componente Affix fissa qualsiasi elemento a una posizione della viewport. Il pulsante BackToTop rileva lo scroll verticale della pagina ed effettua uno scroll fluido verso l'alto."
                             }
-                            button {
-                                r#type: "button",
-                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *selected_pos.read() == AffixPosition::BottomLeft { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| selected_pos.set(AffixPosition::BottomLeft),
-                                "Bottom-Left"
-                            }
-                        }
-
-                        div { class: "p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center gap-4",
                             button {
                                 r#type: "button",
                                 class: "sd-back-to-top",
@@ -95,7 +80,17 @@ BackToTop {
                                 Icon { kind: IconKind::ChevronUp, size: 16 }
                                 span { "Anteprima BackToTop" }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Angolo".to_string(),
+                                options: vec![
+                                    (AffixPosition::BottomRight, "Bottom-Right".to_string()),
+                                    (AffixPosition::BottomLeft, "Bottom-Left".to_string()),
+                                ],
+                                value: selected_pos,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

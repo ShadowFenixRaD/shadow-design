@@ -1,13 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    ChoicePicker, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn CenterPage() -> Element {
-    let mut inline = use_signal(|| false);
+    let inline = use_signal(|| false);
 
     let props = vec![
         PropRow {
@@ -31,75 +31,61 @@ pub fn CenterPage() -> Element {
     ];
 
     let code_snippet = r#"Center {
-    class: "h-48 w-full rounded-xl bg-purple-950/20 border border-purple-800/30",
+    class: "sc-demo-frame h-48 w-full",
     div { class: "flex flex-col items-center gap-2",
         Icon { kind: IconKind::Check, size: 28 }
-        span { class: "font-mono text-sm text-purple-200 font-bold", "Allineato al centro" }
+        span { class: "sc-section-title", "Allineato al centro" }
     }
 }"#
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Center" }
-                Text { dimmed: true, size: TextSize::Sm, "Contenitore utility per centrare istantaneamente il contenuto sia in orizzontale che in verticale senza codice CSS boilerplate, con supporto per layout a blocco o inline." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Center".to_string(),
+                description: "Contenitore utility per centrare istantaneamente il contenuto sia in orizzontale che in verticale senza codice CSS boilerplate, con supporto per layout a blocco o inline.".to_string(),
             }
 
             FeatureBanner { feature_name: "center" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6 w-full",
-                        // Live Center Preview
-                        div { class: "w-full",
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
                             if inline() {
-                                div { class: "p-6 rounded-2xl border border-white/10 bg-zinc-950 text-center space-x-2",
-                                    span { class: "text-zinc-400 text-sm align-middle", "Testo prima dell'elemento" }
-                                    Center {
-                                        inline: true,
-                                        class: "px-4 py-2 rounded-lg bg-purple-950/40 border border-purple-800/50 text-purple-200 gap-2 align-middle",
+                                div { class: "sc-demo-frame text-center",
+                                    span { class: "sc-muted-text", "Testo prima dell'elemento " }
+                                    Center { inline: true, class: "gap-2",
                                         Icon { kind: IconKind::Layers, size: 16 }
-                                        span { class: "text-xs font-mono font-bold", "Inline Centered" }
+                                        span { class: "sc-accent-text sc-mono", "Inline Centered" }
                                     }
-                                    span { class: "text-zinc-400 text-sm align-middle", "Testo dopo l'elemento" }
+                                    span { class: "sc-muted-text", " Testo dopo l'elemento" }
                                 }
                             } else {
-                                Center {
-                                    class: "h-56 w-full rounded-2xl border border-white/10 bg-zinc-950 shadow-inner",
-                                    div { class: "p-6 rounded-xl bg-purple-950/40 border border-purple-800/40 flex flex-col items-center justify-center text-center max-w-xs",
-                                        span { class: "p-3 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 mb-2 flex items-center justify-center",
-                                            Icon { kind: IconKind::Check, size: 28 }
-                                        }
-                                        span { class: "text-sm font-bold text-white font-mono", "Perfettamente Centrato" }
-                                        span { class: "text-xs text-purple-300 font-mono mt-1", "display: flex; justify-center; items-center;" }
-                                        div { class: "mt-3 flex items-center gap-2",
+                                Center { class: "sc-demo-frame h-56 w-full",
+                                    div { class: "sc-stack items-center text-center",
+                                        Icon { kind: IconKind::Check, size: 28 }
+                                        span { class: "sc-section-title sc-mono", "Perfettamente Centrato" }
+                                        span { class: "sc-subtle-text sc-mono", "display: flex; justify-center; items-center;" }
+                                        div { class: "sc-actions",
                                             Badge { label: "H-Center".to_string(), variant: BadgeVariant::Primary }
                                             Badge { label: "V-Center".to_string(), variant: BadgeVariant::Success }
                                         }
                                     }
                                 }
                             }
-                        }
-
-                        // Configurator Controls
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-4",
-                            span { class: "text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold block", "Modalità Display" }
-                            div { class: "flex flex-wrap gap-2",
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: if !inline() { ButtonVariant::Primary } else { ButtonVariant::Outline },
-                                    onclick: move |_| inline.set(false),
-                                    "Block (display: flex)"
-                                }
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: if inline() { ButtonVariant::Primary } else { ButtonVariant::Outline },
-                                    onclick: move |_| inline.set(true),
-                                    "Inline (display: inline-flex)"
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Modalità Display".to_string(),
+                                options: vec![
+                                    (false, "Block (display: flex)".to_string()),
+                                    (true, "Inline (display: inline-flex)".to_string()),
+                                ],
+                                value: inline,
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,

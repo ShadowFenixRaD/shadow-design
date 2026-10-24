@@ -1,15 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    ChoicePicker, DemoCell, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn StackPage() -> Element {
-    let mut selected_gap = use_signal(|| SpacingToken::Md);
-    let mut selected_align = use_signal(|| AlignItems::Stretch);
-    let mut selected_justify = use_signal(|| JustifyContent::Start);
+    let selected_gap = use_signal(|| SpacingToken::Md);
+    let selected_align = use_signal(|| AlignItems::Stretch);
+    let selected_justify = use_signal(|| JustifyContent::Start);
 
     let props = vec![
         PropRow {
@@ -52,95 +52,65 @@ pub fn StackPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Stack" }
-                Text { dimmed: true, size: TextSize::Sm, "Primitiva Flexbox verticale a colonna per impilare componenti con spaziatura tokenizzata rigorosa, allineamento calibrato e zero margini esterni dispersivi." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Stack".to_string(),
+                description: "Primitiva Flexbox verticale per impilare componenti con spaziatura tokenizzata, allineamento calibrato e zero margini esterni.".to_string(),
             }
 
             FeatureBanner { feature_name: "stack" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6 w-full",
-                        // Live Stack Container
-                        div { class: "p-6 rounded-2xl bg-zinc-950/80 border border-white/[0.08] min-h-[220px]",
-                            Stack {
-                                gap: selected_gap(),
-                                align: selected_align(),
-                                justify: selected_justify(),
-                                class: "w-full",
-                                div { class: "p-3.5 rounded-xl bg-purple-950/40 border border-purple-800/40 flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-purple-200 font-semibold", "Modulo Alpha (Security Core)" }
-                                    Badge { label: "99.98% SLA".to_string(), variant: BadgeVariant::Success, dot: true }
-                                }
-                                div { class: "p-3.5 rounded-xl bg-zinc-900/70 border border-white/10 flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-zinc-300", "Servizio Router Mesh P2P" }
-                                    Badge { label: "Attivo".to_string(), variant: BadgeVariant::Primary }
-                                }
-                                div { class: "p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-zinc-400", "Canale Telemetrico e Log" }
-                                    span { class: "text-[11px] font-mono text-zinc-500", "4.2 MB/s" }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-demo-frame w-full",
+                                Stack {
+                                    gap: selected_gap(),
+                                    align: selected_align(),
+                                    justify: selected_justify(),
+                                    class: "w-full",
+                                    DemoCell { index: Some(1), label: Some("Modulo Alpha (Security Core)".to_string()), accent: true }
+                                    DemoCell { index: Some(2), label: Some("Servizio Router Mesh P2P".to_string()) }
+                                    DemoCell { index: Some(3), label: Some("Canale Telemetrico e Log".to_string()) }
                                 }
                             }
-                        }
-
-                        // Configurator Controls
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-4",
-                            span { class: "text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold block", "Controlli Interattivi Playground" }
-                            div { class: "space-y-4",
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Spaziatura Verticale (Gap)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for s in [SpacingToken::None, SpacingToken::Xs, SpacingToken::Sm, SpacingToken::Md, SpacingToken::Lg, SpacingToken::Xl] {
-                                            button {
-                                                class: if selected_gap() == s {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_gap.set(s),
-                                                "{s:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Allineamento Orizzontale (AlignItems)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for a in [AlignItems::Start, AlignItems::Center, AlignItems::End, AlignItems::Stretch] {
-                                            button {
-                                                class: if selected_align() == a {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_align.set(a),
-                                                "{a:?}"
-                                            }
-                                        }
-                                    }
-                                }
-
-                                div {
-                                    span { class: "text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2", "Giustificazione Verticale (JustifyContent)" }
-                                    div { class: "flex flex-wrap gap-2",
-                                        for j in [JustifyContent::Start, JustifyContent::Center, JustifyContent::End, JustifyContent::SpaceBetween] {
-                                            button {
-                                                class: if selected_justify() == j {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200"
-                                                } else {
-                                                    "px-3 py-1 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                                },
-                                                onclick: move |_| selected_justify.set(j),
-                                                "{j:?}"
-                                            }
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Spaziatura verticale (Gap)".to_string(),
+                                options: vec![
+                                    (SpacingToken::None, "None".to_string()),
+                                    (SpacingToken::Xs, "Xs".to_string()),
+                                    (SpacingToken::Sm, "Sm".to_string()),
+                                    (SpacingToken::Md, "Md".to_string()),
+                                    (SpacingToken::Lg, "Lg".to_string()),
+                                    (SpacingToken::Xl, "Xl".to_string()),
+                                ],
+                                value: selected_gap,
                             }
-                        }
+                            ChoicePicker {
+                                label: "Allineamento orizzontale (AlignItems)".to_string(),
+                                options: vec![
+                                    (AlignItems::Start, "Start".to_string()),
+                                    (AlignItems::Center, "Center".to_string()),
+                                    (AlignItems::End, "End".to_string()),
+                                    (AlignItems::Stretch, "Stretch".to_string()),
+                                ],
+                                value: selected_align,
+                            }
+                            ChoicePicker {
+                                label: "Giustificazione verticale (JustifyContent)".to_string(),
+                                options: vec![
+                                    (JustifyContent::Start, "Start".to_string()),
+                                    (JustifyContent::Center, "Center".to_string()),
+                                    (JustifyContent::End, "End".to_string()),
+                                    (JustifyContent::SpaceBetween, "Between".to_string()),
+                                ],
+                                value: selected_justify,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

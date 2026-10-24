@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, Stage, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn ModalsPage() -> Element {
@@ -58,18 +58,18 @@ Modal {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Modal" }
-                Text { dimmed: true, size: TextSize::Sm, "Finestre di dialogo in overlay con backdrop oscurato e sfocato (backdrop-blur), chiusura su click esterno e icona X vettoriale." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Modal".to_string(),
+                description: "Finestre di dialogo in overlay con backdrop oscurato e sfocato (backdrop-blur), chiusura su click esterno e icona X vettoriale.".to_string(),
             }
 
             FeatureBanner { feature_name: "modal" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-4 text-center shadow-inner",
-                        p { class: "text-xs text-zinc-400 max-w-sm",
+                    Stage {
+                        p { class: "sc-page-desc",
                             "Clicca sul pulsante sottostante per aprire la finestra di dialogo. Puoi chiuderla cliccando sulla X, premendo il pulsante 'Chiudi' o cliccando sul backdrop esterno."
                         }
                         Button {
@@ -87,17 +87,18 @@ Modal {
             Modal {
                 is_open: is_modal_open,
                 title: "Finestra di Dialogo Shadow Design".to_string(),
-                div { class: "space-y-4 text-xs sm:text-sm text-zinc-300",
-                    p { class: "leading-relaxed",
-                        "Questa finestra modale utilizza l'architettura a 4 livelli con elevazione "
-                        strong { class: "text-purple-300 font-mono", "Surface Elevated (Level 2)" }
-                        ", rifinitura con top specular highlight a 1px e chiusura intelligente con blocco della propagazione degli eventi."
+                div { class: "sc-stack",
+                    p {
+                        "Questa finestra modale utilizza l'architettura a livelli con elevazione "
+                        strong { class: "sc-accent-text sc-mono", "Raised-max" }
+                        ", rifinitura con specular highlight a 1px e chiusura intelligente con blocco della propagazione degli eventi."
                     }
-                    div { class: "p-3 rounded-lg bg-[#060608] border border-white/[0.06] flex items-center gap-2 text-xs font-mono text-zinc-400",
-                        Icon { kind: IconKind::Sparkles, size: 14 }
-                        span { "Colore e raggio si adattano in tempo reale al tema attivo." }
+                    Alert {
+                        variant: AlertVariant::Info,
+                        title: Some("Tema attivo".to_string()),
+                        "Colore e raggio si adattano in tempo reale al tema attivo."
                     }
-                    div { class: "flex justify-end gap-2.5 pt-3 border-t border-white/[0.06]",
+                    div { class: "sc-actions",
                         Button {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,

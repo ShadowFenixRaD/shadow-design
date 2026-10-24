@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn TabsPage() -> Element {
@@ -67,45 +67,45 @@ TabPanel { value: "security".to_string(), active: active_tab,
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Tabs Component" }
-                Text { dimmed: true, size: TextSize::Sm, "Navigazione a schede orizzontali stile Mantine con supporto a icone native, badge di notifica e rendering condizionale fluido." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Tabs Component".to_string(),
+                description: "Navigazione a schede orizzontali stile Mantine con supporto a icone native, badge di notifica e rendering condizionale fluido.".to_string(),
             }
 
             FeatureBanner { feature_name: "tabs" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-6 rounded-xl bg-[#09090d] border border-white/[0.08] shadow-xl space-y-6",
-                        TabList {
-                            Tab {
-                                value: "account".to_string(),
-                                active: active_tab,
-                                icon: Some(IconKind::Terminal),
-                                "Account"
+                    Stage { start: true, wide: true,
+                        div { class: "sc-stack w-full",
+                            TabList {
+                                Tab {
+                                    value: "account".to_string(),
+                                    active: active_tab,
+                                    icon: Some(IconKind::Terminal),
+                                    "Account"
+                                }
+                                Tab {
+                                    value: "security".to_string(),
+                                    active: active_tab,
+                                    icon: Some(IconKind::Eye),
+                                    badge: Some("2FA".to_string()),
+                                    "Sicurezza"
+                                }
+                                Tab {
+                                    value: "api".to_string(),
+                                    active: active_tab,
+                                    icon: Some(IconKind::Code),
+                                    "Chiavi API"
+                                }
                             }
-                            Tab {
-                                value: "security".to_string(),
-                                active: active_tab,
-                                icon: Some(IconKind::Eye),
-                                badge: Some("2FA".to_string()),
-                                "Sicurezza"
-                            }
-                            Tab {
-                                value: "api".to_string(),
-                                active: active_tab,
-                                icon: Some(IconKind::Code),
-                                "Chiavi API"
-                            }
-                        }
 
-                        div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.06] shadow-inner",
                             TabPanel { value: "account".to_string(), active: active_tab,
-                                div { class: "space-y-3",
-                                    h4 { class: "text-sm font-semibold text-white", "Configurazione Profilo Utente" }
-                                    p { class: "text-xs text-zinc-400", "Gestisci le tue credenziali e le preferenze di interfaccia grafica." }
-                                    div { class: "flex items-center gap-2 pt-2",
+                                div { class: "sc-stack",
+                                    h3 { class: "sc-section-title", "Configurazione Profilo Utente" }
+                                    p { class: "sc-page-desc", "Gestisci le tue credenziali e le preferenze di interfaccia grafica." }
+                                    div { class: "sc-actions",
                                         Badge { label: "Ruolo: Developer Pro".to_string(), variant: BadgeVariant::Primary, pill: true }
                                         Badge { label: "Attivo".to_string(), variant: BadgeVariant::Success, dot: true }
                                     }
@@ -113,22 +113,24 @@ TabPanel { value: "security".to_string(), active: active_tab,
                             }
 
                             TabPanel { value: "security".to_string(), active: active_tab,
-                                div { class: "space-y-3",
-                                    h4 { class: "text-sm font-semibold text-white", "Parametri di Protezione e Accesso" }
-                                    p { class: "text-xs text-zinc-400", "L'autenticazione a due fattori con chiave di sicurezza hardware è raccomandata." }
-                                    Button {
-                                        size: ButtonSize::Sm,
-                                        variant: ButtonVariant::Primary,
-                                        left_icon: rsx! { Icon { kind: IconKind::Check, size: 14 } },
-                                        "Verifica Sessioni Attive"
+                                div { class: "sc-stack",
+                                    h3 { class: "sc-section-title", "Parametri di Protezione e Accesso" }
+                                    p { class: "sc-page-desc", "L'autenticazione a due fattori con chiave di sicurezza hardware è raccomandata." }
+                                    div { class: "sc-actions",
+                                        Button {
+                                            size: ButtonSize::Sm,
+                                            variant: ButtonVariant::Primary,
+                                            left_icon: rsx! { Icon { kind: IconKind::Check, size: 14 } },
+                                            "Verifica Sessioni Attive"
+                                        }
                                     }
                                 }
                             }
 
                             TabPanel { value: "api".to_string(), active: active_tab,
-                                div { class: "space-y-3",
-                                    h4 { class: "text-sm font-semibold text-white", "Token di Accesso al Cluster" }
-                                    p { class: "text-xs text-zinc-400", "Utilizza questo token nelle tue pipeline CI/CD o da linea di comando." }
+                                div { class: "sc-stack",
+                                    h3 { class: "sc-section-title", "Token di Accesso al Cluster" }
+                                    p { class: "sc-page-desc", "Utilizza questo token nelle tue pipeline CI/CD o da linea di comando." }
                                     Code { "sh_live_948fbc923a10488cd723" }
                                 }
                             }

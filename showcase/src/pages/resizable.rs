@@ -2,11 +2,11 @@ use dioxus::prelude::*;
 use shadow_design::prelude::*;
 use shadow_design::resizable::ResizableDirection;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, Playground, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn ResizablePage() -> Element {
-    let mut current_direction = use_signal(|| ResizableDirection::Horizontal);
+    let current_direction = use_signal(|| ResizableDirection::Horizontal);
     let mut panel_1_size = use_signal(|| 35.0);
     let mut panel_2_size = use_signal(|| 65.0);
 
@@ -56,85 +56,77 @@ pub fn ResizablePage() -> Element {
 }"#
     .to_string();
 
-    let is_horiz = *current_direction.read() == ResizableDirection::Horizontal;
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Resizable (SplitPane)" }
-                Text { dimmed: true, size: TextSize::Sm, "Pannelli divisori ridimensionabili con maniglia di presa tattile per layout split orizzontali o verticali." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Resizable (SplitPane)".to_string(),
+                description: "Pannelli divisori ridimensionabili con maniglia di presa tattile per layout split orizzontali o verticali.".to_string(),
             }
 
             FeatureBanner { feature_name: "resizable" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                        div { class: "flex items-center gap-3",
-                            span { class: "text-xs font-mono text-zinc-400 font-semibold", "Direzione Split:" }
-                            button {
-                                r#type: "button",
-                                class: format!("px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if is_horiz { "bg-purple-950/80 text-purple-200 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.08]" }),
-                                onclick: move |_| {
-                                    current_direction.set(ResizableDirection::Horizontal);
-                                    panel_1_size.set(35.0);
-                                    panel_2_size.set(65.0);
-                                },
-                                "Orizzontale"
-                            }
-                            button {
-                                r#type: "button",
-                                class: format!("px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if !is_horiz { "bg-purple-950/80 text-purple-200 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.08]" }),
-                                onclick: move |_| {
-                                    current_direction.set(ResizableDirection::Vertical);
-                                    panel_1_size.set(35.0);
-                                    panel_2_size.set(65.0);
-                                },
-                                "Verticale"
-                            }
-                        }
-
-                        div { class: "h-[320px] rounded-xl border border-white/[0.1] bg-black/60 overflow-hidden",
-                            ResizablePanelGroup {
-                                direction: *current_direction.read(),
-                                on_resize: move |pct: f64| {
-                                    panel_1_size.set(pct);
-                                    panel_2_size.set(100.0 - pct);
-                                },
-                                ResizablePanel {
-                                    default_size: 35.0,
-                                    min_size: 20.0,
-                                    max_size: 70.0,
-                                    div { class: format!("h-full p-4 flex flex-col justify-between bg-zinc-950/50 {}", if is_horiz { "border-r border-white/[0.04]" } else { "border-b border-white/[0.04]" }),
-                                        div { class: "space-y-2",
-                                            span { class: "text-xs font-mono text-purple-300 font-bold", "Pannello 1 (Explorer)" }
-                                            p { class: "text-[11px] text-zinc-400", "Albero file, moduli o parametri di configurazione." }
-                                        }
-                                        div {
-                                            id: "sd-demo-panel-1-size",
-                                            class: "text-[10px] font-mono text-zinc-400 font-medium",
-                                            "Size: {panel_1_size():.1}% (Min 20% / Max 70%)"
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-demo-frame w-full h-[320px] overflow-hidden",
+                                ResizablePanelGroup {
+                                    direction: current_direction(),
+                                    on_resize: move |pct: f64| {
+                                        panel_1_size.set(pct);
+                                        panel_2_size.set(100.0 - pct);
+                                    },
+                                    ResizablePanel {
+                                        default_size: 35.0,
+                                        min_size: 20.0,
+                                        max_size: 70.0,
+                                        div { class: "h-full p-4 flex flex-col justify-between",
+                                            div { class: "sc-stack",
+                                                strong { class: "sc-accent-text", "Pannello 1 (Explorer)" }
+                                                p { class: "sc-page-desc", "Albero file, moduli o parametri di configurazione." }
+                                            }
+                                            div {
+                                                id: "sd-demo-panel-1-size",
+                                                class: "sc-subtle-text sc-mono",
+                                                "Size: {panel_1_size():.1}% (Min 20% / Max 70%)"
+                                            }
                                         }
                                     }
-                                }
-                                ResizableHandle { with_handle: true }
-                                ResizablePanel {
-                                    default_size: 65.0,
-                                    min_size: 30.0,
-                                    div { class: "h-full p-4 flex flex-col justify-between bg-black",
-                                        div { class: "space-y-2",
-                                            span { class: "text-xs font-mono text-cyan-300 font-bold", "Pannello 2 (Editor Principale)" }
-                                            p { class: "text-[11px] text-zinc-400", "Visualizzazione contenuto, editor sorgente o canvas interattivo." }
-                                        }
-                                        div {
-                                            id: "sd-demo-panel-2-size",
-                                            class: "text-[10px] font-mono text-zinc-400 font-medium",
-                                            "Size: {panel_2_size():.1}%"
+                                    ResizableHandle { with_handle: true }
+                                    ResizablePanel {
+                                        default_size: 65.0,
+                                        min_size: 30.0,
+                                        div { class: "h-full p-4 flex flex-col justify-between",
+                                            div { class: "sc-stack",
+                                                strong { class: "sc-info-text", "Pannello 2 (Editor Principale)" }
+                                                p { class: "sc-page-desc", "Visualizzazione contenuto, editor sorgente o canvas interattivo." }
+                                            }
+                                            div {
+                                                id: "sd-demo-panel-2-size",
+                                                class: "sc-subtle-text sc-mono",
+                                                "Size: {panel_2_size():.1}%"
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Direzione split".to_string(),
+                                options: vec![
+                                    (ResizableDirection::Horizontal, "Orizzontale".to_string()),
+                                    (ResizableDirection::Vertical, "Verticale".to_string()),
+                                ],
+                                value: current_direction,
+                                on_change: move |_| {
+                                    panel_1_size.set(35.0);
+                                    panel_2_size.set(65.0);
+                                },
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

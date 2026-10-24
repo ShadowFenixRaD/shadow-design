@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    FeatureBanner, OptionPicker, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn CodeHighlightPage() -> Element {
-    let mut selected_lang = use_signal(|| "rust".to_string());
+    let selected_lang = use_signal(|| "rust".to_string());
 
     let rust_sample = r#"// Modulo di Routing Dioxus 0.7
 use dioxus::prelude::*;
@@ -110,46 +112,41 @@ if __name__ == "__main__":
     };
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "CodeBlock & CodeHighlight" }
-                Text { dimmed: true, size: TextSize::Sm, "Visualizzatore di codice sorgente con syntax highlighting multilinguaggio, numerazione righe, badge di file e pulsante rapido di copia." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "CodeBlock & CodeHighlight".to_string(),
+                description: "Visualizzatore di codice sorgente con syntax highlighting multilinguaggio, numerazione righe, badge di file e pulsante rapido di copia.".to_string(),
             }
 
             FeatureBanner { feature_name: "code_highlight" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                        // Switch linguaggio
-                        div { class: "flex items-center gap-3",
-                            span { class: "text-xs font-mono text-zinc-400 font-semibold", "Linguaggio Demo:" }
-                            for (lang, label) in &[("rust", "Rust / RSX"), ("javascript", "TypeScript"), ("python", "Python")] {
-                                {
-                                    let is_active = *selected_lang.read() == *lang;
-                                    let l = lang.to_string();
-                                    rsx! {
-                                        button {
-                                            key: "{lang}",
-                                            r#type: "button",
-                                            class: format!("px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if is_active { "bg-purple-950/80 text-purple-200 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.08]" }),
-                                            onclick: move |_| selected_lang.set(l.clone()),
-                                            "{label}"
-                                        }
-                                    }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "w-full",
+                                CodeBlock {
+                                    code: cur_code,
+                                    language: selected_lang.read().clone(),
+                                    filename: Some(cur_filename.to_string()),
+                                    with_line_numbers: true,
+                                    with_copy_button: true,
+                                    highlight_lines: vec![2, 8],
                                 }
                             }
-                        }
-
-                        // Blocco codice
-                        CodeBlock {
-                            code: cur_code,
-                            language: selected_lang.read().clone(),
-                            filename: Some(cur_filename.to_string()),
-                            with_line_numbers: true,
-                            with_copy_button: true,
-                            highlight_lines: vec![2, 8],
-                        }
+                        },
+                        controls: rsx! {
+                            OptionPicker {
+                                label: "Linguaggio Demo".to_string(),
+                                options: vec![
+                                    ("rust".to_string(), "Rust / RSX".to_string()),
+                                    ("javascript".to_string(), "TypeScript".to_string()),
+                                    ("python".to_string(), "Python".to_string()),
+                                ],
+                                value: selected_lang,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

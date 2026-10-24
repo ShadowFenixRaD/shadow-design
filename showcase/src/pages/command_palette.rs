@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn CommandPalettePage() -> Element {
@@ -101,44 +101,37 @@ CommandPalette {
     let actions_for_palette = actions.clone();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "CommandPalette (Spotlight)" }
-                Text { dimmed: true, size: TextSize::Sm, "Modal di ricerca e navigazione universale ad alta efficienza azionabile da tastiera, con raggruppamento per categoria e fuzzy matching." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "CommandPalette (Spotlight)".to_string(),
+                description: "Modal di ricerca e navigazione universale ad alta efficienza azionabile da tastiera, con raggruppamento per categoria e fuzzy matching.".to_string(),
             }
 
             FeatureBanner { feature_name: "command_palette" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner",
-                        p { class: "text-xs text-zinc-400 font-mono text-center max-w-md",
+                    Stage {
+                        p { class: "sc-muted-text",
                             "Premi Ctrl+K da tastiera o clicca sul pulsante. Naviga con frecce ↑/↓, premi Invio per confermare ed Esc per chiudere."
                         }
 
-                        div { class: "flex items-center gap-3",
-                            button {
-                                id: "sd-command-palette-demo-trigger",
-                                r#type: "button",
-                                class: "sd-btn sd-btn--primary sd-btn--md flex items-center gap-2",
+                        div { class: "sc-actions",
+                            Button {
+                                variant: ButtonVariant::Primary,
+                                left_icon: rsx! { Icon { kind: IconKind::Search, size: 16 } },
                                 onclick: move |_| {
                                     let cur = *opened.read();
                                     opened.set(!cur);
                                 },
-                                Icon { kind: IconKind::Search, size: 16 }
                                 "Apri Command Palette"
                             }
-                            div { class: "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-zinc-950/80 text-xs font-mono",
-                                Kbd { "Ctrl" }
-                                span { class: "text-zinc-500", "+" }
-                                Kbd { "K" }
-                            }
+                            Kbd { "Ctrl" }
+                            span { class: "sc-subtle-text", "+" }
+                            Kbd { "K" }
                         }
 
-                        div { class: "p-3 rounded-lg border border-white/[0.06] bg-zinc-950/60 text-xs font-mono flex items-center gap-3",
-                            span { class: "text-zinc-500", "Ultima azione eseguita:" }
-                            span { class: "text-purple-300 font-bold", "{last_selected()}" }
-                        }
+                        Counter { label: "Ultima azione eseguita".to_string(), value: last_selected() }
 
                         CommandPalette {
                             opened: opened,

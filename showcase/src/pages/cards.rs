@@ -1,14 +1,14 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    CheckControl, ChoicePicker, ControlRow, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn CardsPage() -> Element {
-    let mut selected_variant = use_signal(|| CardVariant::Default);
-    let mut selected_shadow = use_signal(|| CardShadow::Md);
+    let selected_variant = use_signal(|| CardVariant::Default);
+    let selected_shadow = use_signal(|| CardShadow::Md);
     let with_avatar = use_signal(|| true);
     let with_title = use_signal(|| true);
     let with_subtitle = use_signal(|| true);
@@ -139,28 +139,27 @@ pub fn CardsPage() -> Element {
     },
     image: Some("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80".to_string()),
     footer: rsx! {
-        span { class: "text-zinc-500", "Ultima sincronizzazione 2 minuti fa" }
+        span { class: "sc-subtle-text", "Ultima sincronizzazione 2 minuti fa" }
     },
-    p { class: "text-xs text-zinc-300", "Nodo di sincronizzazione Kyber-1024 attivo." }
+    p { class: "sc-muted-text", "Nodo di sincronizzazione Kyber-1024 attivo." }
 }"#
         .to_string();
 
     let max_h_class = if with_max_height() { "max-h-[420px]" } else { "" };
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Card (Unificata)" }
-                Text { dimmed: true, size: TextSize::Sm, "Superficie modulare avanzata: supporto nativo per avatar, titolo centrato o affiancato, sottotitolo, progress bar, pulsanti d'azione dedicati e cover image inferiore con ritaglio bordi e max-height." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Card (Unificata)".to_string(),
+                description: "Superficie modulare avanzata: supporto nativo per avatar, titolo centrato o affiancato, sottotitolo, progress bar, pulsanti d'azione dedicati e cover image inferiore con ritaglio bordi e max-height.".to_string(),
             }
 
             FeatureBanner { feature_name: "card" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Card Preview
-                        div { class: "w-full flex justify-center",
+                    Playground {
+                        stage: rsx! {
                             Card {
                                 class: "{max_h_class} w-full max-w-sm",
                                 avatar: if with_avatar() {
@@ -193,102 +192,48 @@ pub fn CardsPage() -> Element {
                                 } else {
                                     None
                                 },
-                                div { class: "space-y-2",
-                                    p { class: "text-xs text-zinc-300", "Contenuto informativo della card con tipografia ad alto contrasto e bordi ottici calibrati." }
+                                div { class: "sc-stack",
+                                    p { class: "sc-muted-text", "Contenuto informativo della card con tipografia ad alto contrasto e bordi ottici calibrati." }
                                     Badge { label: "Zero-Knowledge Validated".to_string(), variant: BadgeVariant::Success, dot: true }
                                 }
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Card:" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for v in [CardVariant::Default, CardVariant::Elevated, CardVariant::Interactive, CardVariant::Metric] {
-                                        button {
-                                            key: "{v:?}",
-                                            r#type: "button",
-                                            class: if selected_variant() == v {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                            },
-                                            onclick: move |_| selected_variant.set(v),
-                                            "{v:?}"
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Variante Card".to_string(),
+                                options: vec![
+                                    (CardVariant::Default, "Default".to_string()),
+                                    (CardVariant::Elevated, "Elevated".to_string()),
+                                    (CardVariant::Interactive, "Interactive".to_string()),
+                                    (CardVariant::Metric, "Metric".to_string()),
+                                ],
+                                value: selected_variant,
                             }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Livello Ombra:" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for s in [CardShadow::None, CardShadow::Sm, CardShadow::Md, CardShadow::Lg, CardShadow::Xl] {
-                                        button {
-                                            key: "{s:?}",
-                                            r#type: "button",
-                                            class: if selected_shadow() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                            },
-                                            onclick: move |_| selected_shadow.set(s),
-                                            "{s:?}"
-                                        }
-                                    }
-                                }
+                            ChoicePicker {
+                                label: "Livello Ombra".to_string(),
+                                options: vec![
+                                    (CardShadow::None, "None".to_string()),
+                                    (CardShadow::Sm, "Sm".to_string()),
+                                    (CardShadow::Md, "Md".to_string()),
+                                    (CardShadow::Lg, "Lg".to_string()),
+                                    (CardShadow::Xl, "Xl".to_string()),
+                                ],
+                                value: selected_shadow,
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06] space-y-2.5",
-                                span { class: "text-zinc-400 block uppercase tracking-wider text-[10px]", "Sezioni Attive:" }
-                                div { class: "grid grid-cols-2 gap-2 text-zinc-300",
-                                    Checkbox {
-                                        checked: with_avatar,
-                                        label: Some("Avatar".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: with_title,
-                                        label: Some("Titolo".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: with_subtitle,
-                                        label: Some("Sottotitolo".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: with_progress,
-                                        label: Some("Progress Bar".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: with_buttons,
-                                        label: Some("Bottoni in Basso".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                    Checkbox {
-                                        checked: with_image,
-                                        label: Some("Immagine in Basso".to_string()),
-                                        size: CheckboxSize::Sm,
-                                    }
-                                }
+                            hr { class: "sc-control-divider" }
+                            span { class: "sc-control-label", "Sezioni Attive" }
+                            ControlRow {
+                                CheckControl { label: "Avatar".to_string(), checked: with_avatar }
+                                CheckControl { label: "Titolo".to_string(), checked: with_title }
+                                CheckControl { label: "Sottotitolo".to_string(), checked: with_subtitle }
+                                CheckControl { label: "Progress Bar".to_string(), checked: with_progress }
+                                CheckControl { label: "Bottoni in Basso".to_string(), checked: with_buttons }
+                                CheckControl { label: "Immagine in Basso".to_string(), checked: with_image }
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06] space-y-2",
-                                Checkbox {
-                                    checked: enable_glow,
-                                    label: Some("Attiva Micro-Glow su Hover".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: with_max_height,
-                                    label: Some("Test Altezza Massima (Taglio Immagine)".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                            }
-                        }
+                            hr { class: "sc-control-divider" }
+                            ToggleControl { label: "Attiva Micro-Glow su Hover".to_string(), checked: enable_glow }
+                            ToggleControl { label: "Test Altezza Massima (Taglio Immagine)".to_string(), checked: with_max_height }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -296,55 +241,40 @@ pub fn CardsPage() -> Element {
             }
 
             // Visual Examples
-            div { class: "grid grid-cols-1 md:grid-cols-3 gap-5",
+            div { class: "sc-card-grid sc-card-grid--3",
                 Card {
                     variant: CardVariant::Metric,
-                    div { class: "flex items-start justify-between gap-3",
-                        div { class: "space-y-1.5",
-                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Latenza Media" }
-                            div { class: "text-2xl font-extrabold text-white tracking-tight", "1.2 ms" }
-                            span { class: "text-[11px] text-emerald-400 font-mono flex items-center gap-1",
-                                Icon { kind: IconKind::Check, size: 12 }
-                                "+14% performance"
-                            }
+                    div { class: "sc-title-row",
+                        div { class: "sc-stack",
+                            span { class: "sc-control-label", "Latenza Media" }
+                            span { class: "sc-section-title", "1.2 ms" }
+                            span { class: "sc-success-text sc-mono", "+14% performance" }
                         }
-                        span { class: "p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0",
-                            Icon { kind: IconKind::Sparkles, size: 18 }
-                        }
+                        Icon { kind: IconKind::Sparkles, size: 18 }
                     }
                 }
                 Card {
                     variant: CardVariant::Interactive,
                     hover_glow: true,
                     onclick: move |_| {},
-                    div { class: "flex items-start justify-between gap-3",
-                        div { class: "space-y-1.5",
-                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Richieste Totali" }
-                            div { class: "text-2xl font-extrabold text-white tracking-tight", "4.8M" }
-                            span { class: "text-[11px] text-purple-300 font-mono flex items-center gap-1",
-                                Icon { kind: IconKind::Layers, size: 12 }
-                                "Hover per micro-glow"
-                            }
+                    div { class: "sc-title-row",
+                        div { class: "sc-stack",
+                            span { class: "sc-control-label", "Richieste Totali" }
+                            span { class: "sc-section-title", "4.8M" }
+                            span { class: "sc-accent-text sc-mono", "Hover per micro-glow" }
                         }
-                        span { class: "p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 flex items-center justify-center shrink-0",
-                            Icon { kind: IconKind::Layers, size: 18 }
-                        }
+                        Icon { kind: IconKind::Layers, size: 18 }
                     }
                 }
                 Card {
                     variant: CardVariant::Elevated,
-                    div { class: "flex items-start justify-between gap-3",
-                        div { class: "space-y-1.5",
-                            span { class: "text-[11px] font-mono uppercase tracking-wider text-zinc-400 block", "Affidabilità" }
-                            div { class: "text-2xl font-extrabold text-white tracking-tight", "99.99%" }
-                            span { class: "text-[11px] text-zinc-400 font-mono flex items-center gap-1",
-                                Icon { kind: IconKind::CheckCircle, size: 12 }
-                                "Livello Surface 2"
-                            }
+                    div { class: "sc-title-row",
+                        div { class: "sc-stack",
+                            span { class: "sc-control-label", "Affidabilità" }
+                            span { class: "sc-section-title", "99.99%" }
+                            span { class: "sc-muted-text sc-mono", "Livello Surface 2" }
                         }
-                        span { class: "p-2.5 rounded-xl bg-zinc-800/60 border border-white/10 text-zinc-300 flex items-center justify-center shrink-0",
-                            Icon { kind: IconKind::CheckCircle, size: 18 }
-                        }
+                        Icon { kind: IconKind::CheckCircle, size: 18 }
                     }
                 }
             }

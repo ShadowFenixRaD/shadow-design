@@ -1,12 +1,14 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    Controls, FeatureBanner, OptionPicker, PageHeader, PropRow, ShowcaseTabs, Stage,
+};
 
 #[component]
 pub fn ChartsPage() -> Element {
-    let mut selected_chart_tab = use_signal(|| "area".to_string());
-    let mut heatmap_mode = use_signal(|| "month".to_string());
+    let selected_chart_tab = use_signal(|| "area".to_string());
+    let heatmap_mode = use_signal(|| "month".to_string());
 
     // Dati di esempio per grafici cartesiani (Area, Bar, Line)
     let sample_points = vec![
@@ -19,17 +21,17 @@ pub fn ChartsPage() -> Element {
     ];
 
     let sample_series = vec![
-        ChartSeries::new("revenue").with_label("Ricavi (€k)").with_color("#a855f7"),
-        ChartSeries::new("costs").with_label("Costi (€k)").with_color("#ff1744").with_dashed(true),
-        ChartSeries::new("profit").with_label("Margine (€k)").with_color("#00ff9d"),
+        ChartSeries::new("revenue").with_label("Ricavi (€k)").with_color("#a855f7"),  // sd-lint-allow: runtime data value, not styling
+        ChartSeries::new("costs").with_label("Costi (€k)").with_color("#ff1744").with_dashed(true),  // sd-lint-allow: runtime data value, not styling
+        ChartSeries::new("profit").with_label("Margine (€k)").with_color("#00ff9d"),  // sd-lint-allow: runtime data value, not styling
     ];
 
     // Dati Pie & Donut
     let sample_pie = vec![
-        PieSegment::new("Direct", 45.0).with_color("#a855f7"),
-        PieSegment::new("Referral", 25.0).with_color("#00f0ff"),
-        PieSegment::new("Social", 20.0).with_color("#00ff9d"),
-        PieSegment::new("Organic", 10.0).with_color("#f59e0b"),
+        PieSegment::new("Direct", 45.0).with_color("#a855f7"),  // sd-lint-allow: runtime data value, not styling
+        PieSegment::new("Referral", 25.0).with_color("#00f0ff"),  // sd-lint-allow: runtime data value, not styling
+        PieSegment::new("Social", 20.0).with_color("#00ff9d"),  // sd-lint-allow: runtime data value, not styling
+        PieSegment::new("Organic", 10.0).with_color("#f59e0b"),  // sd-lint-allow: runtime data value, not styling
     ];
 
     // Dati Radar
@@ -41,8 +43,8 @@ pub fn ChartsPage() -> Element {
         RadarDataPoint::new("Design").with_value("Prodotto A", 80.0).with_value("Prodotto B", 75.0),
     ];
     let radar_series = vec![
-        ChartSeries::new("Prodotto A").with_color("#a855f7"),
-        ChartSeries::new("Prodotto B").with_color("#00f0ff"),
+        ChartSeries::new("Prodotto A").with_color("#a855f7"),  // sd-lint-allow: runtime data value, not styling
+        ChartSeries::new("Prodotto B").with_color("#00f0ff"),  // sd-lint-allow: runtime data value, not styling
     ];
 
     // Dati Scatter & Bubble
@@ -138,51 +140,48 @@ pub fn ChartsPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-5xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Charts & Data Visualization" }
-                Text { dimmed: true, size: TextSize::Sm, "Suite completa di grafici vettoriali SVG nativi in Rust per Dioxus 0.7: zero dipendenze JavaScript esterne, rendering reattivo e glow coordinato con il tema." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Charts & Data Visualization".to_string(),
+                description: "Suite completa di grafici vettoriali SVG nativi in Rust per Dioxus 0.7: zero dipendenze JavaScript esterne, rendering reattivo e glow coordinato con il tema.".to_string(),
             }
 
             FeatureBanner { feature_name: "charts" }
 
-            // Selettore tipologia grafico
-            div { class: "flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-zinc-950/80 border border-white/[0.08] backdrop-blur-md",
-                for (tab_id, tab_label) in &[
-                    ("area", "Area"),
-                    ("bar", "Bar"),
-                    ("line", "Line"),
-                    ("pie", "Pie & Donut"),
-                    ("radar", "Radar"),
-                    ("scatter", "Scatter / Bubble"),
-                    ("sparkline", "Sparkline"),
-                    ("gauge", "Gauge & Radial"),
-                    ("heatmap", "Heatmap"),
-                ] {
-                    {
-                        let is_active = selected_chart_tab() == *tab_id;
-                        let tid = tab_id.to_string();
-                        let active_cls = if is_active {
-                            "bg-purple-600 text-white font-semibold shadow-md"
-                        } else {
-                            "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
-                        };
-                        rsx! {
-                            button {
-                                key: "{tab_id}",
-                                r#type: "button",
-                                class: "px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer {active_cls}",
-                                onclick: move |_| selected_chart_tab.set(tid.clone()),
-                                "{tab_label}"
-                            }
-                        }
-                    }
-                }
-            }
-
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-6 rounded-2xl bg-zinc-950/80 border border-white/[0.08] shadow-inner flex flex-col items-center justify-center min-h-[360px]",
+                    div { class: "sc-stack",
+                        Controls {
+                            OptionPicker {
+                                label: "Tipologia Grafico".to_string(),
+                                options: [
+                                    ("area", "Area"),
+                                    ("bar", "Bar"),
+                                    ("line", "Line"),
+                                    ("pie", "Pie & Donut"),
+                                    ("radar", "Radar"),
+                                    ("scatter", "Scatter / Bubble"),
+                                    ("sparkline", "Sparkline"),
+                                    ("gauge", "Gauge & Radial"),
+                                    ("heatmap", "Heatmap"),
+                                ]
+                                    .iter()
+                                    .map(|(v, l)| (v.to_string(), l.to_string()))
+                                    .collect::<Vec<_>>(),
+                                value: selected_chart_tab,
+                            }
+                            if selected_chart_tab() == "heatmap" {
+                                OptionPicker {
+                                    label: "Vista Heatmap".to_string(),
+                                    options: vec![
+                                        ("month".to_string(), "Mensile (12 Mesi x 5 Canali)".to_string()),
+                                        ("day".to_string(), "Giornaliera (52 Settimane x 7 Giorni)".to_string()),
+                                    ],
+                                    value: heatmap_mode,
+                                }
+                            }
+                        }
+                    Stage { wide: true,
                         if selected_chart_tab() == "area" {
                             AreaChart {
                                 data: sample_points.clone(),
@@ -210,14 +209,14 @@ pub fn ChartsPage() -> Element {
                         } else if selected_chart_tab() == "pie" {
                             div { class: "grid grid-cols-1 md:grid-cols-2 gap-8 w-full items-center",
                                 div { class: "flex flex-col items-center",
-                                    span { class: "text-xs font-mono text-zinc-400 mb-2", "PieChart" }
+                                    span { class: "sc-control-label", "PieChart" }
                                     PieChart {
                                         data: sample_pie.clone(),
                                         height: 260,
                                     }
                                 }
                                 div { class: "flex flex-col items-center",
-                                    span { class: "text-xs font-mono text-zinc-400 mb-2", "DonutChart (KPI)" }
+                                    span { class: "sc-control-label", "DonutChart (KPI)" }
                                     DonutChart {
                                         data: sample_pie.clone(),
                                         center_label: Some("100%".to_string()),
@@ -239,27 +238,31 @@ pub fn ChartsPage() -> Element {
                             }
                         } else if selected_chart_tab() == "sparkline" {
                             div { class: "flex flex-wrap items-center justify-center gap-8 py-8",
-                                div { class: "flex items-center gap-4 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
-                                    div { class: "flex flex-col",
-                                        span { class: "text-xs font-mono text-zinc-400", "CPU Load" }
-                                        span { class: "text-lg font-bold text-white", "42.0%" }
-                                        span { class: "text-[11px] font-mono text-emerald-400", "+28.4% (+9.3pt)" }
+                                Card {
+                                    div { class: "sc-title-row",
+                                    div { class: "sc-stack",
+                                        span { class: "sc-control-label", "CPU Load" }
+                                        span { class: "sc-section-title", "42.0%" }
+                                        span { class: "sc-success-text sc-mono", "+28.4% (+9.3pt)" }
                                     }
-                                    Sparkline { data: spark_up.clone(), trend: TrendDirection::Positive }
+                                        Sparkline { data: spark_up.clone(), trend: TrendDirection::Positive }
+                                    }
                                 }
-                                div { class: "flex items-center gap-4 p-4 rounded-xl bg-zinc-900 border border-white/10 shadow-lg",
-                                    div { class: "flex flex-col",
-                                        span { class: "text-xs font-mono text-zinc-400", "Latency" }
-                                        span { class: "text-lg font-bold text-white", "18 ms" }
-                                        span { class: "text-[11px] font-mono text-emerald-400", "-42 ms (da 60 ms)" }
+                                Card {
+                                    div { class: "sc-title-row",
+                                    div { class: "sc-stack",
+                                        span { class: "sc-control-label", "Latency" }
+                                        span { class: "sc-section-title", "18 ms" }
+                                        span { class: "sc-success-text sc-mono", "-42 ms (da 60 ms)" }
                                     }
-                                    Sparkline { data: spark_down.clone(), trend: TrendDirection::Negative }
+                                        Sparkline { data: spark_down.clone(), trend: TrendDirection::Negative }
+                                    }
                                 }
                             }
                         } else if selected_chart_tab() == "gauge" {
                             div { class: "grid grid-cols-1 sm:grid-cols-2 gap-8 w-full items-center",
                                 div { class: "flex flex-col items-center",
-                                    span { class: "text-xs font-mono text-zinc-400 mb-2", "GaugeChart" }
+                                    span { class: "sc-control-label", "GaugeChart" }
                                     GaugeChart {
                                         value: 78.5,
                                         label: Some("Storage Usato".to_string()),
@@ -268,7 +271,7 @@ pub fn ChartsPage() -> Element {
                                     }
                                 }
                                 div { class: "flex flex-col items-center",
-                                    span { class: "text-xs font-mono text-zinc-400 mb-2", "RadialBar (360°)" }
+                                    span { class: "sc-control-label", "RadialBar (360°)" }
                                     RadialBar {
                                         value: 84.0,
                                         label: Some("Battery".to_string()),
@@ -278,31 +281,7 @@ pub fn ChartsPage() -> Element {
                             }
                         } else if selected_chart_tab() == "heatmap" {
                             div { class: "flex flex-col items-center w-full gap-4",
-                                // Sotto-selettore Vista Mese vs Giorno
-                                div { class: "flex items-center gap-2 p-1 rounded-lg bg-zinc-900 border border-white/10 self-start",
-                                    button {
-                                        r#type: "button",
-                                        class: if heatmap_mode() == "month" {
-                                            "px-3 py-1 text-xs font-medium rounded-md bg-purple-950/80 text-purple-200 border border-purple-500/40"
-                                        } else {
-                                            "px-3 py-1 text-xs font-medium rounded-md text-zinc-400 hover:text-white"
-                                        },
-                                        onclick: move |_| heatmap_mode.set("month".to_string()),
-                                        "Vista Mensile (12 Mesi x 5 Canali)"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if heatmap_mode() == "day" {
-                                            "px-3 py-1 text-xs font-medium rounded-md bg-purple-950/80 text-purple-200 border border-purple-500/40"
-                                        } else {
-                                            "px-3 py-1 text-xs font-medium rounded-md text-zinc-400 hover:text-white"
-                                        },
-                                        onclick: move |_| heatmap_mode.set("day".to_string()),
-                                        "Vista Giornaliera (Calendar Heatmap 52 Settimane x 7 Giorni)"
-                                    }
-                                }
-
-                                if heatmap_mode() == "month" {
+                                                                if heatmap_mode() == "month" {
                                     Heatmap {
                                         data: sample_heatmap.clone(),
                                         x_labels: vec!["G".to_string(), "F".to_string(), "M".to_string(), "A".to_string(), "M".to_string(), "G".to_string(), "L".to_string(), "A".to_string(), "S".to_string(), "O".to_string(), "N".to_string(), "D".to_string()],
@@ -319,6 +298,7 @@ pub fn ChartsPage() -> Element {
                                 }
                             }
                         }
+                    }
                     }
                 },
                 code: code_snippet,

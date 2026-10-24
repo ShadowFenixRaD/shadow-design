@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn AppShellPage() -> Element {
@@ -85,7 +85,7 @@ AppShell {
                         onclick: move |_| nav_collapsed.set(!nav_collapsed()),
                         Icon { kind: IconKind::Menu, size: 16 }
                     }
-                    span { class: "font-bold text-white text-sm", "ShadowStudio" }
+                    span { class: "sc-section-title", "ShadowStudio" }
                 }
                 div { class: "flex items-center gap-2",
                     Button {
@@ -101,33 +101,33 @@ AppShell {
     navbar: rsx! {
         AppShellNavbar {
             width: "240px",
-            div { class: "p-4 space-y-2",
-                div { class: "text-xs font-semibold text-zinc-400 uppercase", "Navigazione" }
-                div { class: "p-2 rounded bg-white/10 text-white text-sm cursor-pointer", "Dashboard" }
-                div { class: "p-2 rounded hover:bg-white/[0.06] text-zinc-400 hover:text-white text-sm cursor-pointer", "Progetti" }
-                div { class: "p-2 rounded hover:bg-white/[0.06] text-zinc-400 hover:text-white text-sm cursor-pointer", "Impostazioni" }
+            div { class: "sc-stack",
+                span { class: "sc-control-label", "Navigazione" }
+                Button { variant: ButtonVariant::Secondary, size: ButtonSize::Sm, full_width: true, "Dashboard" }
+                Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, full_width: true, "Progetti" }
+                Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, full_width: true, "Impostazioni" }
             }
         }
     },
     aside: rsx! {
         AppShellAside {
             width: "260px",
-            div { class: "p-4 space-y-3",
-                div { class: "text-xs font-semibold text-zinc-400 uppercase", "Ispettore Attivo" }
-                div { class: "text-xs text-zinc-500", "Nessun nodo selezionato" }
+            div { class: "sc-stack",
+                span { class: "sc-control-label", "Ispettore Attivo" }
+                span { class: "sc-subtle-text", "Nessun nodo selezionato" }
             }
         }
     },
     AppShellMain {
-        div { class: "p-6 space-y-4",
-            h1 { class: "text-xl font-bold text-white", "Contenuto Applicativo" }
-            p { class: "text-sm text-zinc-400", "Area scrollabile indipendente con supporto viewport flessibile." }
+        div { class: "sc-stack",
+            h1 { class: "sc-section-title", "Contenuto Applicativo" }
+            p { class: "sc-muted-text", "Area scrollabile indipendente con supporto viewport flessibile." }
         }
     },
     footer: rsx! {
         AppShellFooter {
             height: "36px",
-            div { class: "flex items-center justify-between w-full px-4 text-xs text-zinc-500 font-mono",
+            div { class: "sc-title-row w-full",
                 span { "Ready • v{VERSION}" }
                 span { "Shadow Design System" }
             }
@@ -137,67 +137,58 @@ AppShell {
     .to_string();
 
     rsx! {
-        div { class: "max-w-5xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "AppShell" }
-                Text { dimmed: true, size: TextSize::Sm, "Architettura e layout master responsive a 5 zone (Header, Navbar, Aside, Main, Footer) con gerarchia z-index standardizzata, hairline specular top e scrolling indipendente." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "AppShell".to_string(),
+                description: "Architettura e layout master responsive a 5 zone (Header, Navbar, Aside, Main, Footer) con gerarchia z-index standardizzata, hairline specular top e scrolling indipendente.".to_string(),
             }
 
             FeatureBanner { feature_name: "app_shell" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "flex flex-col gap-4 w-full",
-                        div { class: "flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-[#060608] border border-white/[0.08]",
-                            div { class: "flex items-center gap-2",
+                    div { class: "sc-stack",
+                        div { class: "sc-title-row",
+                            div { class: "sc-actions",
                                 Button {
                                     size: ButtonSize::Sm,
-                                    variant: if nav_collapsed() { ButtonVariant::Outline } else { ButtonVariant::Primary },
+                                    variant: if nav_collapsed() { ButtonVariant::Secondary } else { ButtonVariant::Primary },
                                     onclick: move |_| nav_collapsed.set(!nav_collapsed()),
                                     left_icon: rsx! { Icon { kind: IconKind::Menu, size: 14 } },
                                     if nav_collapsed() { "Espandi Navbar" } else { "Comprimi Navbar" }
                                 }
                                 Button {
                                     size: ButtonSize::Sm,
-                                    variant: if aside_collapsed() { ButtonVariant::Outline } else { ButtonVariant::Primary },
+                                    variant: if aside_collapsed() { ButtonVariant::Secondary } else { ButtonVariant::Primary },
                                     onclick: move |_| aside_collapsed.set(!aside_collapsed()),
                                     left_icon: rsx! { Icon { kind: IconKind::Settings, size: 14 } },
                                     if aside_collapsed() { "Espandi Aside" } else { "Comprimi Aside" }
                                 }
                             }
-                            div { class: "flex items-center gap-2",
-                                Badge {
-                                    label: "Z-Layers: Header(30) Nav(25) Aside(25) Footer(20) Shell(10)".to_string(),
-                                    variant: BadgeVariant::Primary,
-                                }
+                            Badge {
+                                label: "Strati: Header Nav Aside Footer Shell".to_string(),
+                                variant: BadgeVariant::Primary,
                             }
                         }
 
-                        div {
-                            class: "w-full rounded-xl border border-white/[0.08] overflow-hidden shadow-2xl",
-                            style: "height: 520px;",
+                        div { class: "sc-demo-frame", style: "height: 520px;",
                             AppShell {
                                 navbar_collapsed: nav_collapsed,
                                 aside_collapsed: aside_collapsed,
                                 header: rsx! {
                                     AppShellHeader {
                                         height: "56px",
-                                        div { class: "flex items-center justify-between w-full h-full",
-                                            div { class: "flex items-center gap-3",
+                                        div { class: "sc-title-row w-full h-full",
+                                            div { class: "sc-actions",
                                                 Button {
                                                     size: ButtonSize::Sm,
                                                     variant: ButtonVariant::Ghost,
                                                     onclick: move |_| nav_collapsed.set(!nav_collapsed()),
                                                     Icon { kind: IconKind::Menu, size: 16 }
                                                 }
-                                                div { class: "flex items-center gap-2",
-                                                    div { class: "w-7 h-7 rounded-lg bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-purple-300",
-                                                        Icon { kind: IconKind::Layers, size: 16 }
-                                                    }
-                                                    span { class: "font-bold text-white text-sm tracking-tight", "ShadowStudio" }
-                                                }
+                                                span { class: "sc-section-title", "ShadowStudio" }
                                             }
-                                            div { class: "flex items-center gap-2",
+                                            div { class: "sc-actions",
                                                 Button {
                                                     size: ButtonSize::Xs,
                                                     variant: ButtonVariant::Ghost,
@@ -217,44 +208,28 @@ AppShell {
                                 navbar: rsx! {
                                     AppShellNavbar {
                                         width: "220px",
-                                        div { class: "p-4 space-y-4",
-                                            div { class: "text-xs font-semibold text-zinc-400 uppercase tracking-wider", "Workspace" }
-                                            div { class: "space-y-1",
-                                                div { class: "flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 text-white text-sm font-medium cursor-pointer transition-colors",
-                                                    Icon { kind: IconKind::Box, size: 15 }
-                                                    span { "Dashboard" }
-                                                }
-                                                div { class: "flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] text-sm font-medium cursor-pointer transition-colors",
-                                                    Icon { kind: IconKind::Layers, size: 15 }
-                                                    span { "Progetti" }
-                                                }
-                                                div { class: "flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] text-sm font-medium cursor-pointer transition-colors",
-                                                    Icon { kind: IconKind::Terminal, size: 15 }
-                                                    span { "Console" }
-                                                }
-                                                div { class: "flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] text-sm font-medium cursor-pointer transition-colors",
-                                                    Icon { kind: IconKind::Settings, size: 15 }
-                                                    span { "Impostazioni" }
-                                                }
-                                            }
+                                        div { class: "sc-stack",
+                                            span { class: "sc-control-label", "Workspace" }
+                                            Button { variant: ButtonVariant::Secondary, size: ButtonSize::Sm, full_width: true, left_icon: rsx! { Icon { kind: IconKind::Box, size: 15 } }, "Dashboard" }
+                                            Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, full_width: true, left_icon: rsx! { Icon { kind: IconKind::Layers, size: 15 } }, "Progetti" }
+                                            Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, full_width: true, left_icon: rsx! { Icon { kind: IconKind::Terminal, size: 15 } }, "Console" }
+                                            Button { variant: ButtonVariant::Ghost, size: ButtonSize::Sm, full_width: true, left_icon: rsx! { Icon { kind: IconKind::Settings, size: 15 } }, "Impostazioni" }
                                         }
                                     }
                                 },
                                 aside: rsx! {
                                     AppShellAside {
                                         width: "250px",
-                                        div { class: "p-4 space-y-4",
-                                            div { class: "flex items-center justify-between",
-                                                span { class: "text-xs font-semibold text-zinc-400 uppercase tracking-wider", "Ispettore Nodo" }
+                                        div { class: "sc-stack",
+                                            div { class: "sc-title-row",
+                                                span { class: "sc-control-label", "Ispettore Nodo" }
                                                 Badge { label: "Online".to_string(), variant: BadgeVariant::Success, dot: true }
                                             }
-                                            div { class: "p-3 rounded-lg bg-[#060608] border border-white/[0.08] space-y-2",
-                                                div { class: "text-xs text-zinc-400", "Nodo ID" }
-                                                div { class: "text-xs font-mono text-purple-300", "node-cluster-07x" }
+                                            Card { title: "Nodo ID".to_string(),
+                                                span { class: "sc-accent-text sc-mono", "node-cluster-07x" }
                                             }
-                                            div { class: "p-3 rounded-lg bg-[#060608] border border-white/[0.08] space-y-2",
-                                                div { class: "text-xs text-zinc-400", "Memoria Allocata" }
-                                                div { class: "text-xs font-mono text-zinc-200", "4.2 GB / 16.0 GB" }
+                                            Card { title: "Memoria Allocata".to_string(),
+                                                span { class: "sc-mono", "4.2 GB / 16.0 GB" }
                                             }
                                         }
                                     }
@@ -262,21 +237,18 @@ AppShell {
                                 footer: rsx! {
                                     AppShellFooter {
                                         height: "36px",
-                                        div { class: "flex items-center justify-between w-full h-full text-xs text-zinc-500 font-mono",
-                                            div { class: "flex items-center gap-2",
-                                                span { class: "w-1.5 h-1.5 rounded-full bg-emerald-400" }
-                                                span { "Tutti i sistemi operativi" }
-                                            }
-                                            span { "Shadow Design v{VERSION}" }
+                                        div { class: "sc-title-row w-full h-full",
+                                            span { class: "sc-success-text sc-mono", "Tutti i sistemi operativi" }
+                                            span { class: "sc-subtle-text sc-mono", "Shadow Design v{VERSION}" }
                                         }
                                     }
                                 },
                                 AppShellMain {
-                                    div { class: "p-6 space-y-6",
-                                        div { class: "flex items-center justify-between",
+                                    div { class: "sc-stack",
+                                        div { class: "sc-title-row",
                                             div {
-                                                h3 { class: "text-lg font-bold text-white tracking-tight", "Centro di Controllo Cluster" }
-                                                p { class: "text-xs text-zinc-400", "Monitoraggio dei carichi distribuiti in tempo reale con scrolling fluido." }
+                                                h3 { class: "sc-section-title", "Centro di Controllo Cluster" }
+                                                p { class: "sc-muted-text", "Monitoraggio dei carichi distribuiti in tempo reale con scrolling fluido." }
                                             }
                                             Button {
                                                 size: ButtonSize::Sm,
@@ -286,34 +258,22 @@ AppShell {
                                             }
                                         }
 
-                                        div { class: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                                            div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] space-y-2",
-                                                div { class: "flex items-center justify-between",
-                                                    span { class: "text-xs text-zinc-400", "Rete Peer-to-Peer" }
-                                                    Icon { kind: IconKind::Server, size: 16 }
-                                                }
-                                                div { class: "text-2xl font-bold text-white", "128 Nodi" }
-                                                div { class: "text-xs text-emerald-400", "+14% rispetto a ieri" }
+                                        div { class: "sc-card-grid",
+                                            Card { title: "Rete Peer-to-Peer".to_string(), subtitle: "+14% rispetto a ieri".to_string(),
+                                                span { class: "sc-section-title", "128 Nodi" }
                                             }
-                                            div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] space-y-2",
-                                                div { class: "flex items-center justify-between",
-                                                    span { class: "text-xs text-zinc-400", "Throughput Rete" }
-                                                    Icon { kind: IconKind::Wifi, size: 16 }
-                                                }
-                                                div { class: "text-2xl font-bold text-white", "1.42 GB/s" }
-                                                div { class: "text-xs text-purple-400", "Latenza media: 4.8ms" }
+                                            Card { title: "Throughput Rete".to_string(), subtitle: "Latenza media: 4.8ms".to_string(),
+                                                span { class: "sc-section-title", "1.42 GB/s" }
                                             }
                                         }
 
-                                        div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] space-y-3",
-                                            h4 { class: "text-sm font-semibold text-white", "Eventi di Sistema Recenti" }
-                                            for i in 1..=6 {
-                                                div { key: "{i}", class: "flex items-center justify-between py-2 border-b border-white/[0.08] text-xs",
-                                                    div { class: "flex items-center gap-2",
-                                                        span { class: "w-2 h-2 rounded-full bg-purple-500" }
-                                                        span { class: "text-zinc-200", "Sincronizzazione snapshot cluster #{i}" }
+                                        Card { title: "Eventi di Sistema Recenti".to_string(),
+                                            div { class: "sc-list",
+                                                for i in 1..=6 {
+                                                    div { key: "{i}", class: "sc-title-row",
+                                                        span { class: "sc-muted-text", "Sincronizzazione snapshot cluster #{i}" }
+                                                        span { class: "sc-subtle-text sc-mono", "15:4{i}:02" }
                                                     }
-                                                    span { class: "font-mono text-zinc-500", "15:4{i}:02" }
                                                 }
                                             }
                                         }

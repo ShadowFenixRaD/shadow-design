@@ -1,13 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, ControlRow, Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn ButtonsPage() -> Element {
     let mut click_count = use_signal(|| 0);
-    let mut selected_variant = use_signal(|| ButtonVariant::Primary);
-    let mut selected_size = use_signal(|| ButtonSize::Md);
+    let selected_variant = use_signal(|| ButtonVariant::Primary);
+    let selected_size = use_signal(|| ButtonSize::Md);
     let is_loading = use_signal(|| false);
     let is_disabled = use_signal(|| false);
     let show_left_icon = use_signal(|| true);
@@ -94,20 +96,18 @@ pub fn ButtonsPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Button" }
-                Text { dimmed: true, size: TextSize::Sm, "Pulsanti tattili con feedback ottico alla pressione, supporto a icone native, stato loading accessibile e raggio scalabile da tema." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Button".to_string(),
+                description: "Pulsanti tattili con feedback ottico alla pressione, supporto a icone native, stato loading accessibile e raggio scalabile da tema.".to_string(),
             }
 
             FeatureBanner { feature_name: "button" }
 
-            // Configurator Playground Tabs
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
-                        // Preview Box
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center min-h-[180px] shadow-inner w-full",
+                    Playground {
+                        stage: rsx! {
                             div { class: if is_full_width() { "w-full" } else { "" },
                                 Button {
                                     variant: selected_variant(),
@@ -130,104 +130,61 @@ pub fn ButtonsPage() -> Element {
                                     "Pulsante Interattivo"
                                 }
                             }
-                            span { class: "text-xs font-mono text-zinc-500 mt-4",
-                                "Click registrati: "
-                                strong { class: "text-purple-300", "{click_count}" }
+                            Counter { label: "Click registrati".to_string(), value: click_count().to_string() }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Variante".to_string(),
+                                options: vec![
+                                    (ButtonVariant::Primary, "Primary".to_string()),
+                                    (ButtonVariant::Secondary, "Secondary".to_string()),
+                                    (ButtonVariant::Outline, "Outline".to_string()),
+                                    (ButtonVariant::Ghost, "Ghost".to_string()),
+                                    (ButtonVariant::Success, "Success".to_string()),
+                                    (ButtonVariant::Danger, "Danger".to_string()),
+                                ],
+                                value: selected_variant,
                             }
-                        }
-
-                        // Controls Box
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Cromatica:" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for v in [ButtonVariant::Primary, ButtonVariant::Secondary, ButtonVariant::Outline, ButtonVariant::Ghost, ButtonVariant::Success, ButtonVariant::Danger] {
-                                        button {
-                                            key: "{v:?}",
-                                            r#type: "button",
-                                            class: if selected_variant() == v {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                            },
-                                            onclick: move |_| selected_variant.set(v),
-                                            "{v:?}"
-                                        }
-                                    }
-                                }
+                            ChoicePicker {
+                                label: "Dimensione".to_string(),
+                                options: vec![
+                                    (ButtonSize::Xs, "Xs".to_string()),
+                                    (ButtonSize::Sm, "Sm".to_string()),
+                                    (ButtonSize::Md, "Md".to_string()),
+                                    (ButtonSize::Lg, "Lg".to_string()),
+                                    (ButtonSize::Xl, "Xl".to_string()),
+                                ],
+                                value: selected_size,
                             }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Dimensione (Size):" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for s in [ButtonSize::Xs, ButtonSize::Sm, ButtonSize::Md, ButtonSize::Lg, ButtonSize::Xl] {
-                                        button {
-                                            key: "{s:?}",
-                                            r#type: "button",
-                                            class: if selected_size() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                            },
-                                            onclick: move |_| selected_size.set(s),
-                                            "{s:?}"
-                                        }
-                                    }
-                                }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Stato Loading".to_string(), checked: is_loading }
+                                ToggleControl { label: "Disabilitato".to_string(), checked: is_disabled }
+                                ToggleControl { label: "Icona Sinistra".to_string(), checked: show_left_icon }
+                                ToggleControl { label: "Icona Destra".to_string(), checked: show_right_icon }
+                                ToggleControl { label: "Larghezza 100%".to_string(), checked: is_full_width }
+                                ToggleControl { label: "Attiva Glow".to_string(), checked: enable_glow }
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06] grid grid-cols-2 gap-2.5",
-                                Checkbox {
-                                    checked: is_loading,
-                                    label: Some("Stato Loading".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: Some("Disabilitato".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: show_left_icon,
-                                    label: Some("Icona Sinistra".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: show_right_icon,
-                                    label: Some("Icona Destra".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: is_full_width,
-                                    label: Some("Larghezza 100%".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: enable_glow,
-                                    label: Some("Attiva Glow".to_string()),
-                                    size: CheckboxSize::Sm,
-                                }
-                            }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
                 props: props,
             }
 
-            // Visual Catalog
             Card {
                 title: "Catalogo Dimensioni e Varianti".to_string(),
                 subtitle: "Tutte le scale dimensionali con feedback tattile".to_string(),
-                div { class: "space-y-6",
-                    div { class: "flex flex-wrap items-center gap-3",
+                div { class: "sc-stack",
+                    div { class: "sc-actions",
                         Button { size: ButtonSize::Xs, variant: ButtonVariant::Primary, "Extra Small" }
                         Button { size: ButtonSize::Sm, variant: ButtonVariant::Primary, "Small" }
                         Button { size: ButtonSize::Md, variant: ButtonVariant::Primary, "Medium" }
                         Button { size: ButtonSize::Lg, variant: ButtonVariant::Primary, "Large" }
                         Button { size: ButtonSize::Xl, variant: ButtonVariant::Primary, "Extra Large" }
                     }
-                    div { class: "flex flex-wrap items-center gap-3 pt-4 border-t border-white/[0.06]",
+                    hr { class: "sc-control-divider" }
+                    div { class: "sc-actions",
                         Button { variant: ButtonVariant::Primary, "Primary" }
                         Button { variant: ButtonVariant::Secondary, "Secondary" }
                         Button { variant: ButtonVariant::Outline, "Outline" }

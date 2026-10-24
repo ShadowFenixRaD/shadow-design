@@ -1,4 +1,4 @@
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
@@ -21,7 +21,7 @@ pub fn TypographyPage() -> Element {
             name: "dimmed",
             r#type: "bool",
             default: "false",
-            description: "Applica colore attenuato text-zinc-400 per metadati e spiegazioni",
+            description: "Applica il colore attenuato per metadati e spiegazioni",
         },
     ];
 
@@ -39,42 +39,46 @@ Code { "cargo add shadow-design" }"#
         .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Typography" }
-                Text { dimmed: true, size: TextSize::Sm, "Componenti per gerarchia testuale, scorciatoie da tastiera e codice inline basati sui font Geist e Geist Mono." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Typography".to_string(),
+                description: "Componenti per gerarchia testuale, scorciatoie da tastiera e codice inline basati sui font Geist e Geist Mono.".to_string(),
             }
 
             FeatureBanner { feature_name: "typography" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        div { class: "space-y-2",
-                            Heading { order: HeadingOrder::H1, "Titolo H1 Display" }
-                            Heading { order: HeadingOrder::H2, "Titolo H2 Section" }
-                            Heading { order: HeadingOrder::H3, "Titolo H3 Card" }
-                            Heading { order: HeadingOrder::H4, "Titolo H4 Subsection" }
-                        }
-                        div { class: "pt-4 border-t border-white/[0.06] space-y-3",
-                            Text { size: TextSize::Lg, "Paragrafo Large: eccellente leggibilità su display Retina ad alta densità." }
-                            Text { size: TextSize::Md, "Paragrafo Standard: progettato con il font Geist Sans per un'esperienza di lettura pulita ed essenziale." }
-                            Text { size: TextSize::Sm, dimmed: true, "Testo attenuato (dimmed): ideale per note a piè di pagina e timestamp." }
-                        }
-                        div { class: "pt-4 border-t border-white/[0.06] flex flex-wrap items-center gap-4",
-                            div { class: "flex items-center gap-1.5",
-                                span { class: "text-xs text-zinc-400", "Scorciatoia:" }
-                                Kbd { "⌘" }
-                                Kbd { "K" }
+                    Stage { start: true, wide: true,
+                        div { class: "sc-stack sc-stack--loose w-full",
+                            div { class: "sc-stack",
+                                Heading { order: HeadingOrder::H1, "Titolo H1 Display" }
+                                Heading { order: HeadingOrder::H2, "Titolo H2 Section" }
+                                Heading { order: HeadingOrder::H3, "Titolo H3 Card" }
+                                Heading { order: HeadingOrder::H4, "Titolo H4 Subsection" }
                             }
-                            div { class: "flex items-center gap-1.5",
-                                span { class: "text-xs text-zinc-400", "Salva:" }
-                                Kbd { "Ctrl" }
-                                Kbd { "S" }
+                            hr { class: "sc-control-divider" }
+                            div { class: "sc-stack",
+                                Text { size: TextSize::Lg, "Paragrafo Large: eccellente leggibilità su display Retina ad alta densità." }
+                                Text { size: TextSize::Md, "Paragrafo Standard: progettato con il font Geist Sans per un'esperienza di lettura pulita ed essenziale." }
+                                Text { size: TextSize::Sm, dimmed: true, "Testo attenuato (dimmed): ideale per note a piè di pagina e timestamp." }
                             }
-                            div { class: "flex items-center gap-1.5",
-                                span { class: "text-xs text-zinc-400", "Comando:" }
-                                Code { "dx serve --hot-reload" }
+                            hr { class: "sc-control-divider" }
+                            div { class: "sc-actions",
+                                div { class: "sc-actions",
+                                    span { class: "sc-muted-text", "Scorciatoia:" }
+                                    Kbd { "⌘" }
+                                    Kbd { "K" }
+                                }
+                                div { class: "sc-actions",
+                                    span { class: "sc-muted-text", "Salva:" }
+                                    Kbd { "Ctrl" }
+                                    Kbd { "S" }
+                                }
+                                div { class: "sc-actions",
+                                    span { class: "sc-muted-text", "Comando:" }
+                                    Code { "dx serve --hot-reload" }
+                                }
                             }
                         }
                     }

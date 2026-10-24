@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn NotificationsPage() -> Element {
@@ -72,79 +72,76 @@ Button {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Notification / Toast System" }
-                Text { dimmed: true, size: TextSize::Sm, "Sistema globale di notifiche fluttuanti con animazioni di entrata, icone SVG contestuali, accenti hairline e chiusura manuale o programmata." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Notification / Toast System".to_string(),
+                description: "Sistema globale di notifiche fluttuanti con animazioni di entrata, icone SVG contestuali, accenti hairline e chiusura manuale o programmata.".to_string(),
             }
 
             FeatureBanner { feature_name: "notification" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] shadow-inner space-y-4",
-                            span { class: "text-xs font-mono font-semibold text-zinc-300 uppercase tracking-wider block",
-                                "Collauda le Notifiche Toast in tempo reale:"
+                    Stage {
+                        span { class: "sc-control-label", "Collauda le notifiche toast in tempo reale" }
+                        div { class: "sc-actions",
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Success,
+                                left_icon: rsx! { Icon { kind: IconKind::CheckCircle, size: 14 } },
+                                onclick: move |_| {
+                                    notify.success("Operazione registrata ed eseguita correttamente.");
+                                },
+                                "Toast Success"
                             }
-                            div { class: "flex flex-wrap items-center gap-3",
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Success,
-                                    left_icon: rsx! { Icon { kind: IconKind::CheckCircle, size: 14 } },
-                                    onclick: move |_| {
-                                        notify.success("Operazione registrata ed eseguita correttamente.");
-                                    },
-                                    "Toast Success"
-                                }
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Primary,
-                                    left_icon: rsx! { Icon { kind: IconKind::Info, size: 14 } },
-                                    onclick: move |_| {
-                                        notify.info("Nuovo aggiornamento del design system installato.");
-                                    },
-                                    "Toast Info"
-                                }
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Outline,
-                                    left_icon: rsx! { Icon { kind: IconKind::AlertTriangle, size: 14 } },
-                                    onclick: move |_| {
-                                        notify.warning("Attenzione: connessione debole verso il nodo.");
-                                    },
-                                    "Toast Warning"
-                                }
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Danger,
-                                    left_icon: rsx! { Icon { kind: IconKind::XCircle, size: 14 } },
-                                    onclick: move |_| {
-                                        notify.danger("Errore 500: impossibile completare la richiesta.");
-                                    },
-                                    "Toast Danger"
-                                }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Primary,
+                                left_icon: rsx! { Icon { kind: IconKind::Info, size: 14 } },
+                                onclick: move |_| {
+                                    notify.info("Nuovo aggiornamento del design system installato.");
+                                },
+                                "Toast Info"
                             }
-                            div { class: "pt-3 border-t border-white/[0.06] flex flex-wrap items-center gap-3",
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Secondary,
-                                    left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 14 } },
-                                    onclick: move |_| {
-                                        notify.show_with_title(
-                                            "Compilazione Rust OK",
-                                            "0 errori e 0 warning in 0.31s con profile release.",
-                                            NotificationVariant::Success
-                                        );
-                                    },
-                                    "Toast con Titolo Strutturato"
-                                }
-                                Button {
-                                    size: ButtonSize::Sm,
-                                    variant: ButtonVariant::Ghost,
-                                    onclick: move |_| notify.clear(),
-                                    "Svuota Tutte le Notifiche"
-                                }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Outline,
+                                left_icon: rsx! { Icon { kind: IconKind::AlertTriangle, size: 14 } },
+                                onclick: move |_| {
+                                    notify.warning("Attenzione: connessione debole verso il nodo.");
+                                },
+                                "Toast Warning"
+                            }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Danger,
+                                left_icon: rsx! { Icon { kind: IconKind::XCircle, size: 14 } },
+                                onclick: move |_| {
+                                    notify.danger("Errore 500: impossibile completare la richiesta.");
+                                },
+                                "Toast Danger"
+                            }
+                        }
+                        hr { class: "sc-control-divider" }
+                        div { class: "sc-actions",
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Secondary,
+                                left_icon: rsx! { Icon { kind: IconKind::Sparkles, size: 14 } },
+                                onclick: move |_| {
+                                    notify.show_with_title(
+                                        "Compilazione Rust OK",
+                                        "0 errori e 0 warning in 0.31s con profile release.",
+                                        NotificationVariant::Success
+                                    );
+                                },
+                                "Toast con Titolo Strutturato"
+                            }
+                            Button {
+                                size: ButtonSize::Sm,
+                                variant: ButtonVariant::Ghost,
+                                onclick: move |_| notify.clear(),
+                                "Svuota Tutte le Notifiche"
                             }
                         }
                     }

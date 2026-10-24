@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use shadow_design::date_picker::Date;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn DatePickerPage() -> Element {
@@ -70,54 +70,50 @@ DateRangePicker {
     };
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "DatePicker & Calendar" }
-                Text { dimmed: true, size: TextSize::Sm, "Griglia calendario mensile/annuale, input sincronizzato e selettore intervalli temporali privo di dipendenze esterne." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "DatePicker & Calendar".to_string(),
+                description: "Griglia calendario mensile/annuale, input sincronizzato e selettore intervalli temporali privo di dipendenze esterne.".to_string(),
             }
 
             FeatureBanner { feature_name: "date_picker" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-8 shadow-inner",
-                        div { class: "grid grid-cols-1 md:grid-cols-2 gap-8 items-start",
-                            // 1. Singolo DatePicker
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-4",
-                                span { class: "text-xs font-mono text-purple-300 font-semibold uppercase tracking-wider", "Selezione Data Singola" }
-                                p { class: "text-xs text-zinc-400", "Clicca sull'input per aprire il calendario con evidenziazione del giorno." }
-                                DatePicker {
-                                    value: selected_date,
-                                    placeholder: "Scegli una data...".to_string(),
-                                }
-                                div { class: "text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-zinc-300",
-                                    span { class: "text-zinc-500", "Data attiva: " }
-                                    span { class: "text-purple-300 font-bold", "{display_single}" }
+                    div { class: "sc-stack sc-stack--loose",
+                        div { class: "sc-card-grid",
+                            Card {
+                                title: "Selezione Data Singola".to_string(),
+                                subtitle: "Clicca sull'input per aprire il calendario con evidenziazione del giorno.".to_string(),
+                                div { class: "sc-stack",
+                                    DatePicker {
+                                        value: selected_date,
+                                        placeholder: "Scegli una data...".to_string(),
+                                    }
+                                    Counter { label: "Data attiva".to_string(), value: display_single.to_string() }
                                 }
                             }
 
-                            // 2. DateRangePicker
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-4",
-                                span { class: "text-xs font-mono text-cyan-300 font-semibold uppercase tracking-wider", "Selezione Range Temporale" }
-                                p { class: "text-xs text-zinc-400", "Seleziona prima la data di inizio e poi quella di fine con traccia luminosa." }
-                                DateRangePicker {
-                                    start_date: range_start,
-                                    end_date: range_end,
-                                    placeholder: "Scegli intervallo...".to_string(),
-                                }
-                                div { class: "text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-zinc-300",
-                                    span { class: "text-zinc-500", "Range: " }
-                                    span { class: "text-cyan-300 font-bold", "{display_range}" }
+                            Card {
+                                title: "Selezione Range Temporale".to_string(),
+                                subtitle: "Seleziona prima la data di inizio e poi quella di fine con traccia luminosa.".to_string(),
+                                div { class: "sc-stack",
+                                    DateRangePicker {
+                                        start_date: range_start,
+                                        end_date: range_end,
+                                        placeholder: "Scegli intervallo...".to_string(),
+                                    }
+                                    Counter { label: "Range".to_string(), value: display_range.to_string() }
                                 }
                             }
                         }
 
-                        // 3. Calendar inline fisso
-                        div { class: "p-6 rounded-xl border border-white/[0.06] bg-zinc-950/40 flex flex-col items-center gap-4",
-                            span { class: "text-xs font-mono text-zinc-400 font-semibold uppercase", "Componente Calendar Inline Diretto" }
-                            Calendar {
-                                selected: *selected_date.read(),
-                                on_select: move |d| *selected_date.write() = Some(d),
+                        Card { title: "Componente Calendar Inline Diretto".to_string(),
+                            Stage {
+                                Calendar {
+                                    selected: *selected_date.read(),
+                                    on_select: move |d| *selected_date.write() = Some(d),
+                                }
                             }
                         }
                     }

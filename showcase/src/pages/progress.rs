@@ -1,13 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, ControlGroup, ControlRow, Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn ProgressPage() -> Element {
-    let mut progress_val = use_signal(|| 68.0f32);
-    let mut selected_size = use_signal(|| ProgressSize::Md);
-    let mut selected_variant = use_signal(|| ProgressVariant::Primary);
+    let progress_val = use_signal(|| 68.0f64);
+    let selected_size = use_signal(|| ProgressSize::Md);
+    let selected_variant = use_signal(|| ProgressVariant::Primary);
     let is_indeterminate = use_signal(|| false);
     let show_label = use_signal(|| true);
 
@@ -53,103 +53,58 @@ pub fn ProgressPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Progress & Barra di Avanzamento" }
-                Text { dimmed: true, size: TextSize::Sm, "Barra di progressione fluida per upload chunked, trasferimento file P2P, benchmarking latenza e scansioni radio." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Progress & Barra di Avanzamento".to_string(),
+                description: "Barra di progressione fluida per upload chunked, trasferimento file P2P, benchmarking latenza e scansioni radio.".to_string(),
             }
 
             FeatureBanner { feature_name: "progress" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
-                        // Live Preview
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col justify-center min-h-[160px] shadow-inner space-y-4",
-                            ProgressBar {
-                                value: progress_val(),
-                                size: selected_size(),
-                                variant: selected_variant(),
-                                indeterminate: is_indeterminate(),
-                                show_label: show_label(),
-                            }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Spessore Barra (Size):" }
-                                div { class: "flex gap-2",
-                                    for s in [ProgressSize::Sm, ProgressSize::Md, ProgressSize::Lg] {
-                                        button {
-                                            r#type: "button",
-                                            class: if selected_size() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| selected_size.set(s),
-                                            match s {
-                                                ProgressSize::Sm => "SM (4px)",
-                                                ProgressSize::Md => "MD (8px)",
-                                                ProgressSize::Lg => "LG (12px)",
-                                            }
-                                        }
-                                    }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "w-full",
+                                ProgressBar {
+                                    value: progress_val() as f32,
+                                    size: selected_size(),
+                                    variant: selected_variant(),
+                                    indeterminate: is_indeterminate(),
+                                    show_label: show_label(),
                                 }
                             }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Variante Cromatica:" }
-                                div { class: "flex flex-wrap gap-1.5",
-                                    for v in [ProgressVariant::Primary, ProgressVariant::Success, ProgressVariant::Warning, ProgressVariant::Danger] {
-                                        button {
-                                            r#type: "button",
-                                            class: if selected_variant() == v {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| selected_variant.set(v),
-                                            "{v:?}"
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Spessore barra (Size)".to_string(),
+                                options: vec![
+                                    (ProgressSize::Sm, "SM (4px)".to_string()),
+                                    (ProgressSize::Md, "MD (8px)".to_string()),
+                                    (ProgressSize::Lg, "LG (12px)".to_string()),
+                                ],
+                                value: selected_size,
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06] space-y-3",
-                                div { class: "space-y-1.5",
-                                    div { class: "flex justify-between text-zinc-400 text-[10px]",
-                                        span { "VALORE:" }
-                                        span { "{progress_val():.0}%" }
-                                    }
-                                    input {
-                                        r#type: "range",
-                                        min: "0",
-                                        max: "100",
-                                        step: "1",
-                                        class: "w-full accent-purple-500 cursor-pointer",
-                                        value: "{progress_val}",
-                                        oninput: move |e| {
-                                            if let Ok(v) = e.value().parse::<f32>() {
-                                                progress_val.set(v);
-                                            }
-                                        },
-                                    }
-                                }
-
-                                div { class: "flex flex-col gap-2 pt-1",
-                                    Checkbox {
-                                        checked: is_indeterminate,
-                                        label: Some("Indeterminato (Scan Shimmer)".to_string()),
-                                    }
-                                    Checkbox {
-                                        checked: show_label,
-                                        label: Some("Mostra Etichetta %".to_string()),
-                                    }
-                                }
+                            ChoicePicker {
+                                label: "Variante cromatica".to_string(),
+                                options: vec![
+                                    (ProgressVariant::Primary, "Primary".to_string()),
+                                    (ProgressVariant::Success, "Success".to_string()),
+                                    (ProgressVariant::Warning, "Warning".to_string()),
+                                    (ProgressVariant::Danger, "Danger".to_string()),
+                                ],
+                                value: selected_variant,
                             }
-                        }
+                            ControlGroup { label: format!("Valore: {:.0}%", progress_val()),
+                                Slider { value: progress_val, min: 0.0, max: 100.0, step: 1.0 }
+                            }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Indeterminato (scan shimmer)".to_string(), checked: is_indeterminate }
+                                ToggleControl { label: "Mostra etichetta %".to_string(), checked: show_label }
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

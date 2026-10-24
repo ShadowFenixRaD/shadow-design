@@ -1,15 +1,15 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{CheckControl, ChoicePicker, Counter, Playground, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn PaginationPage() -> Element {
     let page = use_signal(|| 1);
-    let mut total_pages = use_signal(|| 12);
+    let total_pages = use_signal(|| 12);
     let siblings = use_signal(|| 1);
     let boundaries = use_signal(|| 1);
-    let mut size = use_signal(|| ControlSize::Md);
+    let size = use_signal(|| ControlSize::Md);
     let show_edges = use_signal(|| true);
     let show_controls = use_signal(|| true);
     let is_disabled = use_signal(|| false);
@@ -95,152 +95,77 @@ Pagination {
         .collect::<Vec<_>>();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Pagination" }
-                Text { dimmed: true, size: TextSize::Sm, "Barra di navigazione a pagine numerata con calcolo dei salti ellittici, controlli direzionali, salto rapido agli estremi e supporto responsive." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Pagination".to_string(),
+                description: "Barra di navigazione a pagine numerata con calcolo dei salti ellittici, controlli direzionali, salto rapido agli estremi e supporto responsive.".to_string(),
             }
 
             FeatureBanner { feature_name: "pagination" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        // Toolbar di configurazione
-                        div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Totale Pagine:" }
-                                div { class: "flex gap-2",
-                                    button {
-                                        r#type: "button",
-                                        class: if total_pages() == 8 {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| total_pages.set(8),
-                                        "8 Pagine"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if total_pages() == 15 {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| total_pages.set(15),
-                                        "15 Pagine"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if total_pages() == 30 {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| total_pages.set(30),
-                                        "30 Pagine"
-                                    }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                div { class: "sc-title-row",
+                                    span { class: "sc-control-label", "Tabella audit paginata (record real-time)" }
+                                    Counter { label: "Pagina".to_string(), value: format!("{} di {}", page(), total_pages()) }
                                 }
-                            }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Taglia Controlli (ControlSize):" }
-                                div { class: "flex gap-2",
-                                    button {
-                                        r#type: "button",
-                                        class: if size() == ControlSize::Sm {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| size.set(ControlSize::Sm),
-                                        "Small"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if size() == ControlSize::Md {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| size.set(ControlSize::Md),
-                                        "Medium"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if size() == ControlSize::Lg {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| size.set(ControlSize::Lg),
-                                        "Large"
-                                    }
-                                }
-                            }
-
-                            div { class: "flex flex-col justify-center space-y-2 pt-2 md:pt-0 border-t md:border-t-0 md:border-l border-white/[0.06] md:pl-4",
-                                Checkbox {
-                                    checked: show_edges,
-                                    label: Some("Mostra Estremi (« / »)".to_string()),
-                                }
-                                Checkbox {
-                                    checked: show_controls,
-                                    label: Some("Mostra Frecce Precedente/Successivo".to_string()),
-                                }
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: Some("Disabilita Barra".to_string()),
-                                }
-                            }
-                        }
-
-                        // Preview box interattiva con Tabella Mockup collegata al segnale
-                        div { class: "p-6 rounded-xl bg-zinc-950 border border-white/[0.08] shadow-2xl space-y-6",
-                            div { class: "flex items-center justify-between text-xs font-mono text-zinc-400 pb-3 border-b border-white/[0.06]",
-                                span { "TABELLA AUDIT PAGINATA (RECORD REAL-TIME)" }
-                                span { class: "text-purple-400 font-bold", "Pagina {page()} di {total_pages()}" }
-                            }
-
-                            // Mock table rows
-                            div { class: "space-y-2",
-                                for (id, name, hash, verified) in records {
-                                    div {
-                                        key: "{id}",
-                                        class: "p-3 rounded-lg bg-zinc-950/60 border border-white/[0.04] flex items-center justify-between hover:border-white/[0.1] transition-colors",
-                                        div { class: "flex items-center gap-3",
-                                            span { class: "text-xs font-mono text-purple-400 font-bold w-12", "#{id:03}" }
-                                            div {
-                                                div { class: "text-xs font-medium text-zinc-200", "{name}" }
-                                                div { class: "text-[10px] font-mono text-zinc-500", "Digest crittografico: {hash}" }
+                                List { spacing: ListSpacing::Md,
+                                    for (id, name, hash, verified) in records {
+                                        ListItem { key: "{id}",
+                                            span { class: "sc-accent-text sc-mono", "#{id:03} " }
+                                            strong { "{name}" }
+                                            span { class: "sc-subtle-text sc-mono", " Digest: {hash} " }
+                                            Badge {
+                                                label: if verified { "VERIFIED".to_string() } else { "PENDING".to_string() },
+                                                variant: if verified { BadgeVariant::Success } else { BadgeVariant::Default },
                                             }
                                         }
-                                        Badge {
-                                            label: if verified { "VERIFIED".to_string() } else { "PENDING".to_string() },
-                                            variant: if verified { BadgeVariant::Success } else { BadgeVariant::Default },
-                                        }
+                                    }
+                                }
+                                div { class: "sc-title-row",
+                                    span { class: "sc-subtle-text", "Visualizzazione di 4 elementi per pagina" }
+                                    Pagination {
+                                        page: page,
+                                        total: total_pages(),
+                                        siblings: siblings(),
+                                        boundaries: boundaries(),
+                                        show_controls: show_controls(),
+                                        show_edges: show_edges(),
+                                        size: size(),
+                                        disabled: is_disabled(),
                                     }
                                 }
                             }
-
-                            // Barra di paginazione centrata
-                            div { class: "pt-4 border-t border-white/[0.06] flex items-center justify-between flex-wrap gap-4",
-                                div { class: "text-[11px] font-mono text-zinc-500",
-                                    "Visualizzazione di 4 elementi per pagina"
-                                }
-                                Pagination {
-                                    page: page,
-                                    total: total_pages(),
-                                    siblings: siblings(),
-                                    boundaries: boundaries(),
-                                    show_controls: show_controls(),
-                                    show_edges: show_edges(),
-                                    size: size(),
-                                    disabled: is_disabled(),
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Totale pagine".to_string(),
+                                options: vec![
+                                    (8, "8".to_string()),
+                                    (12, "12".to_string()),
+                                    (15, "15".to_string()),
+                                    (30, "30".to_string()),
+                                ],
+                                value: total_pages,
                             }
-                        }
+                            ChoicePicker {
+                                label: "Taglia controlli (ControlSize)".to_string(),
+                                options: vec![
+                                    (ControlSize::Sm, "Small".to_string()),
+                                    (ControlSize::Md, "Medium".to_string()),
+                                    (ControlSize::Lg, "Large".to_string()),
+                                ],
+                                value: size,
+                            }
+                            hr { class: "sc-control-divider" }
+                            CheckControl { label: "Mostra estremi (« / »)".to_string(), checked: show_edges }
+                            CheckControl { label: "Mostra frecce precedente/successivo".to_string(), checked: show_controls }
+                            CheckControl { label: "Disabilita barra".to_string(), checked: is_disabled }
+                        },
                     }
                 },
                 code: code_snippet,

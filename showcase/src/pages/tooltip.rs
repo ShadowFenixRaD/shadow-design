@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Stage, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn TooltipPage() -> Element {
@@ -39,17 +39,17 @@ pub fn TooltipPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Tooltip Component" }
-                Text { dimmed: true, size: TextSize::Sm, "Micro-etichette fluttuanti con animazione di dissolvenza, posizionamento a 4 direzioni e rifinitura specular-top." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Tooltip Component".to_string(),
+                description: "Micro-etichette fluttuanti con animazione di dissolvenza, posizionamento a 4 direzioni e rifinitura specular-top.".to_string(),
             }
 
             FeatureBanner { feature_name: "tooltip" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 rounded-xl bg-[#060608] border border-white/[0.08] shadow-inner flex flex-wrap items-center justify-center gap-6",
+                    Stage {
                         Tooltip {
                             content: "Tooltip ancorato in alto (Top)".to_string(),
                             position: TooltipPosition::Top,

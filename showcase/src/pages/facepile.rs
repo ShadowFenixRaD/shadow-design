@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn FacepilePage() -> Element {
@@ -61,34 +61,28 @@ pub fn FacepilePage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Facepile" }
-                Text { dimmed: true, size: TextSize::Sm, "Cluster compatto di avatar di collaboratori in stile Microsoft Fluent UI con disposizione sovrapposta, badge di presenza e menu di overflow (+N altri)." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Facepile".to_string(),
+                description: "Cluster compatto di avatar di collaboratori in stile Microsoft Fluent UI con disposizione sovrapposta, badge di presenza e menu di overflow (+N altri).".to_string(),
             }
 
             FeatureBanner { feature_name: "facepile" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "flex flex-col gap-6 w-full p-8 rounded-2xl bg-zinc-950/70 border border-white/[0.08]",
-                        div { class: "flex items-center justify-between p-4 rounded-xl bg-black/40 border border-white/[0.06]",
-                            Facepile {
-                                personas: sample_personas,
-                                max_displayable: 4,
-                                size: AvatarSize::Md,
-                                show_presence: true,
-                                on_add_click: move |_| add_count += 1,
-                                on_persona_click: move |p: PersonaProps| {
-                                    selected_persona.set(format!("{} ({})", p.name, p.role.unwrap_or_default()));
-                                },
-                            }
+                    Stage { start: true,
+                        Facepile {
+                            personas: sample_personas,
+                            max_displayable: 4,
+                            size: AvatarSize::Md,
+                            show_presence: true,
+                            on_add_click: move |_| add_count += 1,
+                            on_persona_click: move |p: PersonaProps| {
+                                selected_persona.set(format!("{} ({})", p.name, p.role.unwrap_or_default()));
+                            },
                         }
-
-                        div { class: "p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-zinc-400 flex items-center justify-between",
-                            span { "Collaboratore selezionato:" }
-                            span { class: "text-purple-400 font-bold", "{selected_persona()}" }
-                        }
+                        Counter { label: "Collaboratore selezionato".to_string(), value: selected_persona() }
                     }
                 },
                 code: code_snippet,

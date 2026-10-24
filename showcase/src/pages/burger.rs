@@ -1,12 +1,14 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn BurgerPage() -> Element {
     let opened = use_signal(|| false);
-    let mut size = use_signal(|| BurgerSize::Md);
+    let size = use_signal(|| BurgerSize::Md);
 
     let props = vec![
         PropRow {
@@ -45,53 +47,38 @@ Burger {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Burger" }
-                Text { dimmed: true, size: TextSize::Sm, "Pulsante hamburger animato a 3 linee con transizione ottica fluida in icona di chiusura 'X', ideale per trigger di navigazione mobile e sidebar." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Burger".to_string(),
+                description: "Pulsante hamburger animato a 3 linee con transizione ottica fluida in icona di chiusura 'X', ideale per trigger di navigazione mobile e sidebar.".to_string(),
             }
 
             FeatureBanner { feature_name: "burger" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 py-20 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-8 shadow-inner min-h-[300px]",
-                        div { class: "flex items-center gap-2 flex-wrap justify-center",
-                            span { class: "text-xs text-zinc-400 mr-2 font-mono", "Dimensione:" }
-                            button {
-                                r#type: "button",
-                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *size.read() == BurgerSize::Sm { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| size.set(BurgerSize::Sm),
-                                "Sm (18px)"
-                            }
-                            button {
-                                r#type: "button",
-                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *size.read() == BurgerSize::Md { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| size.set(BurgerSize::Md),
-                                "Md (24px)"
-                            }
-                            button {
-                                r#type: "button",
-                                class: format!("px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer {}", if *size.read() == BurgerSize::Lg { "bg-purple-950/80 text-purple-200 border-purple-500/50" } else { "bg-white/[0.04] text-zinc-400 border-white/[0.06]" }),
-                                onclick: move |_| size.set(BurgerSize::Lg),
-                                "Lg (32px)"
-                            }
-                        }
-
-                        div { class: "p-6 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center shadow-lg",
+                    Playground {
+                        stage: rsx! {
                             Burger {
                                 opened: opened,
                                 size: *size.read(),
                             }
-                        }
-
-                        div { class: "flex items-center gap-2 text-xs font-mono text-zinc-400",
-                            span { "Stato corrente: " }
-                            span {
-                                class: if *opened.read() { "text-purple-300 font-bold" } else { "text-zinc-500" },
-                                if *opened.read() { "Aperto (X)" } else { "Chiuso (Hamburger)" }
+                            Counter {
+                                label: "Stato corrente".to_string(),
+                                value: if *opened.read() { "Aperto (X)".to_string() } else { "Chiuso (Hamburger)".to_string() },
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Dimensione".to_string(),
+                                options: vec![
+                                    (BurgerSize::Sm, "Sm (18px)".to_string()),
+                                    (BurgerSize::Md, "Md (24px)".to_string()),
+                                    (BurgerSize::Lg, "Lg (32px)".to_string()),
+                                ],
+                                value: size,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, Playground, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn TreesPage() -> Element {
@@ -80,40 +80,35 @@ pub fn TreesPage() -> Element {
     ];
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "TreeView & Nodi ad Albero" }
-                Text { dimmed: true, size: TextSize::Sm, "Struttura gerarchica per topologie di rete mesh, mappe dei nodi subordinati e filesystem con guide di connessione e indicatori di latenza." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "TreeView & Nodi ad Albero".to_string(),
+                description: "Struttura gerarchica per topologie di rete mesh, mappe dei nodi subordinati e filesystem con guide di connessione e indicatori di latenza.".to_string(),
             }
 
             FeatureBanner { feature_name: "tree" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Preview
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] shadow-inner",
-                            TreeView {
-                                nodes: mesh_nodes,
-                                selected_id: Some(selected_node),
-                            }
-                        }
-
-                        // Info & Selected State
-                        div { class: "space-y-4 text-xs font-mono",
-                            div { class: "p-4 rounded-lg bg-white/[0.02] border border-white/[0.06] space-y-2",
-                                span { class: "text-zinc-400 block text-[10px] uppercase tracking-wider", "Nodo Selezionato:" }
-                                div { class: "text-sm font-bold text-purple-300",
-                                    {
-                                        let sel = selected_node().unwrap_or_else(|| "Nessuno".to_string());
-                                        rsx! { "{sel}" }
-                                    }
-                                }
-                                p { class: "text-zinc-400 text-xs leading-relaxed",
-                                    "Fai clic sulle frecce chevron per espandere/collassare i rami dell'albero mesh e sui nodi per selezionarli."
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "w-full",
+                                TreeView {
+                                    nodes: mesh_nodes,
+                                    selected_id: Some(selected_node),
                                 }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            Counter {
+                                label: "Nodo selezionato".to_string(),
+                                value: selected_node().unwrap_or_else(|| "Nessuno".to_string()),
+                            }
+                            p { class: "sc-page-desc",
+                                "Fai clic sulle frecce chevron per espandere/collassare i rami dell'albero mesh e sui nodi per selezionarli."
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

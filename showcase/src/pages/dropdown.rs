@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn DropdownPage() -> Element {
@@ -88,21 +88,21 @@ Dropdown {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Dropdown / Popover Component" }
-                Text { dimmed: true, size: TextSize::Sm, "Menu contestuali ancorati al trigger con z-index prioritario (z-[1000]), apertura bidirezionale (Top / Bottom) per non uscire dalla vista a fondo card, e chiusura automatica click-outside." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Dropdown / Popover Component".to_string(),
+                description: "Menu contestuali ancorati al trigger con z-index prioritario (z-[1000]), apertura bidirezionale (Top / Bottom) per non uscire dalla vista a fondo card, e chiusura automatica click-outside.".to_string(),
             }
 
             FeatureBanner { feature_name: "dropdown" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6",
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] shadow-inner flex flex-wrap items-center justify-around gap-8 min-h-[300px] overflow-visible relative",
+                    div { class: "sc-stack",
+                        Stage { wide: true,
                             // 1. Dropdown verso il basso (Bottom)
-                            div { class: "flex flex-col items-center gap-2",
-                                span { class: "text-xs text-zinc-400 font-medium", "Apertura Verso il Basso:" }
+                            div { class: "sc-stack items-center",
+                                span { class: "sc-control-label", "Apertura Verso il Basso:" }
                                 Dropdown {
                                     is_open: is_open,
                                     placement: DropdownPlacement::BottomRight,
@@ -151,8 +151,8 @@ Dropdown {
                             }
 
                             // 2. Dropdown verso l'alto (Top - anti bottom clipping)
-                            div { class: "flex flex-col items-center gap-2",
-                                span { class: "text-xs text-zinc-400 font-medium", "Apertura Verso l'Alto (Fondo Card):" }
+                            div { class: "sc-stack items-center",
+                                span { class: "sc-control-label", "Apertura Verso l'Alto (Fondo Card):" }
                                 Dropdown {
                                     is_open: is_top_open,
                                     placement: DropdownPlacement::TopRight,
@@ -192,10 +192,7 @@ Dropdown {
                             }
                         }
 
-                        div { class: "p-3 rounded-lg bg-[#0e0e14] border border-white/[0.06] flex items-center justify-between text-xs font-mono",
-                            span { class: "text-zinc-500", "Ultima azione eseguita:" }
-                            strong { class: "text-purple-300", "{selected_action}" }
-                        }
+                        Counter { label: "Ultima azione eseguita".to_string(), value: selected_action() }
                     }
                 },
                 code: code_snippet,

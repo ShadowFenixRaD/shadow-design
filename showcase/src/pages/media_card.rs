@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn MediaCardPage() -> Element {
@@ -51,17 +51,17 @@ pub fn MediaCardPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "MediaCard & CardActionArea" }
-                Text { dimmed: true, size: TextSize::Sm, "Scheda contenitore arricchita con testata multimediale a rapporto d'aspetto fisso ed effetto cliccabile tattile esteso a tutta la superficie." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "MediaCard & CardActionArea".to_string(),
+                description: "Scheda contenitore arricchita con testata multimediale a rapporto d'aspetto fisso ed effetto cliccabile tattile esteso a tutta la superficie.".to_string(),
             }
 
             FeatureBanner { feature_name: "media_card" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 sm:grid-cols-2 gap-6 w-full p-4",
+                    div { class: "sc-card-grid w-full",
                         MediaCard {
                             image_url: "https://picsum.photos/seed/cyber/800/450".to_string(),
                             title: Some("Stazione Radio Mesh".to_string()),
@@ -69,7 +69,7 @@ pub fn MediaCardPage() -> Element {
                             badge: Some("ATTIVO".to_string()),
                             on_click: move |_| click_count += 1,
                             footer: rsx! {
-                                span { class: "font-mono text-purple-400 font-bold", "Click: {click_count()}" }
+                                span { class: "sc-accent-text sc-mono", "Click: {click_count()}" }
                                 span { "Visualizza dettagli →" }
                             },
                         }
@@ -81,8 +81,8 @@ pub fn MediaCardPage() -> Element {
                             badge: Some("PROD".to_string()),
                             on_click: move |_| click_count += 1,
                             footer: rsx! {
-                                span { class: "text-zinc-500", "Latenza: 12ms" }
-                                span { class: "text-emerald-400 font-mono", "Online" }
+                                span { class: "sc-subtle-text", "Latenza: 12ms" }
+                                span { class: "sc-success-text sc-mono", "Online" }
                             },
                         }
                     }

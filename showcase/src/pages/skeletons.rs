@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn SkeletonsPage() -> Element {
-    let mut selected_shape = use_signal(|| SkeletonShape::Text);
-    let mut text_count = use_signal(|| 3usize);
+    let selected_shape = use_signal(|| SkeletonShape::Text);
+    let text_count = use_signal(|| 3usize);
     let is_animated = use_signal(|| true);
 
     let props = vec![
@@ -52,91 +52,61 @@ div { class: "flex items-center gap-4",
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Skeleton & Placeholder" }
-                Text { dimmed: true, size: TextSize::Sm, "Placeholder di caricamento asincrono con animazione shimmer wave per profili, messaggi e schede prima della ricezione dei dati." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Skeleton & Placeholder".to_string(),
+                description: "Placeholder di caricamento asincrono con animazione shimmer wave per profili, messaggi e schede prima della ricezione dei dati.".to_string(),
             }
 
             FeatureBanner { feature_name: "skeleton" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-center",
-                        // Live Preview
-                        div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col justify-center min-h-[180px] shadow-inner space-y-6",
-                            // Controllo interattivo
-                            div { class: "w-full",
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
                                 Skeleton {
                                     shape: selected_shape(),
                                     count: text_count(),
                                     animate: is_animated(),
                                 }
-                            }
-
-                            // Mock Card composita
-                            div { class: "pt-4 border-t border-white/[0.06] space-y-2",
-                                span { class: "text-[10px] text-zinc-500 font-mono uppercase block", "Esempio Card Caricamento:" }
-                                div { class: "flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]",
+                                hr { class: "sc-control-divider" }
+                                span { class: "sc-control-label", "Esempio card caricamento" }
+                                div { class: "flex items-center gap-3",
                                     Skeleton { shape: SkeletonShape::Circle, animate: is_animated() }
-                                    div { class: "space-y-2 flex-1",
+                                    div { class: "flex-1",
                                         Skeleton { shape: SkeletonShape::Text, count: 2, animate: is_animated() }
                                     }
                                 }
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Forma (Shape):" }
-                                div { class: "flex gap-2",
-                                    for s in [SkeletonShape::Text, SkeletonShape::Circle, SkeletonShape::Rectangle] {
-                                        button {
-                                            r#type: "button",
-                                            class: if selected_shape() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| selected_shape.set(s),
-                                            match s {
-                                                SkeletonShape::Text => "Text (Righe)",
-                                                SkeletonShape::Circle => "Circle (Cerchio)",
-                                                SkeletonShape::Rectangle => "Rectangle (Card)",
-                                            }
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Forma (Shape)".to_string(),
+                                options: vec![
+                                    (SkeletonShape::Text, "Text (Righe)".to_string()),
+                                    (SkeletonShape::Circle, "Circle (Cerchio)".to_string()),
+                                    (SkeletonShape::Rectangle, "Rectangle (Card)".to_string()),
+                                ],
+                                value: selected_shape,
                             }
-
                             if selected_shape() == SkeletonShape::Text {
-                                div {
-                                    span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Numero Righe:" }
-                                    div { class: "flex gap-2",
-                                        for c in [1, 2, 3, 4, 5] {
-                                            button {
-                                                r#type: "button",
-                                                class: if text_count() == c {
-                                                    "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                                } else {
-                                                    "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                                },
-                                                onclick: move |_| text_count.set(c),
-                                                "{c}"
-                                            }
-                                        }
-                                    }
+                                ChoicePicker {
+                                    label: "Numero righe".to_string(),
+                                    options: vec![
+                                        (1usize, "1".to_string()),
+                                        (2usize, "2".to_string()),
+                                        (3usize, "3".to_string()),
+                                        (4usize, "4".to_string()),
+                                        (5usize, "5".to_string()),
+                                    ],
+                                    value: text_count,
                                 }
                             }
-
-                            div { class: "pt-2 border-t border-white/[0.06]",
-                                Checkbox {
-                                    checked: is_animated,
-                                    label: Some("Attiva Shimmer Wave Animato".to_string()),
-                                }
-                            }
-                        }
+                            hr { class: "sc-control-divider" }
+                            ToggleControl { label: "Shimmer wave animato".to_string(), checked: is_animated }
+                        },
                     }
                 },
                 code: code_snippet,

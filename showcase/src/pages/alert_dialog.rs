@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn AlertDialogPage() -> Element {
@@ -74,22 +74,22 @@ AlertDialog {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "AlertDialog / ConfirmDialog" }
-                Text { dimmed: true, size: TextSize::Sm, "Finestra di dialogo bloccante con backdrop e focus trapping per conferme critiche e distruttive o prompt decisionali irreversibili." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "AlertDialog / ConfirmDialog".to_string(),
+                description: "Finestra di dialogo bloccante con backdrop e focus trapping per conferme critiche e distruttive o prompt decisionali irreversibili.".to_string(),
             }
 
             FeatureBanner { feature_name: "alert_dialog" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-12 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 text-center shadow-inner",
-                        p { class: "text-xs text-zinc-400 max-w-sm",
+                    Stage {
+                        p { class: "sc-muted-text",
                             "Scegli una delle azioni sottostanti per verificare il comportamento dell'AlertDialog in modalità distruttiva o informativa."
                         }
 
-                        div { class: "flex items-center gap-4 flex-wrap justify-center",
+                        div { class: "sc-actions",
                             Button {
                                 variant: ButtonVariant::Danger,
                                 left_icon: rsx! { Icon { kind: IconKind::Trash2, size: 15 } },
@@ -104,11 +104,7 @@ AlertDialog {
                             }
                         }
 
-                        div { class: "p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center gap-2 text-xs font-mono text-zinc-400",
-                            Icon { kind: IconKind::Info, size: 14 }
-                            span { "Feedback: " }
-                            span { class: "text-zinc-200 font-semibold", "{feedback}" }
-                        }
+                        Counter { label: "Feedback".to_string(), value: feedback() }
                     }
                 },
                 code: code_snippet,

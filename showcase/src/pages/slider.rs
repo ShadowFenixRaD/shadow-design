@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn SliderPage() -> Element {
@@ -93,32 +93,29 @@ RangeSlider {
     ];
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Slider & RangeSlider" }
-                Text { dimmed: true, size: TextSize::Sm, "Cursore graduato a trascinamento con traccia evidenziata, tacche (marks), tooltip dinamico e supporto a doppio cursore RangeSlider." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Slider & RangeSlider".to_string(),
+                description: "Cursore graduato a trascinamento con traccia evidenziata, tacche (marks), tooltip dinamico e supporto a doppio cursore RangeSlider.".to_string(),
             }
 
             FeatureBanner { feature_name: "slider" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Preview
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-8 shadow-inner",
-                            // Single Slider
-                            Slider {
-                                label: "Livello Volume".to_string(),
-                                value: volume,
-                                min: 0.0,
-                                max: 100.0,
-                                step: 1.0,
-                                show_tooltip: show_tooltip(),
-                                disabled: is_disabled(),
-                            }
-
-                            // Slider with marks
-                            div { class: "pt-4",
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack sc-stack--loose w-full",
+                                Slider {
+                                    label: "Livello Volume".to_string(),
+                                    value: volume,
+                                    min: 0.0,
+                                    max: 100.0,
+                                    step: 1.0,
+                                    show_tooltip: show_tooltip(),
+                                    disabled: is_disabled(),
+                                }
                                 Slider {
                                     label: "Luminosità Display con Tacche".to_string(),
                                     value: brightness,
@@ -129,10 +126,6 @@ RangeSlider {
                                     show_tooltip: show_tooltip(),
                                     disabled: is_disabled(),
                                 }
-                            }
-
-                            // Range Slider
-                            div { class: "pt-6 border-t border-white/[0.06]",
                                 RangeSlider {
                                     label: "Intervallo Banda Frequenze (MHz)".to_string(),
                                     value: price_range,
@@ -144,23 +137,11 @@ RangeSlider {
                                     disabled: is_disabled(),
                                 }
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div { class: "flex flex-col gap-2",
-                                Checkbox {
-                                    checked: show_tooltip,
-                                    label: "Mostra Tooltip Valore".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: "Disabilitato".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
-                            }
-                        }
+                        },
+                        controls: rsx! {
+                            ToggleControl { label: "Mostra tooltip valore".to_string(), checked: show_tooltip }
+                            ToggleControl { label: "Disabilitato".to_string(), checked: is_disabled }
+                        },
                     }
                 },
                 code: code_snippet,

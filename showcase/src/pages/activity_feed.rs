@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn ActivityFeedPage() -> Element {
@@ -74,17 +74,17 @@ pub fn ActivityFeedPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "ActivityFeed / ActivityItem" }
-                Text { dimmed: true, size: TextSize::Sm, "Feed e timeline di attività collaborative con avatar autore, badge icona evento, connettori continui e supporto per risposte e commenti inline." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "ActivityFeed / ActivityItem".to_string(),
+                description: "Feed e timeline di attività collaborative con avatar autore, badge icona evento, connettori continui e supporto per risposte e commenti inline.".to_string(),
             }
 
             FeatureBanner { feature_name: "activity_feed" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-6 rounded-2xl bg-zinc-950/70 border border-white/[0.08]",
+                    Stage { start: true,
                         ActivityFeed {
                             items: feed_events(),
                             allow_replies: true,

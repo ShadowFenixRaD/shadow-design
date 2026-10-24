@@ -1,13 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, ControlRow, Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn RadioPage() -> Element {
     let plan = use_signal(|| "pro".to_string());
     let storage_type = use_signal(|| "nvme".to_string());
-    let mut orientation = use_signal(|| RadioOrientation::Vertical);
+    let orientation = use_signal(|| RadioOrientation::Vertical);
     let is_disabled = use_signal(|| false);
     let has_error = use_signal(|| false);
 
@@ -84,114 +84,85 @@ RadioGroup {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Radio, RadioGroup & RadioCard" }
-                Text { dimmed: true, size: TextSize::Sm, "Selezione a scelta singola mutualmente esclusiva con supporto per layout orizzontale o verticale e variante ricca RadioCard con icone e micro-glow del tema attivo." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Radio, RadioGroup & RadioCard".to_string(),
+                description: "Selezione a scelta singola mutualmente esclusiva con supporto per layout orizzontale o verticale e variante ricca RadioCard con icone e micro-glow del tema attivo.".to_string(),
             }
 
             FeatureBanner { feature_name: "radio" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Preview
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                            // Classic RadioGroup
-                            RadioGroup {
-                                value: plan,
-                                label: Some("Livello di Licenza".to_string()),
-                                orientation: orientation(),
-                                disabled: is_disabled(),
-                                error: if has_error() { Some("Seleziona un piano valido".to_string()) } else { None },
-                                help_text: Some(format!("Piano attivo: [{}]", plan())),
-
-                                Radio {
-                                    value: "community".to_string(),
-                                    label: Some("Community Edition".to_string()),
-                                    description: Some("Accesso agli strumenti base e supporto forum".to_string()),
-                                }
-                                Radio {
-                                    value: "pro".to_string(),
-                                    label: Some("Pro Enterprise".to_string()),
-                                    description: Some("Cluster ad alta disponibilità e crittografia PQ".to_string()),
-                                }
-                                Radio {
-                                    value: "unlimited".to_string(),
-                                    label: Some("Shadowfenix Core".to_string()),
-                                    description: Some("Infrastruttura mesh distribuita completa".to_string()),
-                                }
-                            }
-
-                            // Rich RadioCard Group
-                            div { class: "pt-4 border-t border-white/[0.06] flex flex-col gap-3",
-                                span { class: "text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono",
-                                    "Architettura Storage (RadioCard)"
-                                }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack sc-stack--loose w-full",
                                 RadioGroup {
-                                    value: storage_type,
+                                    value: plan,
+                                    label: Some("Livello di Licenza".to_string()),
                                     orientation: orientation(),
                                     disabled: is_disabled(),
+                                    error: if has_error() { Some("Seleziona un piano valido".to_string()) } else { None },
+                                    help_text: Some(format!("Piano attivo: [{}]", plan())),
 
-                                    RadioCard {
-                                        value: "nvme".to_string(),
-                                        title: Some("Ultra NVMe Tier 1".to_string()),
-                                        description: Some("1.2M IOPS, latenza sub-millisecondo".to_string()),
-                                        icon: Some(IconKind::Server),
-                                        badge: Some("Consigliato".to_string()),
+                                    Radio {
+                                        value: "community".to_string(),
+                                        label: Some("Community Edition".to_string()),
+                                        description: Some("Accesso agli strumenti base e supporto forum".to_string()),
                                     }
-                                    RadioCard {
-                                        value: "distributed".to_string(),
-                                        title: Some("Mesh Distributed P2P".to_string()),
-                                        description: Some("Sharding ridondato decentralizzato".to_string()),
-                                        icon: Some(IconKind::Layers),
-                                        badge: Some("Zero-Knowledge".to_string()),
+                                    Radio {
+                                        value: "pro".to_string(),
+                                        label: Some("Pro Enterprise".to_string()),
+                                        description: Some("Cluster ad alta disponibilità e crittografia PQ".to_string()),
+                                    }
+                                    Radio {
+                                        value: "unlimited".to_string(),
+                                        label: Some("Shadowfenix Core".to_string()),
+                                        description: Some("Infrastruttura mesh distribuita completa".to_string()),
+                                    }
+                                }
+
+                                div { class: "sc-stack",
+                                    span { class: "sc-control-label", "Architettura storage (RadioCard)" }
+                                    RadioGroup {
+                                        value: storage_type,
+                                        orientation: orientation(),
+                                        disabled: is_disabled(),
+
+                                        RadioCard {
+                                            value: "nvme".to_string(),
+                                            title: Some("Ultra NVMe Tier 1".to_string()),
+                                            description: Some("1.2M IOPS, latenza sub-millisecondo".to_string()),
+                                            icon: Some(IconKind::Server),
+                                            badge: Some("Consigliato".to_string()),
+                                        }
+                                        RadioCard {
+                                            value: "distributed".to_string(),
+                                            title: Some("Mesh Distributed P2P".to_string()),
+                                            description: Some("Sharding ridondato decentralizzato".to_string()),
+                                            icon: Some(IconKind::Layers),
+                                            badge: Some("Zero-Knowledge".to_string()),
+                                        }
                                     }
                                 }
                             }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Orientamento Gruppo:" }
-                                div { class: "flex gap-2",
-                                    button {
-                                        r#type: "button",
-                                        class: if orientation() == RadioOrientation::Vertical {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| orientation.set(RadioOrientation::Vertical),
-                                        "Verticale"
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if orientation() == RadioOrientation::Horizontal {
-                                            "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                        } else {
-                                            "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                        },
-                                        onclick: move |_| orientation.set(RadioOrientation::Horizontal),
-                                        "Orizzontale"
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Orientamento gruppo".to_string(),
+                                options: vec![
+                                    (RadioOrientation::Vertical, "Verticale".to_string()),
+                                    (RadioOrientation::Horizontal, "Orizzontale".to_string()),
+                                ],
+                                value: orientation,
                             }
-
-                            div { class: "pt-2 flex flex-col gap-2 border-t border-white/[0.06]",
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: "Disabilitato".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: has_error,
-                                    label: "Stato Errore".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Disabilitato".to_string(), checked: is_disabled }
+                                ToggleControl { label: "Stato errore".to_string(), checked: has_error }
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,

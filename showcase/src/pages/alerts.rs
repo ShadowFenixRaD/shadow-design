@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    ChoicePicker, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[component]
 pub fn AlertsPage() -> Element {
-    let mut selected_variant = use_signal(|| AlertVariant::Info);
+    let selected_variant = use_signal(|| AlertVariant::Info);
     let mut alert_visible = use_signal(|| true);
 
     let props = vec![
@@ -38,51 +40,50 @@ pub fn AlertsPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Alert" }
-                Text { dimmed: true, size: TextSize::Sm, "Riquadri di avviso e notifica con icone SVG vettoriali native, bordo laterale di accento e supporto a chiusura dismissibile." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Alert".to_string(),
+                description: "Riquadri di avviso e notifica con icone SVG vettoriali native, bordo laterale di accento e supporto a chiusura dismissibile.".to_string(),
             }
 
             FeatureBanner { feature_name: "alert" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-4",
-                        if alert_visible() {
-                            Alert {
-                                title: "Notifica di Sistema".to_string(),
-                                variant: selected_variant(),
-                                on_close: move |_| alert_visible.set(false),
-                                "Tutti i moduli dell'ecosistema shadow-design sono configurati e operativi con feature flags indipendenti."
-                            }
-                        } else {
-                            div { class: "p-4 rounded-xl bg-[#060608] border border-white/[0.08] flex items-center justify-between text-xs text-zinc-400 font-mono",
-                                span { "L'alert è stato chiuso." }
-                                Button {
-                                    size: ButtonSize::Xs,
-                                    variant: ButtonVariant::Secondary,
-                                    onclick: move |_| alert_visible.set(true),
-                                    "Ripristina Alert"
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            if alert_visible() {
+                                Alert {
+                                    title: "Notifica di Sistema".to_string(),
+                                    variant: selected_variant(),
+                                    on_close: move |_| alert_visible.set(false),
+                                    "Tutti i moduli dell'ecosistema shadow-design sono configurati e operativi con feature flags indipendenti."
+                                }
+                            } else {
+                                div { class: "sc-title-row w-full",
+                                    span { class: "sc-muted-text", "L'alert è stato chiuso." }
+                                    Button {
+                                        size: ButtonSize::Xs,
+                                        variant: ButtonVariant::Secondary,
+                                        onclick: move |_| alert_visible.set(true),
+                                        "Ripristina Alert"
+                                    }
                                 }
                             }
-                        }
-
-                        div { class: "flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.06] text-xs font-mono items-center",
-                            span { class: "text-zinc-400 mr-2 uppercase text-[10px]", "Cambia Variante:" }
-                            for v in [AlertVariant::Info, AlertVariant::Success, AlertVariant::Warning, AlertVariant::Danger] {
-                                button {
-                                    r#type: "button",
-                                    class: if selected_variant() == v {
-                                        "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer shadow-sm"
-                                    } else {
-                                        "px-2.5 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.06] cursor-pointer transition-colors"
-                                    },
-                                    onclick: move |_| selected_variant.set(v),
-                                    "{v:?}"
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Variante".to_string(),
+                                options: vec![
+                                    (AlertVariant::Info, "Info".to_string()),
+                                    (AlertVariant::Success, "Success".to_string()),
+                                    (AlertVariant::Warning, "Warning".to_string()),
+                                    (AlertVariant::Danger, "Danger".to_string()),
+                                ],
+                                value: selected_variant,
                             }
-                        }
+                        },
                     }
                 },
                 code: code_snippet,
@@ -90,7 +91,7 @@ pub fn AlertsPage() -> Element {
             }
 
             // Visual Catalog
-            div { class: "space-y-3",
+            div { class: "sc-stack",
                 Alert {
                     title: "Informazione di Sistema (Info)".to_string(),
                     variant: AlertVariant::Info,

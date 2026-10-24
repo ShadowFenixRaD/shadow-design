@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{ChoicePicker, ControlRow, Playground, ToggleControl, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn NumberInputPage() -> Element {
@@ -9,8 +9,8 @@ pub fn NumberInputPage() -> Element {
     let price = use_signal(|| 49.99);
     let percentage = use_signal(|| 75.0);
 
-    let mut step_val = use_signal(|| 1.0);
-    let mut precision_val = use_signal(|| 0usize);
+    let step_val = use_signal(|| 1.0);
+    let precision_val = use_signal(|| 0usize);
     let is_disabled = use_signal(|| false);
     let has_error = use_signal(|| false);
 
@@ -93,104 +93,77 @@ NumberInput {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "NumberInput / SpinButton" }
-                Text { dimmed: true, size: TextSize::Sm, "Controllo numerico con stepper su/giù, precisione decimale, limiti min/max, supporto per prefisso/suffisso e navigazione da tastiera (ArrowUp / ArrowDown)." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "NumberInput / SpinButton".to_string(),
+                description: "Controllo numerico con stepper su/giù, precisione decimale, limiti min/max, supporto per prefisso/suffisso e navigazione da tastiera (ArrowUp / ArrowDown).".to_string(),
             }
 
             FeatureBanner { feature_name: "number_input" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
-                        // Live Preview
-                        div { class: "p-6 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-6 shadow-inner",
-                            NumberInput {
-                                label: "Quantità (Intero standard)".to_string(),
-                                value: quantity,
-                                step: step_val(),
-                                min: Some(0.0),
-                                max: Some(100.0),
-                                precision: precision_val(),
-                                disabled: is_disabled(),
-                                error: if has_error() { Some("Quantità non valida".to_string()) } else { None },
-                                help_text: Some(format!("Valore corrente: {}", quantity())),
-                            }
-
-                            NumberInput {
-                                label: "Prezzo con Valuta".to_string(),
-                                value: price,
-                                prefix: Some("€".to_string()),
-                                suffix: Some("EUR".to_string()),
-                                step: 0.50,
-                                precision: 2,
-                                min: Some(0.0),
-                                disabled: is_disabled(),
-                            }
-
-                            NumberInput {
-                                label: "Percentuale CPU".to_string(),
-                                value: percentage,
-                                suffix: Some("%".to_string()),
-                                step: 5.0,
-                                min: Some(0.0),
-                                max: Some(100.0),
-                                disabled: is_disabled(),
-                            }
-                        }
-
-                        // Configurator
-                        div { class: "space-y-4 text-xs font-mono",
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Step Incremento:" }
-                                div { class: "flex gap-2",
-                                    for s in [1.0, 5.0, 10.0] {
-                                        button {
-                                            r#type: "button",
-                                            class: if step_val() == s {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| step_val.set(s),
-                                            "+/- {s}"
-                                        }
-                                    }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack w-full",
+                                NumberInput {
+                                    label: "Quantità (Intero standard)".to_string(),
+                                    value: quantity,
+                                    step: step_val(),
+                                    min: Some(0.0),
+                                    max: Some(100.0),
+                                    precision: precision_val(),
+                                    disabled: is_disabled(),
+                                    error: if has_error() { Some("Quantità non valida".to_string()) } else { None },
+                                    help_text: Some(format!("Valore corrente: {}", quantity())),
+                                }
+                                NumberInput {
+                                    label: "Prezzo con Valuta".to_string(),
+                                    value: price,
+                                    prefix: Some("€".to_string()),
+                                    suffix: Some("EUR".to_string()),
+                                    step: 0.50,
+                                    precision: 2,
+                                    min: Some(0.0),
+                                    disabled: is_disabled(),
+                                }
+                                NumberInput {
+                                    label: "Percentuale CPU".to_string(),
+                                    value: percentage,
+                                    suffix: Some("%".to_string()),
+                                    step: 5.0,
+                                    min: Some(0.0),
+                                    max: Some(100.0),
+                                    disabled: is_disabled(),
                                 }
                             }
-
-                            div {
-                                span { class: "text-zinc-400 block mb-1.5 uppercase tracking-wider text-[10px]", "Precisione Decimali:" }
-                                div { class: "flex gap-2",
-                                    for p in [0, 1, 2] {
-                                        button {
-                                            r#type: "button",
-                                            class: if precision_val() == p {
-                                                "px-2.5 py-1 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold cursor-pointer"
-                                            } else {
-                                                "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
-                                            },
-                                            onclick: move |_| precision_val.set(p),
-                                            "{p} dec"
-                                        }
-                                    }
-                                }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Step incremento".to_string(),
+                                options: vec![
+                                    (1.0, "+/- 1".to_string()),
+                                    (5.0, "+/- 5".to_string()),
+                                    (10.0, "+/- 10".to_string()),
+                                ],
+                                value: step_val,
                             }
-
-                            div { class: "pt-2 flex flex-col gap-2 border-t border-white/[0.06]",
-                                Checkbox {
-                                    checked: is_disabled,
-                                    label: "Disabilitato".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
-                                Checkbox {
-                                    checked: has_error,
-                                    label: "Stato Errore".to_string(),
-                                    size: CheckboxSize::Sm,
-                                }
+                            ChoicePicker {
+                                label: "Precisione decimali".to_string(),
+                                options: vec![
+                                    (0usize, "0 dec".to_string()),
+                                    (1usize, "1 dec".to_string()),
+                                    (2usize, "2 dec".to_string()),
+                                ],
+                                value: precision_val,
                             }
-                        }
+                            hr { class: "sc-control-divider" }
+                            ControlRow {
+                                ToggleControl { label: "Disabilitato".to_string(), checked: is_disabled }
+                                ToggleControl { label: "Stato errore".to_string(), checked: has_error }
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

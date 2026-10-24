@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn TransferListPage() -> Element {
@@ -63,17 +63,17 @@ TransferList {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "TransferList" }
-                Text { dimmed: true, size: TextSize::Sm, "Interfaccia a due colonne affiancate in stile Material UI per trasferire elementi da un elenco di origine a un elenco di destinazione con ricerca e selezione multipla." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "TransferList".to_string(),
+                description: "Interfaccia a due colonne affiancate in stile Material UI per trasferire elementi da un elenco di origine a un elenco di destinazione con ricerca e selezione multipla.".to_string(),
             }
 
             FeatureBanner { feature_name: "transfer_list" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "w-full p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08]",
+                    div { class: "w-full",
                         TransferList {
                             source: source_items,
                             target: target_items,

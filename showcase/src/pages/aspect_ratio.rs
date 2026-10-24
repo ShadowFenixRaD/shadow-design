@@ -1,9 +1,9 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::banner::FeatureBanner;
-use crate::components::props_table::PropRow;
-use crate::components::showcase_tabs::ShowcaseTabs;
+use crate::components::{
+    ChoicePicker, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs,
+};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum RatioPreset {
@@ -35,7 +35,7 @@ impl RatioPreset {
 
 #[component]
 pub fn AspectRatioPage() -> Element {
-    let mut selected_preset = use_signal(|| RatioPreset::Widescreen16_9);
+    let selected_preset = use_signal(|| RatioPreset::Widescreen16_9);
 
     let props = vec![
         PropRow {
@@ -54,62 +54,53 @@ pub fn AspectRatioPage() -> Element {
 
     let code_snippet = r#"AspectRatio {
     ratio: 16.0 / 9.0,
-    div { class: "p-6 rounded-xl bg-purple-950/40 border border-purple-800/40 flex flex-col items-center justify-center text-center",
+    div { class: "sc-demo-cell sc-demo-cell--accent",
         Icon { kind: IconKind::Layers, size: 32 }
-        span { class: "mt-2 font-mono text-sm text-purple-200 font-bold", "Video Stream Player" }
-        span { class: "text-xs text-purple-400/80", "Aspect Ratio 16:9 garantito senza CLS" }
+        span { class: "sc-section-title", "Video Stream Player" }
+        span { class: "sc-subtle-text", "Aspect Ratio 16:9 garantito senza CLS" }
     }
 }"#
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "AspectRatio" }
-                Text { dimmed: true, size: TextSize::Sm, "Contenitore universale per vincolare il rapporto di forma di immagini, canvas, mappe, video player o iframe, azzerando il Cumulative Layout Shift (CLS)." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "AspectRatio".to_string(),
+                description: "Contenitore universale per vincolare il rapporto di forma di immagini, canvas, mappe, video player o iframe, azzerando il Cumulative Layout Shift (CLS).".to_string(),
             }
 
             FeatureBanner { feature_name: "aspect_ratio" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "space-y-6 w-full",
-                        // Live AspectRatio Container
-                        div { class: "w-full max-w-lg mx-auto",
-                            AspectRatio {
-                                ratio: selected_preset().value(),
-                                class: "rounded-2xl border border-white/10 shadow-lg overflow-hidden bg-zinc-950",
-                                div { class: "p-6 bg-purple-950/40 border border-purple-800/40 flex flex-col items-center justify-center text-center",
-                                    span { class: "p-3 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 mb-2 flex items-center justify-center",
+                    Playground {
+                        stage: rsx! {
+                            div { class: "w-full",
+                                AspectRatio {
+                                    ratio: selected_preset().value(),
+                                    class: "sc-demo-cell sc-demo-cell--accent",
+                                    div { class: "sc-stack items-center text-center",
                                         Icon { kind: IconKind::Layers, size: 28 }
-                                    }
-                                    span { class: "text-sm font-bold text-white font-mono", "{selected_preset().label()}" }
-                                    span { class: "text-xs text-purple-300 font-mono mt-1", "ratio = {selected_preset().value():.3}" }
-                                    div { class: "mt-3 flex items-center gap-2",
-                                        Badge { label: "Zero CLS".to_string(), variant: BadgeVariant::Success, dot: true }
-                                        Badge { label: "Responsive Fit".to_string(), variant: BadgeVariant::Primary }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Configurator Controls
-                        div { class: "p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-4",
-                            span { class: "text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold block", "Preset Rapporto di Forma (Ratio)" }
-                            div { class: "flex flex-wrap gap-2",
-                                for p in [RatioPreset::Widescreen16_9, RatioPreset::Standard4_3, RatioPreset::Square1_1, RatioPreset::Cinematic21_9] {
-                                    button {
-                                        class: if selected_preset() == p {
-                                            "px-3 py-1.5 text-xs font-mono rounded-lg bg-purple-950 border border-purple-600 text-purple-200 font-bold"
-                                        } else {
-                                            "px-3 py-1.5 text-xs font-mono rounded-lg bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white"
-                                        },
-                                        onclick: move |_| selected_preset.set(p),
-                                        "{p.label()}"
+                                        span { class: "sc-section-title sc-mono", "{selected_preset().label()}" }
+                                        span { class: "sc-subtle-text sc-mono", "ratio = {selected_preset().value():.3}" }
+                                        div { class: "sc-actions",
+                                            Badge { label: "Zero CLS".to_string(), variant: BadgeVariant::Success, dot: true }
+                                            Badge { label: "Responsive Fit".to_string(), variant: BadgeVariant::Primary }
+                                        }
                                     }
                                 }
                             }
-                        }
+                        },
+                        controls: rsx! {
+                            ChoicePicker {
+                                label: "Preset Rapporto di Forma (Ratio)".to_string(),
+                                options: [RatioPreset::Widescreen16_9, RatioPreset::Standard4_3, RatioPreset::Square1_1, RatioPreset::Cinematic21_9]
+                                    .iter()
+                                    .map(|p| (*p, p.label().to_string()))
+                                    .collect::<Vec<_>>(),
+                                value: selected_preset,
+                            }
+                        },
                     }
                 },
                 code: code_snippet,

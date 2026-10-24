@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{
+    Counter, FeatureBanner, PageHeader, Playground, PropRow, ShowcaseTabs, ToggleControl,
+};
 
 #[component]
 pub fn CheckboxPage() -> Element {
@@ -11,7 +13,7 @@ pub fn CheckboxPage() -> Element {
     let indeterminate_state = use_signal(|| false);
     let error_state = use_signal(|| false);
     let disabled_active = use_signal(|| true);
-    let mut custom_glow = use_signal(|| true);
+    let custom_glow = use_signal(|| true);
 
     let props = vec![
         PropRow {
@@ -76,27 +78,27 @@ Checkbox {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Checkbox Component" }
-                Text { dimmed: true, size: TextSize::Sm, "Caselle di selezione tattili con animazione di feedback, supporto a tre dimensioni (Sm/Md/Lg), stato indeterminato, gestione errori e glow perimetrale personalizzabile." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Checkbox Component".to_string(),
+                description: "Caselle di selezione tattili con animazione di feedback, supporto a tre dimensioni (Sm/Md/Lg), stato indeterminato, gestione errori e glow perimetrale personalizzabile.".to_string(),
             }
 
             FeatureBanner { feature_name: "checkbox" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "grid grid-cols-1 md:grid-cols-2 gap-8 items-start",
-                        div { class: "space-y-6",
-                            div { class: "space-y-4",
-                                h4 { class: "text-xs font-semibold text-zinc-400 uppercase tracking-wider", "Dimensioni e Glow" }
+                    Playground {
+                        stage_start: true,
+                        stage: rsx! {
+                            div { class: "sc-stack",
+                                span { class: "sc-control-label", "Dimensioni e Glow" }
                                 Checkbox {
                                     checked: accept_terms,
                                     size: CheckboxSize::Sm,
                                     label: "Taglia Sm (16px) — Termini di Licenza".to_string(),
                                     glow: *custom_glow.read(),
                                 }
-
                                 Checkbox {
                                     checked: newsletter,
                                     size: CheckboxSize::Md,
@@ -104,7 +106,6 @@ Checkbox {
                                     description: "Ricevi aggiornamenti sulle release e patch di sicurezza".to_string(),
                                     glow: *custom_glow.read(),
                                 }
-
                                 Checkbox {
                                     checked: diagnostics,
                                     size: CheckboxSize::Lg,
@@ -112,25 +113,21 @@ Checkbox {
                                     description: "Monitoraggio runtime delle metriche di latenza di rete".to_string(),
                                     glow: *custom_glow.read(),
                                 }
-                            }
 
-                            div { class: "pt-4 border-t border-white/[0.06] space-y-4",
-                                h4 { class: "text-xs font-semibold text-zinc-400 uppercase tracking-wider", "Stati Speciali" }
-
+                                hr { class: "sc-control-divider" }
+                                span { class: "sc-control-label", "Stati Speciali" }
                                 Checkbox {
                                     checked: indeterminate_state,
                                     indeterminate: true,
                                     label: "Stato Indeterminato (Parziale)".to_string(),
                                     description: "Visualizza una barra di selezione parziale per nodi con figli misti".to_string(),
                                 }
-
                                 Checkbox {
                                     checked: error_state,
                                     error: "Campo obbligatorio non soddisfatto".to_string(),
                                     label: "Stato con Errore".to_string(),
                                     description: "Bordo evidenziato in rosso pericolo per campi obbligatori omessi".to_string(),
                                 }
-
                                 Checkbox {
                                     checked: disabled_active,
                                     disabled: true,
@@ -138,47 +135,16 @@ Checkbox {
                                     description: "Opzione non modificabile con i tuoi permessi attuali".to_string(),
                                 }
                             }
-                        }
-
-                        div { class: "space-y-4",
-                            div { class: "p-4 rounded-xl bg-[#0e0e14] border border-white/[0.08] space-y-3",
-                                h4 { class: "text-xs font-bold text-white uppercase tracking-wider", "Controlli Live" }
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs text-zinc-400", "Glow Perimetrale:" }
-                                    button {
-                                        r#type: "button",
-                                        class: "px-3 py-1 rounded text-xs font-medium border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white cursor-pointer transition-colors",
-                                        onclick: move |_| {
-                                            let cur = *custom_glow.read();
-                                            *custom_glow.write() = !cur;
-                                        },
-                                        if *custom_glow.read() { "Disattiva Glow" } else { "Attiva Glow" }
-                                    }
-                                }
-                            }
-
-                            div { class: "p-5 rounded-xl bg-[#060608] border border-white/[0.08] space-y-3 font-mono text-xs shadow-inner",
-                                p { class: "text-zinc-400 font-semibold uppercase text-[10px] tracking-wider", "Stato Reattivo Checkbox:" }
-                                div { class: "p-3 rounded-lg bg-black/60 border border-white/[0.04] space-y-1.5",
-                                    div { class: "text-purple-300",
-                                        span { class: "text-zinc-500", "accept_terms = " }
-                                        "{accept_terms}"
-                                    }
-                                    div { class: "text-cyan-300",
-                                        span { class: "text-zinc-500", "newsletter = " }
-                                        "{newsletter}"
-                                    }
-                                    div { class: "text-emerald-300",
-                                        span { class: "text-zinc-500", "diagnostics = " }
-                                        "{diagnostics}"
-                                    }
-                                    div { class: "text-amber-300",
-                                        span { class: "text-zinc-500", "indeterminate_state = " }
-                                        "{indeterminate_state}"
-                                    }
-                                }
-                            }
-                        }
+                        },
+                        controls: rsx! {
+                            ToggleControl { label: "Glow Perimetrale".to_string(), checked: custom_glow }
+                            hr { class: "sc-control-divider" }
+                            span { class: "sc-control-label", "Stato Reattivo Checkbox" }
+                            Counter { label: "accept_terms".to_string(), value: accept_terms().to_string() }
+                            Counter { label: "newsletter".to_string(), value: newsletter().to_string() }
+                            Counter { label: "diagnostics".to_string(), value: diagnostics().to_string() }
+                            Counter { label: "indeterminate_state".to_string(), value: indeterminate_state().to_string() }
+                        },
                     }
                 },
                 code: code_snippet,

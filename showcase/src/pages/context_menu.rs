@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs, Stage};
 
 #[component]
 pub fn ContextMenuPage() -> Element {
@@ -44,7 +44,7 @@ pub fn ContextMenuPage() -> Element {
 
     let code_snippet = r#"ContextMenu {
     ContextMenuTrigger {
-        div { class: "p-12 border border-dashed rounded-xl text-center",
+        Card { class: "cursor-context-menu",
             "Fai click destro qui dentro"
         }
     }
@@ -77,26 +77,26 @@ pub fn ContextMenuPage() -> Element {
     .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "ContextMenu" }
-                Text { dimmed: true, size: TextSize::Sm, "Menu a tendina contestuale richiamato dal click destro del mouse alle coordinate precise del puntatore, con supporto per scorciatoie, checkbox e azioni distruttive." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "ContextMenu".to_string(),
+                description: "Menu a tendina contestuale richiamato dal click destro del mouse alle coordinate precise del puntatore, con supporto per scorciatoie, checkbox e azioni distruttive.".to_string(),
             }
 
             FeatureBanner { feature_name: "context_menu" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col items-center justify-center gap-6 shadow-inner",
+                    Stage {
                         ContextMenu {
                             ContextMenuTrigger {
-                                div { class: "w-full max-w-lg p-16 rounded-2xl border-2 border-dashed border-white/[0.12] hover:border-purple-500/40 bg-white/[0.01] hover:bg-white/[0.03] transition-all flex flex-col items-center justify-center gap-3 cursor-context-menu text-center group",
-                                    div { class: "p-3 rounded-full bg-white/[0.04] text-purple-400 group-hover:scale-110 transition-transform",
+                                Card { class: "cursor-context-menu w-full max-w-lg",
+                                    div { class: "sc-stack items-center text-center",
                                         Icon { kind: IconKind::Terminal, size: 24 }
-                                    }
-                                    h4 { class: "font-semibold text-sm text-zinc-100", "Area di Test Menu Contestuale" }
-                                    p { class: "text-xs text-zinc-400 max-w-xs",
-                                        "Fai click con il tasto destro del mouse ovunque all'interno di questo riquadro per aprire il menu Shadow."
+                                        h4 { class: "sc-section-title", "Area di Test Menu Contestuale" }
+                                        p { class: "sc-muted-text",
+                                            "Fai click con il tasto destro del mouse ovunque all'interno di questo riquadro per aprire il menu Shadow."
+                                        }
                                     }
                                 }
                             }
@@ -146,11 +146,7 @@ pub fn ContextMenuPage() -> Element {
                             }
                         }
 
-                        div { class: "p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center gap-2 text-xs font-mono text-zinc-400",
-                            Icon { kind: IconKind::CheckCircle, size: 14 }
-                            span { "Ultima azione: " }
-                            span { class: "text-purple-300 font-semibold", "{last_action}" }
-                        }
+                        Counter { label: "Ultima azione".to_string(), value: last_action() }
                     }
                 },
                 code: code_snippet,

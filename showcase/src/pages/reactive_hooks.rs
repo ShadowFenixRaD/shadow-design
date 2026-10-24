@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shadow_design::prelude::*;
 
-use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
+use crate::components::{Counter, FeatureBanner, PageHeader, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn ReactiveHooksPage() -> Element {
@@ -18,7 +18,7 @@ pub fn ReactiveHooksPage() -> Element {
     });
 
     // 2. Debounce test
-    let mut search_query = use_signal(|| "".to_string());
+    let search_query = use_signal(|| "".to_string());
     let debounced_query = use_debounced_signal(search_query, 300);
 
     // 3. Media Query test
@@ -28,7 +28,7 @@ pub fn ReactiveHooksPage() -> Element {
     let clipboard = use_clipboard(Some(2000));
 
     // 5. Local Storage test
-    let mut local_store = use_local_storage("shadow_hook_demo", "Valore memorizzato localmente");
+    let local_store = use_local_storage("shadow_hook_demo", "Valore memorizzato localmente");
 
     // 6. Idle test
     let is_user_idle = use_idle(5000);
@@ -100,130 +100,105 @@ let is_desktop = use_media_query("(min-width: 1024px)");"#
         .to_string();
 
     rsx! {
-        div { class: "max-w-4xl space-y-8",
-            div {
-                Heading { order: HeadingOrder::H2, "Reactive Hooks & Utilities" }
-                Text { dimmed: true, size: TextSize::Sm, "Collezione di primitive reattive ad alte prestazioni per scorciatoie, media query, debounce, appunti, storage locale e monitoraggio scroll/inattività." }
+        div { class: "sc-stack sc-stack--loose",
+            PageHeader {
+                title: "Reactive Hooks & Utilities".to_string(),
+                description: "Collezione di primitive reattive ad alte prestazioni per scorciatoie, media query, debounce, appunti, storage locale e monitoraggio scroll/inattività.".to_string(),
             }
 
             FeatureBanner { feature_name: "hooks" }
 
             ShowcaseTabs {
                 preview: rsx! {
-                    div { class: "p-8 rounded-xl bg-[#060608] border border-white/[0.08] flex flex-col gap-8 shadow-inner",
-                        // Griglia interattiva dei moduli hook
-                        div { class: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                            // 1. Hotkey Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-purple-300 font-semibold", "use_hotkey" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950/80 text-purple-200 border border-purple-500/30", "Ctrl+K o Escape" }
+                    div { class: "sc-card-grid",
+                        Card {
+                            title: "use_hotkey".to_string(),
+                            subtitle: "Premi Ctrl+K oppure Escape sulla tastiera per testare l'intercettazione globale.".to_string(),
+                            div { class: "sc-stack",
+                                Badge { label: "Ctrl+K o Escape".to_string(), variant: BadgeVariant::Outline }
+                                Counter { label: "Attivazioni".to_string(), value: hotkey_count().to_string() }
+                                Counter { label: "Ultimo".to_string(), value: last_hotkey() }
+                            }
+                        }
+
+                        Card {
+                            title: "use_debounced_signal".to_string(),
+                            subtitle: "Il valore debounced si aggiorna dopo 300ms dall'ultima digitazione.".to_string(),
+                            div { class: "sc-stack",
+                                TextInput {
+                                    value: search_query,
+                                    placeholder: "Scrivi velocemente qui...".to_string(),
                                 }
-                                p { class: "text-xs text-zinc-400", "Premi Ctrl+K oppure Escape sulla tastiera per testare l'intercettazione globale." }
-                                div { class: "flex items-center justify-between text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04]",
-                                    span { class: "text-zinc-500", "Attivazioni: {hotkey_count()}" }
-                                    span { class: "text-purple-300 font-bold", "Ultimo: {last_hotkey()}" }
+                                Counter {
+                                    label: "Debounced".to_string(),
+                                    value: if debounced_query().is_empty() { "(in attesa)".to_string() } else { debounced_query() },
                                 }
                             }
+                        }
 
-                            // 2. Debounce Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-cyan-300 font-semibold", "use_debounced_signal" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-200 border border-cyan-500/30", "300ms Delay" }
-                                }
-                                input {
-                                    r#type: "text",
-                                    value: "{search_query()}",
-                                    placeholder: "Scrivi velocemente qui...",
-                                    class: "w-full px-3 py-1.5 text-xs font-mono rounded-lg border border-white/[0.1] bg-zinc-900 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-cyan-400",
-                                    oninput: move |e| search_query.set(e.value()),
-                                }
-                                div { class: "flex items-center justify-between text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04]",
-                                    span { class: "text-zinc-500", "Debounced:" }
-                                    span { class: "text-cyan-300 font-bold truncate max-w-[160px]", if debounced_query().is_empty() { "(in attesa)" } else { "{debounced_query()}" } }
+                        Card {
+                            title: "use_media_query".to_string(),
+                            subtitle: "Ridimensiona la larghezza della finestra del browser per vedere il matching live.".to_string(),
+                            div { class: "sc-stack",
+                                Badge { label: "(min-width: 768px)".to_string(), variant: BadgeVariant::Outline }
+                                Counter {
+                                    label: "Layout corrente".to_string(),
+                                    value: if is_wide() { "Desktop (>= 768px)".to_string() } else { "Mobile (< 768px)".to_string() },
                                 }
                             }
+                        }
 
-                            // 3. Media Query Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-emerald-300 font-semibold", "use_media_query" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-200 border border-emerald-500/30", "(min-width: 768px)" }
-                                }
-                                p { class: "text-xs text-zinc-400", "Ridimensiona la larghezza della finestra del browser per vedere il matching live." }
-                                div { class: "flex items-center justify-between text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04]",
-                                    span { class: "text-zinc-500", "Layout Corrente:" }
-                                    span {
-                                        class: if is_wide() { "text-emerald-300 font-bold" } else { "text-amber-300 font-bold" },
-                                        if is_wide() { "Desktop (>= 768px)" } else { "Mobile (< 768px)" }
-                                    }
-                                }
-                            }
-
-                            // 4. Clipboard Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-rose-300 font-semibold", "use_clipboard" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950/80 text-rose-200 border border-rose-500/30", "2000ms Reset" }
-                                }
-                                p { class: "text-xs text-zinc-400", "Copia istantaneamente una stringa negli appunti con feedback visivo temporizzato." }
-                                button {
-                                    r#type: "button",
-                                    class: format!("w-full py-2 text-xs font-mono rounded-lg border transition-all cursor-pointer font-semibold {}", if *clipboard.copied.read() { "bg-emerald-950/80 text-emerald-200 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]" } else { "bg-white/[0.04] text-zinc-300 border-white/[0.08] hover:bg-white/[0.08]" }),
+                        Card {
+                            title: "use_clipboard".to_string(),
+                            subtitle: "Copia istantaneamente una stringa negli appunti con feedback visivo temporizzato.".to_string(),
+                            div { class: "sc-stack",
+                                Badge { label: "2000ms reset".to_string(), variant: BadgeVariant::Outline }
+                                Button {
+                                    variant: if *clipboard.copied.read() { ButtonVariant::Success } else { ButtonVariant::Secondary },
                                     onclick: move |_| {
                                         clipboard.copy("Token Segreto: shadow-token-9988");
                                     },
-                                    if *clipboard.copied.read() { "✓ Copiato negli Appunti!" } else { "Copia Token di Prova" }
+                                    if *clipboard.copied.read() { "Copiato negli Appunti!" } else { "Copia Token di Prova" }
                                 }
                             }
+                        }
 
-                            // 5. Idle Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-amber-300 font-semibold", "use_idle" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-200 border border-amber-500/30", "Timeout: 5s" }
-                                }
-                                p { class: "text-xs text-zinc-400", "Non toccare mouse e tastiera per 5 secondi per verificare lo stato di inattività." }
-                                div { class: "flex items-center justify-between text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04]",
-                                    span { class: "text-zinc-500", "Stato Utente:" }
-                                    span {
-                                        class: if is_user_idle() { "text-amber-400 font-bold animate-pulse" } else { "text-emerald-300 font-bold" },
-                                        if is_user_idle() { "Inattivo (Idle)" } else { "Attivo (Interacting)" }
-                                    }
+                        Card {
+                            title: "use_idle".to_string(),
+                            subtitle: "Non toccare mouse e tastiera per 5 secondi per verificare lo stato di inattività.".to_string(),
+                            div { class: "sc-stack",
+                                Badge { label: "Timeout: 5s".to_string(), variant: BadgeVariant::Outline }
+                                Counter {
+                                    label: "Stato utente".to_string(),
+                                    value: if is_user_idle() { "Inattivo (Idle)".to_string() } else { "Attivo (Interacting)".to_string() },
                                 }
                             }
+                        }
 
-                            // 6. Local Storage Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-blue-300 font-semibold", "use_local_storage" }
-                                    span { class: "text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950/80 text-blue-200 border border-blue-500/30", "Key: shadow_hook_demo" }
-                                }
-                                p { class: "text-xs text-zinc-400", "Modifica il valore e ricarica la pagina: il dato rimane salvato in localStorage." }
-                                input {
-                                    r#type: "text",
-                                    value: "{local_store()}",
-                                    class: "w-full px-3 py-1.5 text-xs font-mono rounded-lg border border-white/[0.1] bg-zinc-900 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-400",
-                                    oninput: move |e| local_store.set(e.value()),
-                                }
+                        Card {
+                            title: "use_local_storage".to_string(),
+                            subtitle: "Modifica il valore e ricarica la pagina: il dato rimane salvato in localStorage.".to_string(),
+                            div { class: "sc-stack",
+                                Badge { label: "Key: shadow_hook_demo".to_string(), variant: BadgeVariant::Outline }
+                                TextInput { value: local_store }
                             }
+                        }
 
-                            // 7. Scroll Card
-                            div { class: "p-5 rounded-xl border border-white/[0.06] bg-zinc-950/40 space-y-3",
-                                div { class: "flex items-center justify-between",
-                                    span { class: "text-xs font-mono text-purple-300 font-semibold", "use_window_scroll" }
-                                    button {
-                                        r#type: "button",
-                                        class: "text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-zinc-300 border border-white/[0.08] hover:bg-white/[0.08] cursor-pointer",
+                        Card {
+                            title: "use_window_scroll".to_string(),
+                            subtitle: "Traccia la coordinata Y della pagina in pixel durante lo scorrimento.".to_string(),
+                            div { class: "sc-stack",
+                                Counter {
+                                    label: "Coordinate viewport".to_string(),
+                                    value: format!("X: {}px | Y: {}px", scroll_x as i32, scroll_y as i32),
+                                }
+                                div { class: "sc-actions",
+                                    Button {
+                                        variant: ButtonVariant::Ghost,
+                                        size: ButtonSize::Sm,
                                         onclick: move |_| scroll.scroll_to_top(),
                                         "Torna in Cima"
                                     }
-                                }
-                                p { class: "text-xs text-zinc-400", "Traccia la coordinata Y della pagina in pixel durante lo scorrimento." }
-                                div { class: "flex items-center justify-between text-xs font-mono p-2.5 rounded bg-white/[0.02] border border-white/[0.04]",
-                                    span { class: "text-zinc-500", "Coordinate Viewport:" }
-                                    span { class: "text-purple-300 font-bold", "X: {scroll_x as i32}px | Y: {scroll_y as i32}px" }
                                 }
                             }
                         }
