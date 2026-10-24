@@ -7,12 +7,28 @@ compares them against selectors in compiled CSS, and reports any unknown utility
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 
+# Paths below are relative to the workspace root, whatever the caller's cwd.
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+def sass_command():
+    # Prefer a native `sass` (e.g. dart-sass from the Nix dev shell), fall back to npx.
+    # shutil.which resolves Windows shims like npx.cmd, so no shell=True is needed.
+    sass = shutil.which("sass")
+    if sass:
+        return [sass]
+    npx = shutil.which("npx")
+    if npx:
+        return [npx, "--yes", "sass"]
+    print("Error: neither `sass` nor `npx` found in PATH (run inside `nix develop`).")
+    sys.exit(1)
+
 def compile_scss():
-    cmd = ["npx", "sass", "crate/scss/main.scss", "target/compiled_styles.css"]
-    res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+    cmd = sass_command() + ["--no-source-map", "crate/scss/main.scss", "target/compiled_styles.css"]
+    res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(f"Error compiling SCSS:\n{res.stderr}")
         sys.exit(1)
