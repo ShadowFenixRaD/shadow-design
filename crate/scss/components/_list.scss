@@ -1,194 +1,142 @@
 // ==============================================================================
-// Shadow Design — Component: List & ListItem
+// Shadow Design — List & ListItem (typographic list: static text, no surface)
 // ==============================================================================
-@use '../layers' as *;
-@use '../variables' as *;
+@use '../mixins' as *;
 
 @layer sd-components {
+.sd-list {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
+  color: var(--sd-text);
+
+  &--center { align-items: center; }
+
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // Markers
+  &--marker-disc { list-style-type: disc; }
+  &--marker-circle { list-style-type: circle; }
+  &--marker-square { list-style-type: square; }
+  &--marker-decimal { list-style-type: decimal; }
+  &--marker-lower-alpha { list-style-type: lower-alpha; }
+  &--marker-upper-alpha { list-style-type: upper-alpha; }
+  &--marker-lower-roman { list-style-type: lower-roman; }
+  &--marker-upper-roman { list-style-type: upper-roman; }
+  &--marker-none,
+  &--marker-custom { list-style: none; }
+
+  // Horizontal comes after the markers so it wins at equal specificity.
+  &--horizontal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+  }
+
+  // Padding
+  &--with-padding { padding-left: var(--sd-space-6); }
+  &--no-padding { padding-left: 0; margin-left: 0; }
+
+  // Spacing
+  &--spacing-xs { gap: var(--sd-space-1); }
+  &--spacing-sm { gap: var(--sd-space-2); }
+  &--spacing-md { gap: var(--sd-space-3); }
+  &--spacing-lg { gap: var(--sd-space-4); }
+  &--spacing-xl { gap: var(--sd-space-6); }
+
+  // Size
+  &--size-xs {
+    font-size: var(--sd-text-xs);
+    line-height: var(--sd-leading-normal);
+
+    .sd-list-item__icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
+  &--size-sm {
+    font-size: var(--sd-text-sm);
+    line-height: var(--sd-leading-normal);
+
+    .sd-list-item__icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  &--size-md {
+    font-size: var(--sd-text-md);
+    line-height: var(--sd-leading-normal);
+
+    .sd-list-item__icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  &--size-lg {
+    font-size: var(--sd-text-lg);
+    line-height: var(--sd-leading-normal);
+
+    .sd-list-item__icon {
+      width: 22px;
+      height: 22px;
+    }
+  }
+  &--size-xl {
+    font-size: var(--sd-text-xl);
+    line-height: var(--sd-leading-normal);
+
+    .sd-list-item__icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  // Nested lists
   .sd-list {
-    margin: 0;
-    color: $zinc-200;
-    box-sizing: border-box;
+    margin-top: var(--sd-space-2);
+    margin-left: var(--sd-space-5);
+  }
+}
 
-    // --- Orientamento ---
-    &--vertical {
-      display: flex;
-      flex-direction: column;
-    }
+.sd-list-item {
+  box-sizing: border-box;
+  color: var(--sd-text);
 
-    &--horizontal {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      list-style: none !important;
-      padding-left: 0 !important;
-    }
+  &--with-icon {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sd-space-3);
+    list-style: none;
+  }
 
-    // --- Marcatori Standard ---
-    &--marker-disc {
-      list-style-type: disc;
-    }
+  &--center {
+    align-items: center;
 
-    &--marker-circle {
-      list-style-type: circle;
-    }
+    .sd-list-item__icon { margin-top: 0; }
+  }
 
-    &--marker-square {
-      list-style-type: square;
-    }
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--sd-text-muted);
 
-    &--marker-decimal {
-      list-style-type: decimal;
-    }
-
-    &--marker-lower-alpha {
-      list-style-type: lower-alpha;
-    }
-
-    &--marker-upper-alpha {
-      list-style-type: upper-alpha;
-    }
-
-    &--marker-lower-roman {
-      list-style-type: lower-roman;
-    }
-
-    &--marker-upper-roman {
-      list-style-type: upper-roman;
-    }
-
-    &--marker-none,
-    &--marker-custom {
-      list-style: none !important;
-    }
-
-    // --- Padding & Allineamento ---
-    &--with-padding {
-      padding-left: 1.5rem;
-    }
-
-    &--no-padding {
-      padding-left: 0;
-      margin-left: 0;
-    }
-
-    // --- Spaziatura (gap tra gli item) ---
-    &--spacing-xs {
-      gap: 0.25rem;
-    }
-
-    &--spacing-sm {
-      gap: 0.5rem;
-    }
-
-    &--spacing-md {
-      gap: 0.75rem;
-    }
-
-    &--spacing-lg {
-      gap: 1rem;
-    }
-
-    &--spacing-xl {
-      gap: 1.5rem;
-    }
-
-    // --- Scala Dimensionale ---
-    &--size-xs {
-      font-size: 0.75rem;
-      line-height: 1.3;
-
-      .sd-list-item__icon {
-        width: 0.875rem;
-        height: 0.875rem;
-      }
-    }
-
-    &--size-sm {
-      font-size: 0.875rem;
-      line-height: 1.4;
-
-      .sd-list-item__icon {
-        width: 1rem;
-        height: 1rem;
-      }
-    }
-
-    &--size-md {
-      font-size: 1rem;
-      line-height: 1.5;
-
-      .sd-list-item__icon {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-    }
-
-    &--size-lg {
-      font-size: 1.125rem;
-      line-height: 1.55;
-
-      .sd-list-item__icon {
-        width: 1.375rem;
-        height: 1.375rem;
-      }
-    }
-
-    &--size-xl {
-      font-size: 1.25rem;
-      line-height: 1.6;
-
-      .sd-list-item__icon {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    }
-
-    // --- Sub-liste annidate ---
-    .sd-list {
-      margin-top: 0.5rem;
-      margin-left: 1.25rem;
+    svg {
+      width: 100%;
+      height: 100%;
     }
   }
 
-  // --- Singolo Elemento ListItem ---
-  .sd-list-item {
-    color: $zinc-300;
-    box-sizing: border-box;
-
-    &--with-icon {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.625rem;
-      list-style: none !important;
-    }
-
-    &--center {
-      align-items: center;
-
-      .sd-list-item__icon {
-        margin-top: 0;
-      }
-    }
-
-    &__icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: $violet-accent;
-      margin-top: 0.15rem;
-
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    &__content {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
+  &__content {
+    flex: 1 1 auto;
+    min-width: 0;
   }
+}
 }

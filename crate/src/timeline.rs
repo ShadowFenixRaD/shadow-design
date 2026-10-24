@@ -170,22 +170,22 @@ pub fn TimelineItem(
     );
 
     let b_size = ctx.bullet_size;
+    let line_w = ctx.line_width;
 
     rsx! {
         div {
             class: "{combined_class}",
             id: id,
             role: "listitem",
+            style: "--sd-timeline-bullet: {b_size}px; --sd-timeline-line: {line_w}px;",
             // Linea connettiva
             div {
                 class: "sd-timeline-item__line",
-                style: "left: {b_size / 2}px;",
                 aria_hidden: "true",
             }
             // Bullet circolare con icona opzionale
             div {
                 class: "sd-timeline-item__bullet",
-                style: "width: {b_size}px; height: {b_size}px; min-width: {b_size}px;",
                 aria_hidden: "true",
                 if let Some(b) = bullet {
                     {b}

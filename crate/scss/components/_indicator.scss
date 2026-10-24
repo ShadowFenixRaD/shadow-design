@@ -1,151 +1,100 @@
 // ==============================================================================
-// Shadow Design — Indicator Component
+// Shadow Design — Indicator (solid small mark, language.md §3.10)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-indicator {
-    position: relative;
-    display: inline-flex;
-    vertical-align: middle;
-  }
-
-  .sd-indicator-badge {
-    position: absolute;
-    z-index: 10;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    pointer-events: none;
-    user-select: none;
-    border-radius: 9999px;
-    border: 2px solid #000000;
-    line-height: 1;
-    font-weight: 700;
-    font-family: inherit;
-
-    // Corner Positions (Centered at the vertex)
-    &--top-end {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%);
-    }
-
-    &--top-start {
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-    }
-
-    &--bottom-end {
-      bottom: 0;
-      right: 0;
-      transform: translate(50%, 50%);
-    }
-
-    &--bottom-start {
-      bottom: 0;
-      left: 0;
-      transform: translate(-50%, 50%);
-    }
-
-    // Dot Sizes
-    &--sm {
-      width: 8px;
-      height: 8px;
-      font-size: 9px;
-
-      &.sd-indicator-badge--with-label {
-        width: auto;
-        min-width: 14px;
-        height: 14px;
-        padding: 0 3px;
-      }
-    }
-
-    &--md {
-      width: 10px;
-      height: 10px;
-      font-size: 10px;
-
-      &.sd-indicator-badge--with-label {
-        width: auto;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 4px;
-      }
-    }
-
-    &--lg {
-      width: 14px;
-      height: 14px;
-      font-size: 11px;
-
-      &.sd-indicator-badge--with-label {
-        width: auto;
-        min-width: 22px;
-        height: 22px;
-        padding: 0 6px;
-      }
-    }
-
-    // Color Variants
-    &--violet {
-      background: #a855f7;
-      color: #ffffff;
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
-    }
-
-    &--emerald {
-      background: #10b981;
-      color: #ffffff;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
-    }
-
-    &--rose {
-      background: #f43f5e;
-      color: #ffffff;
-      box-shadow: 0 0 10px rgba(244, 63, 94, 0.6);
-    }
-
-    &--amber {
-      background: #f59e0b;
-      color: #000000;
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
-    }
-
-    &--cyan {
-      background: #06b6d4;
-      color: #000000;
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
-    }
-  }
-
-  .sd-indicator-text {
-    line-height: 1;
-  }
-
-  .sd-indicator-pulse {
-    position: absolute;
-    inset: -2px;
-    border-radius: 9999px;
-    background: inherit;
-    opacity: 0.8;
-    animation: sd-indicator-radar 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-    pointer-events: none;
-    z-index: -1;
-  }
+.sd-indicator {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
 }
 
-@keyframes sd-indicator-radar {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
+.sd-indicator-badge {
+  --sd-indicator-bg: var(--sd-accent);
+  --sd-indicator-fg: var(--sd-accent-fg);
+  position: absolute;
+  z-index: 1; // local stacking above the wrapped content
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: var(--sd-indicator-bg);
+  color: var(--sd-indicator-fg);
+  // The ring cuts the mark out of whatever it overlaps; override per surface.
+  border: 2px solid var(--sd-indicator-ring, var(--sd-surface-1));
+  border-radius: var(--sd-radius-full);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+
+  // Corner positions (centred on the vertex)
+  &--top-end { top: 0; right: 0; transform: translate(50%, -50%); }
+  &--top-start { top: 0; left: 0; transform: translate(-50%, -50%); }
+  &--bottom-end { bottom: 0; right: 0; transform: translate(50%, 50%); }
+  &--bottom-start { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+
+  // Sizes
+  &--sm {
+    width: 8px;
+    height: 8px;
+    font-size: var(--sd-text-2xs);
+
+    &.sd-indicator-badge--with-label {
+      width: auto;
+      min-width: 14px;
+      height: 14px;
+      padding: 0 3px;
+    }
   }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
+
+  &--md {
+    width: 10px;
+    height: 10px;
+    font-size: var(--sd-text-2xs);
+
+    &.sd-indicator-badge--with-label {
+      width: auto;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 var(--sd-space-1);
+    }
   }
+
+  &--lg {
+    width: 14px;
+    height: 14px;
+    font-size: var(--sd-text-2xs);
+
+    &.sd-indicator-badge--with-label {
+      width: auto;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+    }
+  }
+
+  // Palette names are public API; they map to the semantic tokens.
+  &--violet { --sd-indicator-bg: var(--sd-accent); --sd-indicator-fg: var(--sd-accent-fg); }
+  &--emerald { --sd-indicator-bg: var(--sd-success); --sd-indicator-fg: var(--sd-void); }
+  &--rose { --sd-indicator-bg: var(--sd-danger); --sd-indicator-fg: var(--sd-text); }
+  &--amber { --sd-indicator-bg: var(--sd-warning); --sd-indicator-fg: var(--sd-void); }
+  &--cyan { --sd-indicator-bg: var(--sd-info); --sd-indicator-fg: var(--sd-void); }
+}
+
+.sd-indicator-text {
+  line-height: 1;
+}
+
+.sd-indicator-pulse {
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  background: inherit;
+  border-radius: var(--sd-radius-full);
+  opacity: 0.8;
+  pointer-events: none;
+  @include sd-animate(sd-ping, 1.5s, cubic-bezier(0, 0, 0.2, 1), infinite);
+}
 }

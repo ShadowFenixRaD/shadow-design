@@ -38,7 +38,7 @@ impl CardVariant {
         match self {
             CardVariant::Default => "",
             CardVariant::Elevated => "sd-card--elevated",
-            CardVariant::Interactive => "sd-card--interactive",
+            CardVariant::Interactive => "", // actionability comes from onclick/href (sd-card--actionable)
             CardVariant::Metric => "sd-card--metric",
         }
     }
@@ -133,42 +133,23 @@ pub fn Card(
         rsx! {}
     };
 
+    let wants_glow = glow == Some(true) || (glow.is_none() && hover_glow);
+
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
-    #[cfg(feature = "theme")]
-    let radius_class = theme_val.radius_scale.md();
     #[cfg(feature = "theme")]
     let base_override = theme_val.resolve_component_base("card").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("card", &class);
     #[cfg(feature = "theme")]
-    let glow_class = match glow {
-        Some(true) => theme_val.resolve_elevation_class("card", Some(true)),
-        Some(false) => "".to_string(),
-        None => {
-            if hover_glow
-                || (theme_val.glow_mode != crate::theme::GlowMode::Off
-                    && variant == CardVariant::Interactive)
-            {
-                theme_val.resolve_elevation_class("card", None)
-            } else {
-                "".to_string()
-            }
-        }
-    };
+    let glow_class = theme_val.resolve_elevation_class("card", Some(wants_glow));
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
     #[cfg(not(feature = "theme"))]
-    let radius_class = "";
-    #[cfg(not(feature = "theme"))]
-    let glow_class = if hover_glow || glow == Some(true) {
-        "sd-card--hover-glow".to_string()
-    } else {
-        "".to_string()
-    };
+    let glow_class = if wants_glow { "sd-card--glow" } else { "" };
 
     let card_id_kd = card_id.clone();
     let handle_keydown = move |evt: KeyboardEvent| {
@@ -182,7 +163,7 @@ pub fn Card(
     rsx! {
         div {
             id: "{card_id}",
-            class: "sd-card {base_override} {variant_class} {actionable_class} {shadow_class} {radius_class} {glow_class} {overflow_class} {class_modifiers} {class}",
+            class: "sd-card {base_override} {variant_class} {actionable_class} {shadow_class} {glow_class} {overflow_class} {class_modifiers} {class}",
             role: if is_button { Some("button") } else { None },
             tabindex: if is_button { Some("0") } else { None },
             "aria-labelledby": if is_button && title.is_some() { Some(title_id.as_str()) } else { None },

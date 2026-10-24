@@ -1,235 +1,217 @@
 // ==============================================================================
-// Shadow Design — Component: Table & DataTable
+// Shadow Design — Table & DataTable (container, language.md §3.1)
 // ==============================================================================
-@use '../layers' as *;
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-table-container {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 8px;
-    background: $color-surface-1;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-sizing: border-box;
+.sd-table-container {
+  @include sd-surface(1);
+  @include sd-scrollbar;
+  width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
 
-    // Scrollbar sottile ultra-dark
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+.sd-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
+  font-size: var(--sd-text-md);
+  color: var(--sd-text);
+
+  // --- Alignment ---------------------------------------------------------
+  &--align-left { text-align: left; }
+  &--align-center { text-align: center; }
+  &--align-right { text-align: right; }
+
+  // --- Sticky header -----------------------------------------------------
+  &--sticky-header thead th {
+    position: sticky;
+    top: 0;
+    z-index: z('sticky');
   }
 
-  .sd-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-    color: $zinc-200;
-    box-sizing: border-box;
+  // --- Density -----------------------------------------------------------
+  &--compact {
+    font-size: var(--sd-text-sm);
 
-    // --- Allineamenti celle globali ---
-    &--align-left {
-      text-align: left;
-    }
-
-    &--align-center {
-      text-align: center;
-    }
-
-    &--align-right {
-      text-align: right;
-    }
-
-    // --- Sticky Header ---
-    &--sticky-header {
-      thead th {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
-    }
-
-    // --- Densità Compatta ---
-    &--compact {
-      font-size: 0.8125rem;
-
-      .sd-table-cell {
-        padding: 0.4rem 0.75rem;
-      }
-    }
-
-    // --- Righe Alternate (Striped) ---
-    &--striped {
-      tbody tr:nth-child(even) {
-        background: rgba(255, 255, 255, 0.02);
-      }
-    }
-
-    // --- Hover interattivo ---
-    &--hoverable {
-      tbody tr:hover {
-        background: rgba(168, 85, 247, 0.06);
-      }
-    }
-
-    // --- Bordi tra celle ---
-    &--bordered {
-      th, td {
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-    }
+    .sd-table-cell { padding: var(--sd-space-2) var(--sd-space-3); }
   }
 
-  // --- Intestazione TableHeader ---
-  .sd-table-header {
-    background: $color-surface-2;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-    th {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $zinc-400;
-      white-space: nowrap;
-    }
+  // --- Striped / bordered -------------------------------------------------
+  &--striped .sd-table-body .sd-table-row:nth-child(even) {
+    background-color: var(--sd-tint-1);
   }
 
-  // --- Corpo TableBody ---
-  .sd-table-body {
-    tr {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      transition: background 0.15s ease-in-out;
-
-      &:last-child {
-        border-bottom: none;
-      }
-    }
+  &--bordered {
+    th,
+    td { border: 1px solid var(--sd-border-subtle); }
   }
 
-  // --- Piè di pagina TableFooter ---
-  .sd-table-footer {
-    background: $color-surface-2;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  // --- Hover highlight (opt-out via `hoverable: false`) -------------------
+  &--hoverable .sd-table-body .sd-table-row:where(:hover) {
+    background-color: var(--sd-tint-2);
+  }
+}
+
+// --- Header ------------------------------------------------------------------
+.sd-table-header {
+  background-color: var(--sd-tint-1);
+  border-bottom: 1px solid var(--sd-border);
+
+  th {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
     font-weight: 600;
-    color: $zinc-300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--sd-text-muted);
   }
+}
 
-  // --- Singola Riga TableRow ---
+// --- Body --------------------------------------------------------------------
+.sd-table-body {
   .sd-table-row {
-    &--clickable {
-      cursor: pointer;
-    }
+    border-bottom: 1px solid var(--sd-border-subtle);
+    @include sd-transition(background-color, color);
 
-    &--selected {
-      background: rgba(168, 85, 247, 0.15) !important;
-      color: #ffffff;
+    &:last-child { border-bottom: none; }
+  }
+}
+
+// --- Footer ------------------------------------------------------------------
+.sd-table-footer {
+  background-color: var(--sd-tint-1);
+  border-top: 1px solid var(--sd-border);
+  font-weight: 600;
+  color: var(--sd-text-muted);
+}
+
+// --- Row ---------------------------------------------------------------------
+.sd-table-row {
+  &--clickable {
+    cursor: pointer;
+    @include sd-focus-ring(-2px);
+
+    &:active { background-color: var(--sd-tint-3); }
+  }
+}
+
+// Selected row: fill only (sd-selected row variant). Specificity sits above the
+// hover/striped rows so the selection is never overridden.
+.sd-table .sd-table-body .sd-table-row--selected {
+  @include sd-selected(row);
+}
+
+// --- Cell --------------------------------------------------------------------
+.sd-table-cell {
+  padding: var(--sd-space-3) var(--sd-space-4);
+  vertical-align: middle;
+  box-sizing: border-box;
+
+  &__inner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sd-space-2);
+  }
+
+  &--sortable {
+    cursor: pointer;
+    user-select: none;
+    @include sd-transition(color);
+    @include sd-focus-ring(-2px);
+
+    &:hover {
+      color: var(--sd-text);
+
+      .sd-table-cell__sort-icon { color: var(--sd-text); }
     }
   }
 
-  // --- Cella TableCell ---
-  .sd-table-cell {
-    padding: 0.75rem 1rem;
-    vertical-align: middle;
-    box-sizing: border-box;
-
-    &__inner {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-
-    &--sortable {
-      cursor: pointer;
-      user-select: none;
-
-      &:hover {
-        color: $violet-highlight;
-
-        .sd-table-cell__sort-icon {
-          color: $violet-highlight;
-        }
-      }
-    }
-
-    &__sort-icon {
-      display: inline-flex;
-      align-items: center;
-      font-size: 0.6875rem;
-      color: $zinc-500;
-      transition: color 0.15s ease-in-out;
-    }
-
-    &--sort-asc,
-    &--sort-desc {
-      color: #ffffff;
-
-      .sd-table-cell__sort-icon {
-        color: $violet-accent;
-        font-weight: bold;
-      }
-    }
-
-    // Allineamenti specifici della cella
-    &.sd-table--align-left {
-      text-align: left;
-    }
-
-    &.sd-table--align-center {
-      text-align: center;
-      .sd-table-cell__inner {
-        justify-content: center;
-      }
-    }
-
-    &.sd-table--align-right {
-      text-align: right;
-      .sd-table-cell__inner {
-        justify-content: flex-end;
-      }
-    }
+  &__sort-icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--sd-text-2xs);
+    color: var(--sd-text-subtle);
+    @include sd-transition(color);
   }
 
-  // --- Wrapper DataTable ---
-  .sd-data-table-wrapper {
-    position: relative;
-    width: 100%;
-    border-radius: 8px;
-    background: $color-surface-1;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    overflow: hidden;
+  &--sort-asc,
+  &--sort-desc {
+    color: var(--sd-text);
 
-    .sd-table-container {
-      border: none;
-      border-radius: 0;
-    }
-
-    // Overlay di caricamento con blur
-    .sd-data-table__loading-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(3, 3, 5, 0.7);
-      backdrop-filter: blur(2px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      z-index: 20;
-    }
-
-    .sd-data-table__loading-spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(168, 85, 247, 0.2);
-      border-top-color: $violet-accent;
-      border-radius: 9999px;
-      animation: sd-spin 0.8s linear infinite;
-    }
-
-    .sd-data-table__loading-text {
-      font-size: 0.8125rem;
-      font-family: $font-mono;
-      color: $zinc-400;
-    }
+    .sd-table-cell__sort-icon { color: var(--sd-accent-strong); }
   }
+
+  &__label { min-width: 0; }
+
+  &--sort-none .sd-table-cell__sort-icon { opacity: 0.6; }
+
+  &--empty {
+    padding: var(--sd-space-10) var(--sd-space-4);
+    text-align: center;
+  }
+
+  &.sd-table--align-left { text-align: left; }
+
+  &.sd-table--align-center {
+    text-align: center;
+
+    .sd-table-cell__inner { justify-content: center; }
+  }
+
+  &.sd-table--align-right {
+    text-align: right;
+
+    .sd-table-cell__inner { justify-content: flex-end; }
+  }
+}
+
+.sd-table__empty {
+  font-family: var(--sd-font-mono);
+  font-size: var(--sd-text-sm);
+  color: var(--sd-text-subtle);
+}
+
+// --- DataTable wrapper -----------------------------------------------------------
+.sd-data-table-wrapper {
+  @include sd-surface(1);
+  position: relative;
+  width: 100%;
+
+  .sd-table-container {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    --sd-shadow-specular: #{$sd-shadow-none};
+    --sd-shadow-elev: #{$sd-shadow-none};
+  }
+
+  .sd-loading-overlay-wrapper {
+    border-radius: inherit;
+  }
+}
+
+.sd-data-table__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sd-space-3);
+  flex-wrap: wrap;
+  padding: var(--sd-space-3) var(--sd-space-4);
+  border-top: 1px solid var(--sd-border-subtle);
+  background-color: var(--sd-tint-1);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  font-family: var(--sd-font-mono);
+  font-size: var(--sd-text-xs);
+  color: var(--sd-text-muted);
+}
+
+.sd-data-table__count {
+  font-weight: 600;
+  color: var(--sd-text);
+}
 }

@@ -1,16 +1,154 @@
 // ==============================================================================
-// Shadow Design — TransferList Component Styles
+// Shadow Design — TransferList (two containers, items, move controls)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-transfer-list {
-    width: 100%;
+.sd-transfer-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sd-space-4);
+  width: 100%;
+  font-family: var(--sd-font-sans);
 
-    &__column {
-      transition: border-color $duration-normal ease;
-    }
+  @include bp-up(md) { flex-direction: row; }
+
+  &__column {
+    @include sd-surface(1);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sd-space-3);
+    background-color: var(--sd-tint-1);
+    border-bottom: 1px solid var(--sd-border-subtle);
+  }
+
+  &__title {
+    font-size: var(--sd-text-md);
+    font-weight: 600;
+    color: var(--sd-text);
+  }
+
+  &__count {
+    padding: 2px var(--sd-space-2);
+    border-radius: var(--sd-radius-xs);
+    background-color: var(--sd-tint-2);
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--sd-text-muted);
+  }
+
+  &__search {
+    padding: var(--sd-space-2);
+    border-bottom: 1px solid var(--sd-border-subtle);
+  }
+
+  &__field {
+    @include sd-field(sm);
+    display: flex;
+    align-items: center;
+    padding-inline: var(--sd-space-3);
+  }
+
+  &__input {
+    @include sd-field-bare;
+    width: 100%;
+    font-size: var(--sd-text-sm);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-1);
+    padding: var(--sd-space-2);
+    overflow-y: auto;
+    @include sd-scrollbar;
+  }
+
+  &__empty {
+    padding: var(--sd-space-6);
+    text-align: center;
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+  }
+
+  &__item {
+    @include sd-item(lg);
+    @include sd-selected(row);
+  }
+
+  &__check {
+    @include sd-shadow;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--sd-icon-md);
+    height: var(--sd-icon-md);
+    border: 1px solid var(--sd-border-strong);
+    border-radius: var(--sd-radius-xs);
+    background-color: var(--sd-well);
+    color: var(--sd-accent-fg);
+    @include sd-transition;
+  }
+
+  &__item--selected &__check {
+    background-color: var(--sd-accent);
+    border-color: var(--sd-accent-border);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: var(--sd-text-sm);
+    @include text-truncate;
+  }
+
+  &__desc {
+    font-size: var(--sd-text-xs);
+    font-weight: 400;
+    color: var(--sd-text-subtle);
+    @include text-truncate;
+  }
+
+  &__controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sd-space-2);
+    flex-shrink: 0;
+
+    @include bp-up(md) { flex-direction: column; }
+  }
+
+  &__move {
+    @include sd-lit-fill(secondary);
+    @include sd-press;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sd-control-sm);
+    height: var(--sd-control-sm);
+    padding: 0;
+    border-radius: var(--sd-radius-md);
+  }
+}
 }

@@ -134,7 +134,7 @@ fn test_card_shadows_and_variants() {
 
     assert_eq!(CardVariant::Default.scss_class(), "");
     assert_eq!(CardVariant::Elevated.scss_class(), "sd-card--elevated");
-    assert_eq!(CardVariant::Interactive.scss_class(), "sd-card--interactive");
+    assert_eq!(CardVariant::Interactive.scss_class(), "");
     assert_eq!(CardVariant::Metric.scss_class(), "sd-card--metric");
 }
 

@@ -39,7 +39,7 @@ pub fn Spoiler(
     let mut is_expanded_sig = expanded.unwrap_or(fallback_expanded);
     let is_expanded = *is_expanded_sig.read();
 
-    let content_id = crate::a11y::use_unique_id("sd-spoiler-content", None);
+    let content_id = crate::a11y::use_unique_id("spoiler-content", None);
     let mut is_overflowing = use_signal(|| true);
 
     let content_id_effect = content_id.clone();

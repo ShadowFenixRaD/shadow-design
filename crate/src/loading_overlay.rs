@@ -34,7 +34,7 @@ pub fn LoadingOverlay(
                     "aria-busy": "true",
                     "aria-live": "polite",
                     div { class: "sd-loading-overlay-content",
-                        div { class: "sd-loading-spinner animate-spin text-purple-400",
+                        div { class: "sd-loading-spinner",
                             Icon { kind: IconKind::Spinner, size: loader_size }
                         }
                         if let Some(desc) = description {

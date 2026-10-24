@@ -79,7 +79,7 @@ pub fn ProgressBar(
     };
 
     let bar_width = if indeterminate {
-        "100%".to_string()
+        "40%".to_string()
     } else {
         format!("{:.1}%", clamped_val)
     };

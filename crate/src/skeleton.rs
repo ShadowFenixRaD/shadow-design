@@ -39,15 +39,11 @@ pub fn Skeleton(
     let base_override = theme_val.resolve_component_base("skeleton").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("skeleton", &class);
-    #[cfg(feature = "theme")]
-    let radius = if shape == SkeletonShape::Circle { "" } else { theme_val.radius_scale.sm() };
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let radius = "";
 
     let custom_style = match (&width, &height) {
         (Some(w), Some(h)) => format!("width: {w}; height: {h};"),
@@ -72,7 +68,7 @@ pub fn Skeleton(
                         rsx! {
                             div {
                                 key: "{idx}",
-                                class: "sd-skeleton {shape_class} {anim_class} {radius} {base_override} {class_modifiers}",
+                                class: "sd-skeleton {shape_class} {anim_class} {base_override} {class_modifiers}",
                                 style: "{line_style}",
                                 aria_hidden: "true",
                             }
@@ -84,7 +80,7 @@ pub fn Skeleton(
     } else {
         rsx! {
             div {
-                class: "sd-skeleton {shape_class} {anim_class} {radius} {base_override} {class_modifiers} {class}",
+                class: "sd-skeleton {shape_class} {anim_class} {base_override} {class_modifiers} {class}",
                 style: "{custom_style}",
                 aria_hidden: "true",
             }

@@ -43,7 +43,7 @@ pub fn VirtualList(
     rsx! {
         div {
             class: "sd-virtual-list {class}",
-            style: "height: {height}px; overflow-y: auto; position: relative;",
+            style: "height: {height}px;",
             onscroll: move |e| {
                 let top = (e.data().scroll_top().max(0.0)) as u32;
                 scroll_top.set(top);
@@ -52,13 +52,13 @@ pub fn VirtualList(
             // Elemento fantasma che simula l'intera altezza dello scorrimento
             div {
                 class: "sd-virtual-list-spacer",
-                style: "height: {total_height}px; width: 100%; pointer-events: none;",
+                style: "height: {total_height}px;",
             }
 
             // Slice renderizzata traslata alla posizione corrente
             div {
                 class: "sd-virtual-list-content",
-                style: "transform: translateY({offset_y}px); position: absolute; top: 0; left: 0; right: 0;",
+                style: "transform: translateY({offset_y}px);",
                 for idx in render_start..render_end {
                     div {
                         key: "{idx}",

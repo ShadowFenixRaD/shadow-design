@@ -100,7 +100,6 @@ pub fn Indicator(
     let col_class = color.class_name();
     let sz_class = size.class_name();
     let with_label_class = if label.is_some() { "sd-indicator-badge--with-label" } else { "" };
-    let processing_class = if processing { "sd-indicator-badge--processing" } else { "" };
 
     let offset_style = if let Some(off) = offset {
         match position {
@@ -118,7 +117,7 @@ pub fn Indicator(
             {children}
             if !disabled {
                 div {
-                    class: "sd-indicator-badge {pos_class} {col_class} {sz_class} {with_label_class} {processing_class}",
+                    class: "sd-indicator-badge {pos_class} {col_class} {sz_class} {with_label_class}",
                     style: "{offset_style}",
                     if let Some(ref l) = label {
                         span { class: "sd-indicator-text", "{l}" }

@@ -149,11 +149,14 @@ pub fn TableRow(
     children: Element,
 ) -> Element {
     let sel_class = if selected { "sd-table-row--selected" } else { "" };
-    let clickable_class = if onclick.is_some() { "sd-table-row--clickable" } else { "" };
+    let is_clickable = onclick.is_some();
+    let clickable_class = if is_clickable { "sd-table-row--clickable" } else { "" };
 
     rsx! {
         tr {
             class: "sd-table-row {sel_class} {clickable_class} {class}",
+            tabindex: if is_clickable { Some("0") } else { None },
+            "aria-selected": if selected { Some("true") } else { None },
             onclick: move |e| {
                 if let Some(h) = &onclick {
                     h.call(e);
@@ -177,6 +180,8 @@ pub fn TableCell(
     children: Element,
 ) -> Element {
     let align_class = align.scss_class();
+    let sortable = on_sort.is_some();
+    let on_sort_kd = on_sort;
     let sortable_class = if on_sort.is_some() { "sd-table-cell--sortable" } else { "" };
     let sort_dir_class = sort_direction.map(|d| d.scss_class()).unwrap_or("");
 
@@ -196,9 +201,18 @@ pub fn TableCell(
                 style: style,
                 colspan: cs_attr.as_deref(),
                 aria_sort: aria_sort,
+                tabindex: if sortable { Some("0") } else { None },
                 onclick: move |_| {
                     if let Some(h) = &on_sort {
                         h.call(());
+                    }
+                },
+                onkeydown: move |e: KeyboardEvent| {
+                    if e.key() == Key::Enter || e.key() == Key::Character(" ".to_string()) {
+                        e.prevent_default();
+                        if let Some(h) = &on_sort_kd {
+                            h.call(());
+                        }
                     }
                 },
                 div {
@@ -421,14 +435,9 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
 
     rsx! {
         div { class: "sd-data-table-wrapper {class}",
-            if loading {
-                div {
-                    class: "sd-data-table__loading-overlay",
-                    div { class: "sd-data-table__loading-spinner" }
-                    span { class: "sd-data-table__loading-text", "{locale.table_loading}" }
-                }
-            }
-
+            crate::loading_overlay::LoadingOverlay {
+                visible: loading,
+                description: Some(locale.table_loading.clone()),
             Table {
                 striped: striped,
                 bordered: bordered,
@@ -506,12 +515,12 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                     if display_items.is_empty() {
                         TableRow {
                             TableCell {
-                                class: "sd-table-cell--empty text-center py-10",
+                                class: "sd-table-cell--empty",
                                 col_span: Some(columns.len()),
                                 if let Some(empty) = empty_state {
                                     {empty}
                                 } else {
-                                    div { class: "text-zinc-500 py-6 text-sm font-mono", "{locale.table_empty}" }
+                                    div { class: "sd-table__empty", "{locale.table_empty}" }
                                 }
                             }
                         }
@@ -549,56 +558,23 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                 }
             }
 
-            // Barra di paginazione se page è fornito
-            if let Some(mut p_sig) = page {
-                div { class: "sd-data-table__pagination flex items-center justify-between px-4 py-3 border-t border-white/[0.08] text-xs text-zinc-400 font-mono",
+            }
+
+            // Paginazione (componente della libreria) se `page` è fornito
+            if let Some(p_sig) = page {
+                div { class: "sd-data-table__pagination",
                     div {
                         "{locale.table_items}: "
-                        span { class: "text-zinc-200 font-semibold", "{total}" }
+                        span { class: "sd-data-table__count", "{total}" }
                         " • {locale.table_page} "
-                        span { class: "text-zinc-200 font-semibold", "{current_page}" }
+                        span { class: "sd-data-table__count", "{current_page}" }
                         " {locale.table_of} "
-                        span { class: "text-zinc-200 font-semibold", "{total_pages}" }
+                        span { class: "sd-data-table__count", "{total_pages}" }
                     }
-                    div { class: "flex items-center gap-1.5",
-                        button {
-                            class: "px-2.5 py-1 rounded border border-white/[0.08] bg-zinc-900 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 transition-colors",
-                            disabled: current_page <= 1,
-                            onclick: move |_| {
-                                if current_page > 1 {
-                                    p_sig.set(current_page - 1);
-                                }
-                            },
-                            "{locale.table_prev}"
-                        }
-                        for p_num in 1..=total_pages {
-                            {
-                                let is_curr = p_num == current_page;
-                                rsx! {
-                                    button {
-                                        key: "{p_num}",
-                                        class: format!("px-2.5 py-1 rounded border text-xs transition-colors {}",
-                                            if is_curr {
-                                                "border-purple-500/50 bg-purple-950/60 text-purple-200 font-semibold"
-                                            } else {
-                                                "border-white/[0.08] bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
-                                            }),
-                                        onclick: move |_| p_sig.set(p_num),
-                                        "{p_num}"
-                                    }
-                                }
-                            }
-                        }
-                        button {
-                            class: "px-2.5 py-1 rounded border border-white/[0.08] bg-zinc-900 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 transition-colors",
-                            disabled: current_page >= total_pages,
-                            onclick: move |_| {
-                                if current_page < total_pages {
-                                    p_sig.set(current_page + 1);
-                                }
-                            },
-                            "{locale.table_next}"
-                        }
+                    crate::pagination::Pagination {
+                        page: p_sig,
+                        total: total_pages,
+                        size: crate::a11y::ControlSize::Sm,
                     }
                 }
             }

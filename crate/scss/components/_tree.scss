@@ -1,128 +1,106 @@
 // ==============================================================================
-// Shadow Design — TreeView & TreeNode Styles
+// Shadow Design — TreeView & TreeNode (container + items, selected rail)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-tree-view {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    background-color: $color-surface-1;
-    border: $border-hairline;
-    border-radius: $radius-md;
-    padding: 8px;
-    user-select: none;
-    @include specular-top(0.04);
-  }
+.sd-tree-view {
+  @include sd-surface(1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--sd-space-2);
+  box-sizing: border-box;
+  font-family: var(--sd-font-sans);
+  user-select: none;
+}
 
-  .sd-tree-node-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
+.sd-tree-node-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-  .sd-tree-node {
-    display: flex;
+.sd-tree-node {
+  @include sd-item(md);
+
+  &--selected { @include sd-selected(rail); }
+
+  &__toggle {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: $radius-sm;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--sd-icon-lg);
+    height: var(--sd-icon-lg);
+    padding: 0;
+    border: none;
+    border-radius: var(--sd-radius-xs);
+    background: transparent;
+    color: var(--sd-text-muted);
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: background-color $duration-fast ease, border-color $duration-fast ease;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.04);
-    }
-
-    &--selected {
-      background-color: rgba(59, 7, 100, 0.45);
-      border-color: rgba(168, 85, 247, 0.4);
-      box-shadow: 0 0 14px rgba(107, 33, 168, 0.28);
-
-      .sd-tree-node__label {
-        color: #ffffff;
-        font-weight: 600;
-      }
-    }
-
-    &__toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      border: none;
-      background: transparent;
-      color: $zinc-400;
-      cursor: pointer;
-      padding: 0;
-      border-radius: $radius-xs;
-      transition: color $duration-fast ease;
-
-      &:hover {
-        color: #ffffff;
-        background-color: rgba(255, 255, 255, 0.08);
-      }
-    }
-
-    &__chevron {
-      transition: transform $duration-fast ease;
-
-      &--open {
-        transform: rotate(90deg);
-      }
-    }
-
-    &__toggle-spacer {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-
-    &__icon {
-      color: #c084fc;
-      flex-shrink: 0;
-    }
-
-    &__content {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    &__label {
-      font-size: 13px;
-      color: $zinc-200;
-      font-family: $font-sans;
-    }
-
-    &__sublabel {
-      font-size: 11px;
-      color: $zinc-400;
-      font-family: $font-mono;
-    }
-
-    &__badge {
-      font-size: 10px;
-      font-family: $font-mono;
-      color: #a855f7;
-      background-color: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      border-radius: 4px;
-      padding: 1px 6px;
-    }
-
-    &__children {
-      position: relative;
-      margin-left: 9px;
-      padding-left: 9px;
-      border-left: 1px dashed rgba(255, 255, 255, 0.12);
+    @include sd-transition;
+    @include sd-focus-ring(-2px);
+    @include sd-press;
+    @include sd-hover {
+      color: var(--sd-text);
+      background-color: var(--sd-tint-2);
     }
   }
+
+  &__chevron {
+    @include sd-transition(transform);
+
+    &--open { transform: rotate(90deg); }
+  }
+
+  &__toggle-spacer {
+    display: inline-block;
+    flex-shrink: 0;
+    width: var(--sd-icon-lg);
+    height: var(--sd-icon-lg);
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    color: var(--sd-text-muted);
+  }
+
+  &__content {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sd-space-2);
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: inherit;
+    color: inherit;
+    @include text-truncate;
+  }
+
+  &__sublabel {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
+    font-weight: 400;
+    color: var(--sd-text-subtle);
+  }
+
+  &__badge {
+    @include sd-semantic(accent);
+    padding: 1px var(--sd-space-2);
+    border-radius: var(--sd-radius-xs);
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
+    color: var(--sd-sem-strong);
+  }
+
+  &__children {
+    position: relative;
+    margin-left: var(--sd-space-3);
+    padding-left: var(--sd-space-2);
+    border-left: 1px dashed var(--sd-border);
+  }
+}
 }

@@ -44,7 +44,7 @@ pub fn TransferList(
     mut source: Signal<Vec<TransferItem>>,
     mut target: Signal<Vec<TransferItem>>,
     #[props(default = true)] searchable: bool,
-    #[props(default = ("Origine".to_string(), "Destinazione".to_string()))] titles: (String, String),
+    #[props(default = ("Source".to_string(), "Target".to_string()))] titles: (String, String),
     #[props(default = "320px".to_string())] height: String,
     #[props(default)] on_change: Option<EventHandler<(Vec<TransferItem>, Vec<TransferItem>)>>,
     #[props(default)] class: String,
@@ -52,8 +52,8 @@ pub fn TransferList(
     let locale = crate::locale::use_locale();
     let mut selected_source = use_signal(BTreeSet::<String>::new);
     let mut selected_target = use_signal(BTreeSet::<String>::new);
-    let mut search_source = use_signal(String::new);
-    let mut search_target = use_signal(String::new);
+    let search_source = use_signal(String::new);
+    let search_target = use_signal(String::new);
 
     // Sposta selezionati da source a target
     let move_selected_to_target = move |_| {
@@ -158,197 +158,186 @@ pub fn TransferList(
             .collect()
     };
 
+    let toggle_source = Callback::new(move |id: String| {
+        let mut set = selected_source();
+        if !set.remove(&id) {
+            set.insert(id);
+        }
+        selected_source.set(set);
+    });
+    let toggle_target = Callback::new(move |id: String| {
+        let mut set = selected_target();
+        if !set.remove(&id) {
+            set.insert(id);
+        }
+        selected_target.set(set);
+    });
+
+    let source_total = source().len();
+    let target_total = target().len();
+    let source_selected = selected_source().clone();
+    let target_selected = selected_target().clone();
+    let source_selected_len = source_selected.len();
+    let target_selected_len = target_selected.len();
+
     rsx! {
-        div { class: "sd-transfer-list flex flex-col md:flex-row items-center gap-4 w-full {class}",
-            // Colonna Sorgente
-            div { class: "sd-transfer-list__column flex-1 w-full flex flex-col rounded-xl border border-white/[0.12] bg-zinc-950/70 overflow-hidden shadow-lg",
-                // Intestazione colonna
-                div { class: "p-3 bg-white/[0.03] border-b border-white/[0.08] flex items-center justify-between",
-                    span { class: "text-sm font-semibold text-white", "{titles.0}" }
-                    span { class: "text-xs font-mono text-zinc-400 px-2 py-0.5 rounded bg-white/[0.05]",
-                        "{selected_source().len()} / {source().len()}"
-                    }
-                }
-
-                if searchable {
-                    div { class: "p-2 border-b border-white/[0.06]",
-                        input {
-                            r#type: "text",
-                            class: "w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/[0.10] text-xs text-white placeholder-zinc-500 outline-none focus:border-purple-500",
-                            placeholder: "{locale.transfer_search}",
-                            value: "{search_source}",
-                            oninput: move |e| search_source.set(e.value()),
-                        }
-                    }
-                }
-
-                div {
-                    class: "p-2 overflow-y-auto flex flex-col gap-1",
-                    style: "height: {height};",
-                    if filtered_source.is_empty() {
-                        div { class: "p-6 text-center text-xs text-zinc-500 font-mono",
-                            "{locale.transfer_empty_source}"
-                        }
-                    } else {
-                        for item in filtered_source {
-                            {
-                                let id = item.id.clone();
-                                let is_selected = selected_source().contains(&id);
-                                let disabled = item.disabled;
-                                let item_cls = if is_selected {
-                                    "bg-purple-950/40 border-purple-500/40 text-purple-200"
-                                } else {
-                                    "hover:bg-white/[0.04] border-transparent text-zinc-300"
-                                };
-                                let dis_cls = if disabled { "opacity-40 cursor-not-allowed" } else { "" };
-
-                                let chk_cls = if is_selected {
-                                    "bg-purple-600 border-purple-500 text-white shadow-sm"
-                                } else {
-                                    "border-white/20 bg-white/[0.04] text-transparent"
-                                };
-
-                                rsx! {
-                                    div {
-                                        key: "{id}",
-                                        class: "flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors border {item_cls} {dis_cls}",
-                                        onclick: move |_| {
-                                            if !disabled {
-                                                let mut set = selected_source();
-                                                if set.contains(&id) {
-                                                    set.remove(&id);
-                                                } else {
-                                                    set.insert(id.clone());
-                                                }
-                                                selected_source.set(set);
-                                            }
-                                        },
-                                        div { class: "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-all {chk_cls}",
-                                            if is_selected {
-                                                Icon { kind: IconKind::Check, size: 12 }
-                                            }
-                                        }
-                                        div { class: "flex flex-col min-w-0 flex-1",
-                                            span { class: "text-xs font-medium truncate", "{item.label}" }
-                                            if let Some(desc) = &item.description {
-                                                span { class: "text-[11px] text-zinc-400 truncate", "{desc}" }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        div { class: "sd-transfer-list {class}",
+            TransferColumn {
+                title: titles.0.clone(),
+                total: source_total,
+                selected_count: source_selected_len,
+                items: filtered_source,
+                selected: source_selected,
+                search: search_source,
+                searchable,
+                height: height.clone(),
+                empty_text: locale.transfer_empty_source.clone(),
+                search_placeholder: locale.transfer_search.clone(),
+                on_toggle: toggle_source,
             }
 
-            // Pulsanti Centrali di Controllo
-            div { class: "flex md:flex-col items-center justify-center gap-2 shrink-0",
+            div { class: "sd-transfer-list__controls",
                 button {
                     r#type: "button",
                     title: "{locale.transfer_move_all_right}",
-                    class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm",
+                    "aria-label": "{locale.transfer_move_all_right}",
+                    class: "sd-transfer-list__move",
                     onclick: move_all_to_target,
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
                 button {
                     r#type: "button",
                     title: "{locale.transfer_move_selected_right}",
-                    disabled: selected_source().is_empty(),
-                    class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed",
+                    "aria-label": "{locale.transfer_move_selected_right}",
+                    disabled: source_selected_len == 0,
+                    class: "sd-transfer-list__move",
                     onclick: move_selected_to_target,
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
                 button {
                     r#type: "button",
                     title: "{locale.transfer_move_selected_left}",
-                    disabled: selected_target().is_empty(),
-                    class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed",
+                    "aria-label": "{locale.transfer_move_selected_left}",
+                    disabled: target_selected_len == 0,
+                    class: "sd-transfer-list__move",
                     onclick: move_selected_to_source,
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
                 }
                 button {
                     r#type: "button",
                     title: "{locale.transfer_move_all_left}",
-                    class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm",
+                    "aria-label": "{locale.transfer_move_all_left}",
+                    class: "sd-transfer-list__move",
                     onclick: move_all_to_source,
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
                 }
             }
 
-            // Colonna Destinazione
-            div { class: "sd-transfer-list__column flex-1 w-full flex flex-col rounded-xl border border-white/[0.12] bg-zinc-950/70 overflow-hidden shadow-lg",
-                // Intestazione colonna
-                div { class: "p-3 bg-white/[0.03] border-b border-white/[0.08] flex items-center justify-between",
-                    span { class: "text-sm font-semibold text-white", "{titles.1}" }
-                    span { class: "text-xs font-mono text-zinc-400 px-2 py-0.5 rounded bg-white/[0.05]",
-                        "{selected_target().len()} / {target().len()}"
-                    }
-                }
+            TransferColumn {
+                title: titles.1.clone(),
+                total: target_total,
+                selected_count: target_selected_len,
+                items: filtered_target,
+                selected: target_selected,
+                search: search_target,
+                searchable,
+                height: height.clone(),
+                empty_text: locale.transfer_empty_target.clone(),
+                search_placeholder: locale.transfer_search.clone(),
+                on_toggle: toggle_target,
+            }
+        }
+    }
+}
 
-                if searchable {
-                    div { class: "p-2 border-b border-white/[0.06]",
+/// One column of the transfer list: header, optional search field and the item list.
+#[component]
+fn TransferColumn(
+    title: String,
+    total: usize,
+    selected_count: usize,
+    items: Vec<TransferItem>,
+    selected: BTreeSet<String>,
+    mut search: Signal<String>,
+    searchable: bool,
+    height: String,
+    empty_text: String,
+    search_placeholder: String,
+    on_toggle: Callback<String>,
+) -> Element {
+    rsx! {
+        div { class: "sd-transfer-list__column",
+            div { class: "sd-transfer-list__header",
+                span { class: "sd-transfer-list__title", "{title}" }
+                span { class: "sd-transfer-list__count", "{selected_count} / {total}" }
+            }
+
+            if searchable {
+                div { class: "sd-transfer-list__search",
+                    div { class: "sd-transfer-list__field",
                         input {
                             r#type: "text",
-                            class: "w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/[0.10] text-xs text-white placeholder-zinc-500 outline-none focus:border-purple-500",
-                            placeholder: "{locale.transfer_search}",
-                            value: "{search_target}",
-                            oninput: move |e| search_target.set(e.value()),
+                            class: "sd-transfer-list__input",
+                            placeholder: "{search_placeholder}",
+                            "aria-label": "{search_placeholder}",
+                            value: "{search}",
+                            oninput: move |e| search.set(e.value()),
                         }
                     }
                 }
+            }
 
-                div {
-                    class: "p-2 overflow-y-auto flex flex-col gap-1",
-                    style: "height: {height};",
-                    if filtered_target.is_empty() {
-                        div { class: "p-6 text-center text-xs text-zinc-500 font-mono",
-                            "{locale.transfer_empty_target}"
-                        }
-                    } else {
-                        for item in filtered_target {
-                            {
-                                let id = item.id.clone();
-                                let is_selected = selected_target().contains(&id);
-                                let disabled = item.disabled;
-                                let item_cls = if is_selected {
-                                    "bg-purple-950/40 border-purple-500/40 text-purple-200"
-                                } else {
-                                    "hover:bg-white/[0.04] border-transparent text-zinc-300"
-                                };
-                                let dis_cls = if disabled { "opacity-40 cursor-not-allowed" } else { "" };
+            div {
+                class: "sd-transfer-list__body",
+                role: "listbox",
+                "aria-multiselectable": "true",
+                style: "height: {height};",
+                if items.is_empty() {
+                    div { class: "sd-transfer-list__empty", "{empty_text}" }
+                } else {
+                    for item in items {
+                        {
+                            let id = item.id.clone();
+                            let id_key = item.id.clone();
+                            let is_selected = selected.contains(&id);
+                            let disabled = item.disabled;
+                            let item_class = if is_selected {
+                                "sd-transfer-list__item sd-transfer-list__item--selected"
+                            } else {
+                                "sd-transfer-list__item"
+                            };
 
-                                let chk_cls = if is_selected {
-                                    "bg-purple-600 border-purple-500 text-white shadow-sm"
-                                } else {
-                                    "border-white/20 bg-white/[0.04] text-transparent"
-                                };
-
-                                rsx! {
-                                    div {
-                                        key: "{id}",
-                                        class: "flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors border {item_cls} {dis_cls}",
-                                        onclick: move |_| {
-                                            if !disabled {
-                                                let mut set = selected_target();
-                                                if set.contains(&id) {
-                                                    set.remove(&id);
-                                                } else {
-                                                    set.insert(id.clone());
-                                                }
-                                                selected_target.set(set);
-                                            }
-                                        },
-                                        div { class: "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-all {chk_cls}",
-                                            if is_selected {
-                                                Icon { kind: IconKind::Check, size: 12 }
-                                            }
+                            rsx! {
+                                div {
+                                    key: "{id}",
+                                    class: "{item_class}",
+                                    role: "option",
+                                    tabindex: if disabled { "-1" } else { "0" },
+                                    "aria-selected": if is_selected { "true" } else { "false" },
+                                    "aria-disabled": if disabled { "true" } else { "false" },
+                                    onclick: move |_| {
+                                        if !disabled {
+                                            on_toggle.call(id.clone());
                                         }
-                                        div { class: "flex flex-col min-w-0 flex-1",
-                                            span { class: "text-xs font-medium truncate", "{item.label}" }
-                                            if let Some(desc) = &item.description {
-                                                span { class: "text-[11px] text-zinc-400 truncate", "{desc}" }
-                                            }
+                                    },
+                                    onkeydown: move |evt: KeyboardEvent| {
+                                        if !disabled
+                                            && (evt.key() == Key::Enter
+                                                || evt.key() == Key::Character(" ".to_string()))
+                                        {
+                                            evt.prevent_default();
+                                            on_toggle.call(id_key.clone());
+                                        }
+                                    },
+                                    span { class: "sd-transfer-list__check", "aria-hidden": "true",
+                                        if is_selected {
+                                            Icon { kind: IconKind::Check, size: 12 }
+                                        }
+                                    }
+                                    span { class: "sd-transfer-list__text",
+                                        span { class: "sd-transfer-list__label", "{item.label}" }
+                                        if let Some(desc) = &item.description {
+                                            span { class: "sd-transfer-list__desc", "{desc}" }
                                         }
                                     }
                                 }

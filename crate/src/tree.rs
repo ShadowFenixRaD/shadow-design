@@ -79,7 +79,6 @@ fn TreeNodeRow(
         .unwrap_or(false);
 
     let selected_class = if is_selected { "sd-tree-node--selected" } else { "" };
-    let indent_px = level * 18;
 
     let aria_expanded = if has_children {
         Some(if is_expanded() { "true" } else { "false" })
@@ -96,7 +95,21 @@ fn TreeNodeRow(
 
                 div {
                     class: "sd-tree-node {selected_class}",
-                    style: "padding-left: {indent_px}px;",
+                    tabindex: "0",
+                    onkeydown: {
+                        let id_key = node.id.clone();
+                        move |evt: KeyboardEvent| {
+                            if evt.key() == Key::Enter || evt.key() == Key::Character(" ".to_string()) {
+                                evt.prevent_default();
+                                if let Some(mut sig) = selected_id {
+                                    *sig.write() = Some(id_key.clone());
+                                }
+                                if let Some(handler) = &on_select {
+                                    handler.call(id_key.clone());
+                                }
+                            }
+                        }
+                    },
                 onclick: {
                     let id_click = node.id.clone();
                     move |_| {
@@ -191,19 +204,15 @@ pub fn TreeView(
     let base_override = theme_val.resolve_component_base("tree_view").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("tree_view", &class);
-    #[cfg(feature = "theme")]
-    let radius = theme_val.radius_scale.sm();
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let radius = "";
 
     rsx! {
         div {
-            class: "sd-tree-view {radius} {base_override} {class_modifiers} {class}",
+            class: "sd-tree-view {base_override} {class_modifiers} {class}",
             role: "tree",
 
             for node in nodes {
