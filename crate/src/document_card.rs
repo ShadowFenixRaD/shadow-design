@@ -19,6 +19,7 @@ pub fn DocumentCard(
     #[props(default)] on_click: Option<EventHandler<MouseEvent>>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let ftype = file_type.to_uppercase();
 
     // Stile cromatico badge per estensione/tipo di file
@@ -75,7 +76,7 @@ pub fn DocumentCard(
                             button {
                                 r#type: "button",
                                 class: "sd-doc-card__action-btn",
-                                title: "Download",
+                                title: "{locale.download}",
                                 onclick: move |evt| d_h.call(evt),
                                 Icon { kind: IconKind::Download, size: 14 }
                             }
@@ -84,7 +85,7 @@ pub fn DocumentCard(
                             button {
                                 r#type: "button",
                                 class: "sd-doc-card__action-btn",
-                                title: "Condividi",
+                                title: "{locale.share}",
                                 onclick: move |evt| s_h.call(evt),
                                 Icon { kind: IconKind::Share2, size: 14 }
                             }
@@ -93,7 +94,7 @@ pub fn DocumentCard(
                             button {
                                 r#type: "button",
                                 class: "sd-doc-card__action-btn sd-doc-card__action-btn--delete",
-                                title: "Elimina",
+                                title: "{locale.delete}",
                                 onclick: move |evt| del_h.call(evt),
                                 Icon { kind: IconKind::Trash2, size: 14 }
                             }

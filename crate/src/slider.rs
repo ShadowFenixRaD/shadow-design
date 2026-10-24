@@ -209,6 +209,7 @@ pub fn RangeSlider(
     #[props(default)] class: String,
     #[props(default)] on_change: Option<EventHandler<(f64, f64)>>,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let slider_id = crate::a11y::use_unique_id("sd-range-slider", id);
     let mut is_hovered = use_signal(|| false);
 
@@ -297,7 +298,7 @@ pub fn RangeSlider(
                     max: "{max}",
                     step: "{step}",
                     value: "{val_min}",
-                    "aria-label": label.as_deref().map(|l| format!("{l} (Min)")).unwrap_or_else(|| "Minimo".to_string()),
+                    "aria-label": label.as_deref().map(|l| format!("{l} (Min)")).unwrap_or_else(|| locale.slider_min.clone()),
                     "aria-valuemin": "{min}",
                     "aria-valuemax": "{val_max}",
                     "aria-valuenow": "{val_min}",
@@ -316,7 +317,7 @@ pub fn RangeSlider(
                     max: "{max}",
                     step: "{step}",
                     value: "{val_max}",
-                    "aria-label": label.as_deref().map(|l| format!("{l} (Max)")).unwrap_or_else(|| "Massimo".to_string()),
+                    "aria-label": label.as_deref().map(|l| format!("{l} (Max)")).unwrap_or_else(|| locale.slider_max.clone()),
                     "aria-valuemin": "{val_min}",
                     "aria-valuemax": "{max}",
                     "aria-valuenow": "{val_max}",

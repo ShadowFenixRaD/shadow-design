@@ -23,6 +23,7 @@ pub struct AppShellAsideProps {
 /// Pannello laterale destro collassabile con z-index 25 per ispettori e chat.
 #[component]
 pub fn AppShellAside(props: AppShellAsideProps) -> Element {
+    let locale = crate::locale::use_locale();
     let ctx = try_use_context::<AppShellCtx>();
     let is_collapsed = props
         .collapsed
@@ -43,7 +44,7 @@ pub fn AppShellAside(props: AppShellAsideProps) -> Element {
     rsx! {
         aside {
             role: "complementary",
-            "aria-label": "Pannello secondario ausiliario",
+            "aria-label": "{locale.app_shell_aside_label}",
             "aria-hidden": if is_collapsed { "true" } else { "false" },
             inert: is_collapsed,
             class: "sd-app-shell__aside {border_class} {collapsed_class} {props.class}",

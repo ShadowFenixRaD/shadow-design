@@ -1732,7 +1732,7 @@ pub fn Combobox(
                                 r#type: "button",
                                 class: "sd-select-action-btn",
                                 tabindex: "-1",
-                                "aria-label": "Toggle suggestions",
+                                "aria-label": "{locale.toggle_suggestions}",
                                 "aria-expanded": "{open}",
                                 onclick: move |e| {
                                     e.stop_propagation();

@@ -5,6 +5,7 @@ use crate::components::{FeatureBanner, PropRow, ShowcaseTabs};
 
 #[component]
 pub fn ChatPage() -> Element {
+    let locale = shadow_design::locale::use_locale();
     let mut direction = use_signal(|| BubbleDirection::Outgoing);
     let mut status = use_signal(|| DeliveryStatus::Delivered);
     let with_pq_badge = use_signal(|| true);
@@ -135,7 +136,7 @@ pub fn ChatPage() -> Element {
                                                 "px-2.5 py-1 rounded bg-white/[0.03] text-zinc-400 border border-white/[0.06] cursor-pointer"
                                             },
                                             onclick: move |_| status.set(s),
-                                            "{s.label()}"
+                                            "{s.label(&locale)}"
                                         }
                                     }
                                 }

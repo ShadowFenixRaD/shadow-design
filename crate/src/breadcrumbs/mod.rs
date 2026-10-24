@@ -110,6 +110,7 @@ pub fn calculate_collapse_bounds(
 /// Componente Breadcrumbs per navigazione gerarchica, wayfinding e percorsi strutturati.
 #[component]
 pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
+    let locale = crate::locale::use_locale();
     let mut internal_expanded = use_signal(|| false);
     let mut last_max_items = use_signal(|| props.max_items);
 
@@ -176,7 +177,7 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
     rsx! {
         nav {
             class: "sd-breadcrumbs {base_override} {class_modifiers} {props.class}",
-            "aria-label": "Breadcrumb",
+            "aria-label": "{locale.breadcrumbs_label}",
             ol { class: "sd-breadcrumbs__list",
                 if let Some(ref items) = props.items {
                     {
@@ -208,7 +209,7 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
                                     button {
                                         r#type: "button",
                                         class: "sd-breadcrumbs__ellipsis-button",
-                                        title: "Mostra percorso completo",
+                                        title: "{locale.breadcrumbs_expand}",
                                         onclick: move |_| set_expanded(true),
                                         "..."
                                     }
@@ -257,7 +258,7 @@ pub fn Breadcrumbs(props: BreadcrumbsProps) -> Element {
                                         button {
                                             r#type: "button",
                                             class: "sd-breadcrumbs__ellipsis-button",
-                                            title: "Comprimi percorso",
+                                            title: "{locale.breadcrumbs_collapse}",
                                             onclick: move |_| set_expanded(false),
                                             "«"
                                         }

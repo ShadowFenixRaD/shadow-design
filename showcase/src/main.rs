@@ -215,15 +215,18 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    let locale = use_signal(shadow_design::locale::Locale::italian);
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Link { rel: "stylesheet", href: STYLES }
-        ThemeProvider {
-            persist_key: "shadow_design_custom_theme".to_string(),
-            NotificationProvider {
-                Router::<Route> {}
+        shadow_design::locale::LocaleProvider { locale: Some(locale),
+            ThemeProvider {
+                persist_key: "shadow_design_custom_theme".to_string(),
+                NotificationProvider {
+                    Router::<Route> {}
+                }
             }
         }
     }

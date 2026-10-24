@@ -111,26 +111,6 @@ impl Date {
             Self::new(self.year, self.month + 1, 1)
         }
     }
-
-    /// Nome del mese in italiano.
-    #[must_use]
-    pub const fn month_name_it(month: u32) -> &'static str {
-        match month {
-            1 => "Gennaio",
-            2 => "Febbraio",
-            3 => "Marzo",
-            4 => "Aprile",
-            5 => "Maggio",
-            6 => "Giugno",
-            7 => "Luglio",
-            8 => "Agosto",
-            9 => "Settembre",
-            10 => "Ottobre",
-            11 => "Novembre",
-            12 => "Dicembre",
-            _ => "",
-        }
-    }
 }
 
 /// Modalità di navigazione della vista del calendario.
@@ -170,6 +150,7 @@ pub fn Calendar(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let initial_view = view_date
         .or(selected)
         .or_else(|| range.map(|(s, _)| s))
@@ -275,7 +256,7 @@ pub fn Calendar(
                     r#type: "button",
                     class: "sd-calendar-nav-btn",
                     onclick: handle_prev,
-                    "aria-label": "Precedente",
+                    "aria-label": "{locale.previous}",
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
                 }
 
@@ -286,7 +267,7 @@ pub fn Calendar(
                                 r#type: "button",
                                 class: "sd-calendar-title-btn",
                                 onclick: move |_| view_mode.set(CalendarViewMode::Month),
-                                "{Date::month_name_it(month)}"
+                                "{locale.month_name(month)}"
                             }
                             button {
                                 r#type: "button",
@@ -321,7 +302,7 @@ pub fn Calendar(
                     r#type: "button",
                     class: "sd-calendar-nav-btn",
                     onclick: handle_next,
-                    "aria-label": "Successivo",
+                    "aria-label": "{locale.next}",
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
             }
@@ -331,7 +312,7 @@ pub fn Calendar(
                 CalendarViewMode::Day => rsx! {
                     // Intestazione giorni della settimana
                     div { class: "sd-calendar-weekdays",
-                        for dow in &["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"] {
+                        for dow in locale.weekdays_short.iter() {
                             div { class: "sd-calendar-weekday", "{dow}" }
                         }
                     }
@@ -404,7 +385,7 @@ pub fn Calendar(
                                             current_view.set(Date::new(cur.year, m, 1.min(cur.day)));
                                             view_mode.set(CalendarViewMode::Day);
                                         },
-                                        "{Date::month_name_it(m)}"
+                                        "{locale.month_name(m)}"
                                     }
                                 }
                             }
@@ -444,8 +425,8 @@ pub fn Calendar(
 pub fn DatePicker(
     /// Binding reattivo al valore della data selezionata.
     mut value: Signal<Option<Date>>,
-    /// Testo segnaposto dell'input. Defaults to "Seleziona data...".
-    #[props(default = "Seleziona data...".to_string())]
+    /// Testo segnaposto dell'input. Defaults to the locale `date_placeholder` string.
+    #[props(default)]
     placeholder: String,
     /// Se mostrare il pulsante per cancellare la selezione. Defaults to true.
     #[props(default = true)]
@@ -463,6 +444,8 @@ pub fn DatePicker(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let placeholder = if placeholder.is_empty() { locale.date_placeholder.clone() } else { placeholder };
     let mut is_open = use_signal(|| false);
 
     let display_text = match *value.read() {
@@ -542,8 +525,8 @@ pub fn DateRangePicker(
     mut start_date: Signal<Option<Date>>,
     /// Binding alla data di fine intervallo.
     mut end_date: Signal<Option<Date>>,
-    /// Testo segnaposto. Defaults to "Seleziona intervallo...".
-    #[props(default = "Seleziona intervallo...".to_string())]
+    /// Testo segnaposto. Defaults to the locale `date_range_placeholder` string.
+    #[props(default)]
     placeholder: String,
     /// Se il controllo è disabilitato. Defaults to false.
     #[props(default = false)]
@@ -552,6 +535,8 @@ pub fn DateRangePicker(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let placeholder = if placeholder.is_empty() { locale.date_range_placeholder.clone() } else { placeholder };
     let mut is_open = use_signal(|| false);
 
     let display_text = match (*start_date.read(), *end_date.read()) {

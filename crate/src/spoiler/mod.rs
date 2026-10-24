@@ -11,11 +11,11 @@ pub fn Spoiler(
     /// Maximum visible height in pixels when collapsed. Defaults to `120`.
     #[props(default = 120)]
     max_height: u32,
-    /// Label for the toggle button when collapsed. Defaults to `"Mostra di più"`.
-    #[props(default = "Mostra di più".to_string())]
+    /// Label for the toggle button when collapsed. Defaults to the locale `spoiler_show_more` string.
+    #[props(default)]
     show_label: String,
-    /// Label for the toggle button when expanded. Defaults to `"Mostra meno"`.
-    #[props(default = "Mostra meno".to_string())]
+    /// Label for the toggle button when expanded. Defaults to the locale `spoiler_show_less` string.
+    #[props(default)]
     hide_label: String,
     /// Externally managed reactive signal for expanded state.
     #[props(default)]
@@ -32,6 +32,9 @@ pub fn Spoiler(
     /// Content displayed inside the spoiler.
     children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let show_label = if show_label.is_empty() { locale.spoiler_show_more.clone() } else { show_label };
+    let hide_label = if hide_label.is_empty() { locale.spoiler_show_less.clone() } else { hide_label };
     let fallback_expanded = use_signal(|| default_expanded);
     let mut is_expanded_sig = expanded.unwrap_or(fallback_expanded);
     let is_expanded = *is_expanded_sig.read();

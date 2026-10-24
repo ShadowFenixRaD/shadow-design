@@ -359,6 +359,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
     #[props(default = true)] hoverable: bool,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut internal_sort_key = use_signal(|| None::<String>);
     let mut internal_sort_dir = use_signal(|| SortDirection::None);
 
@@ -424,7 +425,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                 div {
                     class: "sd-data-table__loading-overlay",
                     div { class: "sd-data-table__loading-spinner" }
-                    span { class: "sd-data-table__loading-text", "Caricamento dati..." }
+                    span { class: "sd-data-table__loading-text", "{locale.table_loading}" }
                 }
             }
 
@@ -510,7 +511,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                                 if let Some(empty) = empty_state {
                                     {empty}
                                 } else {
-                                    div { class: "text-zinc-500 py-6 text-sm font-mono", "Nessun dato disponibile" }
+                                    div { class: "text-zinc-500 py-6 text-sm font-mono", "{locale.table_empty}" }
                                 }
                             }
                         }
@@ -552,11 +553,11 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
             if let Some(mut p_sig) = page {
                 div { class: "sd-data-table__pagination flex items-center justify-between px-4 py-3 border-t border-white/[0.08] text-xs text-zinc-400 font-mono",
                     div {
-                        "Elementi: "
+                        "{locale.table_items}: "
                         span { class: "text-zinc-200 font-semibold", "{total}" }
-                        " • Pagina "
+                        " • {locale.table_page} "
                         span { class: "text-zinc-200 font-semibold", "{current_page}" }
-                        " di "
+                        " {locale.table_of} "
                         span { class: "text-zinc-200 font-semibold", "{total_pages}" }
                     }
                     div { class: "flex items-center gap-1.5",
@@ -568,7 +569,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                                     p_sig.set(current_page - 1);
                                 }
                             },
-                            "« Prec"
+                            "{locale.table_prev}"
                         }
                         for p_num in 1..=total_pages {
                             {
@@ -596,7 +597,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(
                                     p_sig.set(current_page + 1);
                                 }
                             },
-                            "Succ »"
+                            "{locale.table_next}"
                         }
                     }
                 }

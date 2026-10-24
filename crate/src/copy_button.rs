@@ -13,19 +13,22 @@ pub fn CopyButton(
     /// Optional label displayed next to the icon before copying.
     #[props(default)]
     label: Option<String>,
-    /// Optional label displayed during copied confirmation. Defaults to "Copiato!".
-    #[props(default = "Copiato!".to_string())]
+    /// Optional label displayed during copied confirmation. Defaults to the locale `copied` string.
+    #[props(default)]
     copied_label: String,
     /// Whether to only show an icon without text label. Defaults to false.
     #[props(default = false)]
     icon_only: bool,
-    /// Accessible title / aria-label. Defaults to "Copia negli appunti".
-    #[props(default = "Copia negli appunti".to_string())]
+    /// Accessible title / aria-label. Defaults to the locale `copy_to_clipboard` string.
+    #[props(default)]
     aria_label: String,
     /// Additional CSS classes.
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let copied_label = if copied_label.is_empty() { locale.copied.clone() } else { copied_label };
+    let aria_label = if aria_label.is_empty() { locale.copy_to_clipboard.clone() } else { aria_label };
     let mut is_copied = use_signal(|| false);
 
     let val_to_copy = value.clone();

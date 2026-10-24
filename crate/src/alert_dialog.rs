@@ -11,11 +11,11 @@ pub fn AlertDialog(
     title: String,
     /// Detailed description or confirmation message.
     description: String,
-    /// Label for the confirmation button. Defaults to "Conferma".
-    #[props(default = "Conferma".to_string())]
+    /// Label for the confirmation button. Defaults to the locale `confirm` string.
+    #[props(default)]
     confirm_label: String,
-    /// Label for the cancellation button. Defaults to "Annulla".
-    #[props(default = "Annulla".to_string())]
+    /// Label for the cancellation button. Defaults to the locale `cancel` string.
+    #[props(default)]
     cancel_label: String,
     /// Whether the action is destructive (renders danger styling and crimson glow). Defaults to true.
     #[props(default = true)]
@@ -39,6 +39,9 @@ pub fn AlertDialog(
     #[props(default)]
     children: Option<Element>,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let confirm_label = if confirm_label.is_empty() { locale.confirm.clone() } else { confirm_label };
+    let cancel_label = if cancel_label.is_empty() { locale.cancel.clone() } else { cancel_label };
     let is_open = *opened.read();
 
     if !is_open {
@@ -124,8 +127,8 @@ pub fn ConfirmDialog(
     opened: Signal<bool>,
     title: String,
     description: String,
-    #[props(default = "Conferma".to_string())] confirm_label: String,
-    #[props(default = "Annulla".to_string())] cancel_label: String,
+    #[props(default)] confirm_label: String,
+    #[props(default)] cancel_label: String,
     #[props(default = false)] is_destructive: bool,
     #[props(default)] icon: Option<IconKind>,
     #[props(default)] on_confirm: Option<EventHandler<()>>,

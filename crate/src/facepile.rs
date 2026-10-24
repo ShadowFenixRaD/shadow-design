@@ -14,6 +14,7 @@ pub fn Facepile(
     #[props(default)] on_persona_click: Option<EventHandler<PersonaProps>>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut show_overflow_menu = use_signal(|| false);
 
     let total = personas.len();
@@ -70,7 +71,7 @@ pub fn Facepile(
                         r#type: "button",
                         class: "sd-facepile__overflow-btn flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-mono font-bold ring-2 ring-black shadow-md cursor-pointer transition-colors z-0 hover:z-10",
                         style: "width: {size.px_size()}px; height: {size.px_size()}px;",
-                        title: "Visualizza tutti i {overflow_count} collaboratori aggiuntivi",
+                        title: "{crate::locale::Locale::fmt(&locale.facepile_overflow_title, &[(\"n\", &overflow_count.to_string())])}",
                         onclick: move |_| {
                             let curr = show_overflow_menu();
                             show_overflow_menu.set(!curr);
@@ -89,7 +90,7 @@ pub fn Facepile(
                             onclick: move |e| e.stop_propagation(),
 
                             div { class: "px-2 py-1 text-[11px] font-mono text-zinc-400 font-bold border-b border-white/[0.06] mb-1",
-                                "Altri collaboratori ({overflow_count})"
+                                "{crate::locale::Locale::fmt(&locale.facepile_overflow_heading, &[(\"n\", &overflow_count.to_string())])}"
                             }
 
                             for p in overflow {
@@ -132,7 +133,7 @@ pub fn Facepile(
                     r#type: "button",
                     class: "sd-facepile__add-btn ml-2 flex items-center justify-center rounded-full border border-dashed border-white/20 hover:border-purple-500/60 bg-white/[0.02] hover:bg-purple-600/20 text-zinc-400 hover:text-purple-300 transition-all cursor-pointer",
                     style: "width: {size.px_size()}px; height: {size.px_size()}px;",
-                    title: "Aggiungi nuovo membro",
+                    title: "{locale.facepile_add}",
                     onclick: move |_| add_handler.call(()),
                     Icon { kind: IconKind::Plus, size: (size.px_size() / 2).max(12) }
                 }

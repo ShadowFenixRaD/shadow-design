@@ -48,6 +48,7 @@ pub fn Coachmark(
     /// Explanatory content or description.
     children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let is_first = step <= 1;
     let is_last = step >= total_steps;
 
@@ -69,13 +70,13 @@ pub fn Coachmark(
             class: "sd-coachmark {glow_class} {base_override} {class}",
             div { class: "sd-coachmark-header",
                 span { class: "sd-coachmark-step-badge",
-                    "Passo {step} di {total_steps}"
+                    "{crate::locale::Locale::fmt(&locale.coachmark_step, &[(\"step\", &step.to_string()), (\"total\", &total_steps.to_string())])}"
                 }
                 if let Some(h) = on_dismiss {
                     button {
                         r#type: "button",
                         class: "sd-coachmark-close-btn",
-                        title: "Chiudi guida",
+                        title: "{locale.coachmark_close}",
                         onclick: move |_| h.call(()),
                         Icon { kind: IconKind::X, size: 14 }
                     }
@@ -108,7 +109,7 @@ pub fn Coachmark(
                                 variant: ButtonVariant::Ghost,
                                 size: ButtonSize::Sm,
                                 onclick: move |_| prev_handler.call(()),
-                                "Indietro"
+                                "{locale.back}"
                             }
                         }
                     }
@@ -117,7 +118,7 @@ pub fn Coachmark(
                             variant: ButtonVariant::Primary,
                             size: ButtonSize::Sm,
                             onclick: move |_| next_handler.call(()),
-                            if is_last { "Completa" } else { "Avanti" }
+                            if is_last { "{locale.finish}" } else { "{locale.forward}" }
                         }
                     }
                 }

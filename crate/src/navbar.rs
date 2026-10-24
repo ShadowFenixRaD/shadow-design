@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 #[component]
 pub fn Navbar(
     brand: Element,
-    /// Accessible landmark label for screen readers. Defaults to "Principale".
-    #[props(default = "Principale".to_string())]
+    /// Accessible landmark label for screen readers. Defaults to the locale `navbar_label` string.
+    #[props(default)]
     aria_label: String,
     /// If true, renders a mobile disclosure button below 640px viewport width.
     #[props(default)]
@@ -17,6 +17,8 @@ pub fn Navbar(
     class: String,
     children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let aria_label = if aria_label.is_empty() { locale.navbar_label.clone() } else { aria_label };
     let mut is_open = use_signal(|| false);
 
     let nav_id = crate::a11y::use_unique_id("navbar", None);
@@ -28,9 +30,9 @@ pub fn Navbar(
 
     let effective_toggle_aria = toggle_aria_label.unwrap_or_else(|| {
         if *is_open.read() {
-            "Chiudi menu di navigazione".to_string()
+            locale.navbar_close.clone()
         } else {
-            "Apri menu di navigazione".to_string()
+            locale.navbar_open.clone()
         }
     });
 

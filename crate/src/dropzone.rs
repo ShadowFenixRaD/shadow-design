@@ -47,8 +47,8 @@ pub fn Dropzone(
     /// Se consentire il caricamento di più file contemporaneamente. Defaults to false.
     #[props(default = false)]
     multiple: bool,
-    /// Titolo visibile dell'area. Defaults to "Trascina qui i file o clicca per sfogliare".
-    #[props(default = "Trascina qui i file o clicca per sfogliare".to_string())]
+    /// Titolo visibile dell'area. Defaults to the locale `dropzone_title` string.
+    #[props(default)]
     title: String,
     /// Descrizione o istruzioni aggiuntive (es. limiti dimensione o formati).
     #[props(default)]
@@ -63,6 +63,8 @@ pub fn Dropzone(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let title = if title.is_empty() { locale.dropzone_title.clone() } else { title };
     let mut is_dragging = use_signal(|| false);
     let mut is_rejected = use_signal(|| false);
 

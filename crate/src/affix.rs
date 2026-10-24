@@ -100,6 +100,7 @@ pub fn BackToTop(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let handle_scroll_top = move |_| {
         let eval = document::eval("window.scrollTo({ top: 0, behavior: 'smooth' });");
         spawn(async move {
@@ -121,7 +122,7 @@ pub fn BackToTop(
             button {
                 r#type: "button",
                 class: "sd-back-to-top {icon_only_class}",
-                title: "Torna in cima",
+                title: "{locale.back_to_top}",
                 onclick: handle_scroll_top,
                 Icon { kind: icon, size: 16 }
                 if let Some(l) = label {

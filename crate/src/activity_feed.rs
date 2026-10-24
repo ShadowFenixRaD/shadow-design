@@ -97,6 +97,7 @@ pub fn ActivityItem(
     #[props(default = true)] allow_replies: bool,
     #[props(default)] on_reply: Option<EventHandler<(String, String)>>,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut is_replying = use_signal(|| false);
     let mut reply_text = use_signal(String::new);
 
@@ -177,13 +178,13 @@ pub fn ActivityItem(
                                 r#type: "button",
                                 class: "text-[11px] font-mono text-zinc-500 hover:text-purple-300 transition-colors cursor-pointer",
                                 onclick: move |_| is_replying.set(true),
-                                "Rispondi"
+                                "{locale.reply}"
                             }
                         } else {
                             div { class: "w-full flex flex-col gap-2 p-2.5 rounded-xl bg-zinc-900 border border-white/10 mt-1",
                                 textarea {
                                     class: "w-full p-2 bg-transparent text-xs text-zinc-200 placeholder-zinc-500 outline-none resize-none min-h-[60px]",
-                                    placeholder: "Scrivi un commento...",
+                                    placeholder: "{locale.activity_reply_placeholder}",
                                     value: "{reply_text}",
                                     oninput: move |e| reply_text.set(e.value()),
                                 }
@@ -192,7 +193,7 @@ pub fn ActivityItem(
                                         r#type: "button",
                                         class: "px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer",
                                         onclick: move |_| is_replying.set(false),
-                                        "Annulla"
+                                        "{locale.cancel}"
                                     }
                                     button {
                                         r#type: "button",
@@ -211,7 +212,7 @@ pub fn ActivityItem(
                                                 }
                                             }
                                         },
-                                        "Invia"
+                                        "{locale.send}"
                                     }
                                 }
                             }
@@ -232,13 +233,14 @@ pub fn ActivityFeed(
     #[props(default)] on_reply: Option<EventHandler<(String, String)>>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let total = items.len();
 
     rsx! {
         div { class: "sd-activity-feed flex flex-col w-full {class}",
             if items.is_empty() {
                 div { class: "p-8 text-center text-xs text-zinc-500 font-mono",
-                    "Nessuna attività registrata."
+                    "{locale.activity_empty}"
                 }
             } else {
                 for (idx, ev) in items.into_iter().enumerate() {

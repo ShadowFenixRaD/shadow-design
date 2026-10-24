@@ -41,6 +41,7 @@ pub fn PieChart(
     #[props(default = 300)] height: u32,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut hover_index = use_signal(|| None::<usize>);
 
     let svg_w = 400.0;
@@ -73,7 +74,7 @@ pub fn PieChart(
         let pct_str = format!("{:.1}%", frac * 100.0);
         let entries = vec![
             (name.clone(), format!("{val:.1}"), col.clone()),
-            ("Percentuale".to_string(), pct_str, col.clone()),
+            (locale.chart_percentage.clone(), pct_str, col.clone()),
         ];
         let mid_a = (start_a + end_a) / 2.0;
         let r_mid = (inner_r + outer_radius) / 2.0;

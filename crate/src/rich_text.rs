@@ -187,13 +187,15 @@ pub fn RichTextToolbar(
 #[component]
 pub fn RichTextEditor(
     mut value: Signal<String>,
-    #[props(default = "Scrivi qui il contenuto...".to_string())] placeholder: String,
+    #[props(default)] placeholder: String,
     #[props(default = true)] editable: bool,
     #[props(default = true)] sticky_toolbar: bool,
     #[props(default)] mode: Option<RichTextMode>,
     #[props(default)] min_height: Option<String>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let placeholder = if placeholder.is_empty() { locale.rich_text_placeholder.clone() } else { placeholder };
     let mut current_mode = use_signal(|| mode.unwrap_or(RichTextMode::Wysiwyg));
     let h_style = min_height.unwrap_or_else(|| "240px".to_string());
     let editor_id = crate::a11y::use_unique_id("rte", None);

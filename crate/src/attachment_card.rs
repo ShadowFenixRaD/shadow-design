@@ -32,6 +32,7 @@ pub fn AttachmentCard(
     #[props(default)] class: String,
     #[props(default)] children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let resolved_avatar = if let Some(custom_av) = avatar {
         Some(custom_av)
     } else if let Some(src) = avatar_src {
@@ -70,7 +71,7 @@ pub fn AttachmentCard(
                     variant: ButtonVariant::Outline,
                     left_icon: Some(rsx! { Icon { kind: IconKind::Download, size: 14 } }),
                     onclick: move |evt| dl.call(evt),
-                    "Scarica"
+                    "{locale.download}"
                 }
             }
             if let Some(sh) = on_share {
@@ -79,7 +80,7 @@ pub fn AttachmentCard(
                     variant: ButtonVariant::Ghost,
                     left_icon: Some(rsx! { Icon { kind: IconKind::Share2, size: 14 } }),
                     onclick: move |evt| sh.call(evt),
-                    "Condividi"
+                    "{locale.share}"
                 }
             }
             if let Some(custom_btns) = buttons {

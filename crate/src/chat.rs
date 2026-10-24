@@ -54,12 +54,12 @@ impl DeliveryStatus {
     }
 
     #[must_use]
-    pub fn label(&self) -> &'static str {
+    pub fn label(&self, locale: &crate::locale::Locale) -> String {
         match self {
-            DeliveryStatus::Sending => "In invio...",
-            DeliveryStatus::Sent => "Inviato",
-            DeliveryStatus::Delivered => "Consegnato",
-            DeliveryStatus::Failed => "Invio non riuscito",
+            DeliveryStatus::Sending => locale.delivery_sending.clone(),
+            DeliveryStatus::Sent => locale.delivery_sent.clone(),
+            DeliveryStatus::Delivered => locale.delivery_delivered.clone(),
+            DeliveryStatus::Failed => locale.delivery_failed.clone(),
         }
     }
 }
@@ -75,6 +75,7 @@ pub fn MessageBubble(
     #[props(default)] class: String,
     children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let dir_class = direction.scss_class();
 
     #[cfg(feature = "theme")]
@@ -132,7 +133,7 @@ pub fn MessageBubble(
                         if let Some(delivery) = status {
                             span {
                                 class: "sd-chat-bubble__status {delivery.scss_class()}",
-                                title: "{delivery.label()}",
+                                title: "{delivery.label(&locale)}",
                                 match delivery {
                                     DeliveryStatus::Sending => rsx! {
                                         Icon { kind: IconKind::Clock, size: 12 }

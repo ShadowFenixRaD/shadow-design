@@ -77,6 +77,7 @@ pub fn Card(
     #[props(default)] footer: Option<Element>,
     #[props(default)] children: Element,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let card_id = crate::a11y::use_unique_id("card", id);
     let title_id = format!("{card_id}-title");
 
@@ -227,7 +228,7 @@ pub fn Card(
                 a {
                     href: "{url}",
                     class: "sd-card__link",
-                    "aria-label": "Card link",
+                    "aria-label": "{locale.card_link}",
                 }
             }
 

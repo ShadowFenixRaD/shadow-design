@@ -83,8 +83,8 @@ pub fn CommandPalette(
     /// Lista di tutte le azioni disponibili.
     #[props(default)]
     actions: Vec<CommandAction>,
-    /// Testo segnaposto dell'input di ricerca. Defaults to "Cerca comandi o naviga...".
-    #[props(default = "Cerca comandi o naviga...".to_string())]
+    /// Testo segnaposto dell'input di ricerca. Defaults to the locale `command_placeholder`.
+    #[props(default)]
     placeholder: String,
     /// Callback invocato quando un'azione viene selezionata.
     #[props(default)]
@@ -96,6 +96,8 @@ pub fn CommandPalette(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
+    let placeholder = if placeholder.is_empty() { locale.command_placeholder.clone() } else { placeholder };
     let search_query = use_signal(String::new);
     let mut active_index = use_signal(|| 0usize);
 
@@ -315,7 +317,7 @@ pub fn CommandPalette(
                     if filtered_actions.is_empty() {
                         div { class: "sd-command-palette-empty",
                             Icon { kind: IconKind::AlertCircle, size: 24 }
-                            span { "Nessun comando o risultato per \"{search_query()}\"" }
+                            span { "{crate::locale::Locale::fmt(&locale.command_empty, &[(\"query\", &search_query())])}" }
                         }
                     } else {
                         {
@@ -374,15 +376,15 @@ pub fn CommandPalette(
                     div { class: "sd-command-palette-footer-item",
                         Kbd { "↑" }
                         Kbd { "↓" }
-                        span { "per navigare" }
+                        span { "{locale.command_hint_navigate}" }
                     }
                     div { class: "sd-command-palette-footer-item",
                         Kbd { "↵" }
-                        span { "per selezionare" }
+                        span { "{locale.command_hint_select}" }
                     }
                     div { class: "sd-command-palette-footer-item",
                         Kbd { "Esc" }
-                        span { "per chiudere" }
+                        span { "{locale.command_hint_close}" }
                     }
                 }
             }

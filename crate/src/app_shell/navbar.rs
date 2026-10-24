@@ -23,6 +23,7 @@ pub struct AppShellNavbarProps {
 /// Pannello di navigazione laterale sinistro collassabile con z-index 25.
 #[component]
 pub fn AppShellNavbar(props: AppShellNavbarProps) -> Element {
+    let locale = crate::locale::use_locale();
     let ctx = try_use_context::<AppShellCtx>();
     let is_collapsed = props
         .collapsed
@@ -43,7 +44,7 @@ pub fn AppShellNavbar(props: AppShellNavbarProps) -> Element {
     rsx! {
         aside {
             role: "navigation",
-            "aria-label": "Navigazione laterale dell'applicazione",
+            "aria-label": "{locale.app_shell_navbar_label}",
             "aria-hidden": if is_collapsed { "true" } else { "false" },
             inert: is_collapsed,
             class: "sd-app-shell__navbar {border_class} {collapsed_class} {props.class}",

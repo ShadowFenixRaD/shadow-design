@@ -57,6 +57,7 @@ pub fn NumberInput(
     #[props(default)] class: String,
     #[props(default)] on_change: Option<EventHandler<f64>>,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let input_id = crate::a11y::use_unique_id("sd-number-input", id);
     let help_id = if help_text.is_some() {
         Some(format!("{input_id}-help"))
@@ -245,7 +246,7 @@ pub fn NumberInput(
                         r#type: "button",
                         tabindex: "-1",
                         disabled: !can_increment,
-                        "aria-label": "Incrementa",
+                        "aria-label": "{locale.number_increment}",
                         class: "sd-number-input__stepper sd-number-input__stepper--up {up_disabled_class}",
                         onclick: move |e| {
                             e.stop_propagation();
@@ -257,7 +258,7 @@ pub fn NumberInput(
                         r#type: "button",
                         tabindex: "-1",
                         disabled: !can_decrement,
-                        "aria-label": "Decrementa",
+                        "aria-label": "{locale.number_decrement}",
                         class: "sd-number-input__stepper sd-number-input__stepper--down {down_disabled_class}",
                         onclick: move |e| {
                             e.stop_propagation();

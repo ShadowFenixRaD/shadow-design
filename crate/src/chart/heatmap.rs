@@ -51,6 +51,7 @@ pub fn Heatmap(
     #[props(default = 220)] height: u32,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut hover_cell = use_signal(|| None::<usize>);
 
     // Calcolo dimensioni griglia (max X e max Y)
@@ -88,10 +89,10 @@ pub fn Heatmap(
             .label
             .clone()
             .or_else(|| cell.date.clone())
-            .unwrap_or_else(|| format!("Cella ({}, {})", cell.x, cell.y));
+            .unwrap_or_else(|| format!("{} ({}, {})", locale.chart_cell, cell.x, cell.y));
 
         let entries = vec![
-            ("Valore".to_string(), format!("{:.1}", cell.value), "#a855f7".to_string()),
+            (locale.chart_value.clone(), format!("{:.1}", cell.value), "#a855f7".to_string()),
         ];
         let cx = pad_left + cell.x as f64 * step + (cell_size as f64 / 2.0);
         let cy = pad_top + cell.y as f64 * step + (cell_size as f64 / 2.0);
@@ -231,15 +232,9 @@ pub fn CalendarHeatmap(
     #[props(default = 140)] height: u32,
     #[props(default)] class: String,
 ) -> Element {
-    let y_days = vec![
-        "Lun".to_string(),
-        "".to_string(),
-        "Mer".to_string(),
-        "".to_string(),
-        "Ven".to_string(),
-        "".to_string(),
-        "".to_string(),
-    ];
+    let locale = crate::locale::use_locale();
+    let day = |i: usize| locale.weekdays_abbr.get(i).cloned().unwrap_or_default();
+    let y_days = vec![day(0), String::new(), day(2), String::new(), day(4), String::new(), String::new()];
 
     rsx! {
         Heatmap {

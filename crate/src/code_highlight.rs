@@ -210,6 +210,7 @@ pub fn CodeBlock(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let lines: Vec<&str> = code.lines().collect();
 
     #[cfg(feature = "theme")]
@@ -228,8 +229,8 @@ pub fn CodeBlock(
                     div { class: "sd-code-block-actions",
                         CopyButton {
                             value: code.clone(),
-                            label: Some("Copia".to_string()),
-                            copied_label: "Copiato!".to_string(),
+                            label: Some(locale.copy.clone()),
+                            copied_label: locale.copied.clone(),
                         }
                     }
                 }

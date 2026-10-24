@@ -98,6 +98,7 @@ pub fn NavigationMenu(
     #[props(default)] on_select: Option<EventHandler<NavigationLinkItem>>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut active_index = use_signal(|| None::<usize>);
 
     let close_menu = move |_| active_index.set(None);
@@ -236,7 +237,7 @@ pub fn NavigationMenu(
                                     }
 
                                     div { class: "flex flex-col gap-1.5",
-                                        span { class: "text-xs font-mono text-purple-400 font-bold", "In evidenza" }
+                                        span { class: "text-xs font-mono text-purple-400 font-bold", "{locale.navigation_featured}" }
                                         h4 { class: "text-sm font-bold text-white", "{prev.title}" }
                                         p { class: "text-xs text-zinc-400 leading-relaxed", "{prev.description}" }
                                     }

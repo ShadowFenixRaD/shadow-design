@@ -35,6 +35,7 @@ pub struct MenubarProps {
 /// shortcut da tastiera visive e scala z-index standard.
 #[component]
 pub fn Menubar(props: MenubarProps) -> Element {
+    let locale = crate::locale::use_locale();
     let internal_active = use_signal(|| None::<String>);
     let active_sig = props.active_menu.unwrap_or(internal_active);
 
@@ -59,7 +60,7 @@ pub fn Menubar(props: MenubarProps) -> Element {
     rsx! {
         div {
             role: "menubar",
-            "aria-label": "Barra dei menu principale",
+            "aria-label": "{locale.menubar_label}",
             class: "sd-menubar {border_class} {base_override} {class_modifiers} {props.class}",
             {props.children}
         }

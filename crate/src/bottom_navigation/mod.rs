@@ -68,6 +68,7 @@ pub struct BottomNavigationProps {
 /// e gestione safe area integrata.
 #[component]
 pub fn BottomNavigation(props: BottomNavigationProps) -> Element {
+    let locale = crate::locale::use_locale();
     #[cfg(feature = "theme")]
     let theme_val = crate::theme::use_theme()();
     #[cfg(feature = "theme")]
@@ -89,7 +90,7 @@ pub fn BottomNavigation(props: BottomNavigationProps) -> Element {
     rsx! {
         nav {
             role: "navigation",
-            "aria-label": "Navigazione inferiore principale",
+            "aria-label": "{locale.bottom_navigation_label}",
             class: "sd-bottom-nav {pos_class} {safe_area_class} {border_class} {blur_class} {base_override} {class_modifiers} {props.class}",
             div { class: "sd-bottom-nav__container",
                 {props.children}

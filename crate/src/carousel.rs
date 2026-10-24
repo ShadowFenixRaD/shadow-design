@@ -29,6 +29,7 @@ pub fn Carousel(
     #[props(default)]
     class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let internal_index = use_signal(|| 0usize);
     let mut current_idx = active_index.unwrap_or(internal_index);
 
@@ -129,7 +130,7 @@ pub fn Carousel(
             tabindex: "0",
             role: "region",
             "aria-roledescription": "carousel",
-            "aria-label": "Carosello di contenuti",
+            "aria-label": "{locale.carousel_label}",
             onkeydown: move |e: KeyboardEvent| {
                 match e.key() {
                     Key::ArrowLeft => {
@@ -161,7 +162,7 @@ pub fn Carousel(
                     disabled: !can_go_prev,
                     class: format!("sd-carousel-control sd-carousel-control--prev {}", if !can_go_prev { "sd-carousel-control--disabled" } else { "" }),
                     onclick: on_prev_click,
-                    "aria-label": "Slide precedente",
+                    "aria-label": "{locale.carousel_previous}",
                     Icon { kind: IconKind::ChevronLeft, size: 18 }
                 }
                 button {
@@ -169,7 +170,7 @@ pub fn Carousel(
                     disabled: !can_go_next,
                     class: format!("sd-carousel-control sd-carousel-control--next {}", if !can_go_next { "sd-carousel-control--disabled" } else { "" }),
                     onclick: on_next_click,
-                    "aria-label": "Slide successiva",
+                    "aria-label": "{locale.carousel_next}",
                     Icon { kind: IconKind::ChevronRight, size: 18 }
                 }
             }
@@ -188,7 +189,7 @@ pub fn Carousel(
                                     role: "tab",
                                     "aria-selected": if is_active { "true" } else { "false" },
                                     class: "{dot_class}",
-                                    "aria-label": "Vai alla slide {i + 1}",
+                                    "aria-label": "{crate::locale::Locale::fmt(&locale.carousel_goto, &[(\"n\", &(i + 1).to_string())])}",
                                     onclick: move |_| current_idx.set(i),
                                 }
                             }

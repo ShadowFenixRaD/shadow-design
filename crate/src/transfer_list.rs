@@ -49,6 +49,7 @@ pub fn TransferList(
     #[props(default)] on_change: Option<EventHandler<(Vec<TransferItem>, Vec<TransferItem>)>>,
     #[props(default)] class: String,
 ) -> Element {
+    let locale = crate::locale::use_locale();
     let mut selected_source = use_signal(BTreeSet::<String>::new);
     let mut selected_target = use_signal(BTreeSet::<String>::new);
     let mut search_source = use_signal(String::new);
@@ -174,7 +175,7 @@ pub fn TransferList(
                         input {
                             r#type: "text",
                             class: "w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/[0.10] text-xs text-white placeholder-zinc-500 outline-none focus:border-purple-500",
-                            placeholder: "Cerca elementi...",
+                            placeholder: "{locale.transfer_search}",
                             value: "{search_source}",
                             oninput: move |e| search_source.set(e.value()),
                         }
@@ -186,7 +187,7 @@ pub fn TransferList(
                     style: "height: {height};",
                     if filtered_source.is_empty() {
                         div { class: "p-6 text-center text-xs text-zinc-500 font-mono",
-                            "Nessun elemento disponibile"
+                            "{locale.transfer_empty_source}"
                         }
                     } else {
                         for item in filtered_source {
@@ -245,14 +246,14 @@ pub fn TransferList(
             div { class: "flex md:flex-col items-center justify-center gap-2 shrink-0",
                 button {
                     r#type: "button",
-                    title: "Sposta tutti a destra",
+                    title: "{locale.transfer_move_all_right}",
                     class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm",
                     onclick: move_all_to_target,
                     Icon { kind: IconKind::ChevronRight, size: 16 }
                 }
                 button {
                     r#type: "button",
-                    title: "Sposta selezionati a destra",
+                    title: "{locale.transfer_move_selected_right}",
                     disabled: selected_source().is_empty(),
                     class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed",
                     onclick: move_selected_to_target,
@@ -260,7 +261,7 @@ pub fn TransferList(
                 }
                 button {
                     r#type: "button",
-                    title: "Sposta selezionati a sinistra",
+                    title: "{locale.transfer_move_selected_left}",
                     disabled: selected_target().is_empty(),
                     class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed",
                     onclick: move_selected_to_source,
@@ -268,7 +269,7 @@ pub fn TransferList(
                 }
                 button {
                     r#type: "button",
-                    title: "Sposta tutti a sinistra",
+                    title: "{locale.transfer_move_all_left}",
                     class: "p-2 rounded-lg bg-zinc-900 border border-white/[0.12] text-zinc-300 hover:text-white hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer shadow-sm",
                     onclick: move_all_to_source,
                     Icon { kind: IconKind::ChevronLeft, size: 16 }
@@ -290,7 +291,7 @@ pub fn TransferList(
                         input {
                             r#type: "text",
                             class: "w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/[0.10] text-xs text-white placeholder-zinc-500 outline-none focus:border-purple-500",
-                            placeholder: "Cerca elementi...",
+                            placeholder: "{locale.transfer_search}",
                             value: "{search_target}",
                             oninput: move |e| search_target.set(e.value()),
                         }
@@ -302,7 +303,7 @@ pub fn TransferList(
                     style: "height: {height};",
                     if filtered_target.is_empty() {
                         div { class: "p-6 text-center text-xs text-zinc-500 font-mono",
-                            "Nessun elemento assegnato"
+                            "{locale.transfer_empty_target}"
                         }
                     } else {
                         for item in filtered_target {

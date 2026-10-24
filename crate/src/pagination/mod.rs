@@ -43,6 +43,7 @@ pub struct PaginationProps {
 /// Componente Pagination: barra di navigazione numerata per liste e tabelle.
 #[component]
 pub fn Pagination(props: PaginationProps) -> Element {
+    let locale = crate::locale::use_locale();
     let current_page = (props.page)().clamp(1, props.total.max(1));
     let items =
         calculate_pagination_range(props.total, current_page, props.siblings, props.boundaries);
@@ -86,7 +87,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
     rsx! {
         nav {
             class: "sd-pagination {size_class} {base_override} {class_modifiers} {props.class}",
-            "aria-label": "Paginazione",
+            "aria-label": "{locale.pagination_label}",
             ul { class: "sd-pagination__list",
                 // Pulsante Prima Pagina (se abilitato)
                 if props.show_edges {
@@ -94,7 +95,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         PaginationControl {
                             is_disabled: props.disabled || is_first,
                             size: props.size,
-                            aria_label: "Prima pagina".to_string(),
+                            aria_label: locale.pagination_first.clone(),
                             on_click: move |_| set_page(1),
                             span { class: "sd-pagination__double-chevron",
                                 Icon { kind: IconKind::ChevronLeft, size: 13 }
@@ -110,7 +111,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         PaginationControl {
                             is_disabled: props.disabled || is_first,
                             size: props.size,
-                            aria_label: "Pagina precedente".to_string(),
+                            aria_label: locale.pagination_previous.clone(),
                             on_click: move |_| set_page(current_page.saturating_sub(1)),
                             Icon { kind: IconKind::ChevronLeft, size: 14 }
                         }
@@ -128,7 +129,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                                         is_active: p_val == current_page,
                                         is_disabled: props.disabled,
                                         size: props.size,
-                                        aria_label: format!("Pagina {p_val}"),
+                                        aria_label: crate::locale::Locale::fmt(&locale.pagination_page, &[("n", &p_val.to_string())]),
                                         on_click: move |_| set_page(p_val),
                                         "{p_val}"
                                     }
@@ -151,7 +152,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         PaginationControl {
                             is_disabled: props.disabled || is_last,
                             size: props.size,
-                            aria_label: "Pagina successiva".to_string(),
+                            aria_label: locale.pagination_next.clone(),
                             on_click: move |_| set_page(current_page + 1),
                             Icon { kind: IconKind::ChevronRight, size: 14 }
                         }
@@ -164,7 +165,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         PaginationControl {
                             is_disabled: props.disabled || is_last,
                             size: props.size,
-                            aria_label: "Ultima pagina".to_string(),
+                            aria_label: locale.pagination_last.clone(),
                             on_click: move |_| set_page(props.total),
                             span { class: "sd-pagination__double-chevron",
                                 Icon { kind: IconKind::ChevronRight, size: 13 }
