@@ -59,12 +59,13 @@ pub fn Heatmap(
     let max_y = data.iter().map(|c| c.y).max().unwrap_or(0);
     let max_val = data.iter().map(|c| c.value).fold(1.0f64, f64::max);
 
+    // Intensity ramp derived from the accent (follows the preset).
     let default_palette = vec![
-        "#18181b".to_string(), // Zinc 900 (quasi spento)
-        "#3b0764".to_string(), // Viola scuro
-        "#6b21a8".to_string(), // Viola medio
-        "#a855f7".to_string(), // Viola neon
-        "#d8b4fe".to_string(), // Viola brillante
+        "var(--sd-tint-2)".to_string(),
+        "rgba(var(--sd-accent-rgb), 0.28)".to_string(),
+        "rgba(var(--sd-accent-rgb), 0.5)".to_string(),
+        "rgba(var(--sd-accent-rgb), 0.75)".to_string(),
+        "var(--sd-accent-strong)".to_string(),
     ];
 
     let palette = if color_scale.is_empty() {
@@ -92,7 +93,7 @@ pub fn Heatmap(
             .unwrap_or_else(|| format!("{} ({}, {})", locale.chart_cell, cell.x, cell.y));
 
         let entries = vec![
-            (locale.chart_value.clone(), format!("{:.1}", cell.value), "#a855f7".to_string()),
+            (locale.chart_value.clone(), format!("{:.1}", cell.value), "var(--sd-chart-1)".to_string()),
         ];
         let cx = pad_left + cell.x as f64 * step + (cell_size as f64 / 2.0);
         let cy = pad_top + cell.y as f64 * step + (cell_size as f64 / 2.0);
@@ -103,9 +104,9 @@ pub fn Heatmap(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col items-center {class}",
+        div { class: "sd-chart-root sd-chart-root--center {class}",
             div {
-                class: "relative w-full overflow-visible",
+                class: "sd-chart-frame",
                 style: "max-width: {svg_w}px;",
                 onmouseleave: move |_| {
                     hover_cell.set(None);
@@ -124,8 +125,7 @@ pub fn Heatmap(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_cell.set(None),
                     }
 
@@ -139,9 +139,7 @@ pub fn Heatmap(
                                     x: "{pad_left - 8.0}",
                                     y: "{y_pos}",
                                     text_anchor: "end",
-                                    fill: "rgba(255, 255, 255, 0.4)",
-                                    font_size: "10",
-                                    font_family: "monospace",
+                                    class: "sd-chart__label",
                                     pointer_events: "none",
                                     "{yl}"
                                 }
@@ -170,11 +168,8 @@ pub fn Heatmap(
                                     height: "{cell_size}",
                                     rx: "{cell_radius}",
                                     ry: "{cell_radius}",
-                                    fill: "{color}",
-                                    stroke: if is_h { "#ffffff" } else { "rgba(255, 255, 255, 0.08)" },
-                                    stroke_width: if is_h { "2" } else { "1" },
-                                    class: "cursor-pointer transition-all duration-150",
-                                    style: "pointer-events: all;",
+                                    style: "fill: {color};",
+                                    class: if is_h { "sd-heatmap__cell sd-heatmap__cell--hover" } else { "sd-heatmap__cell" },
                                     onmouseenter: move |_| hover_cell.set(Some(i)),
                                     onmouseleave: move |_| hover_cell.set(None),
                                     onpointerleave: move |_| hover_cell.set(None),
@@ -194,9 +189,7 @@ pub fn Heatmap(
                                     x: "{x_pos}",
                                     y: "{y_pos}",
                                     text_anchor: "middle",
-                                    fill: "rgba(255, 255, 255, 0.4)",
-                                    font_size: "10",
-                                    font_family: "monospace",
+                                    class: "sd-chart__label",
                                     pointer_events: "none",
                                     "{xl}"
                                 }

@@ -1,17 +1,175 @@
 // ==============================================================================
-// Shadow Design — ActivityFeed Component Styles
+// Shadow Design — ActivityFeed (rows are static; actions are library Buttons)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-activity-feed {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+
+    &__empty {
+      padding: var(--sd-space-8);
+      text-align: center;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text-subtle);
+    }
   }
 
   .sd-activity-item {
+    --sd-activity-avatar: 40px; // keep in step with Avatar md
+    --sd-activity-gap: var(--sd-space-3);
     position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sd-activity-gap);
     width: 100%;
+
+    &--compact {
+      --sd-activity-avatar: 32px; // Avatar sm
+    }
+
+    // Centred on the avatar: half the avatar width minus half the line.
+    &__connector {
+      position: absolute;
+      left: calc(var(--sd-activity-avatar) / 2 - 0.5px);
+      top: calc(var(--sd-activity-avatar) + var(--sd-space-1));
+      bottom: calc(var(--sd-space-1) * -1);
+      width: 1px;
+      background-color: var(--sd-border);
+    }
+
+    &__lead {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    // Event mark: top-right so it never covers the presence dot (bottom-right).
+    &__mark {
+      position: absolute;
+      top: calc(var(--sd-space-1) * -1);
+      right: calc(var(--sd-space-1) * -1);
+      display: inline-flex;
+      padding: 3px;
+      border-radius: var(--sd-radius-full);
+      border: 1px solid var(--sd-border-strong);
+      background-color: var(--sd-surface-2);
+      color: var(--sd-accent-strong);
+    }
+
+    &--unread &__mark {
+      border-color: var(--sd-accent-border);
+      background-color: var(--sd-accent-soft);
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-2);
+      padding-bottom: var(--sd-space-6);
+    }
+
+    &__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--sd-space-2);
+      font-size: var(--sd-text-sm);
+    }
+
+    &__author {
+      font-weight: 600;
+      color: var(--sd-text);
+    }
+
+    &__action {
+      color: var(--sd-text-muted);
+    }
+
+    &__target {
+      font-family: var(--sd-font-mono);
+      font-weight: 600;
+      color: var(--sd-accent-strong);
+    }
+
+    &__time {
+      margin-left: auto;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      color: var(--sd-text-subtle);
+    }
+
+    &__desc {
+      @include sd-surface(1);
+      padding: var(--sd-space-3);
+      font-size: var(--sd-text-sm);
+      line-height: var(--sd-leading-normal);
+      color: var(--sd-text-muted);
+    }
+
+    &__comments {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-2);
+      padding-left: var(--sd-space-3);
+      border-left: 2px solid var(--sd-border);
+    }
+
+    &__comment {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sd-space-2);
+      font-size: var(--sd-text-sm);
+    }
+
+    &__comment-body {
+      @include sd-surface(1);
+      flex: 1;
+      min-width: 0;
+      padding: var(--sd-space-2);
+      border-radius: var(--sd-radius-md);
+    }
+
+    &__comment-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sd-space-2);
+    }
+
+    &__comment-author {
+      font-weight: 600;
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text);
+    }
+
+    &__comment-text {
+      margin: var(--sd-space-1) 0 0;
+      color: var(--sd-text-muted);
+    }
+
+    &__reply {
+      display: flex;
+      align-items: center;
+    }
+
+    &__composer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-2);
+    }
+
+    &__composer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--sd-space-2);
+    }
   }
 }

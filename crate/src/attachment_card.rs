@@ -38,25 +38,25 @@ pub fn AttachmentCard(
     } else if let Some(src) = avatar_src {
         Some(rsx! {
             div {
-                class: "w-10 h-10 rounded-full overflow-hidden border border-white/10 shrink-0",
+                class: "sd-attachment-card__avatar sd-attachment-card__avatar--image",
                 img {
                     src: "{src}",
                     alt: "{title}",
-                    class: "w-full h-full object-cover",
+                    class: "sd-attachment-card__avatar-img",
                 }
             }
         })
     } else if let Some(ic) = avatar_icon {
         Some(rsx! {
             div {
-                class: "w-10 h-10 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center text-purple-300 shrink-0",
+                class: "sd-attachment-card__avatar",
                 RenderSvgIcon { icon: ic, size: 18 }
             }
         })
     } else {
         Some(rsx! {
             div {
-                class: "w-10 h-10 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center text-purple-300 shrink-0",
+                class: "sd-attachment-card__avatar",
                 Icon { kind: IconKind::Paperclip, size: 18 }
             }
         })
@@ -96,7 +96,7 @@ pub fn AttachmentCard(
 
     rsx! {
         crate::card::Card {
-            class: "sd-attachment-card-unified {class}",
+            class: "sd-attachment-card {class}",
             avatar: resolved_avatar,
             title: Some(title),
             subtitle: subtitle,
@@ -107,7 +107,7 @@ pub fn AttachmentCard(
             on_click: on_click,
 
             if let Some(desc) = description {
-                p { class: "text-xs text-zinc-300 leading-relaxed mb-1", "{desc}" }
+                p { class: "sd-attachment-card__desc", "{desc}" }
             }
             {children}
         }

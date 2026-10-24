@@ -119,6 +119,18 @@ Classes `.sd-radius-sharp`, `.sd-radius-medium` and `.sd-radius-soft` set these.
 
 `--sd-chart-1` = `var(--sd-accent)`. `--sd-chart-2..8` = `#38bdf8`, `#00e58f`, `#fbbf24`, `#ff2e57`, `#f472b6`, `#a3e635`, `#94a3b8`.
 
+## Code (component-requested)
+
+| Token | Value | Use |
+| :-- | :-- | :-- |
+| `--sd-code-keyword` | `var(--sd-accent-strong)` | Keywords |
+| `--sd-code-fn` | `var(--sd-info-strong)` | Function names |
+| `--sd-code-type` | `var(--sd-chart-6)` | Types |
+| `--sd-code-string` | `var(--sd-success-strong)` | String literals |
+| `--sd-code-number` | `var(--sd-warning-strong)` | Numbers |
+| `--sd-code-comment` | `var(--sd-text-subtle)` | Comments |
+| `--sd-code-operator` | `var(--sd-text-muted)` | Operators and punctuation |
+
 ## Breakpoints (SCSS only, because media queries can't read variables)
 
 `$bp: (sm: 640px, md: 768px, lg: 1024px, xl: 1280px)`, used through `@include bp-up(md)` (min-width). Never write a raw `@media (max-width: …)` in a component.

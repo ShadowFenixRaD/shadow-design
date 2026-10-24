@@ -22,26 +22,23 @@ pub fn DocumentCard(
     let locale = crate::locale::use_locale();
     let ftype = file_type.to_uppercase();
 
-    // Stile cromatico badge per estensione/tipo di file
-    let type_badge_style = match ftype.as_str() {
-        "PDF" => "color: #fca5a5; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4);",
-        "DOCX" | "DOC" => "color: #93c5fd; background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4);",
-        "XLSX" | "XLS" | "CSV" => "color: #6ee7b7; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);",
-        "RS" | "TS" | "JS" | "PY" => "color: #d8b4fe; background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.4);",
-        "ZIP" | "TAR" | "GZ" => "color: #fcd34d; background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4);",
-        _ => "color: #d4d4d8; background: rgba(39, 39, 42, 0.8); border-color: rgba(82, 82, 91, 0.5);",
+    // Semantic tone per file type (styled by `sd-doc-card__badge--<tone>`)
+    let tone = match ftype.as_str() {
+        "PDF" => "danger",
+        "DOCX" | "DOC" => "info",
+        "XLSX" | "XLS" | "CSV" => "success",
+        "RS" | "TS" | "JS" | "PY" => "accent",
+        "ZIP" | "TAR" | "GZ" => "warning",
+        _ => "neutral",
     };
 
     let has_actions = on_download.is_some() || on_share.is_some() || on_delete.is_some();
 
     rsx! {
-        div {
-            class: "sd-doc-card group {class}",
-            onclick: move |evt| {
-                if let Some(handler) = &on_click {
-                    handler.call(evt);
-                }
-            },
+        crate::card::Card {
+            class: "sd-doc-card {class}",
+            overflow_hidden: true,
+            on_click: on_click,
 
             // Area Thumbnail o Icona File
             div { class: "sd-doc-card__preview",
@@ -50,19 +47,11 @@ pub fn DocumentCard(
                         src: "{url}",
                         alt: "{file_name}",
                     }
-                    span {
-                        class: "sd-doc-card__badge",
-                        style: "{type_badge_style}",
-                        "{ftype}"
-                    }
+                    span { class: "sd-doc-card__badge sd-doc-card__badge--{tone}", "{ftype}" }
                 } else {
                     div { class: "sd-doc-card__center-icon",
-                        Icon { kind: IconKind::Paperclip, size: 36, class: "text-zinc-500" }
-                        span {
-                            class: "text-[11px] font-mono px-2 py-0.5 rounded border",
-                            style: "{type_badge_style}",
-                            "{ftype}"
-                        }
+                        Icon { kind: IconKind::Paperclip, size: 36, class: "sd-doc-card__icon" }
+                        span { class: "sd-doc-card__badge sd-doc-card__badge--inline sd-doc-card__badge--{tone}", "{ftype}" }
                     }
                 }
 
@@ -122,7 +111,7 @@ pub fn DocumentCard(
                             size: AvatarSize::Xs,
                             status: author.status,
                         }
-                        span { class: "truncate max-w-[100px]", "{author.name}" }
+                        span { class: "sd-doc-card__author-name", "{author.name}" }
                     }
 
                     div { class: "sd-doc-card__meta",
@@ -130,7 +119,7 @@ pub fn DocumentCard(
                             span { "{sz}" }
                         }
                         if let Some(v) = views {
-                            span { class: "flex items-center gap-1",
+                            span { class: "sd-doc-card__views",
                                 Icon { kind: IconKind::Eye, size: 12 }
                                 "{v}"
                             }

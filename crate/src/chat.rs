@@ -84,21 +84,17 @@ pub fn MessageBubble(
     let base_override = theme_val.resolve_component_base("chat_bubble").unwrap_or("");
     #[cfg(feature = "theme")]
     let class_modifiers = theme_val.resolve_class_modifiers("chat_bubble", &class);
-    #[cfg(feature = "theme")]
-    let radius = theme_val.radius_scale.lg();
 
     #[cfg(not(feature = "theme"))]
     let base_override = "";
     #[cfg(not(feature = "theme"))]
     let class_modifiers = String::new();
-    #[cfg(not(feature = "theme"))]
-    let radius = "";
 
     rsx! {
         div {
             class: "sd-chat-bubble-container {direction.container_class()}",
             div {
-                class: "sd-chat-bubble {dir_class} {radius} {base_override} {class_modifiers} {class}",
+                class: "sd-chat-bubble {dir_class} {base_override} {class_modifiers} {class}",
 
                 if let Some(sender) = sender_name {
                     div {

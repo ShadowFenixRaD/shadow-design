@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 
 use crate::avatar::{Avatar, AvatarSize, PersonaProps};
+use crate::button::{Button, ButtonSize, ButtonVariant};
 use crate::icon::{Icon, IconKind};
+use crate::textarea::Textarea;
 
 /// Singolo commento o risposta all'interno di un evento di attività.
 #[derive(Clone, PartialEq, Debug)]
@@ -109,95 +111,90 @@ pub fn ActivityItem(
     let ts = event.timestamp.clone();
     let icon_kind = event.icon.unwrap_or(IconKind::Sparkles);
 
+    let size_class = if compact { "sd-activity-item--compact" } else { "" };
+    let unread_class = if event.unread { "sd-activity-item--unread" } else { "" };
+
     rsx! {
-        div { class: "sd-activity-item relative flex items-start gap-3.5 w-full group",
-            // Connettore verticale
+        div { class: "sd-activity-item {size_class} {unread_class}",
+            // Vertical connector (centred on the avatar)
             if !is_last {
-                div {
-                    class: "absolute left-4 top-10 bottom-0 w-px bg-white/[0.08]",
-                }
+                div { class: "sd-activity-item__connector" }
             }
 
-            // Avatar autore con icona sovrapposta
-            div { class: "relative shrink-0 z-10",
+            // Author avatar with the event icon mark (top-right, clear of the presence dot)
+            div { class: "sd-activity-item__lead",
                 Avatar {
                     src: author.avatar_url.clone(),
                     name: Some(author.name.clone()),
                     size: if compact { AvatarSize::Sm } else { AvatarSize::Md },
                     status: author.status,
                 }
-                span { class: "absolute -bottom-1 -right-1 p-1 rounded-full bg-zinc-950 border border-white/10 text-purple-400 shadow-sm",
+                span { class: "sd-activity-item__mark",
                     Icon { kind: icon_kind, size: 10 }
                 }
             }
 
-            // Dettagli evento
-            div { class: "flex-1 flex flex-col gap-1.5 pb-6 min-w-0",
-                div { class: "flex flex-wrap items-baseline gap-1.5 text-xs",
-                    span { class: "font-semibold text-white", "{author.name}" }
-                    span { class: "text-zinc-400", "{action}" }
+            // Event details
+            div { class: "sd-activity-item__body",
+                div { class: "sd-activity-item__head",
+                    span { class: "sd-activity-item__author", "{author.name}" }
+                    span { class: "sd-activity-item__action", "{action}" }
                     if let Some(t) = &target {
-                        span { class: "font-semibold text-purple-300 font-mono", "{t}" }
+                        span { class: "sd-activity-item__target", "{t}" }
                     }
-                    span { class: "text-[11px] text-zinc-500 font-mono ml-auto", "{ts}" }
+                    span { class: "sd-activity-item__time", "{ts}" }
                 }
 
                 if let Some(d) = &desc {
-                    div { class: "p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-zinc-300 leading-relaxed font-sans mt-0.5",
-                        "{d}"
-                    }
+                    div { class: "sd-activity-item__desc", "{d}" }
                 }
 
-                // Commenti o risposte
                 if !event.comments.is_empty() {
-                    div { class: "flex flex-col gap-2 mt-2 pl-3 border-l-2 border-white/[0.06]",
+                    div { class: "sd-activity-item__comments",
                         for c in &event.comments {
-                            div { key: "{c.timestamp}", class: "flex items-start gap-2 text-xs",
+                            div { key: "{c.timestamp}", class: "sd-activity-item__comment",
                                 Avatar {
                                     src: c.author.avatar_url.clone(),
                                     name: Some(c.author.name.clone()),
                                     size: AvatarSize::Xs,
                                 }
-                                div { class: "flex flex-col flex-1 bg-white/[0.02] p-2 rounded-lg border border-white/[0.04]",
-                                    div { class: "flex items-center justify-between text-[11px]",
-                                        span { class: "font-semibold text-zinc-200", "{c.author.name}" }
-                                        span { class: "text-zinc-500 font-mono", "{c.timestamp}" }
+                                div { class: "sd-activity-item__comment-body",
+                                    div { class: "sd-activity-item__comment-head",
+                                        span { class: "sd-activity-item__comment-author", "{c.author.name}" }
+                                        span { class: "sd-activity-item__time", "{c.timestamp}" }
                                     }
-                                    p { class: "text-zinc-300 mt-1", "{c.text}" }
+                                    p { class: "sd-activity-item__comment-text", "{c.text}" }
                                 }
                             }
                         }
                     }
                 }
 
-                // Azione Rispondi
                 if allow_replies {
-                    div { class: "flex items-center gap-2 mt-1",
+                    div { class: "sd-activity-item__reply",
                         if !is_replying() {
-                            button {
-                                r#type: "button",
-                                class: "text-[11px] font-mono text-zinc-500 hover:text-purple-300 transition-colors cursor-pointer",
+                            Button {
+                                variant: ButtonVariant::Ghost,
+                                size: ButtonSize::Xs,
                                 onclick: move |_| is_replying.set(true),
                                 "{locale.reply}"
                             }
                         } else {
-                            div { class: "w-full flex flex-col gap-2 p-2.5 rounded-xl bg-zinc-900 border border-white/10 mt-1",
-                                textarea {
-                                    class: "w-full p-2 bg-transparent text-xs text-zinc-200 placeholder-zinc-500 outline-none resize-none min-h-[60px]",
-                                    placeholder: "{locale.activity_reply_placeholder}",
-                                    value: "{reply_text}",
-                                    oninput: move |e| reply_text.set(e.value()),
+                            div { class: "sd-activity-item__composer",
+                                Textarea {
+                                    value: reply_text,
+                                    placeholder: Some(locale.activity_reply_placeholder.clone()),
                                 }
-                                div { class: "flex items-center justify-end gap-2",
-                                    button {
-                                        r#type: "button",
-                                        class: "px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer",
+                                div { class: "sd-activity-item__composer-actions",
+                                    Button {
+                                        variant: ButtonVariant::Ghost,
+                                        size: ButtonSize::Sm,
                                         onclick: move |_| is_replying.set(false),
                                         "{locale.cancel}"
                                     }
-                                    button {
-                                        r#type: "button",
-                                        class: "px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white transition-colors cursor-pointer disabled:opacity-40",
+                                    Button {
+                                        variant: ButtonVariant::Primary,
+                                        size: ButtonSize::Sm,
                                         disabled: reply_text().trim().is_empty(),
                                         onclick: {
                                             let eid = event_id.clone();
@@ -237,9 +234,9 @@ pub fn ActivityFeed(
     let total = items.len();
 
     rsx! {
-        div { class: "sd-activity-feed flex flex-col w-full {class}",
+        div { class: "sd-activity-feed {class}",
             if items.is_empty() {
-                div { class: "p-8 text-center text-xs text-zinc-500 font-mono",
+                div { class: "sd-activity-feed__empty",
                     "{locale.activity_empty}"
                 }
             } else {

@@ -174,9 +174,9 @@ pub fn ScatterChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col {class}",
+        div { class: "sd-chart-root {class}",
             div {
-                class: "relative w-full",
+                class: "sd-chart-frame",
                 onmouseleave: move |_| {
                     hover_index.set(None);
                 },
@@ -195,8 +195,7 @@ pub fn ScatterChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_index.set(None),
                     }
 
@@ -226,11 +225,9 @@ pub fn ScatterChart(
                                     cx: "{cx}",
                                     cy: "{cy}",
                                     r: "{r_draw}",
-                                    fill: "{color}",
                                     fill_opacity: if is_h { "1.0" } else { "0.7" },
-                                    stroke: if is_h { "#ffffff" } else { "{color}" },
-                                    stroke_width: if is_h { "2.5" } else { "1.5" },
-                                    class: "cursor-pointer transition-all duration-150",
+                                    style: if is_h { format!("fill: {color};") } else { format!("fill: {color}; stroke: {color};") },
+                                    class: if is_h { "sd-chart__point sd-chart__point--hover" } else { "sd-chart__point" },
                                     onmouseenter: move |_| hover_index.set(Some(n_idx)),
                                     onmouseleave: move |_| hover_index.set(None),
                                     onpointerleave: move |_| hover_index.set(None),
@@ -243,9 +240,7 @@ pub fn ScatterChart(
                     text {
                         x: "{padding_left}",
                         y: "{baseline_y + 18.0}",
-                        fill: "rgba(255, 255, 255, 0.45)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         pointer_events: "none",
                         "{min_x:.1}"
                     }
@@ -253,9 +248,7 @@ pub fn ScatterChart(
                         x: "{padding_left + plot_w}",
                         y: "{baseline_y + 18.0}",
                         text_anchor: "end",
-                        fill: "rgba(255, 255, 255, 0.45)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         pointer_events: "none",
                         "{max_x:.1}"
                     }
@@ -264,9 +257,7 @@ pub fn ScatterChart(
                         y: "{padding_top + plot_h}",
                         text_anchor: "end",
                         dominant_baseline: "middle",
-                        fill: "rgba(255, 255, 255, 0.45)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         pointer_events: "none",
                         "{min_y:.1}"
                     }
@@ -275,9 +266,7 @@ pub fn ScatterChart(
                         y: "{padding_top}",
                         text_anchor: "end",
                         dominant_baseline: "middle",
-                        fill: "rgba(255, 255, 255, 0.45)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         pointer_events: "none",
                         "{max_y:.1}"
                     }

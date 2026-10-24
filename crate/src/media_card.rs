@@ -1,8 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::aspect_ratio::AspectRatio;
+use crate::card::Card;
 
-/// Area d'azione cliccabile con effetto tattile e focus-ring esteso a tutta la superficie.
+/// Clickable wrapper that gives a whole area the interactive-container treatment
+/// (hover border, press, focus ring) with keyboard activation.
 #[component]
 pub fn CardActionArea(
     #[props(default)] on_click: Option<EventHandler<MouseEvent>>,
@@ -11,18 +13,14 @@ pub fn CardActionArea(
     children: Element,
 ) -> Element {
     let action_id = crate::a11y::use_unique_id("card-action", None);
-    let state_cls = if !disabled {
-        "cursor-pointer hover:border-purple-500/40 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-purple-500"
-    } else {
-        "opacity-60 cursor-not-allowed"
-    };
-
     let aid_kd = action_id.clone();
     rsx! {
         div {
             id: "{action_id}",
-            class: "sd-card-action-area group relative w-full rounded-xl transition-all outline-none {state_cls} {class}",
+            class: "sd-card-action-area {class}",
+            role: "button",
             tabindex: if disabled { "-1" } else { "0" },
+            "aria-disabled": if disabled { "true" } else { "false" },
             onclick: move |evt| {
                 if !disabled {
                     if let Some(handler) = &on_click {
@@ -47,7 +45,8 @@ pub fn CardActionArea(
     }
 }
 
-/// Scheda contenitore arricchita con testata multimediale immersiva (video o immagine ad aspect ratio fisso).
+/// Card with an immersive media header (video or image at a fixed aspect ratio).
+/// Built on the library `Card`: it becomes interactive when `on_click` is set.
 #[component]
 pub fn MediaCard(
     image_url: String,
@@ -61,18 +60,20 @@ pub fn MediaCard(
     #[props(default)] class: String,
     #[props(default)] children: Element,
 ) -> Element {
+    let footer_el = footer.map(|f| rsx! { div { class: "sd-media-card__footer", {f} } });
     rsx! {
-        CardActionArea {
+        Card {
+            class: "sd-media-card {class}",
+            overflow_hidden: true,
             on_click: on_click,
-            class: "sd-media-card flex flex-col rounded-xl border border-white/[0.12] bg-zinc-950/70 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-200 {class}",
+            footer: footer_el,
 
-            // Media Header
-            div { class: "relative w-full overflow-hidden bg-zinc-900 border-b border-white/[0.08]",
+            div { class: "sd-media-card__media",
                 AspectRatio { ratio: aspect_ratio,
                     if let Some(v_url) = &video_url {
                         video {
                             src: "{v_url}",
-                            class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
+                            class: "sd-media-card__asset",
                             autoplay: true,
                             muted: true,
                             r#loop: true,
@@ -82,39 +83,25 @@ pub fn MediaCard(
                         img {
                             src: "{image_url}",
                             alt: "{title.clone().unwrap_or_default()}",
-                            class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
+                            class: "sd-media-card__asset",
                             loading: "lazy",
                         }
                     }
                 }
 
                 if let Some(b_text) = &badge {
-                    span { class: "absolute top-3 right-3 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-black/75 text-purple-300 border border-purple-500/30 backdrop-blur-md shadow-md",
-                        "{b_text}"
-                    }
+                    span { class: "sd-media-card__badge", "{b_text}" }
                 }
             }
 
-            // Body
-            div { class: "p-4 flex flex-col gap-2 flex-1",
+            div { class: "sd-media-card__body",
                 if let Some(t) = &title {
-                    h3 { class: "text-base font-semibold text-white group-hover:text-purple-300 transition-colors",
-                        "{t}"
-                    }
+                    h3 { class: "sd-media-card__title", "{t}" }
                 }
                 if let Some(s) = &subtitle {
-                    p { class: "text-xs text-zinc-400 font-mono line-clamp-2",
-                        "{s}"
-                    }
+                    p { class: "sd-media-card__subtitle", "{s}" }
                 }
                 {children}
-            }
-
-            // Footer Slot opzionale
-            if let Some(f) = footer {
-                div { class: "p-3 bg-white/[0.02] border-t border-white/[0.06] flex items-center justify-between text-xs text-zinc-400",
-                    {f}
-                }
             }
         }
     }

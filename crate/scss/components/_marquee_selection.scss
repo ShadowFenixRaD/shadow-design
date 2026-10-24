@@ -1,7 +1,6 @@
 // ==============================================================================
-// Shadow Design — MarqueeSelection Component
+// Shadow Design — MarqueeSelection
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
@@ -13,11 +12,15 @@
 
   .sd-marquee-box {
     position: absolute;
-    z-index: 40;
+    z-index: z('sticky');
     pointer-events: none;
-    background: rgba(168, 85, 247, 0.18);
-    border: 1px dashed #c084fc;
-    border-radius: 4px;
-    box-shadow: 0 0 14px rgba(168, 85, 247, 0.25);
+    background-color: var(--sd-accent-soft);
+    border: 1px dashed var(--sd-accent-border);
+    border-radius: var(--sd-radius-sm);
+  }
+
+  // Added by the selection engine to items covered by the lasso.
+  .sd-marquee-item--selected {
+    @include sd-selected;
   }
 }

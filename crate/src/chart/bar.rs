@@ -109,9 +109,9 @@ pub fn BarChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col {class}",
+        div { class: "sd-chart-root {class}",
             div {
-                class: "relative w-full",
+                class: "sd-chart-frame",
                 onmouseleave: move |_| {
                     hover_index.set(None);
                 },
@@ -130,8 +130,7 @@ pub fn BarChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_index.set(None),
                     }
                     if with_grid {
@@ -151,7 +150,7 @@ pub fn BarChart(
                             let is_hovered = hover_index() == Some(i);
                             let group_x = padding_left + i as f64 * group_w + group_offset_x;
                             let opacity_val = if hover_index().is_some() && !is_hovered { "0.55" } else { "1.0" };
-                            let label_color = if is_hovered { "rgba(255, 255, 255, 0.95)" } else { "rgba(255, 255, 255, 0.45)" };
+                            let label_class = if is_hovered { "sd-chart__label sd-chart__label--active" } else { "sd-chart__label" };
 
                             rsx! {
                                 g { key: "bar-group-{i}",
@@ -173,11 +172,9 @@ pub fn BarChart(
                                                         height: "{bh}",
                                                         rx: "{bar_radius}",
                                                         ry: "{bar_radius}",
-                                                        fill: "{color}",
-                                                        stroke: if is_hovered { "#ffffff" } else { "none" },
-                                                        stroke_width: if is_hovered { "1.5" } else { "0" },
+                                                        style: "fill: {color};",
                                                         opacity: "{opacity_val}",
-                                                        class: "transition-all duration-150",
+                                                        class: if is_hovered { "sd-chart__bar sd-chart__bar--hover" } else { "sd-chart__bar" },
                                                         pointer_events: "none",
                                                     }
                                                 }
@@ -211,11 +208,9 @@ pub fn BarChart(
                                                                 height: "{bh}",
                                                                 rx: "{bar_radius}",
                                                                 ry: "{bar_radius}",
-                                                                fill: "{color}",
-                                                                stroke: if is_hovered { "#ffffff" } else { "none" },
-                                                                stroke_width: if is_hovered { "1.5" } else { "0" },
+                                                                style: "fill: {color};",
                                                                 opacity: "{opacity_val}",
-                                                                class: "transition-all duration-150",
+                                                                class: if is_hovered { "sd-chart__bar sd-chart__bar--hover" } else { "sd-chart__bar" },
                                                                 pointer_events: "none",
                                                             }
                                                         }
@@ -230,9 +225,7 @@ pub fn BarChart(
                                         x: "{group_x + group_inner_w / 2.0}",
                                         y: "{baseline_y + 20.0}",
                                         text_anchor: "middle",
-                                        fill: "{label_color}",
-                                        font_size: "11",
-                                        font_family: "monospace",
+                                        class: "{label_class}",
                                         pointer_events: "none",
                                         "{pt.label}"
                                     }
@@ -256,9 +249,7 @@ pub fn BarChart(
                                                 y: "0",
                                                 width: "{zone_w}",
                                                 height: "{svg_h}",
-                                                fill: "rgba(0, 0, 0, 0.001)",
-                                                style: "pointer-events: all;",
-                                                class: "cursor-pointer",
+                                                class: "sd-chart__hit sd-chart__hit--pointer",
                                                 onmouseenter: move |_| hover_index.set(Some(i)),
                                                 onmouseleave: move |_| hover_index.set(None),
                                                 onpointerleave: move |_| hover_index.set(None),

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use std::collections::{BTreeMap, BTreeSet};
 use std::f64::consts::PI;
 
-use super::primitives::{get_series_color, ChartContainer, ChartLegend, ChartSeries, ChartTooltip};
+use super::primitives::{get_series_color, series_line_style, ChartContainer, ChartLegend, ChartSeries, ChartTooltip};
 
 /// Singolo punto o asse di valutazione per grafico radar polare.
 #[derive(Clone, PartialEq, Debug, Default)]
@@ -52,8 +52,8 @@ pub fn RadarChart(
     let num_axes = data.len();
     if num_axes < 3 {
         return rsx! {
-            div { class: "p-4 text-center text-xs text-zinc-500 font-mono",
-                "RadarChart richiede almeno 3 assi dati."
+            div { class: "sd-chart__empty",
+                "RadarChart requires at least 3 data axes."
             }
         };
     }
@@ -151,9 +151,9 @@ pub fn RadarChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col items-center {class}",
+        div { class: "sd-chart-root sd-chart-root--center {class}",
             div {
-                class: "relative w-full max-w-md",
+                class: "sd-chart-frame sd-chart-frame--narrow",
                 onmouseleave: move |_| {
                     hover_axis.set(None);
                 },
@@ -171,8 +171,7 @@ pub fn RadarChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_axis.set(None),
                     }
 
@@ -181,9 +180,7 @@ pub fn RadarChart(
                         polygon {
                             key: "grid-poly-{lvl_idx}",
                             points: "{poly_pts}",
-                            fill: "none",
-                            stroke: "rgba(255, 255, 255, 0.08)",
-                            stroke_width: "1",
+                            class: "sd-chart__ring",
                             pointer_events: "none",
                         }
                     }
@@ -196,8 +193,7 @@ pub fn RadarChart(
                             y1: "{center_y}",
                             x2: "{px}",
                             y2: "{py}",
-                            stroke: "rgba(255, 255, 255, 0.10)",
-                            stroke_width: "1",
+                            class: "sd-chart__spoke",
                             pointer_events: "none",
                         }
                     }
@@ -207,11 +203,9 @@ pub fn RadarChart(
                         g { key: "series-radar-{orig_idx}",
                             polygon {
                                 points: "{poly_pts}",
-                                fill: "{color}",
                                 fill_opacity: "0.25",
-                                stroke: "{color}",
                                 stroke_width: "2",
-                                style: "filter: drop-shadow(0 0 6px {color}66);",
+                                style: "fill: {color}; {series_line_style(&color)}",
                                 pointer_events: "none",
                             }
                             if with_dots {
@@ -225,18 +219,16 @@ pub fn RadarChart(
                                                     cx: "{cx}",
                                                     cy: "{cy}",
                                                     r: if is_h { "5.5" } else { "3.5" },
-                                                    fill: "#09090b",
-                                                    stroke: if is_h { "#ffffff" } else { "{color}" },
+                                                    style: if is_h { String::new() } else { format!("stroke: {color};") },
                                                     stroke_width: if is_h { "2.5" } else { "2" },
-                                                    class: "transition-all duration-150",
+                                                    class: "sd-chart__dot",
                                                     pointer_events: "none",
                                                 }
                                                 circle {
                                                     cx: "{cx}",
                                                     cy: "{cy}",
                                                     r: "12",
-                                                    fill: "transparent",
-                                                    style: "cursor: pointer;",
+                                                    class: "sd-chart__hit sd-chart__hit--pointer",
                                                     onmouseenter: move |_| hover_axis.set(Some(pt_idx)),
                                                 }
                                             }
@@ -258,11 +250,7 @@ pub fn RadarChart(
                                     y: "{ly}",
                                     text_anchor: "middle",
                                     dominant_baseline: "middle",
-                                    fill: if is_h { "#ffffff" } else { "rgba(255, 255, 255, 0.55)" },
-                                    font_size: "10.5",
-                                    font_family: "monospace",
-                                    font_weight: if is_h { "bold" } else { "normal" },
-                                    class: "cursor-pointer transition-colors",
+                                    class: if is_h { "sd-chart__label sd-chart__label--active sd-chart__label--interactive" } else { "sd-chart__label sd-chart__label--interactive" },
                                     onmouseenter: move |_| hover_axis.set(Some(i)),
                                     onmouseleave: move |_| hover_axis.set(None),
                                     onpointerleave: move |_| hover_axis.set(None),

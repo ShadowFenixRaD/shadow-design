@@ -38,7 +38,7 @@ pub fn ContactCard(
             on_click: on_click,
 
             if let Some(desc) = description {
-                p { class: "sd-contact-card__desc text-xs text-zinc-300 leading-relaxed mb-1", "{desc}" }
+                p { class: "sd-contact-card__desc", "{desc}" }
             }
             {children}
         }

@@ -171,21 +171,6 @@
     --sd-glow-danger: 0 0 12px -2px rgba(var(--sd-danger-rgb), calc(0.5 * var(--sd-glow-strength)));
 
     --sd-chart-1: var(--sd-accent);
-
-    // ------------------------------------------------------------------------
-    // LEGACY — do not use, removed after migration.
-    // Aliases read by not-yet-migrated component partials and the showcase.
-    // ------------------------------------------------------------------------
-    --sd-primary-color: var(--sd-accent);
-    --sd-accent-soft-bg: var(--sd-accent-soft);
-    --sd-accent-glow: rgba(var(--sd-accent-rgb), calc(0.4 * var(--sd-glow-strength)));
-    --sd-surface-0: var(--sd-void);
-    --color-void: var(--sd-void);
-    --color-surface-1: var(--sd-surface-1);
-    --color-surface-2: var(--sd-surface-2);
-    --color-surface-3: var(--sd-surface-3);
-    --font-sans: var(--sd-font-sans);
-    --font-mono: var(--sd-font-mono);
   }
 
   // ----------------------------------------------------------------------------
@@ -236,5 +221,16 @@
   /* component-requested tokens (each must also be listed in docs/design/tokens.md) */
   :root {
     // (none yet)
+  }
+  :root,
+  .sd-theme {
+    // Syntax colours (CodeBlock). Derived from semantic/accent tokens so they follow the preset.
+    --sd-code-keyword: var(--sd-accent-strong);
+    --sd-code-fn: var(--sd-info-strong);
+    --sd-code-type: var(--sd-chart-6);
+    --sd-code-string: var(--sd-success-strong);
+    --sd-code-number: var(--sd-warning-strong);
+    --sd-code-comment: var(--sd-text-subtle);
+    --sd-code-operator: var(--sd-text-muted);
   }
 }

@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use super::primitives::{generate_svg_area_path, generate_svg_path, CurveType};
+use super::primitives::{generate_svg_area_path, generate_svg_path, series_line_style, CurveType};
 
 /// Direzione o tendenza del trend per colorazione automatica.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
@@ -27,7 +27,7 @@ pub fn Sparkline(
 ) -> Element {
     if data.is_empty() {
         return rsx! {
-            div { class: "inline-block {class}", style: "width: {width}px; height: {height}px;" }
+            div { class: "sd-sparkline {class}", style: "width: {width}px; height: {height}px;" }
         };
     }
 
@@ -62,18 +62,18 @@ pub fn Sparkline(
         c
     } else {
         match trend {
-            TrendDirection::Positive => "#00ff9d".to_string(), // Emerald
-            TrendDirection::Negative => "#ff1744".to_string(), // Crimson
-            TrendDirection::Neutral => "#a1a1aa".to_string(),  // Zinc
+            TrendDirection::Positive => "var(--sd-success)".to_string(),
+            TrendDirection::Negative => "var(--sd-danger)".to_string(),
+            TrendDirection::Neutral => "var(--sd-text-subtle)".to_string(),
             TrendDirection::Auto => {
                 let first = data.first().copied().unwrap_or(0.0);
                 let last = data.last().copied().unwrap_or(0.0);
                 if last > first {
-                    "#00ff9d".to_string()
+                    "var(--sd-success)".to_string()
                 } else if last < first {
-                    "#ff1744".to_string()
+                    "var(--sd-danger)".to_string()
                 } else {
-                    "#a855f7".to_string() // Violet neon
+                    "var(--sd-chart-1)".to_string()
                 }
             }
         }
@@ -87,7 +87,7 @@ pub fn Sparkline(
 
     rsx! {
         div {
-            class: "relative inline-block select-none shrink-0 {class}",
+            class: "sd-sparkline {class}",
             style: "width: {width}px; height: {height}px;",
             onmousemove: move |evt| {
                 let c = evt.element_coordinates();
@@ -106,7 +106,7 @@ pub fn Sparkline(
                 hover_index.set(None);
             },
             svg {
-                class: "w-full h-full overflow-visible",
+                class: "sd-sparkline__svg",
                 view_box: "0 0 {width} {height}",
                 onmouseleave: move |_| {
                     hover_index.set(None);
@@ -123,13 +123,11 @@ pub fn Sparkline(
                         y2: "1",
                         stop {
                             offset: "0%",
-                            stop_color: "{resolved_color}",
-                            stop_opacity: "0.35",
+                            style: "stop-color: {resolved_color}; stop-opacity: 0.35;",
                         }
                         stop {
                             offset: "100%",
-                            stop_color: "{resolved_color}",
-                            stop_opacity: "0.0",
+                            style: "stop-color: {resolved_color}; stop-opacity: 0;",
                         }
                     }
                 }
@@ -143,11 +141,10 @@ pub fn Sparkline(
                 path {
                     d: "{line_path}",
                     fill: "none",
-                    stroke: "{resolved_color}",
                     stroke_width: "{stroke_width}",
                     stroke_linecap: "round",
                     stroke_linejoin: "round",
-                    style: "filter: drop-shadow(0 0 4px {resolved_color}88);",
+                    style: "{series_line_style(&resolved_color)}",
                     pointer_events: "none",
                 }
 
@@ -161,9 +158,8 @@ pub fn Sparkline(
                                     cx: "{cx}",
                                     cy: "{cy}",
                                     r: "3.5",
-                                    fill: "{resolved_color}",
-                                    stroke: "#ffffff",
-                                    stroke_width: "1.5",
+                                    class: "sd-chart__dot sd-chart__dot--hover",
+                                    style: "fill: {resolved_color};",
                                     pointer_events: "none",
                                 }
                             }
@@ -186,7 +182,7 @@ pub fn Sparkline(
                         };
                         rsx! {
                             div {
-                                class: "pointer-events-none absolute z-[1000] px-2 py-0.5 rounded-md bg-zinc-950/95 border border-white/20 text-[11px] font-mono font-bold text-white shadow-xl backdrop-blur-md whitespace-nowrap",
+                                class: "sd-chart__tooltip sd-chart__tooltip--mini",
                                 style: "{pos_style} {transform}",
                                 "{val:.2}"
                             }

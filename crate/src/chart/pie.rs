@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use std::f64::consts::PI;
 
-use super::primitives::{get_series_color, ChartContainer, ChartTooltip};
+use super::primitives::{get_series_color, ChartContainer, ChartLegend, ChartSeries, ChartTooltip};
 
 /// Singolo spicchio di dati per grafico a torta o ciambella.
 #[derive(Clone, PartialEq, Debug)]
@@ -43,6 +43,7 @@ pub fn PieChart(
 ) -> Element {
     let locale = crate::locale::use_locale();
     let mut hover_index = use_signal(|| None::<usize>);
+    let hidden_series = use_signal(std::collections::BTreeSet::<String>::new);
 
     let svg_w = 400.0;
     let svg_h = 300.0;
@@ -51,13 +52,20 @@ pub fn PieChart(
     let outer_radius = 110.0;
     let inner_r = inner_radius.unwrap_or(0.0);
 
-    let total: f64 = data.iter().map(|s| s.value).sum();
+    let total: f64 = data
+        .iter()
+        .filter(|s| !hidden_series().contains(&s.name))
+        .map(|s| s.value)
+        .sum();
 
     // Calcolo angoli di ciascuno spicchio
     let mut current_angle = -PI / 2.0; // Inizio alle 12 in punto
     let mut slices = Vec::new();
 
     for (i, seg) in data.iter().enumerate() {
+        if hidden_series().contains(&seg.name) {
+            continue;
+        }
         let fraction = if total > 0.0 { seg.value / total } else { 0.0 };
         let sweep_angle = fraction * 2.0 * PI;
         let start_angle = current_angle;
@@ -87,9 +95,9 @@ pub fn PieChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col items-center {class}",
+        div { class: "sd-chart-root sd-chart-root--center {class}",
             div {
-                class: "relative w-full max-w-md",
+                class: "sd-chart-frame sd-chart-frame--narrow",
                 onmouseleave: move |_| {
                     hover_index.set(None);
                 },
@@ -107,8 +115,7 @@ pub fn PieChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_index.set(None),
                     }
 
@@ -164,12 +171,10 @@ pub fn PieChart(
                                 path {
                                     key: "slice-{idx}",
                                     d: "{path_d}",
-                                    fill: "{color}",
-                                    stroke: if is_hovered { "#ffffff" } else { "#09090b" },
                                     stroke_width: if is_hovered { "2.5" } else { "{stroke_width}" },
                                     opacity: if hover_index().is_some() && !is_hovered { "0.6" } else { "1.0" },
-                                    style: "cursor: pointer;",
-                                    class: "transition-all duration-150",
+                                    style: "fill: {color};",
+                                    class: if is_hovered { "sd-chart__slice sd-chart__slice--hover" } else { "sd-chart__slice" },
                                     onmouseenter: move |_| hover_index.set(Some(n_idx)),
                                     onmouseleave: move |_| hover_index.set(None),
                                     onpointerleave: move |_| hover_index.set(None),
@@ -180,16 +185,13 @@ pub fn PieChart(
 
                     // Elemento centrale opzionale per Donut (KPI)
                     if inner_r > 30.0 {
-                        g { class: "pointer-events-none select-none text-center",
+                        g { class: "sd-chart__center",
                             if let Some(lbl) = &center_label {
                                 text {
                                     x: "{center_x}",
                                     y: if center_sublabel.is_some() { "{center_y - 4.0}" } else { "{center_y + 6.0}" },
                                     text_anchor: "middle",
-                                    fill: "#ffffff",
-                                    font_size: "18",
-                                    font_weight: "bold",
-                                    font_family: "monospace",
+                                    class: "sd-chart__center-value",
                                     "{lbl}"
                                 }
                             }
@@ -198,9 +200,7 @@ pub fn PieChart(
                                     x: "{center_x}",
                                     y: "{center_y + 16.0}",
                                     text_anchor: "middle",
-                                    fill: "rgba(255, 255, 255, 0.45)",
-                                    font_size: "11",
-                                    font_family: "monospace",
+                                    class: "sd-chart__label",
                                     "{sub}"
                                 }
                             }
@@ -222,28 +222,16 @@ pub fn PieChart(
                 }
             }
 
-            // Legenda sottostante
-            div { class: "flex flex-wrap items-center justify-center gap-4 mt-2 text-xs font-mono",
-                for (idx, seg) in data.iter().enumerate() {
-                    {
-                        let color = get_series_color(idx, seg.color.as_deref());
-                        let is_h = hover_index() == Some(idx);
-                        let leg_cls = if is_h { "opacity-100 font-bold" } else { "opacity-70" };
-                        rsx! {
-                            div {
-                                key: "leg-{idx}",
-                                class: "flex items-center gap-2 cursor-pointer transition-opacity {leg_cls}",
-                                onmouseenter: move |_| hover_index.set(Some(idx)),
-                                onmouseleave: move |_| hover_index.set(None),
-                                span {
-                                    class: "w-2.5 h-2.5 rounded-full shrink-0",
-                                    style: "background-color: {color}; box-shadow: 0 0 6px {color}66;",
-                                }
-                                span { "{seg.name}" }
-                            }
-                        }
-                    }
-                }
+            ChartLegend {
+                series: data
+                    .iter()
+                    .enumerate()
+                    .map(|(i, seg)| {
+                        ChartSeries::new(seg.name.clone())
+                            .with_color(get_series_color(i, seg.color.as_deref()))
+                    })
+                    .collect::<Vec<_>>(),
+                hidden_series: hidden_series,
             }
         }
     }

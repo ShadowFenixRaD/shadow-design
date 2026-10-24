@@ -1,15 +1,38 @@
 // ==============================================================================
-// Shadow Design — Charts & Data Visualization Component Styles
+// Shadow Design — Charts (container recipe; series paint from --sd-chart-n)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  .sd-chart {
-    position: relative;
+  .sd-chart-root {
     display: flex;
     flex-direction: column;
+    width: 100%;
+
+    &--center {
+      align-items: center;
+    }
+  }
+
+  .sd-chart__empty {
+    padding: var(--sd-space-4);
+    text-align: center;
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+  }
+
+  .sd-chart-frame {
+    position: relative;
+    width: 100%;
+
+    &--narrow {
+      max-width: 28rem;
+    }
+  }
+
+  .sd-chart {
+    position: relative;
     width: 100%;
     user-select: none;
 
@@ -19,36 +42,252 @@
       overflow: visible;
     }
 
-    &__grid {
-      line {
-        stroke: rgba(255, 255, 255, 0.08);
+    // Grid
+    &__grid line {
+      stroke: var(--sd-border-subtle);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+
+    &__ring {
+      fill: none;
+      stroke: var(--sd-border-subtle);
+      stroke-width: 1;
+      pointer-events: none;
+    }
+
+    &__spoke {
+      fill: none;
+      stroke: var(--sd-border);
+      stroke-width: 1;
+      pointer-events: none;
+    }
+
+    &__cursor {
+      stroke: var(--sd-border-hover);
+      stroke-width: 1.5;
+      stroke-dasharray: 3 3;
+      pointer-events: none;
+    }
+
+    // Axis and caption text
+    &__label {
+      fill: var(--sd-text-subtle);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      pointer-events: none;
+      @include sd-transition(fill);
+
+      &--active {
+        fill: var(--sd-text);
+      }
+
+      &--interactive {
+        cursor: pointer;
+        pointer-events: auto;
       }
     }
 
+    &__caption {
+      fill: var(--sd-text-muted);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+    }
+
+    &__value {
+      fill: var(--sd-text);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xl);
+      font-weight: 600;
+
+      &--lg {
+        font-size: var(--sd-text-3xl);
+      }
+    }
+
+    &__center {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &__center-value {
+      fill: var(--sd-text);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xl);
+      font-weight: 600;
+    }
+
+    // Transparent hit areas
+    &__hit {
+      fill: transparent;
+      pointer-events: all;
+
+      &--pointer {
+        cursor: pointer;
+      }
+    }
+
+    // Value tracks (gauge, radial bar)
+    &__track {
+      fill: none;
+      stroke: var(--sd-tint-2);
+    }
+
+    &__arc {
+      fill: none;
+      @include sd-transition(stroke-dashoffset);
+    }
+
+    // Marks
+    &__dot {
+      fill: var(--sd-surface-1);
+      stroke-width: 2;
+      @include sd-transition(r, stroke, stroke-width);
+
+      &--hover {
+        stroke: var(--sd-text);
+        stroke-width: 2.5;
+      }
+    }
+
+    &__point {
+      stroke-width: 1.5;
+      cursor: pointer;
+      @include sd-transition(r, fill-opacity, stroke-width);
+
+      &--hover {
+        stroke: var(--sd-text);
+        stroke-width: 2.5;
+      }
+    }
+
+    &__bar {
+      stroke: none;
+      @include sd-transition(opacity, stroke, stroke-width);
+
+      &--hover {
+        stroke: var(--sd-text);
+        stroke-width: 1.5;
+      }
+    }
+
+    &__slice {
+      stroke: var(--sd-surface-1);
+      cursor: pointer;
+      @include sd-transition(opacity, stroke, stroke-width);
+
+      &--hover {
+        stroke: var(--sd-text);
+      }
+    }
+
+    // Legend: toggling series is interactive, so each entry is an item.
     &__legend {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 0.75rem;
-      font-size: 0.75rem;
-      font-family: $font-mono;
+      gap: var(--sd-space-2);
+      margin-top: var(--sd-space-3);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
     }
 
+    &__legend-item {
+      @include sd-item(sm);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+
+      &--hidden {
+        text-decoration: line-through;
+        color: var(--sd-text-subtle);
+
+        .sd-chart__swatch {
+          opacity: 0.35;
+        }
+      }
+    }
+
+    &__swatch {
+      flex-shrink: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: var(--sd-radius-full);
+
+      &--sm {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    // Tooltip: floating panel
     &__tooltip {
-      pointer-events: none;
+      @include sd-surface(2);
+      @include sd-animate(sd-fade-in, var(--sd-dur-fast));
       position: absolute;
-      z-index: 100;
-      padding: 0.5rem 0.75rem;
-      border-radius: $radius-md;
-      background-color: rgba(9, 9, 11, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8), 0 0 15px rgba(168, 85, 247, 0.2);
-      backdrop-filter: blur(16px);
-      font-size: 0.75rem;
-      font-family: $font-mono;
-      transition: transform 75ms ease;
+      z-index: z('tooltip');
+      pointer-events: none;
+      min-width: max-content;
+      padding: var(--sd-space-2) var(--sd-space-3);
+      border-radius: var(--sd-radius-md);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      white-space: nowrap;
+
+      &--mini {
+        min-width: 0;
+        padding: 2px var(--sd-space-2);
+        font-weight: 500;
+        color: var(--sd-text);
+      }
+    }
+
+    &__tooltip-title {
+      margin-bottom: var(--sd-space-2);
+      padding-bottom: var(--sd-space-1);
+      border-bottom: 1px solid var(--sd-border-subtle);
+      font-weight: 600;
+      color: var(--sd-text);
+    }
+
+    &__tooltip-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-1);
+    }
+
+    &__tooltip-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sd-space-5);
+      min-width: 130px;
+    }
+
+    &__tooltip-key {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+      color: var(--sd-text-muted);
+    }
+
+    &__tooltip-value {
+      font-weight: 600;
+      color: var(--sd-text);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .sd-sparkline {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    user-select: none;
+
+    &__svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
     }
   }
 
@@ -57,11 +296,15 @@
     overflow-x: auto;
 
     &__cell {
-      transition: all $duration-fast ease;
+      stroke: var(--sd-border-subtle);
+      stroke-width: 1;
       cursor: pointer;
+      pointer-events: all;
+      @include sd-transition(stroke, stroke-width, opacity);
 
-      &:hover {
-        transform: scale(1.15);
+      &--hover {
+        stroke: var(--sd-text);
+        stroke-width: 2;
       }
     }
   }

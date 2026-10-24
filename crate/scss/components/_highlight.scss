@@ -1,7 +1,6 @@
 // ==============================================================================
-// Shadow Design — Highlight Component
+// Shadow Design — Highlight (search match mark: accent soft)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
@@ -10,15 +9,13 @@
   }
 
   .sd-highlight {
-    --sd-highlight-color: rgba(168, 85, 247, 0.28);
+    --sd-highlight-color: var(--sd-accent-soft);
+    padding: 0 var(--sd-space-1);
+    border-radius: var(--sd-radius-xs);
     background-color: var(--sd-highlight-color);
-    color: #ffffff;
-    font-weight: 600;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
+    color: var(--sd-accent-strong);
+    font-weight: 500;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
-    transition: background-color 0.15s ease;
   }
 }

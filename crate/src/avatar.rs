@@ -78,7 +78,7 @@ impl PresenceStatus {
         match self {
             PresenceStatus::Online => "Online",
             PresenceStatus::Offline => "Offline",
-            PresenceStatus::Busy => "Occupato",
+            PresenceStatus::Busy => "Busy",
             PresenceStatus::DirectP2P => "Direct P2P / Mesh",
         }
     }
@@ -139,21 +139,19 @@ pub fn Avatar(
     let initials = name.as_deref().map(compute_initials).unwrap_or_default();
     let alt_text = alt.or_else(|| name.clone()).unwrap_or_else(|| "Avatar".to_string());
 
-    // Stile di sfondo dinamico per iniziali se non c'è immagine
-    let bg_style = if src.is_none() && !initials.is_empty() {
-        let hue = name.as_deref().map(deterministic_hue).unwrap_or(270);
-        let hue2 = (hue + 40) % 360;
-        format!(
-            "background: linear-gradient(135deg, hsl({hue}, 55%, 18%) 0%, hsl({hue2}, 60%, 10%) 100%); border-color: hsla({hue}, 60%, 45%, 0.4);"
-        )
+    // Deterministic hue for the initials fallback, consumed by SCSS (`--sd-avatar-hue`).
+    let use_hue = src.is_none() && !initials.is_empty();
+    let hue_style = if use_hue {
+        format!("--sd-avatar-hue: {};", name.as_deref().map(deterministic_hue).unwrap_or(270))
     } else {
         String::new()
     };
+    let initials_class = if use_hue { "sd-avatar--initials" } else { "" };
 
     rsx! {
         div {
-            class: "sd-avatar {size_class} {base_override} {class_modifiers} {class}",
-            style: "{bg_style}",
+            class: "sd-avatar {size_class} {initials_class} {base_override} {class_modifiers} {class}",
+            style: "{hue_style}",
             title: "{alt_text}",
 
             if let Some(img_url) = src {
@@ -178,7 +176,7 @@ pub fn Avatar(
                     Icon {
                         kind: IconKind::Sparkles,
                         size: size.px_size() / 2,
-                        class: "sd-avatar__icon text-zinc-400".to_string(),
+                        class: "sd-avatar__icon".to_string(),
                     }
                 }
             }

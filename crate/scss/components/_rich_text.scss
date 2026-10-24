@@ -1,119 +1,244 @@
 // ==============================================================================
-// Shadow Design — RichTextEditor Component Styles
+// Shadow Design — RichTextEditor (field recipe + toolbar of items in tracks)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-rte {
+    // The whole editor is one recessed field; focus-within lights the border.
+    @include sd-field(null);
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    min-height: 0;
 
     &__toolbar {
-      transition: background-color $duration-normal ease;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sd-space-2);
+      padding: var(--sd-space-2);
+      background-color: var(--sd-tint-1);
+      border-bottom: 1px solid var(--sd-border-subtle);
+
+      &--sticky {
+        position: sticky;
+        top: 0;
+        z-index: z('sticky');
+        background-color: var(--sd-surface-1);
+      }
     }
 
+    // A group of controls sits in a track.
     &__group {
+      @include sd-track;
       display: flex;
       align-items: center;
+      gap: 2px;
     }
 
     &__control {
-      display: inline-flex;
-      align-items: center;
+      @include sd-item(sm);
       justify-content: center;
-      transition: all $duration-fast ease;
+      padding-inline: var(--sd-space-2);
+      @include sd-press;
 
-      &:active {
-        transform: scale(0.95);
+      &--active {
+        @include sd-selected;
       }
     }
 
+    &__modes {
+      @include sd-track;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: auto;
+    }
+
+    &__mode {
+      @include sd-item(sm);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+
+      &--active {
+        @include sd-selected;
+      }
+    }
+
+    &__panes {
+      display: grid;
+      grid-template-columns: 1fr;
+      width: 100%;
+
+      &--split {
+        grid-template-columns: 1fr 1fr;
+
+        > * + * {
+          border-left: 1px solid var(--sd-border-subtle);
+        }
+      }
+    }
+
+    &__source,
     &__editable {
-      outline: none;
+      @include sd-field-bare;
+      width: 100%;
+      min-height: var(--sd-rte-min-height, 240px);
+      padding: var(--sd-space-4);
+      font-size: var(--sd-text-md);
+      line-height: var(--sd-leading-normal);
+      color: var(--sd-text);
+      box-sizing: border-box;
+    }
+
+    &__source {
+      font-family: var(--sd-font-mono);
+      resize: vertical;
+    }
+
+    &__editable {
+      overflow-y: auto;
+      cursor: text;
+      @include sd-scrollbar;
+
+      p {
+        margin: var(--sd-space-1) 0;
+        color: var(--sd-text);
+
+        &:empty {
+          min-height: var(--sd-space-2);
+        }
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: var(--sd-text);
+        margin: var(--sd-space-3) 0 var(--sd-space-1);
+      }
 
       h1 {
-        font-size: 1.5rem;
+        font-size: var(--sd-text-2xl);
         font-weight: 700;
-        color: #ffffff;
-        margin-top: 0.75rem;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.25rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: var(--sd-space-1);
+        border-bottom: 1px solid var(--sd-border-subtle);
       }
 
       h2 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #d8b4fe;
-        margin-top: 0.75rem;
-        margin-bottom: 0.35rem;
+        font-size: var(--sd-text-xl);
+        font-weight: 600;
       }
 
       h3 {
-        font-size: 1.1rem;
+        font-size: var(--sd-text-lg);
         font-weight: 600;
-        color: #f4f4f5;
-        margin-top: 0.5rem;
-        margin-bottom: 0.25rem;
+      }
+
+      strong {
+        font-weight: 600;
+        color: var(--sd-text);
+      }
+
+      em {
+        font-style: italic;
       }
 
       blockquote {
-        border-left: 3px solid #a855f7;
-        padding-left: 0.75rem;
-        margin: 0.5rem 0;
-        color: #a1a1aa;
+        margin: var(--sd-space-2) 0;
+        padding-left: var(--sd-space-3);
+        border-left: 2px solid var(--sd-accent);
+        color: var(--sd-text-muted);
         font-style: italic;
+      }
+
+      ul,
+      ol {
+        margin: var(--sd-space-1) 0;
+        padding-left: var(--sd-space-5);
+        color: var(--sd-text);
       }
 
       ul {
         list-style-type: disc;
-        margin-left: 1.25rem;
-        margin-top: 0.25rem;
-        margin-bottom: 0.25rem;
       }
 
       ol {
         list-style-type: decimal;
-        margin-left: 1.25rem;
-        margin-top: 0.25rem;
-        margin-bottom: 0.25rem;
       }
 
       pre {
-        background-color: #18181b;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.5rem;
-        padding: 0.75rem;
-        font-family: monospace;
-        font-size: 0.85rem;
-        color: #d8b4fe;
-        margin: 0.5rem 0;
+        margin: var(--sd-space-2) 0;
+        padding: var(--sd-space-3);
+        overflow-x: auto;
+        border-radius: var(--sd-radius-md);
+        border: 1px solid var(--sd-border);
+        background-color: var(--sd-well);
+        font-family: var(--sd-font-mono);
+        font-size: var(--sd-text-sm);
+        color: var(--sd-code-string);
+
+        code {
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+        }
+      }
+
+      code {
+        padding: 1px var(--sd-space-1);
+        border-radius: var(--sd-radius-xs);
+        border: 1px solid var(--sd-border);
+        background-color: var(--sd-tint-3);
+        font-family: var(--sd-font-mono);
+        font-size: var(--sd-text-xs);
+        color: var(--sd-accent-strong);
       }
 
       mark {
-        background-color: rgba(168, 85, 247, 0.35);
-        color: #ffffff;
-        padding: 0 4px;
-        border-radius: 2px;
+        padding: 0 var(--sd-space-1);
+        border-radius: var(--sd-radius-xs);
+        background-color: var(--sd-accent-soft);
+        color: var(--sd-accent-strong);
       }
 
       u {
         text-decoration: underline;
-        text-decoration-color: #a855f7;
+        text-decoration-color: var(--sd-accent);
         text-underline-offset: 3px;
       }
 
-      del, s {
+      del,
+      s {
         text-decoration: line-through;
-        color: #71717a;
+        color: var(--sd-text-subtle);
       }
 
       a {
-        color: #00f0ff;
+        color: var(--sd-accent-strong);
         text-decoration: underline;
+      }
+
+      table {
+        width: 100%;
+        margin: var(--sd-space-2) 0;
+        border-collapse: collapse;
+        font-size: var(--sd-text-sm);
+      }
+
+      th,
+      td {
+        padding: var(--sd-space-1) var(--sd-space-2);
+        border: 1px solid var(--sd-border);
+      }
+
+      th {
+        background-color: var(--sd-tint-1);
+        font-weight: 500;
+        text-align: left;
       }
     }
   }

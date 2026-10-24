@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use std::collections::BTreeSet;
 
 use super::primitives::{
-    compute_min_max, generate_svg_path, get_series_color, ChartContainer, ChartDataPoint,
+    compute_min_max, generate_svg_path, get_series_color, series_line_style, ChartContainer, ChartDataPoint,
     ChartGrid, ChartLegend, ChartSeries, ChartTooltip, CurveType,
 };
 
@@ -104,9 +104,9 @@ pub fn LineChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col {class}",
+        div { class: "sd-chart-root {class}",
             div {
-                class: "relative w-full",
+                class: "sd-chart-frame",
                 onmouseleave: move |_| {
                     hover_index.set(None);
                 },
@@ -125,8 +125,7 @@ pub fn LineChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_index.set(None),
                     }
                     if with_grid {
@@ -150,12 +149,11 @@ pub fn LineChart(
                                         key: "line-{orig_idx}-{seg_idx}",
                                         d: "{path_d}",
                                         fill: "none",
-                                        stroke: "{color}",
-                                        stroke_width: "{stroke_width}",
+                                                                                stroke_width: "{stroke_width}",
                                         stroke_linecap: "round",
                                         stroke_linejoin: "round",
                                         stroke_dasharray: if *dashed { "6 4" } else { "none" },
-                                        style: "filter: drop-shadow(0 0 6px {color}88);",
+                                        style: "{series_line_style(&color)}",
                                         pointer_events: "none",
                                     }
                                 }
@@ -176,10 +174,9 @@ pub fn LineChart(
                                                 cx: "{cx}",
                                                 cy: "{cy}",
                                                 r: if is_hovered { "5.5" } else { "3.5" },
-                                                fill: "#09090b",
-                                                stroke: if is_hovered { "#ffffff" } else { "{color}" },
+                                                style: if is_hovered { String::new() } else { format!("stroke: {color};") },
                                                 stroke_width: if is_hovered { "2.5" } else { "2" },
-                                                class: "transition-all duration-150",
+                                                class: "sd-chart__dot",
                                                 pointer_events: "none",
                                             }
                                         }
@@ -199,9 +196,7 @@ pub fn LineChart(
                                     y1: "{padding_top}",
                                     x2: "{cx}",
                                     y2: "{baseline_y}",
-                                    stroke: "rgba(255, 255, 255, 0.25)",
-                                    stroke_width: "1.5",
-                                    stroke_dasharray: "3 3",
+                                    class: "sd-chart__cursor",
                                     pointer_events: "none",
                                 }
                             }
@@ -218,9 +213,7 @@ pub fn LineChart(
                                     x: "{cx}",
                                     y: "{baseline_y + 20.0}",
                                     text_anchor: "middle",
-                                    fill: "rgba(255, 255, 255, 0.45)",
-                                    font_size: "11",
-                                    font_family: "monospace",
+                                    class: "sd-chart__label",
                                     pointer_events: "none",
                                     "{pt.label}"
                                 }
@@ -248,9 +241,7 @@ pub fn LineChart(
                                     y: "0",
                                     width: "{zone_w}",
                                     height: "{svg_h}",
-                                    fill: "rgba(0, 0, 0, 0.001)",
-                                    style: "pointer-events: all;",
-                                    class: "cursor-pointer",
+                                    class: "sd-chart__hit sd-chart__hit--pointer",
                                     onmouseenter: move |_| hover_index.set(Some(i)),
                                     onmouseleave: move |_| hover_index.set(None),
                                     onpointerleave: move |_| hover_index.set(None),

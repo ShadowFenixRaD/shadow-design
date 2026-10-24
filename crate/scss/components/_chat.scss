@@ -1,80 +1,54 @@
 // ==============================================================================
-// Shadow Design — MessageBubble & Chat Styles
+// Shadow Design — MessageBubble & Chat (bubbles are static surfaces)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-chat-bubble-container {
     display: flex;
     width: 100%;
-    margin-bottom: 10px;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
+    margin-bottom: var(--sd-space-2);
 
-    &--incoming,
-    &.sd-chat-bubble-container--incoming,
-    &.sd-chat-bubble--incoming {
+    &--incoming {
       justify-content: flex-start;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
     }
 
-    &--outgoing,
-    &.sd-chat-bubble-container--outgoing,
-    &.sd-chat-bubble--outgoing {
+    &--outgoing {
       justify-content: flex-end;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
     }
   }
 
   .sd-chat-bubble {
+    @include sd-surface(1);
     position: relative;
     display: flex;
     flex-direction: column;
     width: fit-content;
     max-width: 78%;
     min-width: 80px;
-    padding: 12px 18px;
-    font-family: $font-sans;
-    font-size: 13.5px;
-    line-height: 1.5;
-    border-radius: 18px;
     box-sizing: border-box;
-    transition: transform $duration-fast ease, box-shadow $duration-fast ease;
+    padding: var(--sd-space-3) var(--sd-space-4);
+    font-family: var(--sd-font-sans);
+    font-size: var(--sd-text-md);
+    line-height: var(--sd-leading-normal);
 
-    &--incoming,
-    &.sd-chat-bubble--incoming {
-      background-color: #0e0e16;
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      color: $zinc-100;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    // Incoming = the plain surface recipe.
+    &--incoming {
       margin-right: auto;
     }
 
-    &--outgoing,
-    &.sd-chat-bubble--outgoing {
-      background: linear-gradient(135deg, rgba(59, 7, 100, 0.65) 0%, rgba(22, 9, 38, 0.92) 100%);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      color: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.5), 0 0 18px rgba(107, 33, 168, 0.22);
+    // Outgoing = accent soft recipe (follows the preset).
+    &--outgoing {
+      @include sd-semantic(accent);
+      color: var(--sd-text);
       margin-left: auto;
     }
 
     &__sender {
-      font-size: 11px;
+      margin-bottom: var(--sd-space-1);
+      font-size: var(--sd-text-xs);
       font-weight: 600;
-      color: #c084fc;
-      margin-bottom: 4px;
-      letter-spacing: 0.02em;
+      color: var(--sd-accent-strong);
     }
 
     &__content {
@@ -85,29 +59,28 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 6px;
-      margin-top: 6px;
-      font-size: 10px;
-      color: $zinc-400;
+      gap: var(--sd-space-2);
+      margin-top: var(--sd-space-2);
+      font-size: var(--sd-text-2xs);
+      color: var(--sd-text-subtle);
       user-select: none;
     }
 
     &__badge {
       display: inline-flex;
       align-items: center;
-      background: rgba(168, 85, 247, 0.25);
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      color: #e9d5ff;
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-size: 9px;
-      font-weight: 700;
+      padding: 1px var(--sd-space-1);
+      border-radius: var(--sd-radius-xs);
+      border: 1px solid var(--sd-accent-border);
+      background-color: var(--sd-accent-soft);
+      color: var(--sd-accent-strong);
+      font-size: var(--sd-text-2xs);
+      font-weight: 500;
       letter-spacing: 0.05em;
     }
 
     &__time {
-      font-feature-settings: 'tnum';
-      opacity: 0.85;
+      font-variant-numeric: tabular-nums;
     }
 
     &__status {
@@ -115,19 +88,19 @@
       align-items: center;
 
       &--sending {
-        color: $zinc-500;
+        color: var(--sd-text-subtle);
       }
 
       &--sent {
-        color: $zinc-400;
+        color: var(--sd-text-muted);
       }
 
       &--delivered {
-        color: #38bdf8;
+        color: var(--sd-info-strong);
       }
 
       &--failed {
-        color: #f43f5e;
+        color: var(--sd-danger-strong);
       }
     }
   }

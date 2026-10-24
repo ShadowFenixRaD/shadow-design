@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use std::f64::consts::PI;
 
-use super::primitives::ChartContainer;
+use super::primitives::{series_line_style, ChartContainer};
 
 /// Grafico a tachimetro (Gauge) ad arco o barra radiale circolare per metriche di completamento.
 #[component]
@@ -39,7 +39,7 @@ pub fn GaugeChart(
     let resolved_color = if let Some(c) = color {
         c
     } else if !thresholds.is_empty() {
-        let mut chosen = "#a855f7".to_string();
+        let mut chosen = "var(--sd-chart-1)".to_string();
         for (thresh, col) in &thresholds {
             if clamped_val >= *thresh {
                 chosen = col.clone();
@@ -47,7 +47,7 @@ pub fn GaugeChart(
         }
         chosen
     } else {
-        "#a855f7".to_string()
+        "var(--sd-chart-1)".to_string()
     };
 
     // Coordinate arco di sfondo
@@ -72,7 +72,7 @@ pub fn GaugeChart(
     );
 
     rsx! {
-        div { class: "flex flex-col items-center select-none {class}",
+        div { class: "sd-chart-root sd-chart-root--center {class}",
             ChartContainer {
                 view_box: "0 0 {svg_w} {svg_h}",
                 height: height,
@@ -80,8 +80,7 @@ pub fn GaugeChart(
                 // Arco di sfondo neutro
                 path {
                     d: "{bg_arc_d}",
-                    fill: "none",
-                    stroke: "rgba(255, 255, 255, 0.08)",
+                    class: "sd-chart__track",
                     stroke_width: "{thickness}",
                     stroke_linecap: "round",
                 }
@@ -91,10 +90,9 @@ pub fn GaugeChart(
                     path {
                         d: "{val_arc_d}",
                         fill: "none",
-                        stroke: "{resolved_color}",
                         stroke_width: "{thickness}",
                         stroke_linecap: "round",
-                        style: "filter: drop-shadow(0 0 8px {resolved_color}aa);",
+                        style: "{series_line_style(&resolved_color)}",
                     }
                 }
 
@@ -103,10 +101,7 @@ pub fn GaugeChart(
                     x: "{center_x}",
                     y: "{center_y - 8.0}",
                     text_anchor: "middle",
-                    fill: "#ffffff",
-                    font_size: "28",
-                    font_weight: "bold",
-                    font_family: "monospace",
+                    class: "sd-chart__value sd-chart__value--lg",
                     "{clamped_val:.1}"
                 }
 
@@ -115,9 +110,7 @@ pub fn GaugeChart(
                         x: "{center_x}",
                         y: "{center_y + 14.0}",
                         text_anchor: "middle",
-                        fill: "rgba(255, 255, 255, 0.7)",
-                        font_size: "12",
-                        font_family: "monospace",
+                        class: "sd-chart__caption",
                         "{lbl}"
                     }
                 }
@@ -127,9 +120,7 @@ pub fn GaugeChart(
                         x: "{center_x}",
                         y: "{center_y + 30.0}",
                         text_anchor: "middle",
-                        fill: "rgba(255, 255, 255, 0.4)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         "{sub}"
                     }
                 }
@@ -139,18 +130,14 @@ pub fn GaugeChart(
                     x: "{bg_x1 - 4.0}",
                     y: "{bg_y1 + 16.0}",
                     text_anchor: "middle",
-                    fill: "rgba(255, 255, 255, 0.35)",
-                    font_size: "10",
-                    font_family: "monospace",
+                    class: "sd-chart__label",
                     "{min:.0}"
                 }
                 text {
                     x: "{bg_x2 + 4.0}",
                     y: "{bg_y2 + 16.0}",
                     text_anchor: "middle",
-                    fill: "rgba(255, 255, 255, 0.35)",
-                    font_size: "10",
-                    font_family: "monospace",
+                    class: "sd-chart__label",
                     "{max:.0}"
                 }
             }
@@ -179,12 +166,12 @@ pub fn RadialBar(
     let circumference = 2.0 * PI * radius;
     let stroke_offset = circumference * (1.0 - fraction);
 
-    let resolved_color = color.unwrap_or_else(|| "#00f0ff".to_string());
+    let resolved_color = color.unwrap_or_else(|| "var(--sd-chart-1)".to_string());
     let size = (radius * 2.0 + thickness as f64 * 2.0 + 20.0).max(120.0);
     let center = size / 2.0;
 
     rsx! {
-        div { class: "flex flex-col items-center select-none {class}",
+        div { class: "sd-chart-root sd-chart-root--center {class}",
             ChartContainer {
                 view_box: "0 0 {size} {size}",
                 height: height,
@@ -194,8 +181,7 @@ pub fn RadialBar(
                     cx: "{center}",
                     cy: "{center}",
                     r: "{radius}",
-                    fill: "none",
-                    stroke: "rgba(255, 255, 255, 0.08)",
+                    class: "sd-chart__track",
                     stroke_width: "{thickness}",
                 }
 
@@ -205,13 +191,13 @@ pub fn RadialBar(
                     cy: "{center}",
                     r: "{radius}",
                     fill: "none",
-                    stroke: "{resolved_color}",
                     stroke_width: "{thickness}",
                     stroke_dasharray: "{circumference}",
                     stroke_dashoffset: "{stroke_offset}",
                     stroke_linecap: "round",
                     transform: "rotate(-90 {center} {center})",
-                    style: "filter: drop-shadow(0 0 6px {resolved_color}aa); transition: stroke-dashoffset 0.3s ease;",
+                    class: "sd-chart__arc",
+                    style: "{series_line_style(&resolved_color)}",
                 }
 
                 // Testo percentuale interno
@@ -219,10 +205,7 @@ pub fn RadialBar(
                     x: "{center}",
                     y: if label.is_some() { "{center - 2.0}" } else { "{center + 5.0}" },
                     text_anchor: "middle",
-                    fill: "#ffffff",
-                    font_size: "18",
-                    font_weight: "bold",
-                    font_family: "monospace",
+                    class: "sd-chart__value",
                     "{(fraction * 100.0):.0}%"
                 }
 
@@ -231,9 +214,7 @@ pub fn RadialBar(
                         x: "{center}",
                         y: "{center + 14.0}",
                         text_anchor: "middle",
-                        fill: "rgba(255, 255, 255, 0.45)",
-                        font_size: "10.5",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         "{lbl}"
                     }
                 }

@@ -54,25 +54,25 @@ impl RichTextCommand {
     #[must_use]
     pub fn label(&self) -> &'static str {
         match self {
-            Self::Bold => "Grassetto (Ctrl+B)",
-            Self::Italic => "Corsivo (Ctrl+I)",
-            Self::Underline => "Sottolineato (Ctrl+U)",
-            Self::Strikethrough => "Barrato",
-            Self::Highlight => "Evidenziatore",
-            Self::ClearFormat => "Cancella formato",
+            Self::Bold => "Bold (Ctrl+B)",
+            Self::Italic => "Italic (Ctrl+I)",
+            Self::Underline => "Underline (Ctrl+U)",
+            Self::Strikethrough => "Strikethrough",
+            Self::Highlight => "Highlight",
+            Self::ClearFormat => "Clear formatting",
             Self::Heading(lvl) => match lvl {
-                1 => "Intestazione H1",
-                2 => "Intestazione H2",
-                3 => "Intestazione H3",
-                _ => "Intestazione",
+                1 => "Heading 1",
+                2 => "Heading 2",
+                3 => "Heading 3",
+                _ => "Heading",
             },
-            Self::Blockquote => "Citazione",
-            Self::BulletList => "Elenco puntato",
-            Self::OrderedList => "Elenco numerato",
-            Self::CodeBlock => "Blocco codice",
-            Self::InsertTable => "Tabella",
-            Self::InsertLink => "Inserisci link",
-            Self::InsertImage => "Inserisci immagine",
+            Self::Blockquote => "Quote",
+            Self::BulletList => "Bullet list",
+            Self::OrderedList => "Numbered list",
+            Self::CodeBlock => "Code block",
+            Self::InsertTable => "Table",
+            Self::InsertLink => "Insert link",
+            Self::InsertImage => "Insert image",
         }
     }
 
@@ -114,7 +114,7 @@ impl RichTextCommand {
             Self::OrderedList => format!("1. {text}"),
             Self::CodeBlock => format!("```rust\n{text}\n```"),
             Self::InsertTable => {
-                "| Intestazione 1 | Intestazione 2 |\n| --- | --- |\n| Cella 1 | Cella 2 |".to_string()
+                "| Heading 1 | Heading 2 |\n| --- | --- |\n| Cell 1 | Cell 2 |".to_string()
             }
             Self::InsertLink => format!("[{text}](https://)"),
             Self::InsertImage => format!("![{text}](https://)"),
@@ -134,18 +134,15 @@ pub fn RichTextControl(
     let lbl = command.label();
     let icon_kind = command.icon();
 
-    let active_cls = if active {
-        "bg-purple-600/30 text-purple-200 border-purple-500/40"
-    } else {
-        "border-transparent hover:bg-white/[0.06]"
-    };
-    let disabled_cls = if disabled { "opacity-40 cursor-not-allowed" } else { "" };
+    let active_cls = if active { "sd-rte__control--active" } else { "" };
 
     rsx! {
         button {
             r#type: "button",
-            class: "sd-rte__control p-1.5 rounded-md text-zinc-300 hover:text-white transition-colors cursor-pointer border {active_cls} {disabled_cls}",
+            class: "sd-rte__control {active_cls}",
             title: "{lbl}",
+            "aria-label": "{lbl}",
+            "aria-pressed": "{active}",
             disabled: disabled,
             onclick: move |_| {
                 if !disabled {
@@ -161,7 +158,7 @@ pub fn RichTextControl(
 #[component]
 pub fn RichTextControlsGroup(children: Element) -> Element {
     rsx! {
-        div { class: "sd-rte__group flex items-center gap-0.5 px-1 py-0.5 rounded-lg bg-white/[0.02] border border-white/[0.06]",
+        div { class: "sd-rte__group",
             {children}
         }
     }
@@ -173,11 +170,11 @@ pub fn RichTextToolbar(
     #[props(default = true)] sticky: bool,
     children: Element,
 ) -> Element {
-    let sticky_cls = if sticky { "sticky top-0 z-10" } else { "" };
+    let sticky_cls = if sticky { "sd-rte__toolbar--sticky" } else { "" };
 
     rsx! {
         div {
-            class: "sd-rte__toolbar flex flex-wrap items-center gap-1.5 p-2 bg-zinc-950/80 border-b border-white/[0.08] backdrop-blur-md {sticky_cls}",
+            class: "sd-rte__toolbar {sticky_cls}",
             {children}
         }
     }
@@ -211,7 +208,7 @@ pub fn RichTextEditor(
                 RichTextCommand::Italic => "document.execCommand('italic', false, null);",
                 RichTextCommand::Underline => "document.execCommand('underline', false, null);",
                 RichTextCommand::Strikethrough => "document.execCommand('strikeThrough', false, null);",
-                RichTextCommand::Highlight => "document.execCommand('hiliteColor', false, 'rgba(168, 85, 247, 0.4)');",
+                RichTextCommand::Highlight => "document.execCommand('hiliteColor', false, getComputedStyle(el).getPropertyValue('--sd-accent-soft').trim() || 'transparent');",
                 RichTextCommand::ClearFormat => "document.execCommand('removeFormat', false, null);",
                 RichTextCommand::Heading(1) => "document.execCommand('formatBlock', false, '<h1>');",
                 RichTextCommand::Heading(2) => "document.execCommand('formatBlock', false, '<h2>');",
@@ -222,13 +219,13 @@ pub fn RichTextEditor(
                 RichTextCommand::OrderedList => "document.execCommand('insertOrderedList', false, null);",
                 RichTextCommand::CodeBlock => "document.execCommand('formatBlock', false, '<pre>');",
                 RichTextCommand::InsertLink => {
-                    "const u = prompt('Inserisci URL link:'); if (u) document.execCommand('createLink', false, u);"
+                    "const u = prompt('Link URL:'); if (u) document.execCommand('createLink', false, u);"
                 }
                 RichTextCommand::InsertImage => {
-                    "const u = prompt('Inserisci URL immagine:'); if (u) document.execCommand('insertImage', false, u);"
+                    "const u = prompt('Image URL:'); if (u) document.execCommand('insertImage', false, u);"
                 }
                 RichTextCommand::InsertTable => {
-                    "document.execCommand('insertHTML', false, '<table class=\"border border-white/20 w-full my-2 text-xs\"><tr><th class=\"border border-white/20 p-1\">Colonna 1</th><th class=\"border border-white/20 p-1\">Colonna 2</th></tr><tr><td class=\"border border-white/20 p-1\">Dato 1</td><td class=\"border border-white/20 p-1\">Dato 2</td></tr></table>');"
+                    "document.execCommand('insertHTML', false, '<table><tr><th>Column 1</th><th>Column 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>');"
                 }
             };
 
@@ -254,20 +251,18 @@ pub fn RichTextEditor(
         });
     });
 
-    let split_cls = if current_mode() == RichTextMode::Split {
-        "grid-cols-2 divide-x divide-white/[0.08]"
-    } else {
-        "grid-cols-1"
-    };
-
-    let btn_preview_cls = if current_mode() == RichTextMode::Wysiwyg { "bg-purple-600 text-white font-semibold" } else { "text-zinc-400 hover:text-zinc-200" };
-    let btn_md_cls = if current_mode() == RichTextMode::Markdown { "bg-purple-600 text-white font-semibold" } else { "text-zinc-400 hover:text-zinc-200" };
-    let btn_split_cls = if current_mode() == RichTextMode::Split { "bg-purple-600 text-white font-semibold" } else { "text-zinc-400 hover:text-zinc-200" };
+    let panes_cls = if current_mode() == RichTextMode::Split { "sd-rte__panes--split" } else { "" };
+    let mode_cls = |m: RichTextMode| if current_mode() == m { "sd-rte__mode sd-rte__mode--active" } else { "sd-rte__mode" };
+    let btn_preview_cls = mode_cls(RichTextMode::Wysiwyg);
+    let btn_md_cls = mode_cls(RichTextMode::Markdown);
+    let btn_split_cls = mode_cls(RichTextMode::Split);
 
     let eid_sync = editor_id.clone();
 
     rsx! {
-        div { class: "sd-rte w-full rounded-xl border border-white/[0.12] bg-zinc-950/60 overflow-hidden shadow-lg transition-all focus-within:border-purple-500/50 {class}",
+        div {
+            class: "sd-rte {class}",
+            style: "--sd-rte-min-height: {h_style};",
             // Toolbar master
             RichTextToolbar { sticky: sticky_toolbar,
                 // Gruppo Formattazione
@@ -299,22 +294,25 @@ pub fn RichTextEditor(
                 }
 
                 // Switcher modalità (WYSIWYG TipTap / Markdown / Split)
-                div { class: "ml-auto flex items-center gap-1 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.06] text-xs font-mono",
+                div { class: "sd-rte__modes",
                     button {
                         r#type: "button",
-                        class: "px-2 py-1 rounded-md transition-colors {btn_preview_cls}",
+                        class: "{btn_preview_cls}",
+                        "aria-pressed": "{current_mode() == RichTextMode::Wysiwyg}",
                         onclick: move |_| current_mode.set(RichTextMode::Wysiwyg),
-                        "Visuale (TipTap)"
+                        "Visual"
                     }
                     button {
                         r#type: "button",
-                        class: "px-2 py-1 rounded-md transition-colors {btn_md_cls}",
+                        class: "{btn_md_cls}",
+                        "aria-pressed": "{current_mode() == RichTextMode::Markdown}",
                         onclick: move |_| current_mode.set(RichTextMode::Markdown),
                         "Markdown"
                     }
                     button {
                         r#type: "button",
-                        class: "px-2 py-1 rounded-md transition-colors {btn_split_cls}",
+                        class: "{btn_split_cls}",
+                        "aria-pressed": "{current_mode() == RichTextMode::Split}",
                         onclick: move |_| current_mode.set(RichTextMode::Split),
                         "Split"
                     }
@@ -322,11 +320,11 @@ pub fn RichTextEditor(
             }
 
             // Area Contenuto
-            div { class: "w-full grid {split_cls}",
+            div { class: "sd-rte__panes {panes_cls}",
                 // Vista Editor Markdown
                 if current_mode() == RichTextMode::Markdown || current_mode() == RichTextMode::Split {
                     textarea {
-                        class: "w-full p-4 bg-transparent text-zinc-100 font-mono text-sm leading-relaxed outline-none resize-y min-h-[{h_style}]",
+                        class: "sd-rte__source",
                         placeholder: "{placeholder}",
                         value: "{value}",
                         readonly: !editable,
@@ -338,7 +336,7 @@ pub fn RichTextEditor(
                 if current_mode() == RichTextMode::Wysiwyg || current_mode() == RichTextMode::Split {
                     div {
                         id: "{eid_sync}",
-                        class: "sd-rte__editable w-full p-4 text-zinc-100 text-sm leading-relaxed outline-none min-h-[{h_style}] overflow-y-auto cursor-text",
+                        class: "sd-rte__editable",
                         contenteditable: if editable { "true" } else { "false" },
                         dangerous_inner_html: "{rendered_html}",
                         oninput: {
@@ -386,7 +384,7 @@ pub fn markdown_to_html(md: &str) -> String {
             } else {
                 if in_ul { html.push_str("</ul>"); in_ul = false; }
                 if in_ol { html.push_str("</ol>"); in_ol = false; }
-                html.push_str("<pre class=\"bg-zinc-900 border border-white/10 p-3 rounded-lg font-mono text-xs text-purple-300 overflow-x-auto my-2\"><code>");
+                html.push_str("<pre><code>");
                 in_code_block = true;
             }
             continue;
@@ -401,42 +399,42 @@ pub fn markdown_to_html(md: &str) -> String {
         if let Some(h1) = trimmed.strip_prefix("# ") {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str(&format!("<h1 class=\"text-2xl font-bold text-white border-b border-white/10 pb-1 mt-3 mb-2\">{}</h1>", format_inline(h1)));
+            html.push_str(&format!("<h1>{}</h1>", format_inline(h1)));
         } else if let Some(h2) = trimmed.strip_prefix("## ") {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str(&format!("<h2 class=\"text-xl font-bold text-purple-300 mt-3 mb-1.5\">{}</h2>", format_inline(h2)));
+            html.push_str(&format!("<h2>{}</h2>", format_inline(h2)));
         } else if let Some(h3) = trimmed.strip_prefix("### ") {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str(&format!("<h3 class=\"text-lg font-semibold text-zinc-100 mt-2 mb-1\">{}</h3>", format_inline(h3)));
+            html.push_str(&format!("<h3>{}</h3>", format_inline(h3)));
         } else if let Some(bq) = trimmed.strip_prefix("> ") {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str(&format!("<blockquote class=\"border-l-4 border-purple-500 pl-3 my-2 text-zinc-400 italic\">{}</blockquote>", format_inline(bq)));
+            html.push_str(&format!("<blockquote>{}</blockquote>", format_inline(bq)));
         } else if let Some(li) = trimmed.strip_prefix("- ").or_else(|| trimmed.strip_prefix("* ")) {
             if in_ol { html.push_str("</ol>"); in_ol = false; }
             if !in_ul {
-                html.push_str("<ul class=\"list-disc list-inside space-y-1 my-1\">");
+                html.push_str("<ul>");
                 in_ul = true;
             }
-            html.push_str(&format!("<li class=\"text-zinc-200\">{}</li>", format_inline(li)));
+            html.push_str(&format!("<li>{}</li>", format_inline(li)));
         } else if trimmed.chars().next().is_some_and(|c| c.is_ascii_digit()) && trimmed.contains(". ") {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if !in_ol {
-                html.push_str("<ol class=\"list-decimal list-inside space-y-1 my-1\">");
+                html.push_str("<ol>");
                 in_ol = true;
             }
             let text = trimmed.split_once(". ").map(|(_, t)| t).unwrap_or(trimmed);
-            html.push_str(&format!("<li class=\"text-zinc-200\">{}</li>", format_inline(text)));
+            html.push_str(&format!("<li>{}</li>", format_inline(text)));
         } else if trimmed.is_empty() {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str("<p class=\"h-2\"></p>");
+            html.push_str("<p></p>");
         } else {
             if in_ul { html.push_str("</ul>"); in_ul = false; }
             if in_ol { html.push_str("</ol>"); in_ol = false; }
-            html.push_str(&format!("<p class=\"text-zinc-200 leading-relaxed my-1\">{}</p>", format_inline(trimmed)));
+            html.push_str(&format!("<p>{}</p>", format_inline(trimmed)));
         }
     }
 
@@ -455,7 +453,7 @@ fn format_inline(text: &str) -> String {
         if let Some(end) = s[start + 2..].find("**") {
             let actual_end = start + 2 + end;
             let inner = &s[start + 2..actual_end];
-            s = format!("{}<strong class=\"font-bold text-white\">{}</strong>{}", &s[..start], inner, &s[actual_end + 2..]);
+            s = format!("{}<strong>{}</strong>{}", &s[..start], inner, &s[actual_end + 2..]);
         } else {
             break;
         }
@@ -466,7 +464,7 @@ fn format_inline(text: &str) -> String {
         if let Some(end) = s[start + 1..].find('*') {
             let actual_end = start + 1 + end;
             let inner = &s[start + 1..actual_end];
-            s = format!("{}<em class=\"italic text-purple-200\">{}</em>{}", &s[..start], inner, &s[actual_end + 1..]);
+            s = format!("{}<em>{}</em>{}", &s[..start], inner, &s[actual_end + 1..]);
         } else {
             break;
         }
@@ -477,18 +475,18 @@ fn format_inline(text: &str) -> String {
         if let Some(end) = s[start + 2..].find("~~") {
             let actual_end = start + 2 + end;
             let inner = &s[start + 2..actual_end];
-            s = format!("{}<del class=\"line-through text-zinc-500\">{}</del>{}", &s[..start], inner, &s[actual_end + 2..]);
+            s = format!("{}<del>{}</del>{}", &s[..start], inner, &s[actual_end + 2..]);
         } else {
             break;
         }
     }
 
     // Highlight <mark>text</mark>
-    s = s.replace("&lt;mark&gt;", "<mark class=\"bg-purple-900/60 text-purple-200 px-1 py-0.5 rounded border border-purple-500/30\">");
+    s = s.replace("&lt;mark&gt;", "<mark>");
     s = s.replace("&lt;/mark&gt;", "</mark>");
 
     // Underline <u>text</u>
-    s = s.replace("&lt;u&gt;", "<u class=\"underline decoration-purple-400 decoration-1 underline-offset-2\">");
+    s = s.replace("&lt;u&gt;", "<u>");
     s = s.replace("&lt;/u&gt;", "</u>");
 
     // Inline code `code`
@@ -496,7 +494,7 @@ fn format_inline(text: &str) -> String {
         if let Some(end) = s[start + 1..].find('`') {
             let actual_end = start + 1 + end;
             let inner = &s[start + 1..actual_end];
-            s = format!("{}<code class=\"bg-zinc-800/80 text-purple-300 font-mono text-xs px-1.5 py-0.5 rounded border border-white/10\">{}</code>{}", &s[..start], inner, &s[actual_end + 1..]);
+            s = format!("{}<code>{}</code>{}", &s[..start], inner, &s[actual_end + 1..]);
         } else {
             break;
         }

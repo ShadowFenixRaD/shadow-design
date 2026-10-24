@@ -1,103 +1,31 @@
 // ==============================================================================
-// Shadow Design — DocumentCard Component Styles
+// Shadow Design — DocumentCard (composes the library Card)
 // ==============================================================================
-@use 'sass:color';
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
   .sd-doc-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    border-radius: $radius-lg;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(18, 18, 24, 0.75);
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-    transition: all $duration-normal ease;
-    cursor: pointer;
-
-    &:hover {
-      transform: translateY(-2px);
-      border-color: rgba(168, 85, 247, 0.4);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(168, 85, 247, 0.15);
+    > .sd-card__body {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     &__preview {
       position: relative;
       width: 100%;
       height: 140px;
-      background: rgba(24, 24, 27, 0.8);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      background-color: var(--sd-well);
+      border-bottom: 1px solid var(--sd-border-subtle);
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
-      }
-    }
-
-    &:hover &__preview img {
-      transform: scale(1.05);
-    }
-
-    &__badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 10px;
-      font-family: $font-mono;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: $radius-sm;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      z-index: 2;
-    }
-
-    &__actions {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
-      padding: 3px 6px;
-      border-radius: $radius-md;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      z-index: 5;
-      transition: all 0.2s ease;
-    }
-
-    &__action-btn {
-      padding: 5px;
-      border-radius: $radius-sm;
-      color: #d4d4d8;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-
-      &:hover {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.15);
-      }
-
-      &--delete:hover {
-        color: #f87171;
-        background: rgba(239, 68, 68, 0.25);
       }
     }
 
@@ -105,61 +33,140 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: var(--sd-space-2);
+    }
+
+    &__icon {
+      color: var(--sd-text-subtle);
+    }
+
+    // File-type mark: small semantic pill.
+    &__badge {
+      --sd-sem: var(--sd-text-subtle);
+      --sd-sem-strong: var(--sd-text-muted);
+      position: absolute;
+      top: var(--sd-space-2);
+      left: var(--sd-space-2);
+      padding: 2px var(--sd-space-2);
+      border-radius: var(--sd-radius-sm);
+      border: 1px solid var(--sd-border-strong);
+      background-color: var(--sd-surface-2);
+      color: var(--sd-sem-strong);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      font-weight: 500;
+
+      &--inline {
+        position: static;
+      }
+
+      &--danger {
+        @include sd-semantic(danger);
+      }
+      &--info {
+        @include sd-semantic(info);
+      }
+      &--success {
+        @include sd-semantic(success);
+      }
+      &--warning {
+        @include sd-semantic(warning);
+      }
+      &--accent {
+        @include sd-semantic(accent);
+      }
+      &--danger,
+      &--info,
+      &--success,
+      &--warning,
+      &--accent {
+        color: var(--sd-sem-strong);
+      }
+    }
+
+    // Quick-action bar: a small floating layer holding items.
+    &__actions {
+      @include sd-surface(2);
+      position: absolute;
+      top: var(--sd-space-2);
+      right: var(--sd-space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-1);
+      padding: var(--sd-space-1);
+      border-radius: var(--sd-radius-md);
+    }
+
+    &__action-btn {
+      @include sd-item(sm);
+      justify-content: center;
+      padding-inline: var(--sd-space-2);
+      cursor: pointer;
+
+      &--delete {
+        @include sd-item-danger;
+      }
     }
 
     &__body {
-      padding: 14px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: var(--sd-space-3);
+      padding: var(--sd-space-3) var(--sd-space-4);
     }
 
     &__title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: var(--sd-space-2);
     }
 
     &__title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #f4f4f5;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      margin: 0;
       flex: 1;
-      transition: color 0.15s ease;
-    }
-
-    &:hover &__title {
-      color: #d8b4fe;
+      min-width: 0;
+      font-size: var(--sd-text-md);
+      font-weight: 600;
+      color: var(--sd-text);
+      @include text-truncate;
     }
 
     &__footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 11px;
-      color: #71717a;
-      font-family: $font-mono;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      gap: var(--sd-space-2);
+      padding-top: var(--sd-space-3);
+      border-top: 1px solid var(--sd-border-subtle);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      color: var(--sd-text-subtle);
     }
 
     &__author {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--sd-space-2);
       min-width: 0;
+    }
+
+    &__author-name {
+      max-width: 100px;
+      @include text-truncate;
     }
 
     &__meta {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--sd-space-2);
       flex-shrink: 0;
+    }
+
+    &__views {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sd-space-1);
     }
   }
 }

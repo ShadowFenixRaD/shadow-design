@@ -1,58 +1,52 @@
 // ==============================================================================
-// Shadow Design — Avatar & AvatarGroup Styles
+// Shadow Design — Avatar & AvatarGroup (static: no hover, no press)
 // ==============================================================================
-@use '../variables' as *;
 @use '../mixins' as *;
 
 @layer sd-components {
-  @keyframes sd-pulse-p2p {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 6px rgba(0, 240, 255, 0.7);
-    }
-    50% {
-      transform: scale(1.15);
-      box-shadow: 0 0 14px rgba(139, 92, 246, 0.9);
-    }
-  }
-
   .sd-avatar {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: $radius-full;
-    border: $border-hairline;
-    background-color: $color-surface-1;
-    color: #ffffff;
-    font-family: $font-sans;
+    flex-shrink: 0;
+    border-radius: var(--sd-radius-full);
+    border: 1px solid var(--sd-border-strong);
+    background-color: var(--sd-surface-2);
+    color: var(--sd-text);
+    font-family: var(--sd-font-sans);
     font-weight: 600;
     user-select: none;
-    flex-shrink: 0;
-    transition: transform $duration-fast ease, box-shadow $duration-fast ease;
+    @include sd-shadow(var(--sd-specular));
 
-    &:hover {
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    // Initials fallback: hue is derived from the name (`--sd-avatar-hue`, 0-360).
+    &--initials {
+      background-image: linear-gradient(
+        135deg,
+        hsl(var(--sd-avatar-hue) 55% 18%),
+        hsl(calc(var(--sd-avatar-hue) + 40) 60% 10%)
+      );
+      border-color: hsl(var(--sd-avatar-hue) 60% 45% / 0.4);
     }
 
     &--xs {
       width: 24px;
       height: 24px;
-      font-size: 10px;
+      font-size: var(--sd-text-2xs);
 
       .sd-avatar__status {
         width: 7px;
         height: 7px;
         border-width: 1.5px;
-        bottom: 0;
-        right: 0;
+        bottom: 0px;
+        right: 0px;
       }
     }
 
     &--sm {
       width: 32px;
       height: 32px;
-      font-size: 12px;
+      font-size: var(--sd-text-xs);
 
       .sd-avatar__status {
         width: 9px;
@@ -66,7 +60,7 @@
     &--md {
       width: 40px;
       height: 40px;
-      font-size: 14px;
+      font-size: var(--sd-text-md);
 
       .sd-avatar__status {
         width: 11px;
@@ -80,7 +74,7 @@
     &--lg {
       width: 48px;
       height: 48px;
-      font-size: 16px;
+      font-size: var(--sd-text-lg);
 
       .sd-avatar__status {
         width: 13px;
@@ -94,12 +88,12 @@
     &--xl {
       width: 64px;
       height: 64px;
-      font-size: 20px;
+      font-size: var(--sd-text-xl);
 
       .sd-avatar__status {
         width: 16px;
         height: 16px;
-        border-width: 2.5px;
+        border-width: 2px;
         bottom: 3px;
         right: 3px;
       }
@@ -108,7 +102,7 @@
     &__img {
       width: 100%;
       height: 100%;
-      border-radius: $radius-full;
+      border-radius: var(--sd-radius-full);
       object-fit: cover;
       display: block;
     }
@@ -118,56 +112,77 @@
       text-transform: uppercase;
     }
 
-    &__fallback {
-      color: $zinc-400;
+    &__icon {
+      color: var(--sd-text-subtle);
     }
 
+    // Presence dot: a small solid mark. Never glows.
     &__status {
       position: absolute;
       bottom: 0;
       right: 0;
-      border-radius: $radius-full;
+      z-index: 1;
+      border-radius: var(--sd-radius-full);
       border-style: solid;
-      border-color: $color-void;
-      z-index: 2;
+      border-color: var(--sd-void);
+      background-color: var(--sd-text-subtle);
 
       &--online {
-        background-color: #10b981;
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.65);
+        background-color: var(--sd-success);
       }
 
       &--offline {
-        background-color: #71717a;
+        background-color: var(--sd-text-subtle);
       }
 
       &--busy {
-        background-color: #f43f5e;
-        box-shadow: 0 0 8px rgba(244, 63, 94, 0.65);
+        background-color: var(--sd-danger);
       }
 
       &--direct-p2p {
-        background-color: #00f0ff;
-        animation: sd-pulse-p2p 2s infinite ease-in-out;
+        background-color: var(--sd-accent);
+        @include sd-animate(sd-breathe, 2s, var(--sd-ease), infinite);
       }
     }
   }
 
+  // Overlapping stack. Used by AvatarGroup and Facepile (children may be avatars or wrappers).
   .sd-avatar-group {
     display: inline-flex;
     align-items: center;
 
+    > * + * {
+      margin-left: calc(var(--sd-space-1) * -2.5);
+    }
+
     .sd-avatar {
-      border-color: $color-void;
+      border-color: var(--sd-void);
+    }
+  }
 
-      + .sd-avatar {
-        margin-left: -10px;
-        box-shadow: -2px 0 6px rgba(0, 0, 0, 0.6);
-      }
+  // Icon (crate/src/icon.rs). Kept in this partial because `icon` has no partial of its own in main.scss.
+  .sd-icon {
+    flex-shrink: 0;
 
-      &:hover {
-        z-index: 5;
-        transform: translateY(-2px);
+    &--custom {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    // <= 12px: the 1.5 stroke would scale to a blurry < 1px line, so use a
+    // non-scaling stroke that always renders as a crisp hairline.
+    &--tiny {
+      stroke-width: 1.25px;
+
+      * {
+        vector-effect: non-scaling-stroke;
       }
+    }
+
+    &--spin {
+      transform-origin: center;
+      @include sd-animate-essential(sd-spin, 0.8s, linear);
     }
   }
 }

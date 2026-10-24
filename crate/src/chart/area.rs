@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 
 use super::primitives::{
     compute_min_max, generate_stacked_area_band_path, generate_svg_area_path, generate_svg_path,
-    get_series_color, ChartContainer, ChartDataPoint, ChartGrid, ChartLegend, ChartSeries,
+    get_series_color, series_line_style, ChartContainer, ChartDataPoint, ChartGrid, ChartLegend, ChartSeries,
     ChartTooltip, CurveType,
 };
 
@@ -149,9 +149,9 @@ pub fn AreaChart(
     });
 
     rsx! {
-        div { class: "w-full flex flex-col {class}",
+        div { class: "sd-chart-root {class}",
             div {
-                class: "relative w-full",
+                class: "sd-chart-frame",
                 onmouseleave: move |_| {
                     hover_index.set(None);
                 },
@@ -170,8 +170,7 @@ pub fn AreaChart(
                         y: "0",
                         width: "{svg_w}",
                         height: "{svg_h}",
-                        fill: "rgba(0, 0, 0, 0.001)",
-                        style: "pointer-events: all;",
+                        class: "sd-chart__hit",
                         onmouseenter: move |_| hover_index.set(None),
                     }
                     defs {
@@ -184,13 +183,11 @@ pub fn AreaChart(
                                 y2: "1",
                                 stop {
                                     offset: "0%",
-                                    stop_color: "{color}",
-                                    stop_opacity: "0.55",
+                                    style: "stop-color: {color}; stop-opacity: 0.55;",
                                 }
                                 stop {
                                     offset: "100%",
-                                    stop_color: "{color}",
-                                    stop_opacity: "0.05",
+                                    style: "stop-color: {color}; stop-opacity: 0.05;",
                                 }
                             }
                         }
@@ -227,11 +224,10 @@ pub fn AreaChart(
                                 path {
                                     d: "{line_d}",
                                     fill: "none",
-                                    stroke: "{color}",
-                                    stroke_width: "2.5",
+                                                                        stroke_width: "2.5",
                                     stroke_linecap: "round",
                                     stroke_linejoin: "round",
-                                    style: "filter: drop-shadow(0 0 6px {color}88);",
+                                    style: "{series_line_style(&color)}",
                                     pointer_events: "none",
                                 }
                                 if with_dots {
@@ -245,10 +241,9 @@ pub fn AreaChart(
                                                     cx: "{cx}",
                                                     cy: "{cy}",
                                                     r: "{dot_r}",
-                                                    fill: "#09090b",
-                                                    stroke: if is_h { "#ffffff" } else { "{color}" },
+                                                    style: if is_h { String::new() } else { format!("stroke: {color};") },
                                                     stroke_width: if is_h { "2.5" } else { "2" },
-                                                    class: "transition-all duration-150",
+                                                    class: "sd-chart__dot",
                                                     pointer_events: "none",
                                                 }
                                             }
@@ -269,9 +264,7 @@ pub fn AreaChart(
                                     y1: "{padding_top}",
                                     x2: "{cx}",
                                     y2: "{baseline_y}",
-                                    stroke: "rgba(255, 255, 255, 0.25)",
-                                    stroke_width: "1.5",
-                                    stroke_dasharray: "3 3",
+                                    class: "sd-chart__cursor",
                                     pointer_events: "none",
                                 }
                             }
@@ -289,9 +282,7 @@ pub fn AreaChart(
                                     x: "{cx}",
                                     y: "{baseline_y + 20.0}",
                                     text_anchor: "middle",
-                                    fill: "rgba(255, 255, 255, 0.45)",
-                                    font_size: "11",
-                                    font_family: "monospace",
+                                    class: "sd-chart__label",
                                     pointer_events: "none",
                                     "{lbl}"
                                 }
@@ -304,9 +295,7 @@ pub fn AreaChart(
                         x: "{padding_left - 8.0}",
                         y: "{padding_top + 6.0}",
                         text_anchor: "end",
-                        fill: "rgba(255, 255, 255, 0.40)",
-                        font_size: "10",
-                        font_family: "monospace",
+                        class: "sd-chart__label",
                         pointer_events: "none",
                         "{max_val_used:.0}"
                     }
@@ -331,9 +320,7 @@ pub fn AreaChart(
                                     y: "0",
                                     width: "{zone_w}",
                                     height: "{svg_h}",
-                                    fill: "rgba(0, 0, 0, 0.001)",
-                                    style: "pointer-events: all;",
-                                    class: "cursor-pointer",
+                                    class: "sd-chart__hit sd-chart__hit--pointer",
                                     onmouseenter: move |_| hover_index.set(Some(i)),
                                     onmouseleave: move |_| hover_index.set(None),
                                     onpointerleave: move |_| hover_index.set(None),

@@ -1,6 +1,4 @@
 use crate::copy_button::CopyButton;
-#[cfg(feature = "theme")]
-use crate::theme::use_theme;
 use dioxus::prelude::*;
 
 /// Categoria sintattica del token evidenziato.
@@ -212,9 +210,6 @@ pub fn CodeBlock(
 ) -> Element {
     let locale = crate::locale::use_locale();
     let lines: Vec<&str> = code.lines().collect();
-
-    #[cfg(feature = "theme")]
-    let _theme = use_theme();
 
     let display_title = filename.unwrap_or_else(|| language.to_uppercase());
 

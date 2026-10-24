@@ -237,7 +237,7 @@ pub fn RenderSvgIcon(
                     span {
                         role: "img",
                         aria_label: "{lbl}",
-                        class: "shrink-0 inline-flex items-center justify-center {class}",
+                        class: "sd-icon sd-icon--custom {class}",
                         {elem}
                     }
                 }
@@ -245,7 +245,7 @@ pub fn RenderSvgIcon(
                 rsx! {
                     span {
                         aria_hidden: "true",
-                        class: "shrink-0 inline-flex items-center justify-center {class}",
+                        class: "sd-icon sd-icon--custom {class}",
                         {elem}
                     }
                 }
@@ -262,7 +262,9 @@ pub fn Icon(
     #[props(default)] label: Option<String>,
 ) -> Element {
     let size_str = size.to_string();
-    let spinner_class = if matches!(kind, IconKind::Spinner) { " animate-spin" } else { "" };
+    let spinner_class = if matches!(kind, IconKind::Spinner) { " sd-icon--spin" } else { "" };
+    // Tiny icons keep a crisp hairline via a non-scaling stroke (see `.sd-icon--tiny`).
+    let tiny_class = if size <= 12 { " sd-icon--tiny" } else { "" };
     let paths = render_icon_paths(kind);
 
     if let Some(lbl) = label {
@@ -280,7 +282,7 @@ pub fn Icon(
                 "role": "img",
                 "aria-label": "{lbl}",
                 "focusable": "false",
-                class: "shrink-0 {class}{spinner_class}",
+                class: "sd-icon{tiny_class} {class}{spinner_class}",
                 {paths}
             }
         }
@@ -298,7 +300,7 @@ pub fn Icon(
                 stroke_linejoin: "round",
                 "aria-hidden": "true",
                 "focusable": "false",
-                class: "shrink-0 {class}{spinner_class}",
+                class: "sd-icon{tiny_class} {class}{spinner_class}",
                 {paths}
             }
         }

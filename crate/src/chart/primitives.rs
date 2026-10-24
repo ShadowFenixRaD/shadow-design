@@ -109,17 +109,26 @@ impl ChartSeries {
     }
 }
 
-/// Palette di colori di default per le serie dei grafici Shadow.
+/// Default series colours: the `--sd-chart-1..8` tokens (`--sd-chart-1` is the accent).
 pub const DEFAULT_CHART_COLORS: &[&str] = &[
-    "#a855f7", // Violet neon (primario ultraviolet)
-    "#00f0ff", // Cyber cyan
-    "#00ff9d", // Emerald matrix
-    "#ff1744", // Crimson fire
-    "#f59e0b", // Amber glow
-    "#3b82f6", // Electric blue
-    "#ec4899", // Neon pink
-    "#8b5cf6", // Indigo
+    "var(--sd-chart-1)",
+    "var(--sd-chart-2)",
+    "var(--sd-chart-3)",
+    "var(--sd-chart-4)",
+    "var(--sd-chart-5)",
+    "var(--sd-chart-6)",
+    "var(--sd-chart-7)",
+    "var(--sd-chart-8)",
 ];
+
+/// Inline style for a series stroke: the colour plus a subtle glow that follows
+/// `--sd-glow-strength` (so it disappears with `GlowMode::Off`). `color` may be any CSS colour.
+#[must_use]
+pub fn series_line_style(color: &str) -> String {
+    format!(
+        "stroke: {color}; filter: drop-shadow(0 0 5px color-mix(in srgb, {color} calc(55% * var(--sd-glow-strength)), transparent));"
+    )
+}
 
 #[must_use]
 pub fn get_series_color(index: usize, custom: Option<&str>) -> String {
@@ -267,7 +276,7 @@ pub fn ChartContainer(
 ) -> Element {
     rsx! {
         div {
-            class: "sd-chart w-full relative select-none {class}",
+            class: "sd-chart {class}",
             style: "min-height: {height}px;",
             onmouseleave: move |evt| {
                 if let Some(handler) = &onmouseleave {
@@ -280,7 +289,7 @@ pub fn ChartContainer(
                 }
             },
             svg {
-                class: "sd-chart__svg w-full h-full overflow-visible",
+                class: "sd-chart__svg",
                 view_box: "{view_box}",
                 preserve_aspect_ratio: "{preserve_aspect_ratio}",
                 onmouseleave: move |evt| {
@@ -324,9 +333,6 @@ pub fn ChartGrid(
                                 y1: "{line_y}",
                                 x2: "{x + width}",
                                 y2: "{line_y}",
-                                stroke: "rgba(255, 255, 255, 0.08)",
-                                stroke_width: "1",
-                                stroke_dasharray: "3 3",
                             }
                         }
                     }
@@ -343,9 +349,6 @@ pub fn ChartGrid(
                                 y1: "{y}",
                                 x2: "{line_x}",
                                 y2: "{y + height}",
-                                stroke: "rgba(255, 255, 255, 0.08)",
-                                stroke_width: "1",
-                                stroke_dasharray: "3 3",
                             }
                         }
                     }
@@ -363,7 +366,7 @@ pub fn ChartLegend(
     #[props(default)] class: String,
 ) -> Element {
     rsx! {
-        div { class: "sd-chart__legend flex flex-wrap items-center justify-center gap-4 mt-3 text-xs font-mono {class}",
+        div { class: "sd-chart__legend {class}",
             for (idx, s) in series.into_iter().enumerate() {
                 {
                     let name = s.name.clone();
@@ -371,16 +374,17 @@ pub fn ChartLegend(
                     let is_hidden = hidden_series().contains(&name);
                     let display = s.display_label().to_string();
                     let state_class = if is_hidden {
-                        "opacity-40 border-transparent text-zinc-500"
+                        "sd-chart__legend-item sd-chart__legend-item--hidden"
                     } else {
-                        "opacity-100 border-white/[0.06] bg-white/[0.02] text-zinc-200 hover:border-white/[0.12]"
+                        "sd-chart__legend-item"
                     };
 
                     rsx! {
                         button {
                             key: "{name}",
                             r#type: "button",
-                            class: "flex items-center gap-2 px-2.5 py-1 rounded-md transition-all cursor-pointer border {state_class}",
+                            class: "{state_class}",
+                            "aria-pressed": "{!is_hidden}",
                             onclick: {
                                 let n = name.clone();
                                 move |_| {
@@ -394,8 +398,8 @@ pub fn ChartLegend(
                                 }
                             },
                             span {
-                                class: "w-2.5 h-2.5 rounded-full shrink-0 shadow-sm",
-                                style: "background-color: {color}; box-shadow: 0 0 6px {color}66;",
+                                class: "sd-chart__swatch",
+                                style: "background-color: {color};",
                             }
                             span { "{display}" }
                         }
@@ -453,22 +457,21 @@ pub fn ChartTooltip(
 
     rsx! {
         div {
-            class: "sd-chart__tooltip pointer-events-none absolute z-[1000] px-3.5 py-2.5 rounded-lg bg-zinc-950/95 border border-white/15 shadow-2xl backdrop-blur-md text-xs font-mono transition-all duration-75 whitespace-nowrap min-w-max",
-            style: "{pos_style} {transform} pointer-events: none !important;",
-            div { class: "font-semibold text-zinc-100 mb-1.5 pb-1 border-b border-white/[0.08] whitespace-nowrap",
-                "{title}"
-            }
-            div { class: "flex flex-col gap-1.5",
+            class: "sd-chart__tooltip",
+            role: "tooltip",
+            style: "{pos_style} {transform}",
+            div { class: "sd-chart__tooltip-title", "{title}" }
+            div { class: "sd-chart__tooltip-rows",
                 for (lbl, val, col) in entries {
-                    div { key: "{lbl}", class: "flex items-center justify-between gap-5 min-w-[130px] whitespace-nowrap",
-                        div { class: "flex items-center gap-2 whitespace-nowrap",
+                    div { key: "{lbl}", class: "sd-chart__tooltip-row",
+                        span { class: "sd-chart__tooltip-key",
                             span {
-                                class: "w-2 h-2 rounded-full shrink-0 shadow-sm",
+                                class: "sd-chart__swatch sd-chart__swatch--sm",
                                 style: "background-color: {col};",
                             }
-                            span { class: "text-zinc-400 whitespace-nowrap", "{lbl}:" }
+                            span { "{lbl}:" }
                         }
-                        span { class: "font-bold text-zinc-100 whitespace-nowrap", "{val}" }
+                        span { class: "sd-chart__tooltip-value", "{val}" }
                     }
                 }
             }
