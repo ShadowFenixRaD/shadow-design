@@ -22,7 +22,7 @@ const PRESETS: [(PrimaryColor, fn() -> Theme); 5] = [
 #[component]
 pub fn Home() -> Element {
     let navigator = use_navigator();
-    let scene = use_signal(|| "dashboard".to_string());
+    let scene = use_signal(|| "settings".to_string());
     // Below md the hero scene drops the table's least important columns (REVAMP §1.6).
     let narrow = use_media_query("(max-width: 767px)");
     let components = registry::all().len();
@@ -96,19 +96,15 @@ pub fn Home() -> Element {
                 SectionHead {
                     eyebrow: "Scene",
                     title: "Componenti in un prodotto vero",
-                    desc: Some("Quattro schermate composte solo con la libreria."),
+                    desc: Some("La dashboard qui sopra e altre tre schermate, composte solo con la libreria."),
                 }
                 Tabs {
                     TabList { aria_label: Some("Scene".to_string()),
-                        Tab { value: "dashboard", active: scene, icon: Some(IconKind::Layers), "Dashboard" }
                         Tab { value: "settings", active: scene, icon: Some(IconKind::Settings), "Impostazioni" }
                         Tab { value: "inbox", active: scene, icon: Some(IconKind::MessageSquare), "Inbox" }
                         Tab { value: "auth", active: scene, icon: Some(IconKind::Lock), "Accesso" }
                     }
                     div { class: "sc-scene",
-                        TabPanel { value: "dashboard", active: scene, class: "animate-fade-in",
-                            OpsDashboard { compact: narrow() }
-                        }
                         TabPanel { value: "settings", active: scene, class: "animate-fade-in",
                             SettingsForm { compact: narrow() }
                         }
