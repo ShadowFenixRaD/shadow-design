@@ -10,8 +10,9 @@ index_on_404 = true
 # include `assets` in web platform
 [web.resource]
 
-# Additional CSS style files
-style = ["assets/critical.css"]
+# Additional CSS style files. The boot CSS (no white flash before WASM) is
+# inlined in index.html; the showcase stylesheet is loaded with asset!() in main.rs.
+style = []
 
 # Additional JavaScript files
 script = []

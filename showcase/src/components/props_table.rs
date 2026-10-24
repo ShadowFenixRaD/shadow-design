@@ -12,8 +12,9 @@ pub struct PropRow {
 #[component]
 pub fn PropsTable(rows: Vec<PropRow>) -> Element {
     rsx! {
+        div { class: "sc-props",
         Table {
-            hoverable: true,
+            hoverable: false,
             bordered: true,
             TableHeader {
                 TableRow {
@@ -26,13 +27,14 @@ pub fn PropsTable(rows: Vec<PropRow>) -> Element {
             TableBody {
                 for row in rows {
                     TableRow {
-                        TableCell { class: "font-mono text-purple-300 font-medium", "{row.name}" }
-                        TableCell { class: "font-mono text-zinc-400", "{row.r#type}" }
-                        TableCell { class: "font-mono text-zinc-500", "{row.default}" }
-                        TableCell { class: "text-zinc-300 leading-normal", "{row.description}" }
+                        TableCell { class: "sc-props__name", "{row.name}" }
+                        TableCell { class: "sc-props__type", "{row.r#type}" }
+                        TableCell { class: "sc-props__default", "{row.default}" }
+                        TableCell { class: "sc-props__desc", "{row.description}" }
                     }
                 }
             }
+        }
         }
     }
 }

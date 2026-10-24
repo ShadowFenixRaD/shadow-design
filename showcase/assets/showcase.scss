@@ -1,0 +1,759 @@
+// ==============================================================================
+// Showcase chrome (.sc-*). Tokens only (--sd-*): no colour literals, no hex.
+//
+// Layer choice: `sc-showcase` is appended AFTER the library layers
+// (sd-reset .. sd-theme). The showcase is the consumer of the library, so its
+// layout classes must win over library defaults and layout utilities, but stay
+// below unlayered rules so that a page can still override a single property.
+// ==============================================================================
+@use '../../crate/scss/mixins' as *;
+
+@layer sd-reset, sd-base, sd-components, sd-utilities, sd-theme, sc-showcase;
+
+@layer sc-showcase {
+  :root {
+    --sc-header-h: 3.5rem;
+    --sc-sidebar-w: 16rem;
+    --sc-sidebar-w-collapsed: 4.25rem;
+    --sc-page-w: 56rem;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shell
+  // ---------------------------------------------------------------------------
+  .sc-topbar {
+    position: sticky;
+    top: 0;
+    // z-order comes from the library class .z-layer-header on the element
+    display: flex;
+    align-items: center;
+    gap: var(--sd-space-3);
+    height: var(--sc-header-h);
+    padding-inline: var(--sd-space-3);
+    border-bottom: 1px solid var(--sd-border);
+    background-color: var(--sd-void);
+    @include bp-up(sm) {
+      padding-inline: var(--sd-space-6);
+    }
+  }
+
+  .sc-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--sd-space-3);
+    min-width: 0;
+    color: var(--sd-text);
+    text-decoration: none;
+    @include sd-focus-ring;
+    border-radius: var(--sd-radius-md);
+
+    &__logo {
+      height: 2rem;
+      width: auto;
+      flex: none;
+    }
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: var(--sd-text-lg);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    &__tag {
+      display: none;
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sd-text-subtle);
+      @include bp-up(sm) {
+        display: block;
+      }
+    }
+  }
+
+  .sc-topbar__spacer {
+    flex: 1;
+  }
+
+  // Version badge: hidden on small screens, the sidebar footer repeats it.
+  .sc-hide-below-lg {
+    display: none;
+    @include bp-up(lg) {
+      display: inline-flex;
+    }
+  }
+
+  .sc-hide-below-xl {
+    display: none;
+    @include bp-up(xl) {
+      display: flex;
+    }
+  }
+
+  .sc-hide-xl {
+    @include bp-up(xl) {
+      display: none;
+    }
+  }
+
+  .sc-hide-below-md {
+    display: none;
+    @include bp-up(md) {
+      display: inline-flex;
+    }
+  }
+
+  // Search trigger: a field-like button that opens the palette.
+  .sc-search {
+    @include sd-field(sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sd-space-2);
+    padding-inline: var(--sd-space-3);
+    color: var(--sd-text-muted);
+    font-size: var(--sd-text-sm);
+    cursor: pointer;
+    @include sd-transition;
+    @include sd-focus-ring;
+    @include sd-press(0.98);
+
+    &__label {
+      display: none;
+      @include bp-up(sm) {
+        display: inline;
+      }
+    }
+  }
+
+  // Theme toolbar: fixed-width segments so nothing shifts when a value changes.
+  .sc-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--sd-space-3);
+
+    &__group {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+    }
+
+    &__seg {
+      flex: none;
+      &--radius { width: 13rem; }
+      &--glow { width: 15rem; }
+    }
+
+    &__swatches {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+      min-width: 8.5rem;
+    }
+  }
+
+  // Second toolbar row, shown under the top bar below the xl breakpoint.
+  .sc-toolrow {
+    padding: var(--sd-space-2) var(--sd-space-3);
+    border-bottom: 1px solid var(--sd-border);
+    background-color: var(--sd-surface-1);
+    @include bp-up(sm) {
+      padding-inline: var(--sd-space-6);
+    }
+    @include bp-up(xl) {
+      display: none;
+    }
+  }
+
+  .sc-swatch {
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    flex: none;
+    border-radius: var(--sd-radius-full);
+    border: 1px solid var(--sd-border-strong);
+    cursor: pointer;
+    @include sd-shadow;
+    @include sd-transition;
+    @include sd-focus-ring;
+    @include sd-hover {
+      border-color: var(--sd-border-hover);
+    }
+
+    &--active {
+      border-color: var(--sd-text);
+      --sd-shadow-glow: var(--sd-glow-sm);
+    }
+  }
+
+  .sc-shell {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    min-width: 0;
+  }
+
+  .sc-sidebar {
+    display: none;
+    flex: none;
+    flex-direction: column;
+    gap: var(--sd-space-5);
+    position: sticky;
+    top: var(--sc-header-h);
+    align-self: flex-start;
+    height: calc(100vh - var(--sc-header-h));
+    width: var(--sc-sidebar-w);
+    padding: var(--sd-space-4);
+    overflow-y: auto;
+    border-right: 1px solid var(--sd-border);
+    @include sd-scrollbar;
+    @include bp-up(md) {
+      display: flex;
+    }
+
+    &--collapsed {
+      width: var(--sc-sidebar-w-collapsed);
+      padding-inline: var(--sd-space-2);
+      align-items: center;
+    }
+  }
+
+  // The same navigation inside the mobile Drawer.
+  .sc-sidebar-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-5);
+  }
+
+  .sc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-1);
+    width: 100%;
+
+    &__label {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+      padding-inline: var(--sd-space-3);
+      margin-bottom: var(--sd-space-1);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sd-text-subtle);
+
+      &--accent {
+        color: var(--sd-accent-strong);
+      }
+    }
+
+    &__sep {
+      width: 100%;
+      margin-block: var(--sd-space-1);
+      border-top: 1px solid var(--sd-border-subtle);
+    }
+  }
+
+  .sc-theme-card {
+    @include sd-surface(1);
+    margin-top: auto;
+    padding: var(--sd-space-3);
+    width: 100%;
+    font-size: var(--sd-text-xs);
+
+    &__row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--sd-space-2);
+      font-family: var(--sd-font-mono);
+      color: var(--sd-text-subtle);
+
+      strong {
+        font-weight: 500;
+        color: var(--sd-text);
+      }
+    }
+
+    &__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--sd-space-2);
+      padding-bottom: var(--sd-space-2);
+      border-bottom: 1px solid var(--sd-border-subtle);
+      color: var(--sd-text);
+      font-weight: 500;
+    }
+  }
+
+  .sc-main {
+    flex: 1;
+    min-width: 0;
+    padding: var(--sd-space-4);
+    @include bp-up(sm) {
+      padding: var(--sd-space-8);
+    }
+  }
+
+  // Every page shares one width. The root element of a page may carry a layout
+  // utility such as max-w-4xl, it is neutralised here on purpose.
+  .sc-page {
+    width: 100%;
+    max-width: var(--sc-page-w);
+
+    > * {
+      max-width: none;
+    }
+  }
+
+  .sc-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+    margin-bottom: var(--sd-space-6);
+  }
+
+  .sc-page-title {
+    margin: 0;
+    font-size: var(--sd-text-2xl);
+    font-weight: 700;
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+    overflow-wrap: anywhere;
+  }
+
+  .sc-page-desc {
+    margin: 0;
+    font-size: var(--sd-text-md);
+    line-height: var(--sd-leading-normal);
+    color: var(--sd-text-muted);
+    max-width: 44rem;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Showcase panel (tabs: Playground / Codice / API) and playground vocabulary
+  // ---------------------------------------------------------------------------
+  .sc-panel {
+    @include sd-surface(1);
+    overflow: visible; // floating menus must not be clipped (AGENTS.md §4)
+
+    &__head {
+      padding: var(--sd-space-3) var(--sd-space-4);
+      background-color: var(--sd-tint-1);
+      border-bottom: 1px solid var(--sd-border-subtle);
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+      overflow-x: auto;
+    }
+
+    &__body {
+      padding: var(--sd-space-4);
+      @include bp-up(sm) {
+        padding: var(--sd-space-6);
+      }
+    }
+  }
+
+  .sc-playground {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-6);
+    align-items: start;
+    @include bp-up(lg) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  // Demo stage: static, flat-lit, centred. Never reacts to the pointer.
+  .sc-stage {
+    @include sd-surface(1);
+    border-radius: var(--sd-radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sd-space-4);
+    min-height: 9rem;
+    padding: var(--sd-space-6);
+    min-width: 0;
+
+    &--start {
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .sc-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-control {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sd-space-2);
+    min-width: 0;
+    max-width: 100%;
+
+    > .sd-segmented-control {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  .sc-control-label {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sd-text-subtle);
+  }
+
+  .sc-control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sd-space-2) var(--sd-space-6);
+  }
+
+  .sc-control-divider {
+    height: 0;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--sd-border-subtle);
+    align-self: stretch;
+  }
+
+  // Static layout tile for grid/group/stack/masonry/center/aspect-ratio demos.
+  // It looks nothing like a button on purpose: dashed hairline, no fill
+  // gradient, no hover, default cursor.
+  .sc-demo-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sd-space-2);
+    min-width: 0;
+    padding: var(--sd-space-3);
+    border: 1px dashed var(--sd-border-strong);
+    border-radius: var(--sd-radius-sm);
+    background-color: var(--sd-tint-1);
+    color: var(--sd-text-subtle);
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    line-height: var(--sd-leading-tight);
+    text-align: center;
+    cursor: default;
+    user-select: none;
+
+    &__index {
+      font-size: var(--sd-text-2xs);
+      font-variant-numeric: tabular-nums;
+      color: var(--sd-text-muted);
+    }
+
+    &--tall { min-height: 5rem; }
+    &--short { min-height: 2rem; }
+    &--accent {
+      // Emphasised tile (for example "the item being aligned"). Still static.
+      border-color: var(--sd-accent-border);
+      background-color: var(--sd-accent-soft);
+      color: var(--sd-accent-strong);
+    }
+  }
+
+  .sc-demo-frame {
+    // Bounded area that holds demo cells (resizable, scroll or aspect demos).
+    width: 100%;
+    padding: var(--sd-space-3);
+    border: 1px solid var(--sd-border-subtle);
+    border-radius: var(--sd-radius-md);
+    background-color: var(--sd-well);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Text helpers (coloured text without colour utilities)
+  // ---------------------------------------------------------------------------
+  .sc-accent-text { color: var(--sd-accent-strong); }
+  .sc-muted-text { color: var(--sd-text-muted); }
+  .sc-subtle-text { color: var(--sd-text-subtle); }
+  .sc-success-text { color: var(--sd-success-strong); }
+  .sc-warning-text { color: var(--sd-warning-strong); }
+  .sc-danger-text { color: var(--sd-danger-strong); }
+  .sc-info-text { color: var(--sd-info-strong); }
+  .sc-mono { font-family: var(--sd-font-mono); }
+
+  .sc-counter {
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-xs);
+    color: var(--sd-text-subtle);
+    font-variant-numeric: tabular-nums;
+
+    strong {
+      font-weight: 500;
+      color: var(--sd-accent-strong);
+    }
+  }
+
+  .sc-section-title {
+    margin: 0;
+    font-size: var(--sd-text-lg);
+    font-weight: 600;
+    line-height: var(--sd-leading-tight);
+    color: var(--sd-text);
+  }
+
+  .sc-kbd {
+    display: inline-block;
+    padding: 1px var(--sd-space-1);
+    border: 1px solid var(--sd-border-subtle);
+    border-radius: var(--sd-radius-xs);
+    background-color: var(--sd-tint-3);
+    color: var(--sd-text-muted);
+    font-family: var(--sd-font-mono);
+    font-size: var(--sd-text-2xs);
+    line-height: 1.4;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Feature banner, props table
+  // ---------------------------------------------------------------------------
+  .sc-banner {
+    @include sd-surface(1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sd-space-2) var(--sd-space-4);
+    margin-bottom: var(--sd-space-6);
+    padding: var(--sd-space-3) var(--sd-space-4);
+    font-size: var(--sd-text-sm);
+
+    &__label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-2xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sd-accent-strong);
+    }
+
+    &__code {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sd-space-2);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    &__hint {
+      font-family: var(--sd-font-mono);
+      font-size: var(--sd-text-xs);
+      color: var(--sd-text-subtle);
+    }
+  }
+
+  .sc-props {
+    overflow-x: auto;
+    @include sd-scrollbar;
+
+    &__name { font-family: var(--sd-font-mono); color: var(--sd-accent-strong); font-weight: 500; }
+    &__type { font-family: var(--sd-font-mono); color: var(--sd-text-muted); }
+    &__default { font-family: var(--sd-font-mono); color: var(--sd-text-subtle); }
+    &__desc { color: var(--sd-text-muted); line-height: var(--sd-leading-normal); }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Home and theme builder
+  // ---------------------------------------------------------------------------
+  .sc-card-grid {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-4);
+    @include bp-up(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > * {
+      min-width: 0;
+      height: 100%;
+    }
+
+    &--3 {
+      @include bp-up(lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  }
+
+  .sc-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-4);
+    min-width: 0;
+  }
+
+  .sc-stack--loose {
+    gap: var(--sd-space-6);
+  }
+
+  .sc-hero {
+    @include sd-surface(1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sd-space-4);
+    padding: var(--sd-space-6);
+    @include bp-up(sm) {
+      padding: var(--sd-space-8);
+    }
+
+    &__title {
+      margin: 0;
+      font-size: var(--sd-text-3xl);
+      font-weight: 700;
+      line-height: var(--sd-leading-tight);
+      color: var(--sd-text);
+    }
+  }
+
+  .sc-list {
+    margin: 0;
+    padding-left: var(--sd-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sd-space-2);
+    color: var(--sd-text-muted);
+    font-size: var(--sd-text-sm);
+  }
+
+  .sc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sd-space-2);
+  }
+
+  .sc-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sd-space-3);
+  }
+
+  // Theme builder
+  .sc-builder-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sd-space-8);
+    @include bp-up(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .sc-tabs-head {
+    margin-bottom: var(--sd-space-4);
+    overflow-x: auto;
+  }
+
+  .sc-tabs-body {
+    min-width: 0;
+  }
+
+  .sc-token {
+    display: flex;
+    gap: var(--sd-space-3);
+    align-items: stretch;
+    padding: var(--sd-space-3);
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-md);
+    background-color: var(--sd-surface-1);
+
+    &__swatch {
+      flex: none;
+      width: 3.5rem;
+      border: 1px solid var(--sd-border-strong);
+      border-radius: var(--sd-radius-sm);
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sd-space-1);
+      flex: 1;
+      min-width: 0;
+      font-size: var(--sd-text-xs);
+    }
+
+    &__inputs {
+      display: flex;
+      align-items: center;
+      gap: var(--sd-space-2);
+      margin-top: var(--sd-space-1);
+
+      .sd-input {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+  }
+
+  .sc-color-input {
+    flex: none;
+    width: var(--sd-control-md);
+    height: var(--sd-control-md);
+    padding: 0;
+    border: 1px solid var(--sd-border-strong);
+    border-radius: var(--sd-radius-md);
+    background: transparent;
+    cursor: pointer;
+    @include sd-focus-ring;
+  }
+
+  .sc-textarea {
+    width: 100%;
+    min-height: 6rem;
+  }
+
+}
+
+@layer sc-showcase {
+  .sc-only-below-md {
+    @include bp-up(md) {
+      display: none;
+    }
+  }
+
+  .sc-sidebar--collapsed .sd-sidebar-link {
+    justify-content: center;
+    padding-inline: 0;
+    width: 100%;
+  }
+
+  .sc-sidebar .sd-sidebar-link,
+  .sc-sidebar-drawer .sd-sidebar-link {
+    text-decoration: none;
+  }
+}

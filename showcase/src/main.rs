@@ -207,6 +207,8 @@ pub enum Route {
 
 pub const FAVICON: Asset = asset!("/assets/favicon.ico");
 pub const STYLES: Asset = shadow_design::STYLES;
+/// Showcase chrome (.sc-* classes), loaded after the library stylesheet.
+pub const SHOWCASE_STYLES: Asset = asset!("/assets/showcase.scss");
 pub const HEADER_SVG: Asset = asset!("/assets/header.svg");
 
 fn main() {
@@ -221,6 +223,7 @@ fn App() -> Element {
         document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Link { rel: "stylesheet", href: STYLES }
+        document::Link { rel: "stylesheet", href: SHOWCASE_STYLES }
         shadow_design::locale::LocaleProvider { locale: Some(locale),
             ThemeProvider {
                 persist_key: "shadow_design_custom_theme".to_string(),
