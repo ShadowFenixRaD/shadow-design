@@ -2,267 +2,246 @@
 
 Istruzioni operative, architettura e standard di sviluppo per agenti AI e sviluppatori che lavorano su **Shadow Design**.
 
+> `GEMINI.md` e `CLAUDE.md` sono symlink a questo file: modifica **solo** `AGENTS.md`.
+
+---
+
+## 0. Navigazione del Codice con graphify
+
+Il progetto ha un knowledge graph in `graphify-out/` (god nodes, community structure, relazioni cross-file).
+
+- Quando esiste `graphify-out/graph.json`, esegui `graphify query "<domanda>"` **prima** del primo grep, ricerca o lettura di file sorgente per una domanda sul codice, e includi questa regola in ogni prompt di subagent che esplora il codice. Leggi i file raw solo per le righe già localizzate dal grafo o da una lettura precedente.
+- Usa `graphify path "<A>" "<B>"` per le relazioni e `graphify explain "<concetto>"` per concetti mirati: restituiscono un sottografo circoscritto, molto più piccolo di `GRAPH_REPORT.md` o dell'output di grep.
+- Se esiste `graphify-out/wiki/index.md`, usalo per la navigazione ad ampio raggio invece di sfogliare i sorgenti.
+- Leggi `graphify-out/GRAPH_REPORT.md` solo per review architetturali ampie o quando query/path/explain non bastano.
+- Dopo aver modificato codice, esegui `graphify update .` per mantenere il grafo aggiornato (solo AST, nessun costo API).
+- `graphify-out/graph.json` viene riscritto per intero a ogni build: un diff ampio in una PR è atteso. Non segnalarlo come churn e non suggerire di saltare il rebuild o i relativi hook.
+
 ---
 
 ## 1. Panoramica del Progetto
 
-**Shadow Design** è una libreria di componenti UI modulare e ad alte prestazioni progettata per **Dioxus 0.7** (applicazioni Web, Desktop e Mobile), nata all'interno dell'ecosistema **Shadowfenix**.
+**Shadow Design** (v0.5.x) è una libreria di componenti UI modulare e ad alte prestazioni per **Dioxus 0.7** (Web, Desktop, Mobile), nata nell'ecosistema **Shadowfenix**. Licenza `MIT OR Apache-2.0`.
 
 ### Filosofia Estetica
-- **Sfondo**: Nero assoluto (`#000000`, `bg-black`).
-- **Accenti Cromatici**: Viola scuro intenso (`purple-950`, `purple-900`, `purple-800`), con preset alternativi Obsidian (monocromatico) e Crimson (fenice rossa).
-- **Dettagli**: Micro-glow (`shadow-[0_0_20px_rgba(107,33,168,0.3)]`), bordi semi-trasparenti sottili e contrasti elevati.
-- **Modularità**: Architettura *zero-bloat* dove ogni componente è vincolato a una feature flag Cargo indipendente.
+- **Sfondo**: nero assoluto (`#000000`) con superfici a 4 livelli (`--color-void`, `--color-surface-1..3`).
+- **Accenti**: viola Ultraviolet di default, con preset Obsidian, Crimson, Cyan, Emerald e Cartoon.
+- **Dettagli**: micro-glow, specular highlights, bordi hairline semi-trasparenti, contrasti elevati, micro-scrollbar.
+- **Modularità**: architettura *zero-bloat*, ogni componente è dietro una feature flag Cargo indipendente.
+- **Zero tooling a valle**: nessun Node/npm/Tailwind richiesto ai consumatori; lo SCSS è compilato dalla pipeline `asset!()` di Dioxus.
 
 ---
 
 ## 2. Struttura del Workspace Cargo
 
-Il progetto è configurato come un Cargo workspace con due membri principali:
-
 ```text
 shadow-design/
-├── Cargo.toml               # Workspace root (resolver = "2", Dioxus 0.7.1)
-├── Cargo.lock               # Dipendenze bloccate del workspace
-├── clippy.toml              # Regole di linting per Dioxus 0.7 / Generational Box
-├── AGENTS.md                # Questo file d'istruzioni
-├── crate/                   # Crate libreria: shadow-design
-│   ├── Cargo.toml           # Manifest della libreria con feature flags
-│   ├── scss/                # Sistema di stile nativo Pure SCSS
-│   │   ├── main.scss        # Entrypoint SCSS master esportato come Asset
-│   │   ├── _variables.scss  # Token e scale cromatiche
-│   │   ├── _mixins.scss     # Mixin tattili, specular, depth e ambient glow
-│   │   ├── _reset.scss      # Reset CSS preflight (@layer sd-reset)
-│   │   ├── _utilities.scss  # Utilità universali (@layer sd-utilities)
-│   │   ├── _theme_presets.scss # Stili dei 5 temi e scale di personalizzazione
-│   │   └── components/      # Moduli SCSS dedicati per ogni componente
+├── Cargo.toml          # Workspace (resolver "2", dioxus 0.7.1, serde, serde_json)
+├── flake.nix           # Dev shell Nix (toolchain, dx, sass, graphify) — vedi §8
+├── clippy.toml         # await-holding-invalid-types per Signal / GenerationalBox
+├── AGENTS.md           # Questo file (GEMINI.md e CLAUDE.md sono symlink)
+├── CHANGELOG.md
+├── deploy.nu           # Build release web dello showcase + deploy in /var/www/shadow-design
+├── scripts/
+│   └── check_classes.py   # Verifica che le classi usate in RSX esistano nel CSS compilato
+├── graphify-out/       # Knowledge graph del codice (vedi §0)
+├── .agents/            # Regole/workflow agent (graphify)
+├── crate/              # Libreria `shadow-design`
+│   ├── Cargo.toml      # Feature flags (vedi §3)
+│   ├── build.rs        # rerun-if-changed=scss
+│   ├── tests/          # Test di integrazione (*_tests.rs)
+│   ├── scss/           # Sistema di stile 100% SCSS (vedi §4)
 │   └── src/
-│       ├── lib.rs           # Entry point libreria, re-export condizionali e prelude
-│       ├── a11y.rs          # Helper di accessibilità ARIA e ID univoci
-│       ├── alert.rs         # Componente Alert con icone automatiche
-│       ├── animation.rs     # Transizioni ottiche e micro-animazioni
-│       ├── badge.rs         # Componente Badge con stili pill/rettangolari
-│       ├── button.rs        # Componente Button, varianti e dimensioni
-│       ├── card.rs          # Componente Card con header, footer e ombre
-│       ├── checkbox.rs      # Caselle di selezione tattili (Sm/Md/Lg)
-│       ├── compat.rs        # Layer di retrocompatibilità
-│       ├── drawer.rs        # Pannelli laterali a scomparsa da sx/dx
-│       ├── dropdown.rs      # Menu a tendina contestuali ancorati
-│       ├── glow.rs          # Risolutore del micro-glow
-│       ├── icon.rs          # Modulo icone native SVG (50 IconKind)
-│       ├── input.rs         # Componente TextInput collegato a Signal<String>
-│       ├── modal.rs         # Finestre di dialogo in overlay con backdrop
-│       ├── navbar.rs        # Componente Navbar responsive
-│       ├── notification.rs  # Sistema Toast globale con NotificationProvider
-│       ├── select.rs        # Select, MultiSelect e Combobox filtrabili
-│       ├── switch.rs        # Interruttori a scatto tattili ad alta precisione
-│       ├── tabs.rs          # Navigazione a schede orizzontali stile Mantine
-│       ├── textarea.rs      # Campi di testo multilinea con autosize
-│       ├── theme.rs         # Sistema reattivo del tema, Context e Preset
-│       ├── tooltip.rs       # Micro-etichette fluttuanti su hover a 4 direzioni
-│       ├── typography.rs    # Componenti tipografici basati su Geist
-│       └── util.rs          # Utility class builder cx!
-└── showcase/                # Crate applicativo: Espositore componenti
-    ├── Cargo.toml           # Manifest dell'app (dipende da shadow-design { all })
-    ├── Dioxus.toml          # Configurazione Dioxus CLI (dx)
-    ├── assets/
-    │   ├── critical.css     # CSS critico di boot (dark background immediato)
-    │   ├── header.svg       # Logo vettoriale Shadowfenix
-    │   └── favicon.ico      # Icona dell'applicazione
+│       ├── lib.rs      # Moduli condizionali, `STYLES`, `VERSION`, `pub mod prelude`
+│       ├── a11y.rs     # use_unique_id, ControlSize, AriaHeading (sempre compilato)
+│       ├── locale.rs   # Locale, LocaleProvider, use_locale (sempre compilato)
+│       ├── util.rs     # Helper interni (hex_to_rgb, parse_hex_rgba, …)
+│       ├── theme.rs    # Theme engine, preset, ThemeProvider, use_theme
+│       ├── icon.rs     # IconKind: icone SVG native (stroke 1.5px)
+│       ├── <componente>.rs        # Componenti semplici (button, card, input, …)
+│       ├── <componente>/mod.rs    # Componenti composti (accordion, app_shell, menubar,
+│       │                          #   stepper, pagination, nav_link, breadcrumbs, …)
+│       ├── chart/      # Feature `charts`: primitives, area, bar, line, pie, radar,
+│       │               #   scatter, sparkline, gauge, heatmap
+│       └── hooks/      # Feature `hooks`: click_outside, clipboard, debounce, hotkey,
+│                       #   idle, intersection, local_storage, media_query, scroll
+└── showcase/           # App Dioxus di documentazione interattiva (publish = false)
+    ├── Cargo.toml      # Dipende da shadow-design { features = ["all", "serde"] }; feature web/desktop/mobile
+    ├── Dioxus.toml
+    ├── assets/         # critical.css (boot dark), header.svg, favicon.ico
     └── src/
-        ├── main.rs          # App root, caricamento asset e Dioxus Router
+        ├── main.rs     # App root, `enum Route` (Dioxus Router), provider e STYLES
         ├── components/
-        │   ├── banner.rs    # Banner informativo con comando Cargo feature
-        │   ├── clipboard.rs # Helper asincrono copy-to-clipboard con fallback
-        │   ├── code_block.rs# Visualizzatore codice con syntax highlighting
-        │   ├── highlight.rs # Tokenizer sintattico per Rust/RSX
-        │   ├── layout.rs    # Shell con Navbar, Sidebar responsive e Theme Switcher
-        │   ├── mod.rs       # Moduli componenti showcase
-        │   ├── nav.rs       # Registry componenti e SearchPalette (Ctrl+K)
-        │   ├── props_table.rs# Tabella documentazione props delle API
-        │   └── showcase_tabs.rs # Tabs Playground / Codice RSX / API Props
-        └── pages/
-            ├── mod.rs
-            ├── alerts.rs    # Showcase di Alert
-            ├── animation.rs # Playground interattivo Transition
-            ├── badges.rs    # Showcase di Badge e varianti
-            ├── buttons.rs   # Showcase e playground interattivo di Button
-            ├── cards.rs     # Showcase di Card e livelli di ombra
-            ├── checkbox.rs  # Showcase di Checkbox tattile
-            ├── drawer.rs    # Showcase di Drawer laterale
-            ├── dropdown.rs  # Showcase di Dropdown contestuale
-            ├── home.rs      # Panoramica, hero e test dinamico del Theme
-            ├── icons.rs     # Griglia ricercabile di tutti i 50 IconKind
-            ├── inputs.rs    # Showcase di TextInput con binding reattivo
-            ├── modals.rs    # Showcase e test di apertura modale
-            ├── navbar.rs    # Anteprima di Navbar
-            ├── notifications.rs # Showcase del Toast Provider
-            ├── select.rs    # Showcase di Select, MultiSelect e Combobox
-            ├── switch.rs    # Showcase di Switch tattile
-            ├── tabs.rs      # Showcase di Tabs orizzontali
-            ├── textarea.rs  # Showcase di Textarea autosize
-            ├── theme_builder.rs # Studio visuale Theme Builder
-            ├── tooltip.rs   # Showcase di Tooltip su hover
-            └── typography.rs# Showcase della scala tipografica Geist
+        │   ├── layout.rs        # Shell: header, toolbar tema, sidebar, Outlet::<Route>
+        │   ├── nav.rs           # Registry unico COMPONENTS / CATEGORIES + SearchPalette (Ctrl+K)
+        │   ├── showcase_tabs.rs # Tabs Playground / Codice RSX / API Props
+        │   ├── props_table.rs   # Tabella documentazione props
+        │   ├── banner.rs        # Banner con comando Cargo feature
+        │   └── clipboard.rs     # Copy-to-clipboard async con fallback
+        └── pages/      # Una pagina per componente + home.rs, theme_builder.rs, icons.rs
 ```
+
+Le fonti di verità per l'elenco dei componenti sono: `crate/Cargo.toml` (`[features]`), `crate/src/lib.rs` (moduli e `prelude`) e `showcase/src/components/nav.rs` (`COMPONENTS`). Non duplicare elenchi completi in questo file.
 
 ---
 
-## 3. Crate Libreria (`crate` / `shadow-design`)
+## 3. Feature Flags
 
-### Feature Flags Cargo
-Il file `crate/Cargo.toml` definisce feature individuali per consentire ai consumatori di importare esclusivamente ciò di cui necessitano:
+- `default = ["all"]`. `all` abilita l'intera suite (esclusa `serde`).
+- Nomi canonici in `snake_case` (es. `number_input`), con alias `kebab-case` (es. `number-input = ["number_input"]`).
+- Le feature dichiarano le proprie dipendenze interne (es. `input = ["icon", "close_button"]`, `table = ["icon", "pagination", "loading_overlay"]`).
+- `serde`: serializzazione JSON di `Theme`, preset e override (`dep:serde`, `dep:serde_json`).
 
-| Feature Flag | Descrizione | Modulo |
-| :--- | :--- | :--- |
-| `all` | Abilita l'intera suite di componenti e il tema | Include tutte le feature sottostanti |
-| `button` | Pulsanti con varianti, dimensioni, loading spinner e stati tattili | `crate::button` |
-| `card` | Schede contenitore con varianti (Interactive, Metric, Elevated) e ombre | `crate::card` |
-| `input` | Input di testo reattivi con icone statiche/cliccabili (`on_left_icon_click`, `on_right_icon_click`), clear button e Signal<String> | `crate::input` |
-| `badge` | Etichette di stato, indicatori a pillola e dot animato | `crate::badge` |
-| `navbar` | Barra di navigazione responsive con specular top highlight | `crate::navbar` |
-| `modal` | Finestre di dialogo in overlay con backdrop click-to-close | `crate::modal` |
-| `alert` | Riquadri di notifica con icone SVG native e dismiss manuale | `crate::alert` |
-| `theme` | Engine reattivo in stile Mantine (PrimaryColor, RadiusScale, GlowMode) | `crate::theme` |
-| `icon` | Modulo icone vettoriali native SVG (stroke 1.5px, zero dipendenze) | `crate::icon` |
-| `typography` | Componenti tipografici basati su Geist (Heading, Text, Kbd, Code) | `crate::typography` |
-| `notification` | Sistema Toast globale (NotificationProvider, use_notification, dismiss) | `crate::notification` |
-| `tabs` | Navigazione a schede orizzontali stile Mantine (TabList, Tab, TabPanel) | `crate::tabs` |
-| `switch` | Interruttori a scatto tattili ad alta precisione con descrizioni | `crate::switch` |
-| `tooltip` | Micro-etichette fluttuanti su hover a 4 direzioni (Top, Bottom, Left, Right) | `crate::tooltip` |
-| `drawer` | Pannelli laterali a scomparsa da sinistra o destra con backdrop | `crate::drawer` |
-| `dropdown` | Menu a tendina contestuali ancorati al trigger con dismiss automatico | `crate::dropdown` |
-| `checkbox` | Caselle di selezione tattili (Sm/Md/Lg, indeterminate, error, glow) | `crate::checkbox` |
-| `select` | Menu a discesa Select, MultiSelect e Combobox ricercabili | `crate::select` |
-| `textarea` | Campi di testo multilinea con autosize reattivo e contatore | `crate::textarea` |
-| `animation` | Sistema di transizioni ottiche e micro-animazioni Dioxus (Fade, Slide, Scale, Pulse) | `crate::animation` |
-| `serde` | Serializzazione e deserializzazione JSON di Theme, Preset e Overrides | Dipendenza `serde` opzionale |
+| Area | Feature |
+| :--- | :--- |
+| Core & tema | `theme`, `icon`, `typography`, `animation`, `hooks` |
+| Form & input | `button`, `input`, `select` (Select/MultiSelect/Combobox), `textarea`, `checkbox`, `radio`, `switch`, `slider`, `rating`, `number_input`, `pin_input`, `color_picker`, `chip`, `segmented_control`, `date_picker`, `dropzone`, `fieldset`, `form` |
+| Layout | `app_shell`, `grid`, `group`, `stack`, `layout_primitives`, `center`, `aspect_ratio`, `divider`, `scroll_area`, `resizable`, `masonry` |
+| Navigazione | `navbar`, `tabs`, `breadcrumbs`, `pagination`, `nav_link`, `bottom_navigation`, `stepper`, `menubar`, `navigation_menu`, `overflow_set`, `burger` |
+| Overlay | `modal`, `drawer`, `dropdown`, `tooltip`, `popover`, `hover_card`, `context_menu`, `alert_dialog`, `coachmark`, `speed_dial`, `affix`, `command_palette`, `keytip` |
+| Dati & feedback | `card`, `badge`, `alert`, `notification`, `progress`, `skeleton`, `loading_overlay`, `indicator`, `table`, `list`, `timeline`, `tree`, `virtual_list`, `transfer_list`, `accordion`, `spoiler`, `carousel` |
+| Grafici | `charts` (= `chart_primitives`, `chart_area`, `chart_bar`, `chart_line`, `chart_pie`, `chart_radar`, `chart_scatter`, `chart_sparkline`, `chart_gauge`, `chart_heatmap`; base `chart_core`) |
+| Rich content & social | `avatar`, `chat`, `attachment_card`, `contact_card`, `document_card`, `media_card`, `facepile`, `activity_feed`, `rich_text`, `code_highlight` |
+| Micro-utility | `close_button`, `copy_button`, `highlight`, `marquee_selection` |
 
-### Gerarchia Z-Index Standardizzata
-Per prevenire clipping e sovrapposizioni errate (es. Dropdown clippato da Card o nascosto sotto altri elementi):
-- `Card` e `ShowcaseTabs` non usano `overflow-hidden` forzato sull'intero contenitore per permettere ai menu fluttuanti di estendersi all'esterno.
-- `Dropdown` supporta `DropdownPlacement` (`BottomRight`, `BottomLeft`, `TopRight`, `TopLeft`): quando posizionato vicino al fondo di una card, il preset `Top` apre il menu verso l'alto evitando di fuoriuscire dal layout.
-- Quando aperto, il Dropdown riceve priorità assoluta: Backdrop `z-[995]`, Container `z-[999]`, Menu `z-[1000]`.
-- Scala Z-index universale:
-  - Header / Sticky: `z-30`
-  - Drawer: Backdrop `z-[65]`, Panel `z-[70]`
-  - Modal: Backdrop `z-[75]`, Dialog `z-[80]` / `z-[85]`
-  - Notifications: Container `z-[90]`
-  - Tooltips: Bubble `z-[100]`
-  - Select Menu: Container `z-[999]`, Menu `z-[1000]`
-  - Dropdown Attivo: Container `z-[999]`, Menu `z-[1000]`
+---
 
-### Architettura 100% SCSS & Supporto Nativo Dioxus `asset!()` nella Crate
-TailwindCSS è stato completamente rimosso dal progetto. L'intera suite di stili è ora scritta in puro SCSS e risiede direttamente all'interno della crate libreria in `crate/scss/`, esposta nativamente tramite la macro di Dioxus in [crate/src/lib.rs](crate/src/lib.rs):
+## 4. Sistema di Stile (100% SCSS)
+
+TailwindCSS è stato rimosso. Tutti gli stili vivono in `crate/scss/` e sono esposti come asset Dioxus in `crate/src/lib.rs`:
+
 ```rust
 pub const STYLES: Asset = asset!("/scss/main.scss");
 ```
-E consumata direttamente dalle applicazioni (come lo showcase) tramite:
+
+Consumo nelle app:
+
 ```rust
 document::Link { rel: "stylesheet", href: shadow_design::STYLES }
 ```
-- `_variables.scss`: Token per colori, surface 4-livelli, font Geist, raggi di curvatura.
-- `_zindex.scss`: Mappa `$z-layers` e funzione `z($layer)` per un layer management matematicamente affidabile.
-- `_mixins.scss`: Mixin per specular highlights, ambient glow, micro-scrollbar, tactile press.
-- `_reset.scss`: CSS Preflight Reset totale che azzera i default del browser per `button`, `input`, `textarea`, `select`, eliminando alla radice il problema dei bottoni con background bianco o grigio nativo del browser.
-- `_animations.scss`: Keyframes per toast in/out, modal scale-in, dropdown unroll, drawer slides, indeterminate slide, spin, pulse glow e classi `.animate-*`.
-- `_utilities.scss`: Motore di utilità SCSS universale (Flexbox, Grid, Sizing, Spacing, Typography, Colors, Borders, Shadows).
-- `_theme_presets.scss`: Presets e classi cromatiche per i 5 temi (Violet, Obsidian, Crimson, Cyan, Emerald), anelli di selezione (`ring-2`), scale attive e glow matrix dinamica.
-- `components/_*.scss`: Moduli specifici per ciascun componente UI, inclusi `.sd-btn`, `.sd-card`, `.sd-input`, `.sd-checkbox`, `.sd-modal`, `.sd-drawer`, `.sd-dropdown`, `.sd-toast`, `.sd-alert`, `.sd-badge`, `.sd-navbar`, `.sd-switch`, `.sd-tabs`, `.sd-tooltip`, `.sd-heading`/`.sd-text`.
-- `main.scss`: Entrypoint master all'interno di `crate/scss/` che assembla e compila l'intera suite.
 
-### Supporto Duale al Tema (`Theme` vs Fallback statico)
-Tutti i componenti in `crate/src/` sono scritti per funzionare in due modalità grazie a `#[cfg]`:
-1. **Con feature `theme` attiva**: Leggono le classi SCSS in modo reattivo invocando `crate::theme::use_theme()`. Quando il tema cambia a runtime, tutti i componenti istanziati si aggiornano immediatamente.
-2. **Senza feature `theme` attiva**: Fanno fallback trasparente su classi statiche predefinite hardcoded nei componenti (zero overhead se il sistema a tema non è richiesto).
+### File principali
+| File | Ruolo |
+| :--- | :--- |
+| `main.scss` | Entrypoint: `@use` di tutti i partial e di ogni `components/_*.scss`, più `:root` vars e utility ottiche in `@layer sd-base` |
+| `_layers.scss` | Ordine dei cascade layer: `sd-reset, sd-base, sd-components, sd-utilities, sd-theme` |
+| `_variables.scss` | Token colore, superfici, font Geist, raggi |
+| `_fonts.scss` | Font face |
+| `_zindex.scss` | Mappa `$z-layers`, funzione `z($layer)` e classi `.z-layer-*` |
+| `_mixins.scss` | Specular highlight, ambient glow, micro-scrollbar, tactile press |
+| `_reset.scss` | Preflight reset (`button`, `input`, `textarea`, `select`, …) |
+| `_animations.scss` | Keyframes (toast, modal, dropdown, drawer, spin, pulse, …) e classi `.animate-*` |
+| `_utilities.scss` | Utility universali (flex, grid, sizing, spacing, typography, colori, bordi, ombre) |
+| `_theme_presets.scss` + `_preset_cartoon.scss` | Classi dei preset, ring di selezione, glow matrix |
+| `components/_<nome>.scss` | Stili BEM per componente (`.sd-btn`, `.sd-card`, `.sd-input`, …) |
 
-### Sistema del Tema in stile Mantine (`crate/src/theme.rs`)
-- **`Theme`**: Struttura dati che raggruppa tutti i token CSS di layout, superfici a 4 livelli, accenti e classi di ogni componente.
-- **Preset inclusi**:
-  - `Theme::shadow()` (Default): Ultraviolet Shadow (Nero profondo + accenti viola e specular highlights).
-  - `Theme::obsidian()`: Obsidian Titanium (Monocromatico rigoroso argento e titanio).
-  - `Theme::crimson()`: Crimson Phoenix (Nero profondo con fiamme cremisi fenice).
-  - `Theme::cyan()`: Cyber Cyan (Ciano elettrico ad alto contrasto).
-  - `Theme::emerald()`: Emerald Matrix (Verde smeraldo ad alta nitidezza).
-- **Scale di Personalizzazione**:
-  - `PrimaryColor`: Violet, Obsidian, Crimson, Cyan, Emerald.
-  - `RadiusScale`: Sharp (2px), Medium (8px), Soft (14px).
-  - `GlowMode`: Subtle, Expressive, Off.
-- **Context API Dioxus**: `ThemeProvider` per fornire il tema all'albero di componenti e `use_theme()` per consumarlo o scrivervi (`theme.write()`).
+### Regole
+- Le classi di componente usano il prefisso `sd-` con BEM (`.sd-btn--primary`, `.sd-card__header`).
+- Ogni regola deve stare nel cascade layer corretto (componenti in `sd-components`, utility in `sd-utilities`).
+- Non usare z-index numerici: usa `z('<layer>')` in SCSS o le classi `.z-layer-*`.
+- Se usi in RSX una classe utility nuova, verifica che esista con `scripts/check_classes.py`.
 
----
+### Gerarchia Z-Index (`_zindex.scss`)
+| Layer | Valore |
+| :--- | :--- |
+| `base` / `sticky` / `header` | 0 / 20 / 30 |
+| `speed-dial`, `affix` | 60 |
+| `drawer-back` / `drawer` | 65 / 70 |
+| `modal-back` / `modal` / `modal-content` | 75 / 80 / 85 |
+| `notification` | 90 |
+| `coachmark` | 95 |
+| `tooltip` | 100 |
+| `popover-back` / `popover` | 989 / 990 |
+| `dropdown-back`, `context-menu-back` | 995 |
+| `dropdown`, `context-menu` | 1000 |
 
-## 4. Crate Showcase (`showcase`)
-
-È l'applicazione web interattiva usata per collaudare e mostrare visivamente tutti i componenti.
-
-- **Routing (Dioxus 0.7)**: Gestito tramite l'enum `Route` in `showcase/src/main.rs`.
-- **Layout Shell (`showcase/src/components/layout.rs`)**:
-  - Fornisce la barra superiore con logo Shadowfenix e toolbar interattiva Mantine (palette swatches, radius selector, glow toggle).
-  - Barra laterale con navigazione alle pagine dei singoli componenti e icone SVG native.
-  - Renderizza la pagina corrente tramite `Outlet::<Route> {}`.
-- **ComponentShowcase a 3 Schede (`ShowcaseTabs`)**:
-  - **Playground**: Controlli interattivi live (varianti, dimensioni, stati, switch).
-  - **Codice RSX**: Snippet di codice copiabile negli appunti con feedback "Copiato!".
-  - **API Props**: Tabella dettagliata dei parametri (Nome, Tipo Rust, Default, Descrizione).
+Per evitare clipping dei menu fluttuanti, `Card` e `ShowcaseTabs` non usano `overflow: hidden` sull'intero contenitore. `Dropdown` supporta `DropdownPlacement` (`BottomRight`, `BottomLeft`, `TopRight`, `TopLeft`) per aprirsi verso l'alto vicino al fondo di un contenitore.
 
 ---
 
-## 5. Regole e Convenzioni per lo Sviluppo
+## 5. Theme Engine (`crate/src/theme.rs`)
 
-### Dioxus 0.7 API Standards
-- **No API obsolete**: `cx`, `Scope`, `use_state` non esistono più in Dioxus 0.7.
-- **Stato reattivo**:
-  - Usa `use_signal(|| init_val)`.
-  - Lettura: `sig()` oppure `*sig.read()`.
-  - Scrittura: `*sig.write() = new_val` oppure `sig.with_mut(|v| ...)`.
-- **Proprietà dei Componenti**:
-  - Devono implementare `Clone` e `PartialEq`.
-  - Usa tipi posseduti (`String`, `Option<String>`, `Signal<T>`), non riferimenti (`&str`, `&[T]`).
-  - Per eventi, usa `Option<EventHandler<MouseEvent>>` o simili.
-- **Sintassi RSX**:
-  - Cicli con `for item in items { ... }`.
-  - Condizionali diretti con `if condition { ... }`.
-  - Attributi condizionali e stringhe formattate con `{base} {extra}`.
+- **`Theme`**: token di layout, superfici, accenti e classi per componente. Si costruisce dai preset o con `Theme::builder()` / `ThemeBuilder`.
+- **Preset**: `Theme::shadow()` (default, Ultraviolet), `obsidian()`, `crimson()`, `cyan()`, `emerald()`, `cartoon()`.
+- **Scale**:
+  - `PrimaryColor`: `Violet`, `Obsidian`, `Crimson`, `Cyan`, `Emerald`, `Custom { name, hex, css_prefix }` (`PrimaryColor::custom`, `custom_with_prefix`).
+  - `RadiusScale`: `Sharp` (2px), `Medium` (8px, default), `Soft` (14px).
+  - `GlowMode`: `Subtle` (default), `Expressive`, `Off`.
+  - `ElevationStyle`: `NeonGlow` (default), `HardBlock`, `SoftElevated`, `Flat`.
+- **Override per componente**: `ComponentOverride` (base class, varianti, size, shadow, modifier) via `with_component_override` / `with_class_override`; risoluzione con `resolve_variant_class`, `resolve_size_class`, `resolve_elevation_class`, ecc.
+- **Mutazioni runtime**: `apply_primary_color`, `apply_radius_scale`, `apply_glow_mode`, `apply_elevation_style`.
+- **CSS variables**: `to_css_variables()` / `to_inline_css_variables()`.
+- **Context**: `ThemeProvider` fornisce un `Signal<Theme>`; `use_theme()` lo legge o lo scrive (`theme.write()`).
 
-### Regole di Concorrenza e Linting (`clippy.toml`)
-Il repository include configurazioni specifiche per evitare deadlock e panic nei thread asincroni Dioxus:
-- **NON trattenere mai riferimenti o lock attraverso punti di `.await`**:
-  - `generational_box::GenerationalRef`
-  - `generational_box::GenerationalRefMut`
-  - `dioxus_signals::WriteLock`
-- Se devi eseguire un `.await`, rilascia sempre prima il lock dello Signal o della box generazionale (ad esempio clonando il valore prima dell'await o chiudendo il blocco di scope del lock).
+### Supporto duale (`theme` on/off)
+Ogni componente deve compilare in entrambe le modalità tramite `#[cfg]`:
+1. **Con `theme`**: legge le classi da `crate::theme::use_theme()` e si aggiorna reattivamente al cambio tema.
+2. **Senza `theme`** (`#[cfg(not(feature = "theme"))]`): fallback su classi statiche hardcoded, zero overhead.
 
-### Linee Guida per Aggiungere Nuovi Componenti
-Quando si aggiunge un nuovo componente a `shadow-design`:
-1. Crea il file `crate/src/<componente>.rs`.
-2. Aggiungi la feature in `crate/Cargo.toml` (sia come feature isolata, sia come dipendenza di `all`).
-3. In `crate/src/lib.rs`, esponi il modulo con `#[cfg(feature = "...")]` e includilo in `pub mod prelude`.
-4. Nel componente, gestisci sia il supporto reattivo a `crate::theme::use_theme()` sia il fallback statico senza feature `theme`.
-5. Se il componente richiede stili nel tema, aggiorna `Theme` in `crate/src/theme.rs` con i campi corrispondenti e i metodi builder.
-6. Aggiungi la pagina dimostrativa corrispondente in `showcase/src/pages/` e registrala nel Router e nella Sidebar.
+### Locale (`crate/src/locale.rs`)
+Le stringhe UI (placeholder, "Nothing found", "Close", ecc.) vengono da `Locale` (default inglese), fornito globalmente con `LocaleProvider` e letto con `use_locale()`; i singoli componenti possono sovrascriverle via props. Non hardcodare testo visibile nei componenti della libreria.
 
 ---
 
-## 6. Comandi Utili per il Workflow
+## 6. Showcase (`showcase/`)
 
-Esegui sempre i comandi dalla root del workspace o specificando il package target:
+- **Routing**: `enum Route` in `showcase/src/main.rs`, tutte le pagine sotto `#[layout(Layout)]`.
+- **Registry unico** (`showcase/src/components/nav.rs`): ogni `ComponentItem` in `COMPONENTS` (nome, `route`, `urls`, categoria `class`, `features`, `icon`, `description`, `keywords`) si propaga automaticamente a sidebar, `SearchPalette` (Ctrl+K) e `all_cargo_features()`. Le categorie sono in `CATEGORIES`.
+- **Layout shell** (`layout.rs`): header con logo Shadowfenix, toolbar tema (swatch colore, radius, glow), sidebar, `Outlet::<Route> {}`.
+- **`ShowcaseTabs`**: Playground (controlli live), Codice RSX (copia con feedback "Copiato!"), API Props (Nome, Tipo Rust, Default, Descrizione).
+- I testi dello showcase sono in italiano; la documentazione rustdoc della libreria è in inglese.
+
+---
+
+## 7. Regole di Sviluppo
+
+### Dioxus 0.7
+- Niente API obsolete: `cx`, `Scope`, `use_state` non esistono.
+- Stato: `use_signal(|| init)`; lettura `sig()` o `*sig.read()`; scrittura `*sig.write() = v` o `sig.with_mut(|v| …)`.
+- Props: `Clone + PartialEq`, tipi posseduti (`String`, `Option<String>`, `Signal<T>`), mai `&str` / `&[T]`. Eventi come `Option<EventHandler<MouseEvent>>` o simili.
+- RSX: `for item in items { … }`, `if cond { … }`, stringhe formattate `"{base} {extra}"`.
+- **Hook**: chiamali sempre incondizionatamente e nello stesso ordine. Non chiamare hook dentro le closure di altri hook (es. `use_unique_id` dentro `use_signal(|| …)`): corrompe gli slot e causa panic.
+
+### Concorrenza (`clippy.toml`)
+Non trattenere mai attraverso un `.await`: `generational_box::GenerationalRef`, `generational_box::GenerationalRefMut`, `dioxus_signals::WriteLock`. Clona il valore o chiudi lo scope del lock prima dell'`.await`.
+
+### Lint
+`crate/Cargo.toml` attiva `clippy::must_use_candidate` e `clippy::return_self_not_must_use` come warning: annota con `#[must_use]` getter e builder.
+
+### Aggiungere un nuovo componente
+1. Crea `crate/src/<nome>.rs` (o `crate/src/<nome>/mod.rs` se composto da più parti).
+2. In `crate/Cargo.toml`: aggiungi la feature `snake_case` con le sue dipendenze, l'alias `kebab-case` se il nome è composto, e inseriscila in `all`.
+3. In `crate/src/lib.rs`: `#[cfg(feature = "<nome>")] pub mod <nome>;` e il re-export in `pub mod prelude`; aggiorna la tabella feature nella doc del crate.
+4. Implementa sia il percorso `use_theme()` sia il fallback `#[cfg(not(feature = "theme"))]`; usa `Locale` per le stringhe e `a11y` per ID/ARIA.
+5. Se servono classi nel tema, aggiungi campi e builder a `Theme` in `theme.rs` (inclusi tutti i preset).
+6. Crea `crate/scss/components/_<nome>.scss` (layer `sd-components`, z-index via `z()`) e aggiungi `@use 'components/<nome>' as *;` in `crate/scss/main.scss`.
+7. Aggiungi test in `crate/tests/` se il componente ha logica non banale.
+8. Showcase: crea `showcase/src/pages/<nome>.rs`, registralo in `pages/mod.rs`, aggiungi la variante a `Route` in `main.rs` e un `ComponentItem` in `COMPONENTS` (`nav.rs`).
+9. Aggiorna `CHANGELOG.md`.
+
+---
+
+## 8. Comandi
+
+Esegui dalla root del workspace, dentro la dev shell Nix (`flake.nix`): fornisce toolchain Rust stable con target `wasm32-unknown-unknown`, `dx` (dioxus-cli), `sass`, `wasm-opt`, Python/uv, `nu` e installa graphify in `.tools/graphify` (venv locale, ignorato da git). Nessun tool va installato globalmente.
+
+> Quando aggiorni `wasm-bindgen` in `Cargo.lock`, aggiorna anche `pkgs.wasm-bindgen-cli_0_2_XXX` in `flake.nix`: `dx` rifiuta versioni CLI diverse da quella del lockfile.
 
 ```bash
-# Verifica rapida della compilazione dell'intero workspace
-cargo check --workspace
+nix develop                      # Entra nella dev shell (o: nix develop --command <cmd>)
 
-# Analisi statica con linter Clippy (rispetta clippy.toml)
-cargo clippy --workspace
+cargo check --workspace          # Compilazione rapida
+cargo clippy --workspace         # Lint (rispetta clippy.toml)
+cargo test --workspace           # Test (incluso crate/tests/)
 
-# Esecuzione dei test
-cargo test --workspace
+# Verifica le combinazioni di feature quando tocchi #[cfg] o dipendenze
+cargo check -p shadow-design --no-default-features --features <feature>
 
-# Avvio del server di sviluppo dello Showcase (con hot-reload)
-cd showcase
-dx serve
+cd showcase && dx serve          # Dev server dello showcase (hot-reload)
 
-# Verifica che tutte le classi RSX utilizzate esistano nel CSS compilato
-python scripts/check_classes.py
+python scripts/check_classes.py  # Classi RSX vs CSS compilato (richiede `npx sass`)
 
+graphify update .                # Aggiorna il knowledge graph dopo modifiche al codice
+
+nu deploy.nu                     # Build release web + deploy (usa sudo, solo su richiesta)
 ```
