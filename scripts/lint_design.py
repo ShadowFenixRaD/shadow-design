@@ -5,6 +5,7 @@ Usage:
   python scripts/lint_design.py                 # whole repo
   python scripts/lint_design.py FILE [FILE...]  # only these files (scss or rs)
   python scripts/lint_design.py --no-compile    # skip the compiled-CSS class check
+  python scripts/lint_design.py --showcase      # also check showcase/src (no colour utilities / hex)
 
 A single line may opt out with a trailing comment:  // sd-lint-allow: <reason>
 Exit code 1 when any violation is found.
@@ -21,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCSS_COMPONENTS = ROOT / "crate" / "scss" / "components"
 RUST_SRC = ROOT / "crate" / "src"
+SHOWCASE_SRC = ROOT / "showcase" / "src"
 MAIN_SCSS = ROOT / "crate" / "scss" / "main.scss"
 
 ALLOW = "sd-lint-allow"
@@ -152,6 +154,17 @@ def _looks_like_classes(s: str) -> bool:
     return classy == len(toks)
 
 
+def lint_showcase(path: Path) -> list[str]:
+    """Showcase may use layout utilities, never colour utilities or hex (ADR-0004 §2)."""
+    errors: list[str] = []
+    for no, _, s in rust_strings(path.read_text(encoding="utf-8")):
+        if UTILITY_COLOR.search(s):
+            errors.append(f"{rel(path)}:{no}: [showcase-color] use library components or .sc-* classes  →  \"{s[:90]}\"")
+        elif HEX_IN_STRING.search(s) and "{" not in s.replace("{{", ""):
+            errors.append(f"{rel(path)}:{no}: [showcase-color] hex colour in showcase markup  →  \"{s[:90]}\"")
+    return errors
+
+
 def compiled_classes() -> set[str] | None:
     sass = shutil.which("sass")
     if not sass:
@@ -194,19 +207,24 @@ def rel(p: Path) -> str:
 
 def main(argv: list[str]) -> int:
     compile_check = "--no-compile" not in argv
+    showcase = "--showcase" in argv
     args = [a for a in argv if not a.startswith("--")]
     if args:
         targets = [Path(a).resolve() for a in args]
         scss = [p for p in targets if p.suffix == ".scss" and SCSS_COMPONENTS in p.parents]
         rust = [p for p in targets if p.suffix == ".rs" and RUST_SRC in p.parents]
+        show = [p for p in targets if p.suffix == ".rs" and SHOWCASE_SRC in p.parents]
     else:
         scss = sorted(SCSS_COMPONENTS.glob("*.scss"))
         rust = sorted(RUST_SRC.rglob("*.rs"))
+        show = sorted(SHOWCASE_SRC.rglob("*.rs")) if showcase else []
     errors: list[str] = []
     for p in scss:
         errors += lint_scss(p)
     for p in rust:
         errors += lint_rust(p)
+    for p in show:
+        errors += lint_showcase(p)
     if compile_check and rust:
         css = compiled_classes()
         if css is not None:
