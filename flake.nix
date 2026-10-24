@@ -62,6 +62,10 @@
                     && echo "${graphifyVersion}+${python.version}" > "$stamp"
                 fi
                 export PATH="$tools/bin:$PATH"
+                # ADR-0001: pre-commit esegue scripts/lint_design.py
+                if [ "$(git -C "$root" config core.hooksPath)" != ".githooks" ]; then
+                  git -C "$root" config core.hooksPath .githooks
+                fi
               else
                 echo "[shadow-design] fuori dal repo: graphify non disponibile (lancia nix develop dalla root)" >&2
               fi

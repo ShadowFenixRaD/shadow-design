@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# ADR-0001: design lint must pass before every commit.
+# Enabled by the Nix dev shell (git config core.hooksPath .githooks).
+root="$(git rev-parse --show-toplevel)"
+staged="$(git diff --cached --name-only --diff-filter=ACMR -- 'crate/scss/*.scss' 'crate/src/*.rs')"
+[ -z "$staged" ] && exit 0
+cd "$root" || exit 1
+# Lint only the staged files; the compiled-class check runs when `sass` is on PATH.
+# shellcheck disable=SC2086
+python3 scripts/lint_design.py $staged || {
+  printf "\npre-commit: design lint failed. See docs/adr/0004-component-styling-contract.md\n" >&2
+  exit 1
+}

@@ -6,6 +6,19 @@ Istruzioni operative, architettura e standard di sviluppo per agenti AI e svilup
 
 ---
 
+## ⚠️ Contratto di design (vincolante, leggere per primo)
+
+Prima di toccare `crate/scss/`, `crate/src/` (componenti o tema) o `showcase/src/`:
+
+1. **Leggi tutti gli ADR *Accepted* in [`docs/adr/`](docs/adr/README.md) e tutto [`docs/design/`](docs/design/README.md)**: `language.md` (linguaggio *Lit Glass* e ricette), `tokens.md` (ogni `--sd-*`), `component-checklist.md`.
+2. **Il codice esistente non è un precedente.** Se il codice vicino contraddice un ADR, vale l'ADR: non copiare mai la deviazione.
+3. **Nessun pattern nuovo in silenzio.** Un token nuovo, un trattamento visivo nuovo o un'eccezione richiedono prima un ADR *Proposed*, da implementare solo dopo l'approvazione.
+4. **`python scripts/lint_design.py` deve passare** (dentro `nix develop`). Il pre-commit hook in `.githooks/` lo esegue: la dev shell imposta `core.hooksPath`. Non aggirarlo con `--no-verify`.
+
+In sintesi (i dettagli sono negli ADR): un solo materiale per tutto (superficie, hairline, bordo speculare, ombra); il glow è un segnale tenue, mai una decorazione; ciò che è statico non reagisce all'hover, ciò che è interattivo ha sempre hover, press, focus e disabled; valori solo da `var(--sd-*)`, dai mixin e da `z()`; nel Rust della libreria solo classi `sd-*`; testi UI solo da `Locale`.
+
+---
+
 ## 0. Navigazione del Codice con graphify
 
 Il progetto ha un knowledge graph in `graphify-out/` (god nodes, community structure, relazioni cross-file).
@@ -23,10 +36,10 @@ Il progetto ha un knowledge graph in `graphify-out/` (god nodes, community struc
 
 **Shadow Design** (v0.5.x) è una libreria di componenti UI modulare e ad alte prestazioni per **Dioxus 0.7** (Web, Desktop, Mobile), nata nell'ecosistema **Shadowfenix**. Licenza `MIT OR Apache-2.0`.
 
-### Filosofia Estetica
-- **Sfondo**: nero assoluto (`#000000`) con superfici a 4 livelli (`--color-void`, `--color-surface-1..3`).
-- **Accenti**: viola Ultraviolet di default, con preset Obsidian, Crimson, Cyan, Emerald e Cartoon.
-- **Dettagli**: micro-glow, specular highlights, bordi hairline semi-trasparenti, contrasti elevati, micro-scrollbar.
+### Filosofia Estetica: *Lit Glass* (ADR-0002, `docs/design/language.md`)
+- **Materiale unico**: vetro nero illuminato dall'alto. Void `--sd-void` (`#030305`), pozzetti `--sd-well` per i campi, superfici `--sd-surface-1..3`.
+- **Accenti**: viola Ultraviolet di default, con preset Obsidian, Crimson, Cyan, Emerald o qualsiasi hex custom. L'accento arriva ovunque via `--sd-accent*` (ADR-0003).
+- **Dettagli**: glow tenue solo come segnale di stato (`--sd-glow-*`), bordo speculare superiore, hairline, contrasti elevati, micro-scrollbar.
 - **Modularità**: architettura *zero-bloat*, ogni componente è dietro una feature flag Cargo indipendente.
 - **Zero tooling a valle**: nessun Node/npm/Tailwind richiesto ai consumatori; lo SCSS è compilato dalla pipeline `asset!()` di Dioxus.
 
@@ -123,23 +136,24 @@ document::Link { rel: "stylesheet", href: shadow_design::STYLES }
 ### File principali
 | File | Ruolo |
 | :--- | :--- |
-| `main.scss` | Entrypoint: `@use` di tutti i partial e di ogni `components/_*.scss`, più `:root` vars e utility ottiche in `@layer sd-base` |
+| `main.scss` | Entrypoint: `@use` di tutti i partial e di ogni `components/_*.scss` |
 | `_layers.scss` | Ordine dei cascade layer: `sd-reset, sd-base, sd-components, sd-utilities, sd-theme` |
-| `_variables.scss` | Token colore, superfici, font Geist, raggi |
-| `_fonts.scss` | Font face |
+| `_tokens.scss` | **Token runtime** `--sd-*` su `:root` (layer `sd-base`) e classi `.sd-radius-sharp|medium|soft`. Fonte di verità: `docs/design/tokens.md` |
+| `_variables.scss` | Solo costanti SCSS di build (breakpoint `$bp`, palette per le utility). Vietate nei componenti |
+| `_fonts.scss` | Font face (Geist da Google Fonts; self-hosting rinviato, ADR-0003) |
 | `_zindex.scss` | Mappa `$z-layers`, funzione `z($layer)` e classi `.z-layer-*` |
-| `_mixins.scss` | Specular highlight, ambient glow, micro-scrollbar, tactile press |
+| `_mixins.scss` | Ricette Lit Glass: `sd-surface`, `sd-shadow`, `sd-lit-fill`, `sd-field`, `sd-item`, `sd-selected`, `sd-semantic`, `sd-focus-ring`, `sd-transition`, `sd-press`, `sd-animate`, `sd-scrollbar`, `bp-up` |
 | `_reset.scss` | Preflight reset (`button`, `input`, `textarea`, `select`, …) |
-| `_animations.scss` | Keyframes (toast, modal, dropdown, drawer, spin, pulse, …) e classi `.animate-*` |
-| `_utilities.scss` | Utility universali (flex, grid, sizing, spacing, typography, colori, bordi, ombre) |
-| `_theme_presets.scss` + `_preset_cartoon.scss` | Classi dei preset, ring di selezione, glow matrix |
-| `components/_<nome>.scss` | Stili BEM per componente (`.sd-btn`, `.sd-card`, `.sd-input`, …) |
+| `_animations.scss` | Keyframes `sd-*` (pop-in, fade-in, slide-in, spin, shimmer, …) e classi `.animate-*` |
+| `_utilities.scss` | Utility di layout per lo **showcase**: vietate nel Rust della libreria (ADR-0004) |
+| `_theme_presets.scss` | Classi provider (`sd-glow-*`); niente classi per-preset (ADR-0003) |
+| `components/_<feature>.scss` | Un blocco BEM per componente (`.sd-btn`, `.sd-card`, …) che usa solo token e mixin |
 
-### Regole
-- Le classi di componente usano il prefisso `sd-` con BEM (`.sd-btn--primary`, `.sd-card__header`).
-- Ogni regola deve stare nel cascade layer corretto (componenti in `sd-components`, utility in `sd-utilities`).
-- Non usare z-index numerici: usa `z('<layer>')` in SCSS o le classi `.z-layer-*`.
-- Se usi in RSX una classe utility nuova, verifica che esista con `scripts/check_classes.py`.
+### Regole (dettagli in ADR-0004)
+- Classi `sd-` in BEM, tutte dentro `@layer sd-components`.
+- Nei partial dei componenti niente letterali colore, niente `$violet-*`/`$radius-*`, niente z-index numerici (eccetto -1/0/1 locali), niente `!important`; niente `box-shadow`/`transition`/`animation`/`font-size`/`border-radius`/`@media` diretti: usa token e mixin.
+- Nel Rust della libreria solo classi `sd-*`, e ogni classe emessa deve esistere nel CSS compilato.
+- `python scripts/lint_design.py` verifica tutto questo.
 
 ### Gerarchia Z-Index (`_zindex.scss`)
 | Layer | Valore |
@@ -148,38 +162,37 @@ document::Link { rel: "stylesheet", href: shadow_design::STYLES }
 | `speed-dial`, `affix` | 60 |
 | `drawer-back` / `drawer` | 65 / 70 |
 | `modal-back` / `modal` / `modal-content` | 75 / 80 / 85 |
+| `command-palette` | 88 |
 | `notification` | 90 |
 | `coachmark` | 95 |
-| `tooltip` | 100 |
-| `popover-back` / `popover` | 989 / 990 |
+| `popover-back` / `popover` (anche `hover-card`) | 989 / 990 |
 | `dropdown-back`, `context-menu-back` | 995 |
 | `dropdown`, `context-menu` | 1000 |
+| `keytip` | 1005 |
+| `tooltip` | 1010 (sopra ai menu) |
 
 Per evitare clipping dei menu fluttuanti, `Card` e `ShowcaseTabs` non usano `overflow: hidden` sull'intero contenitore. `Dropdown` supporta `DropdownPlacement` (`BottomRight`, `BottomLeft`, `TopRight`, `TopLeft`) per aprirsi verso l'alto vicino al fondo di un contenitore.
 
 ---
 
-## 5. Theme Engine (`crate/src/theme.rs`)
+## 5. Theme Engine (`crate/src/theme.rs`, ADR-0003)
 
-- **`Theme`**: token di layout, superfici, accenti e classi per componente. Si costruisce dai preset o con `Theme::builder()` / `ThemeBuilder`.
-- **Preset**: `Theme::shadow()` (default, Ultraviolet), `obsidian()`, `crimson()`, `cyan()`, `emerald()`, `cartoon()`.
+- **Solo variabili CSS.** `ThemeProvider` scrive l'intero set accento calcolato da un solo hex (`--sd-accent`, `-rgb`, `-strong`, `-deep`, `-soft`, `-border`, `-fg`, `--sd-focus-ring`), le superfici e `--sd-glow-strength`, e applica una classe radius (`sd-radius-*`). Niente classi per-preset e niente utility Tailwind emesse dal tema.
+- **Preset**: `Theme::shadow()` (default, Ultraviolet), `obsidian()`, `crimson()`, `cyan()`, `emerald()`. Un preset è un nome più un hex. Cartoon è stato rimosso.
 - **Scale**:
-  - `PrimaryColor`: `Violet`, `Obsidian`, `Crimson`, `Cyan`, `Emerald`, `Custom { name, hex, css_prefix }` (`PrimaryColor::custom`, `custom_with_prefix`).
-  - `RadiusScale`: `Sharp` (2px), `Medium` (8px, default), `Soft` (14px).
-  - `GlowMode`: `Subtle` (default), `Expressive`, `Off`.
-  - `ElevationStyle`: `NeonGlow` (default), `HardBlock`, `SoftElevated`, `Flat`.
-- **Override per componente**: `ComponentOverride` (base class, varianti, size, shadow, modifier) via `with_component_override` / `with_class_override`; risoluzione con `resolve_variant_class`, `resolve_size_class`, `resolve_elevation_class`, ecc.
+  - `PrimaryColor`: `Violet`, `Obsidian`, `Crimson`, `Cyan`, `Emerald`, `Custom { name, hex, css_prefix }`. Qualsiasi hex funziona su tutti i componenti.
+  - `RadiusScale`: `Sharp`, `Medium` (default), `Soft`, che impostano `--sd-radius-xs..xl` (valori in `docs/design/tokens.md`).
+  - `GlowMode`: `Off` (0), `Subtle` (0.6, default), `Expressive` (1), che impostano `--sd-glow-strength`.
+  - `ElevationStyle`: `NeonGlow` (default), `Flat`. HardBlock e SoftElevated sono stati rimossi.
+- **Override per componente**: `ComponentOverride` (base class, varianti, size, shadow, modifier) via `with_component_override` / `with_class_override`. È l'unico motivo per cui un componente legge `use_theme()`.
 - **Mutazioni runtime**: `apply_primary_color`, `apply_radius_scale`, `apply_glow_mode`, `apply_elevation_style`.
-- **CSS variables**: `to_css_variables()` / `to_inline_css_variables()`.
 - **Context**: `ThemeProvider` fornisce un `Signal<Theme>`; `use_theme()` lo legge o lo scrive (`theme.write()`).
 
 ### Supporto duale (`theme` on/off)
-Ogni componente deve compilare in entrambe le modalità tramite `#[cfg]`:
-1. **Con `theme`**: legge le classi da `crate::theme::use_theme()` e si aggiorna reattivamente al cambio tema.
-2. **Senza `theme`** (`#[cfg(not(feature = "theme"))]`): fallback su classi statiche hardcoded, zero overhead.
+Ogni componente compila e **rende in modo identico** in entrambe le modalità: emette le stesse classi `sd-*` e i default dei token su `:root` coprono il caso senza tema. Con `theme` attivo legge solo i `ComponentOverride`.
 
 ### Locale (`crate/src/locale.rs`)
-Le stringhe UI (placeholder, "Nothing found", "Close", ecc.) vengono da `Locale` (default inglese), fornito globalmente con `LocaleProvider` e letto con `use_locale()`; i singoli componenti possono sovrascriverle via props. Non hardcodare testo visibile nei componenti della libreria.
+Le stringhe UI e ARIA vengono da `Locale` (default inglese), fornito globalmente con `LocaleProvider` e letto con `use_locale()`; i singoli componenti possono sovrascriverle via props. Il lint segnala il testo italiano hardcodato nella libreria.
 
 ---
 
@@ -208,16 +221,19 @@ Non trattenere mai attraverso un `.await`: `generational_box::GenerationalRef`, 
 ### Lint
 `crate/Cargo.toml` attiva `clippy::must_use_candidate` e `clippy::return_self_not_must_use` come warning: annota con `#[must_use]` getter e builder.
 
-### Aggiungere un nuovo componente
-1. Crea `crate/src/<nome>.rs` (o `crate/src/<nome>/mod.rs` se composto da più parti).
-2. In `crate/Cargo.toml`: aggiungi la feature `snake_case` con le sue dipendenze, l'alias `kebab-case` se il nome è composto, e inseriscila in `all`.
-3. In `crate/src/lib.rs`: `#[cfg(feature = "<nome>")] pub mod <nome>;` e il re-export in `pub mod prelude`; aggiorna la tabella feature nella doc del crate.
-4. Implementa sia il percorso `use_theme()` sia il fallback `#[cfg(not(feature = "theme"))]`; usa `Locale` per le stringhe e `a11y` per ID/ARIA.
-5. Se servono classi nel tema, aggiungi campi e builder a `Theme` in `theme.rs` (inclusi tutti i preset).
-6. Crea `crate/scss/components/_<nome>.scss` (layer `sd-components`, z-index via `z()`) e aggiungi `@use 'components/<nome>' as *;` in `crate/scss/main.scss`.
-7. Aggiungi test in `crate/tests/` se il componente ha logica non banale.
-8. Showcase: crea `showcase/src/pages/<nome>.rs`, registralo in `pages/mod.rs`, aggiungi la variante a `Route` in `main.rs` e un `ComponentItem` in `COMPONENTS` (`nav.rs`).
-9. Aggiorna `CHANGELOG.md`.
+### Aggiungere o modificare un componente
+Segui `docs/design/component-checklist.md` (vincolante). In breve:
+
+1. Scegli la ricetta in `docs/design/language.md` §3; se nessuna va bene, scrivi prima un ADR.
+2. Crea `crate/src/<nome>.rs` (o `crate/src/<nome>/mod.rs` se composto da più parti).
+3. In `crate/Cargo.toml`: aggiungi la feature `snake_case` con le sue dipendenze, l'alias `kebab-case` se il nome è composto, e inseriscila in `all`.
+4. In `crate/src/lib.rs`: `#[cfg(feature = "<nome>")] pub mod <nome>;` e il re-export in `pub mod prelude`; aggiorna la tabella feature nella doc del crate.
+5. Emetti le stesse classi `sd-*` con e senza `theme` (con `theme` leggi solo i `ComponentOverride`); usa `Locale` per le stringhe e `a11y` per ID/ARIA.
+6. Non aggiungere classi per-preset a `Theme`: i colori arrivano dai token `--sd-*` (ADR-0003).
+7. Crea `crate/scss/components/_<nome>.scss` (layer `sd-components`, solo token, mixin e `z()`) e aggiungi `@use 'components/<nome>' as *;` in `crate/scss/main.scss`.
+8. Aggiungi test in `crate/tests/` se il componente ha logica non banale.
+9. Showcase: crea `showcase/src/pages/<nome>.rs` (usa componenti della libreria per la chrome, mai markup utility per i colori), registralo in `pages/mod.rs`, aggiungi la variante a `Route` in `main.rs` e un `ComponentItem` in `COMPONENTS` (`nav.rs`).
+10. Aggiorna `CHANGELOG.md`.
 
 ---
 
@@ -239,7 +255,8 @@ cargo check -p shadow-design --no-default-features --features <feature>
 
 cd showcase && dx serve          # Dev server dello showcase (hot-reload)
 
-python scripts/check_classes.py  # Classi RSX vs CSS compilato (richiede `npx sass`)
+python scripts/lint_design.py    # Contratto di design (ADR-0004): token, mixin, z(), classi sd-*, Locale
+python scripts/check_classes.py  # Utility RSX dello showcase vs CSS compilato
 
 graphify update .                # Aggiorna il knowledge graph dopo modifiche al codice
 
