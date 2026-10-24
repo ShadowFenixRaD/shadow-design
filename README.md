@@ -58,7 +58,7 @@ fn App() -> Element {
 
 ### 🎭 Sistema Temi Mantine-Style & ThemeBuilder
 
-Shadow Design supporta la personalizzazione totale dell'interfaccia a runtime con 5 preset cromatici integrati, `ElevationStyle` multilivello e preset `Theme::cartoon()` neo-brutalista:
+Shadow Design supporta la personalizzazione totale dell'interfaccia a runtime con 5 preset cromatici integrati (Ultraviolet, Obsidian, Crimson, Cyan, Emerald): ogni colore, anche custom, diventa variabili CSS `--sd-*` (ADR-0003):
 
 ```rust
 use dioxus::prelude::*;

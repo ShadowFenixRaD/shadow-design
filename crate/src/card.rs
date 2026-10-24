@@ -142,7 +142,7 @@ pub fn Card(
     let class_modifiers = theme_val.resolve_class_modifiers("card", &class);
     #[cfg(feature = "theme")]
     let glow_class = match glow {
-        Some(true) => format!("sd-card--glow-{}", theme_val.primary_color.css_prefix()),
+        Some(true) => theme_val.resolve_elevation_class("card", Some(true)),
         Some(false) => "".to_string(),
         None => {
             if hover_glow

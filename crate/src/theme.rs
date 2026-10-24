@@ -1,3 +1,20 @@
+//! Theme engine (ADR-0003: runtime CSS tokens are the only theming mechanism).
+//!
+//! A [`Theme`] is data: a preset name, one accent hex ([`PrimaryColor`]), the
+//! surface hexes, a [`RadiusScale`], a [`GlowMode`] and an [`ElevationStyle`].
+//! [`ThemeProvider`] turns it into CSS custom properties on a wrapper element:
+//!
+//! * classes `sd-theme sd-radius-{sharp|medium|soft} sd-glow-{off|subtle|expressive}`;
+//! * inline `--sd-accent`, `--sd-accent-rgb`, `--sd-accent-strong`, `--sd-accent-deep`,
+//!   `--sd-accent-soft`, `--sd-accent-border`, `--sd-accent-fg`, `--sd-focus-ring`,
+//!   `--sd-void`, `--sd-surface-1..3` and `--sd-glow-strength`.
+//!
+//! Every token default lives in `crate/scss/_tokens.scss` (documented in
+//! `docs/design/tokens.md`), so components look identical with and without the
+//! `theme` feature. The engine never emits per-preset or utility classes; the
+//! string fields of [`Theme`] hold generic `sd-*` class names (or `""`), and
+//! [`ComponentOverride`] remains the supported way to swap a component's classes.
+
 use dioxus::prelude::*;
 use std::collections::HashMap;
 
@@ -11,6 +28,11 @@ use crate::button::ButtonVariant;
 use crate::card::CardShadow;
 
 pub use crate::util::{hex_to_rgb, is_valid_hex_color, parse_hex_rgba};
+
+/// Default accent (Ultraviolet).
+const DEFAULT_ACCENT: &str = "#a855f7";
+/// Default surface hexes (`--sd-void`, `--sd-surface-1..3`).
+const DEFAULT_SURFACES: [&str; 4] = ["#030305", "#09090d", "#111118", "#181824"];
 
 fn sanitize_css_prefix(raw: &str) -> String {
     let sanitized: String = raw
@@ -30,19 +52,126 @@ fn sanitize_css_prefix(raw: &str) -> String {
     }
 }
 
-/// Palette di colori primari in stile Mantine / Material-UI, con supporto a colori Custom estendibili.
+fn safe_hex<'a>(candidate: &'a str, fallback: &'a str) -> &'a str {
+    if is_valid_hex_color(candidate) {
+        candidate
+    } else {
+        fallback
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Accent derivation
+// ------------------------------------------------------------------------------
+
+/// The full accent token set derived from one hex colour (`docs/design/tokens.md`).
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct AccentTokens {
+    /// `--sd-accent`: the base colour as `#rrggbb`.
+    pub accent: String,
+    /// `--sd-accent-rgb` channels.
+    pub rgb: (u8, u8, u8),
+    /// `--sd-accent-strong`: base mixed with 35% white (accent text on dark).
+    pub strong: String,
+    /// `--sd-accent-deep`: base mixed with 40% black (bottom of the primary fill).
+    pub deep: String,
+    /// `--sd-accent-soft`: base at alpha .14.
+    pub soft: String,
+    /// `--sd-accent-border`: base at alpha .45.
+    pub border: String,
+    /// `--sd-accent-fg`: `#000000` if the relative luminance of base > 0.55, else `#ffffff`.
+    pub fg: String,
+    /// `--sd-focus-ring`: equal to `strong`.
+    pub focus_ring: String,
+}
+
+fn to_hex((r, g, b): (u8, u8, u8)) -> String {
+    format!("#{r:02x}{g:02x}{b:02x}")
+}
+
+fn mix_channel(c: u8, target: u8, amount: f64) -> u8 {
+    let c = f64::from(c);
+    let t = f64::from(target);
+    // Values stay in 0..=255, so the cast cannot truncate.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let v = (c + (t - c) * amount).round().clamp(0.0, 255.0) as u8;
+    v
+}
+
+fn mix((r, g, b): (u8, u8, u8), target: u8, amount: f64) -> (u8, u8, u8) {
+    (
+        mix_channel(r, target, amount),
+        mix_channel(g, target, amount),
+        mix_channel(b, target, amount),
+    )
+}
+
+/// WCAG relative luminance of an sRGB colour (0.0 – 1.0).
+#[must_use]
+pub fn relative_luminance((r, g, b): (u8, u8, u8)) -> f64 {
+    fn lin(c: u8) -> f64 {
+        let c = f64::from(c) / 255.0;
+        if c <= 0.04045 {
+            c / 12.92
+        } else {
+            ((c + 0.055) / 1.055).powf(2.4)
+        }
+    }
+    0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+}
+
+impl AccentTokens {
+    /// Derives the accent set from a hex colour. Invalid input falls back to the
+    /// Ultraviolet default; any alpha channel is ignored.
+    #[must_use]
+    pub fn from_hex(hex: &str) -> Self {
+        let rgb = hex_to_rgb(safe_hex(hex, DEFAULT_ACCENT))
+            .or_else(|| hex_to_rgb(DEFAULT_ACCENT))
+            .unwrap_or((168, 85, 247));
+        let (r, g, b) = rgb;
+        let strong = to_hex(mix(rgb, 255, 0.35));
+        let fg = if relative_luminance(rgb) > 0.55 {
+            "#000000"
+        } else {
+            "#ffffff"
+        };
+        Self {
+            accent: to_hex(rgb),
+            rgb,
+            focus_ring: strong.clone(),
+            strong,
+            deep: to_hex(mix(rgb, 0, 0.40)),
+            soft: format!("rgba({r}, {g}, {b}, 0.14)"),
+            border: format!("rgba({r}, {g}, {b}, 0.45)"),
+            fg: fg.to_string(),
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Scales
+// ------------------------------------------------------------------------------
+
+/// Accent colour of a theme. Presets are data: a name plus one hex.
 #[derive(Clone, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PrimaryColor {
+    /// Ultraviolet `#a855f7` (default).
     #[default]
     Violet,
+    /// Obsidian `#f4f4f5` (light accent, dark text on fills).
     Obsidian,
+    /// Crimson `#ff1744`.
     Crimson,
+    /// Cyan `#00e5ff`.
     Cyan,
+    /// Emerald `#00ff9d`.
     Emerald,
+    /// Any hex colour; it goes through the same derivation as the presets.
     Custom {
         name: String,
         hex: String,
+        /// Free-form identifier. No CSS class depends on it.
         css_prefix: Option<String>,
     },
 }
@@ -60,40 +189,48 @@ impl PrimaryColor {
         }
     }
 
-    /// Restituisce il valore hex primario. Per Violet restituisce l'accento vivido #a855f7 (VQA-22).
+    /// The base accent hex (same as [`PrimaryColor::accent_hex`]).
     #[must_use]
     pub fn hex(&self) -> &str {
         self.accent_hex()
     }
 
-    /// Restituisce il colore vivido di accento per swatch e variabili CSS (VQA-22).
+    /// The base accent hex written to `--sd-accent`.
     #[must_use]
     pub fn accent_hex(&self) -> &str {
         match self {
             PrimaryColor::Violet => "#a855f7",
-            PrimaryColor::Obsidian => "#ffffff",
+            PrimaryColor::Obsidian => "#f4f4f5",
             PrimaryColor::Crimson => "#ff1744",
-            PrimaryColor::Cyan => "#00f0ff",
+            PrimaryColor::Cyan => "#00e5ff",
             PrimaryColor::Emerald => "#00ff9d",
             PrimaryColor::Custom { hex, .. } => hex.as_str(),
         }
     }
 
-    /// Restituisce il colore d'ombra o tonalità profonda (VQA-22).
+    /// The full derived accent token set (see [`AccentTokens`]).
+    #[must_use]
+    pub fn accent_tokens(&self) -> AccentTokens {
+        AccentTokens::from_hex(self.accent_hex())
+    }
+
+    /// Deprecated: use `accent_tokens().deep`. Kept for API compatibility; returns
+    /// the base hex for `Custom`.
     #[must_use]
     pub fn shadow_hex(&self) -> &str {
         match self {
-            PrimaryColor::Violet => "#3b0764",
-            PrimaryColor::Obsidian => "#27272a",
-            PrimaryColor::Crimson => "#4c0519",
-            PrimaryColor::Cyan => "#083344",
-            PrimaryColor::Emerald => "#022c22",
+            PrimaryColor::Violet => "#653394",
+            PrimaryColor::Obsidian => "#929293",
+            PrimaryColor::Crimson => "#990e29",
+            PrimaryColor::Cyan => "#008999",
+            PrimaryColor::Emerald => "#00995e",
             PrimaryColor::Custom { hex, .. } => hex.as_str(),
         }
     }
 
-    /// Ricava automaticamente il prefisso o slug per le classi CSS (es. "custom", "cartoon").
-    /// Se css_prefix è None, mappa a "custom" (RS-02). Se Some(p), sanitizza a caratteri alfanumerici e trattini.
+    /// A sanitised identifier (`violet`, `crimson`, …, or the custom prefix,
+    /// default `custom`). Informational only: no CSS class is generated from it,
+    /// so any prefix works.
     #[must_use]
     pub fn css_prefix(&self) -> String {
         match self {
@@ -109,12 +246,13 @@ impl PrimaryColor {
         }
     }
 
+    /// A custom accent. Invalid hex input falls back to Ultraviolet.
     pub fn custom(name: impl Into<String>, hex: impl Into<String>) -> Self {
         let h = hex.into();
         let valid_hex = if is_valid_hex_color(&h) {
             h
         } else {
-            "#a855f7".to_string()
+            DEFAULT_ACCENT.to_string()
         };
         Self::Custom {
             name: name.into(),
@@ -123,6 +261,7 @@ impl PrimaryColor {
         }
     }
 
+    /// A custom accent with an identifier (sanitised to `[a-z0-9-]`).
     pub fn custom_with_prefix(
         name: impl Into<String>,
         hex: impl Into<String>,
@@ -132,7 +271,7 @@ impl PrimaryColor {
         let valid_hex = if is_valid_hex_color(&h) {
             h
         } else {
-            "#a855f7".to_string()
+            DEFAULT_ACCENT.to_string()
         };
         let final_prefix = sanitize_css_prefix(&css_prefix.into());
         Self::Custom {
@@ -143,7 +282,8 @@ impl PrimaryColor {
     }
 }
 
-/// Scala globale per i raggi di curvatura (Border Radius).
+/// Global corner-radius scale. Applied by `ThemeProvider` as one class
+/// (`sd-radius-sharp|medium|soft`) that sets the `--sd-radius-*` tokens.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RadiusScale {
@@ -159,73 +299,101 @@ impl RadiusScale {
         match self {
             RadiusScale::Sharp => "Sharp (2px)",
             RadiusScale::Medium => "Medium (8px)",
-            RadiusScale::Soft => "Soft (14px)",
+            RadiusScale::Soft => "Soft (12px)",
         }
     }
 
+    /// The provider class that selects this scale.
+    #[must_use]
+    pub fn class(&self) -> &'static str {
+        match self {
+            RadiusScale::Sharp => "sd-radius-sharp",
+            RadiusScale::Medium => "sd-radius-medium",
+            RadiusScale::Soft => "sd-radius-soft",
+        }
+    }
+
+    /// Deprecated: always `""`. Radius is applied by the provider class
+    /// ([`RadiusScale::class`]) through the `--sd-radius-*` tokens.
     #[must_use]
     pub fn sm(&self) -> &'static str {
-        match self {
-            RadiusScale::Sharp => "sd-radius-sharp",
-            RadiusScale::Medium => "rounded-md",
-            RadiusScale::Soft => "rounded-lg",
-        }
+        ""
     }
 
+    /// Deprecated: always `""`. See [`RadiusScale::sm`].
     #[must_use]
     pub fn md(&self) -> &'static str {
-        match self {
-            RadiusScale::Sharp => "sd-radius-sharp",
-            RadiusScale::Medium => "rounded-lg",
-            RadiusScale::Soft => "rounded-xl",
-        }
+        ""
     }
 
+    /// Deprecated: always `""`. See [`RadiusScale::sm`].
     #[must_use]
     pub fn lg(&self) -> &'static str {
-        match self {
-            RadiusScale::Sharp => "sd-radius-sharp",
-            RadiusScale::Medium => "rounded-xl",
-            RadiusScale::Soft => "rounded-2xl",
-        }
+        ""
     }
 }
 
-/// Intensità del micro-glow ottico radiale.
+/// Global glow intensity, written as `--sd-glow-strength`.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum GlowMode {
+    /// 0.6 (default).
     #[default]
     Subtle,
+    /// 1.0.
     Expressive,
+    /// 0.
     Off,
 }
 
-/// Stile di elevazione delle ombre (Livello 1): Neon Glow, Hard Block cartoon, Soft o Flat.
+impl GlowMode {
+    /// The `--sd-glow-strength` value.
+    #[must_use]
+    pub fn strength(&self) -> &'static str {
+        match self {
+            GlowMode::Off => "0",
+            GlowMode::Subtle => "0.6",
+            GlowMode::Expressive => "1",
+        }
+    }
+
+    /// The provider class (`sd-glow-off|subtle|expressive`).
+    #[must_use]
+    pub fn class(&self) -> &'static str {
+        match self {
+            GlowMode::Off => "sd-glow-off",
+            GlowMode::Subtle => "sd-glow-subtle",
+            GlowMode::Expressive => "sd-glow-expressive",
+        }
+    }
+}
+
+/// Shadow style. `Flat` behaves like [`GlowMode::Off`] for glow.
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ElevationStyle {
+    /// Lit Glass shadows with the subtle accent glow (default).
     #[default]
-    NeonGlow,     // Specular neon glow sfumato (Cyberpunk / Ultraviolet)
-    HardBlock,    // Ombre piene offset senza blur (Cartoon / Manga Pop / Neo-brutalist)
-    SoftElevated, // Ombre material soft
-    Flat,         // Senza ombre
+    NeonGlow,
+    /// Lit Glass shadows, glow strength forced to 0.
+    Flat,
 }
 
-/// Personalizzazione specifica per un componente (Livello 2 - Component Level).
+/// Per-component class customisation (level 2). The supported way for consumers
+/// to swap a component's classes; library defaults never depend on it.
 #[derive(Clone, PartialEq, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(default))]
 pub struct ComponentOverride {
-    /// Classe base aggiuntiva o sostitutiva
+    /// Extra or replacement base class.
     pub base_class: Option<String>,
-    /// Mappa delle varianti (es. "primary" -> "my-primary-btn", "danger" -> "my-danger-btn")
+    /// Variant classes (e.g. "primary" -> "my-primary-btn").
     pub variant_classes: HashMap<String, String>,
-    /// Mappa delle taglie (es. "sm" -> "my-sm-btn")
+    /// Size classes (e.g. "sm" -> "my-sm-btn").
     pub size_classes: HashMap<String, String>,
-    /// Override dell'ombra o elevazione per questo componente
+    /// Shadow/glow class override for this component.
     pub shadow_class: Option<String>,
-    /// Modificatori condizionali per classi specifiche
+    /// Conditional modifiers keyed by an instance class.
     pub class_modifiers: HashMap<String, String>,
 }
 
@@ -271,37 +439,15 @@ impl ComponentOverride {
     }
 }
 
-#[derive(Clone, Debug, Default)]
-struct GlowTokens {
-    glow: String,
-    button: String,
-    card: String,
-    input: String,
-    badge: String,
-    modal: String,
-    alert: String,
-    dropdown: String,
-    notification: String,
-    switch: String,
-    checkbox: String,
-    select: String,
-    tooltip: String,
-    drawer: String,
-}
+// ------------------------------------------------------------------------------
+// Theme
+// ------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
-struct ColorTokens {
-    sidebar_link_active: String,
-    border_accent: String,
-    text_accent: String,
-    text_accent_bright: String,
-    button_primary: String,
-    badge_primary: String,
-    banner: String,
-}
-
-/// Struttura centrale del tema per Shadow Design ispirata a Mantine e Material-UI.
-/// Supporta personalizzazione gerarchica su 3 livelli.
+/// The theme: data that `ThemeProvider` writes as CSS variables.
+///
+/// The string fields are generic `sd-*` class names (identical for every preset)
+/// or `""` where nothing is needed; they are kept for API compatibility and may
+/// be replaced by consumers. Fields documented as deprecated are always `""`.
 #[derive(Clone, PartialEq, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(default))]
@@ -312,13 +458,16 @@ pub struct Theme {
     pub elevation_style: ElevationStyle,
     pub glow_mode: GlowMode,
 
-    // Token di Superficie a 4 Livelli (Void, Base, Elevated, Overlay)
+    /// `--sd-void` (page background).
     pub surface_0: String,
+    /// `--sd-surface-1` (containers).
     pub surface_1: String,
+    /// `--sd-surface-2` (floating layers).
     pub surface_2: String,
+    /// `--sd-surface-3` (hover inside floating layers, secondary button top).
     pub surface_3: String,
 
-    // Layout e Struttura
+    // Application shell classes (_theme_presets.scss).
     pub root: String,
     pub header: String,
     pub sidebar: String,
@@ -329,15 +478,22 @@ pub struct Theme {
     pub panel: String,
     pub banner: String,
 
-    // Accenti e Bordi
+    /// Deprecated, always `""`.
     pub border: String,
+    /// Deprecated, always `""`.
     pub border_subtle: String,
+    /// Deprecated, always `""`.
     pub border_accent: String,
+    /// `sd-text-accent` (colour `--sd-accent-strong`).
     pub text_accent: String,
+    /// `sd-text-accent` (colour `--sd-accent-strong`).
     pub text_accent_bright: String,
+    /// Deprecated, always `""`.
     pub glow: String,
 
-    // Glow specifici per componente (Livello 1 fallback)
+    // Glow modifier classes per component, emitted only for an explicit
+    // `glow: true` prop (see `resolve_elevation_class`). Intensity comes from
+    // `--sd-glow-strength`, never from the class.
     pub glow_button: String,
     pub glow_card: String,
     pub glow_input: String,
@@ -352,7 +508,7 @@ pub struct Theme {
     pub glow_tooltip: String,
     pub glow_drawer: String,
 
-    // Classi dei componenti (Livello 1 fallback)
+    // Component classes (level 1 fallback).
     pub button_primary: String,
     pub button_secondary: String,
     pub button_outline: String,
@@ -396,7 +552,7 @@ pub struct Theme {
     pub alert_title_warning: String,
     pub alert_title_danger: String,
 
-    // Livello 2: Registro di personalizzazione per componente e per classe
+    // Level 2: per-component and per-class overrides.
     pub components: HashMap<String, ComponentOverride>,
     pub class_overrides: HashMap<String, String>,
 }
@@ -408,14 +564,13 @@ impl Default for Theme {
 }
 
 impl Theme {
-    /// Inizia la costruzione di un tema personalizzato con builder fluido.
+    /// Starts a fluent theme builder.
     #[must_use]
     pub fn builder() -> ThemeBuilder {
         ThemeBuilder::default()
     }
 
-    /// Risolve la classe variante tenendo conto della gerarchia:
-    /// Livello 2 (Component Override) -> Livello 1 (Global Theme Fallback).
+    /// Variant class: level 2 override, else `fallback_class`.
     #[must_use]
     pub fn resolve_variant_class(
         &self,
@@ -431,7 +586,7 @@ impl Theme {
         fallback_class.to_string()
     }
 
-    /// Risolve la classe taglia per un componente tenendo conto di Livello 2 -> Livello 1.
+    /// Size class: level 2 override, else `fallback_class`.
     #[must_use]
     pub fn resolve_size_class(&self, component: &str, size: &str, fallback_class: &str) -> String {
         if let Some(comp_override) = self.components.get(component) {
@@ -442,7 +597,7 @@ impl Theme {
         fallback_class.to_string()
     }
 
-    /// Restituisce la classe base opzionale definita per il componente (Livello 2).
+    /// Optional level 2 base class of a component.
     #[must_use]
     pub fn resolve_component_base(&self, component: &str) -> Option<&str> {
         self.components
@@ -450,12 +605,11 @@ impl Theme {
             .and_then(|c| c.base_class.as_deref())
     }
 
-    /// Risolve modificatori condizionali per classi specifiche (Livello 2 per classi).
+    /// Conditional modifiers for the classes of one instance (level 2).
     #[must_use]
     pub fn resolve_class_modifiers(&self, component: &str, instance_classes: &str) -> String {
         let mut modifiers = Vec::new();
 
-        // Controllo sui modificatori del componente specifico
         if let Some(comp) = self.components.get(component) {
             for word in instance_classes.split_whitespace() {
                 if let Some(m) = comp.class_modifiers.get(word) {
@@ -464,7 +618,6 @@ impl Theme {
             }
         }
 
-        // Controllo sugli override globali per classe
         for word in instance_classes.split_whitespace() {
             if let Some(m) = self.class_overrides.get(word) {
                 modifiers.push(m.as_str());
@@ -474,496 +627,99 @@ impl Theme {
         modifiers.join(" ")
     }
 
-    /// Risolve la classe di ombra / glow in base all'ElevationStyle e alla configurazione del componente.
+    /// Shadow/glow modifier class for a component.
+    ///
+    /// * `Some(false)` → `""`.
+    /// * a level 2 `shadow_class` override → that class.
+    /// * `Some(true)` → the component's `--glow` class (`component_glow`, or
+    ///   `sd-<component>--glow` by convention for components without a field).
+    ///   Always emitted; its intensity comes from `--sd-glow-strength`, so
+    ///   `GlowMode::Off` / `ElevationStyle::Flat` simply render it at 0.
+    /// * `None` → `""`: default glow (primary button, focus, selected, value fills)
+    ///   is part of the component's SCSS recipe, not a class.
     #[must_use]
     pub fn resolve_elevation_class(&self, component: &str, override_glow: Option<bool>) -> String {
         if override_glow == Some(false) {
             return String::new();
         }
-
-        // Se il componente ha un override esplicito di ombra/glow a Livello 2
         if let Some(comp) = self.components.get(component) {
             if let Some(custom_shadow) = &comp.shadow_class {
                 return custom_shadow.clone();
             }
         }
-
-        match self.elevation_style {
-            ElevationStyle::Flat => String::new(),
-            ElevationStyle::HardBlock => match component {
-                "button" => "sd-comic-shadow-sm".to_string(),
-                "card" => "sd-comic-shadow-lg".to_string(),
-                "modal" => "sd-comic-shadow-xl".to_string(),
-                "dropdown" => "sd-comic-shadow-md".to_string(),
-                "badge" => "sd-comic-shadow-xs".to_string(),
-                "alert" => "sd-comic-shadow-md".to_string(),
-                _ => "sd-comic-shadow-sm".to_string(),
-            },
-            ElevationStyle::SoftElevated => match component {
-                "button" => "shadow-sm".to_string(),
-                "card" => "shadow-md".to_string(),
-                "modal" => "shadow-xl".to_string(),
-                _ => "shadow-md".to_string(),
-            },
-            ElevationStyle::NeonGlow => {
-                if self.is_component_glow_enabled(component, override_glow) {
-                    self.component_glow(component).to_string()
-                } else {
-                    String::new()
-                }
+        if override_glow == Some(true) {
+            let class = self.component_glow(component);
+            if class.is_empty() {
+                return format!("sd-{}--glow", component.replace('_', "-"));
             }
+            return class.to_string();
+        }
+        String::new()
+    }
+
+    /// The effective `--sd-glow-strength` (0 when `ElevationStyle::Flat`).
+    #[must_use]
+    pub fn glow_strength(&self) -> &'static str {
+        if self.elevation_style == ElevationStyle::Flat {
+            GlowMode::Off.strength()
+        } else {
+            self.glow_mode.strength()
         }
     }
 
-    /// Genera la stringa di CSS Custom Properties da iniettare dinamicamente a runtime (DS-10, SC-15).
+    /// The effective glow provider class (`sd-glow-off` when `ElevationStyle::Flat`).
     #[must_use]
-    pub fn to_css_variables(&self) -> String {
-        let safe_primary = if is_valid_hex_color(self.primary_color.hex()) {
-            self.primary_color.hex()
+    pub fn glow_class(&self) -> &'static str {
+        if self.elevation_style == ElevationStyle::Flat {
+            GlowMode::Off.class()
         } else {
-            "#a855f7"
-        };
-        let (r, g, b) = hex_to_rgb(safe_primary).unwrap_or((168, 85, 247));
-        let safe_s0 = if is_valid_hex_color(&self.surface_0) {
-            &self.surface_0
-        } else {
-            "#030305"
-        };
-        let safe_s1 = if is_valid_hex_color(&self.surface_1) {
-            &self.surface_1
-        } else {
-            "#09090d"
-        };
-        let safe_s2 = if is_valid_hex_color(&self.surface_2) {
-            &self.surface_2
-        } else {
-            "#111118"
-        };
-        let safe_s3 = if is_valid_hex_color(&self.surface_3) {
-            &self.surface_3
-        } else {
-            "#181824"
-        };
-        let glow_strength = match self.glow_mode {
-            GlowMode::Off => "0",
-            GlowMode::Subtle => "0.7",
-            GlowMode::Expressive => "1.0",
-        };
+            self.glow_mode.class()
+        }
+    }
 
+    /// Classes of the `ThemeProvider` wrapper: `sd-theme sd-radius-* sd-glow-*`.
+    #[must_use]
+    pub fn provider_classes(&self) -> String {
         format!(
-            ":root {{ \
-                --sd-primary-color: {safe_primary}; \
-                --sd-accent: {safe_primary}; \
-                --sd-accent-rgb: {r}, {g}, {b}; \
-                --sd-surface-0: {safe_s0}; \
-                --sd-surface-1: {safe_s1}; \
-                --sd-surface-2: {safe_s2}; \
-                --sd-surface-3: {safe_s3}; \
-                --sd-glow-strength: {glow_strength}; \
-            }}"
+            "sd-theme {} {}",
+            self.radius_scale.class(),
+            self.glow_class()
         )
     }
 
-    /// Restituisce le sole variabili CSS come stili inline per il wrapping scoped.
+    /// CSS declarations (`--sd-…: …;`) for the accent set, the surfaces and the
+    /// glow strength. Inputs are validated: invalid hex values fall back to the
+    /// defaults, so the output never contains user-controlled CSS.
     #[must_use]
     pub fn to_inline_css_variables(&self) -> String {
-        let safe_primary = if is_valid_hex_color(self.primary_color.accent_hex()) {
-            self.primary_color.accent_hex()
-        } else {
-            "#a855f7"
-        };
-        let (r, g, b) = hex_to_rgb(safe_primary).unwrap_or((168, 85, 247));
-        let safe_s0 = if is_valid_hex_color(&self.surface_0) { &self.surface_0 } else { "#030305" };
-        let safe_s1 = if is_valid_hex_color(&self.surface_1) { &self.surface_1 } else { "#09090d" };
-        let safe_s2 = if is_valid_hex_color(&self.surface_2) { &self.surface_2 } else { "#111118" };
-        let safe_s3 = if is_valid_hex_color(&self.surface_3) { &self.surface_3 } else { "#181824" };
-        let glow_strength = match self.glow_mode {
-            GlowMode::Off => "0",
-            GlowMode::Subtle => "0.7",
-            GlowMode::Expressive => "1.0",
-        };
-
+        let a = self.primary_color.accent_tokens();
+        let (r, g, b) = a.rgb;
+        let void = safe_hex(&self.surface_0, DEFAULT_SURFACES[0]);
+        let s1 = safe_hex(&self.surface_1, DEFAULT_SURFACES[1]);
+        let s2 = safe_hex(&self.surface_2, DEFAULT_SURFACES[2]);
+        let s3 = safe_hex(&self.surface_3, DEFAULT_SURFACES[3]);
+        let glow = self.glow_strength();
         format!(
-            "--sd-primary-color: {safe_primary}; --sd-accent: {safe_primary}; --sd-accent-rgb: {r}, {g}, {b}; --sd-surface-0: {safe_s0}; --sd-surface-1: {safe_s1}; --sd-surface-2: {safe_s2}; --sd-surface-3: {safe_s3}; --sd-glow-strength: {glow_strength};"
+            "--sd-accent: {}; --sd-accent-rgb: {r}, {g}, {b}; --sd-accent-strong: {}; \
+             --sd-accent-deep: {}; --sd-accent-soft: {}; --sd-accent-border: {}; \
+             --sd-accent-fg: {}; --sd-focus-ring: {}; --sd-void: {void}; \
+             --sd-surface-1: {s1}; --sd-surface-2: {s2}; --sd-surface-3: {s3}; \
+             --sd-glow-strength: {glow};",
+            a.accent, a.strong, a.deep, a.soft, a.border, a.fg, a.focus_ring
         )
     }
 
-    /// Calcola i valori di glow per ogni componente in base al colore primario e alla modalità (DS-13, DS-12, DS-02).
-    fn calculate_glows(color: &PrimaryColor, mode: GlowMode) -> GlowTokens {
-        if mode == GlowMode::Off {
-            return GlowTokens::default();
-        }
-
-        let prefix = color.css_prefix();
-        let is_subtle = mode == GlowMode::Subtle;
-
-        match color {
-            PrimaryColor::Violet => GlowTokens {
-                glow: if is_subtle {
-                    String::new()
-                } else {
-                    "glow-violet".to_string()
-                },
-                button: "sd-btn--glow".to_string(),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-card--hover-glow".to_string()
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-badge--glow".to_string()
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-modal-dialog--glow".to_string()
-                },
-                alert: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-alert--glow-info".to_string()
-                },
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-toast--glow-info".to_string()
-                },
-                switch: "sd-switch__track--glow".to_string(),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-select-trigger--glow".to_string()
-                },
-                tooltip: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-tooltip__bubble--glow".to_string()
-                },
-                drawer: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-drawer-panel--glow".to_string()
-                },
-            },
-            PrimaryColor::Obsidian => GlowTokens {
-                glow: String::new(),
-                button: "sd-btn--glow-obsidian".to_string(),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-card--hover-glow".to_string()
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-badge--glow".to_string()
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-modal-dialog--glow".to_string()
-                },
-                alert: String::new(),
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: String::new(),
-                switch: "sd-switch__track--glow-obsidian".to_string(),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: String::new(),
-                tooltip: String::new(),
-                drawer: String::new(),
-            },
-            PrimaryColor::Crimson => GlowTokens {
-                glow: if is_subtle {
-                    String::new()
-                } else {
-                    "glow-crimson".to_string()
-                },
-                button: "sd-btn--glow-crimson".to_string(),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-card--hover-glow".to_string()
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-badge--glow".to_string()
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-modal-dialog--glow".to_string()
-                },
-                alert: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-alert--glow-danger".to_string()
-                },
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-toast--glow-danger".to_string()
-                },
-                switch: "sd-switch__track--glow-crimson".to_string(),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-select-trigger--glow".to_string()
-                },
-                tooltip: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-tooltip__bubble--glow".to_string()
-                },
-                drawer: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-drawer-panel--glow".to_string()
-                },
-            },
-            PrimaryColor::Cyan => GlowTokens {
-                glow: if is_subtle {
-                    String::new()
-                } else {
-                    "glow-cyan".to_string()
-                },
-                button: "sd-btn--glow-cyan".to_string(),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-card--hover-glow".to_string()
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-badge--glow".to_string()
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-modal-dialog--glow".to_string()
-                },
-                alert: String::new(),
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: String::new(),
-                switch: "sd-switch__track--glow-cyan".to_string(),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-select-trigger--glow".to_string()
-                },
-                tooltip: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-tooltip__bubble--glow".to_string()
-                },
-                drawer: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-drawer-panel--glow".to_string()
-                },
-            },
-            PrimaryColor::Emerald => GlowTokens {
-                glow: if is_subtle {
-                    String::new()
-                } else {
-                    "glow-emerald".to_string()
-                },
-                button: "sd-btn--glow-emerald".to_string(),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-card--hover-glow".to_string()
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-badge--glow".to_string()
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-modal-dialog--glow".to_string()
-                },
-                alert: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-alert--glow-success".to_string()
-                },
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-toast--glow-success".to_string()
-                },
-                switch: "sd-switch__track--glow-emerald".to_string(),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-select-trigger--glow".to_string()
-                },
-                tooltip: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-tooltip__bubble--glow".to_string()
-                },
-                drawer: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-drawer-panel--glow".to_string()
-                },
-            },
-            PrimaryColor::Custom { .. } => GlowTokens {
-                glow: if is_subtle {
-                    String::new()
-                } else {
-                    format!("glow-{}", prefix)
-                },
-                button: format!("sd-btn--glow-{}", prefix),
-                card: if is_subtle {
-                    String::new()
-                } else {
-                    format!("sd-card--glow-{}", prefix)
-                },
-                input: String::new(),
-                badge: if is_subtle {
-                    String::new()
-                } else {
-                    format!("sd-badge--glow-{}", prefix)
-                },
-                modal: if is_subtle {
-                    String::new()
-                } else {
-                    format!("sd-modal-dialog--glow-{}", prefix)
-                },
-                alert: String::new(),
-                dropdown: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-dropdown-menu--glow".to_string()
-                },
-                notification: String::new(),
-                switch: format!("sd-switch__track--glow-{}", prefix),
-                checkbox: "sd-checkbox__box--glow".to_string(),
-                select: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-select-trigger--glow".to_string()
-                },
-                tooltip: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-tooltip__bubble--glow".to_string()
-                },
-                drawer: if is_subtle {
-                    String::new()
-                } else {
-                    "sd-drawer-panel--glow".to_string()
-                },
-            },
-        }
+    /// The same declarations as [`Theme::to_inline_css_variables`] wrapped in a
+    /// `:root { … }` rule, for consumers who want to inject them globally.
+    /// `ThemeProvider` does not use it.
+    #[must_use]
+    pub fn to_css_variables(&self) -> String {
+        format!(":root {{ {} }}", self.to_inline_css_variables())
     }
 
-    fn color_tokens(color: &PrimaryColor) -> ColorTokens {
-        match color {
-            PrimaryColor::Violet => ColorTokens {
-                sidebar_link_active: "sd-sidebar-link--active".to_string(),
-                border_accent: "border-purple-500/40".to_string(),
-                text_accent: "text-purple-400".to_string(),
-                text_accent_bright: "text-purple-300".to_string(),
-                button_primary: "sd-btn--primary".to_string(),
-                badge_primary: "sd-badge--primary".to_string(),
-                banner: "sd-banner".to_string(),
-            },
-            PrimaryColor::Obsidian => ColorTokens {
-                sidebar_link_active: "sd-sidebar-link--active-obsidian".to_string(),
-                border_accent: "border-zinc-500/40".to_string(),
-                text_accent: "text-zinc-300".to_string(),
-                text_accent_bright: "text-white".to_string(),
-                button_primary: "sd-btn--primary-obsidian".to_string(),
-                badge_primary: "sd-badge--default".to_string(),
-                banner: "sd-banner sd-banner--obsidian".to_string(),
-            },
-            PrimaryColor::Crimson => ColorTokens {
-                sidebar_link_active: "sd-sidebar-link--active-crimson".to_string(),
-                border_accent: "border-rose-500/40".to_string(),
-                text_accent: "text-rose-400".to_string(),
-                text_accent_bright: "text-rose-300".to_string(),
-                button_primary: "sd-btn--primary-crimson".to_string(),
-                badge_primary: "sd-badge--danger".to_string(),
-                banner: "sd-banner sd-banner--crimson".to_string(),
-            },
-            PrimaryColor::Cyan => ColorTokens {
-                sidebar_link_active: "sd-sidebar-link--active-cyan".to_string(),
-                border_accent: "border-cyan-500/40".to_string(),
-                text_accent: "text-cyan-400".to_string(),
-                text_accent_bright: "text-cyan-300".to_string(),
-                button_primary: "sd-btn--primary-cyan".to_string(),
-                badge_primary: "sd-badge--primary".to_string(),
-                banner: "sd-banner sd-banner--cyan".to_string(),
-            },
-            PrimaryColor::Emerald => ColorTokens {
-                sidebar_link_active: "sd-sidebar-link--active-emerald".to_string(),
-                border_accent: "border-emerald-500/40".to_string(),
-                text_accent: "text-emerald-400".to_string(),
-                text_accent_bright: "text-emerald-300".to_string(),
-                button_primary: "sd-btn--primary-emerald".to_string(),
-                badge_primary: "sd-badge--success".to_string(),
-                banner: "sd-banner sd-banner--emerald".to_string(),
-            },
-            PrimaryColor::Custom { .. } => {
-                let prefix = color.css_prefix();
-                ColorTokens {
-                    sidebar_link_active: "sd-sidebar-link--active".to_string(),
-                    border_accent: "border-custom".to_string(),
-                    text_accent: "text-custom".to_string(),
-                    text_accent_bright: "text-custom-bright".to_string(),
-                    button_primary: format!("sd-btn--primary-{}", prefix),
-                    badge_primary: "sd-badge--primary".to_string(),
-                    banner: "sd-banner".to_string(),
-                }
-            }
-        }
-    }
-
-    /// Tema di default Shadow Design (Ultraviolet Obsidian: Nero profondo con accenti viola).
+    /// Default theme: Ultraviolet accent on the black void.
     #[must_use]
     pub fn shadow() -> Self {
-        let glows = Self::calculate_glows(&PrimaryColor::Violet, GlowMode::Subtle);
-
         Self {
             name: "Ultraviolet Shadow".to_string(),
             primary_color: PrimaryColor::Violet,
@@ -971,10 +727,10 @@ impl Theme {
             elevation_style: ElevationStyle::NeonGlow,
             glow_mode: GlowMode::Subtle,
 
-            surface_0: "#030305".to_string(),
-            surface_1: "#09090d".to_string(),
-            surface_2: "#111118".to_string(),
-            surface_3: "#181824".to_string(),
+            surface_0: DEFAULT_SURFACES[0].to_string(),
+            surface_1: DEFAULT_SURFACES[1].to_string(),
+            surface_2: DEFAULT_SURFACES[2].to_string(),
+            surface_3: DEFAULT_SURFACES[3].to_string(),
 
             root: "sd-root".to_string(),
             header: "sd-header".to_string(),
@@ -986,26 +742,26 @@ impl Theme {
             panel: "sd-panel".to_string(),
             banner: "sd-banner".to_string(),
 
-            border: "border-purple-500/25".to_string(),
-            border_subtle: "border-purple-500/10".to_string(),
-            border_accent: "border-purple-500/40".to_string(),
-            text_accent: "text-purple-400".to_string(),
-            text_accent_bright: "text-purple-300".to_string(),
-            glow: glows.glow,
+            border: String::new(),
+            border_subtle: String::new(),
+            border_accent: String::new(),
+            text_accent: "sd-text-accent".to_string(),
+            text_accent_bright: "sd-text-accent".to_string(),
+            glow: String::new(),
 
-            glow_button: glows.button,
-            glow_card: glows.card,
-            glow_input: glows.input,
-            glow_badge: glows.badge,
-            glow_modal: glows.modal,
-            glow_alert: glows.alert,
-            glow_dropdown: glows.dropdown,
-            glow_notification: glows.notification,
-            glow_switch: glows.switch,
-            glow_checkbox: glows.checkbox,
-            glow_select: glows.select,
-            glow_tooltip: glows.tooltip,
-            glow_drawer: glows.drawer,
+            glow_button: "sd-btn--glow".to_string(),
+            glow_card: "sd-card--glow".to_string(),
+            glow_input: "sd-input--glow".to_string(),
+            glow_badge: "sd-badge--glow".to_string(),
+            glow_modal: "sd-modal-dialog--glow".to_string(),
+            glow_alert: "sd-alert--glow".to_string(),
+            glow_dropdown: "sd-dropdown-menu--glow".to_string(),
+            glow_notification: "sd-toast--glow".to_string(),
+            glow_switch: "sd-switch__track--glow".to_string(),
+            glow_checkbox: "sd-checkbox__box--glow".to_string(),
+            glow_select: "sd-select-trigger--glow".to_string(),
+            glow_tooltip: "sd-tooltip__bubble--glow".to_string(),
+            glow_drawer: "sd-drawer-panel--glow".to_string(),
 
             button_primary: "sd-btn--primary".to_string(),
             button_secondary: "sd-btn--secondary".to_string(),
@@ -1055,138 +811,59 @@ impl Theme {
         }
     }
 
-    /// Preset Obsidian Titanium (Monocromatico con accenti grafite).
+    fn preset(name: &str, color: PrimaryColor) -> Self {
+        let mut t = Self::shadow();
+        t.name = name.to_string();
+        t.apply_primary_color(color);
+        t
+    }
+
+    /// Obsidian preset (`#f4f4f5`).
     #[must_use]
     pub fn obsidian() -> Self {
-        let mut t = Self::shadow();
-        t.name = "Obsidian Titanium".to_string();
-        t.apply_primary_color(PrimaryColor::Obsidian);
-        t
+        Self::preset("Obsidian Titanium", PrimaryColor::Obsidian)
     }
 
-    /// Preset Crimson Phoenix.
+    /// Crimson preset (`#ff1744`).
     #[must_use]
     pub fn crimson() -> Self {
-        let mut t = Self::shadow();
-        t.name = "Crimson Phoenix".to_string();
-        t.apply_primary_color(PrimaryColor::Crimson);
-        t
+        Self::preset("Crimson Phoenix", PrimaryColor::Crimson)
     }
 
-    /// Preset Cyber Cyan.
+    /// Cyan preset (`#00e5ff`).
     #[must_use]
     pub fn cyan() -> Self {
-        let mut t = Self::shadow();
-        t.name = "Cyber Cyan".to_string();
-        t.apply_primary_color(PrimaryColor::Cyan);
-        t
+        Self::preset("Cyber Cyan", PrimaryColor::Cyan)
     }
 
-    /// Preset Emerald Matrix.
+    /// Emerald preset (`#00ff9d`).
     #[must_use]
     pub fn emerald() -> Self {
-        let mut t = Self::shadow();
-        t.name = "Emerald Matrix".to_string();
-        t.apply_primary_color(PrimaryColor::Emerald);
-        t
+        Self::preset("Emerald Matrix", PrimaryColor::Emerald)
     }
 
-    /// Nuovo Preset Nativo: Cartoon Pop / Manga Neo-Brutalist (DS-09).
-    #[must_use]
-    pub fn cartoon() -> Self {
-        let mut t = Self::shadow();
-        t.name = "Cartoon Pop".to_string();
-        t.primary_color = PrimaryColor::custom_with_prefix("Cartoon Yellow", "#FFCC00", "cartoon");
-        t.radius_scale = RadiusScale::Sharp;
-        t.elevation_style = ElevationStyle::HardBlock;
-        t.glow_mode = GlowMode::Off;
-
-        t.surface_0 = "#FBFAF3".to_string();
-        t.surface_1 = "#FFFFFF".to_string();
-        t.surface_2 = "#F4F4F4".to_string();
-        t.surface_3 = "#EAE6DF".to_string();
-
-        t.root = "sd-root sd-root--cartoon".to_string();
-        t.header = "sd-header sd-header--cartoon".to_string();
-        t.border = "border-3 border-black".to_string();
-        t.border_accent = "border-4 border-black".to_string();
-        t.text_accent = "text-[#FF3333]".to_string();
-        t.text_accent_bright = "text-[#FFCC00]".to_string();
-
-        t.button_primary = "sd-btn--primary-cartoon".to_string();
-        t.button_secondary = "sd-btn--secondary-cartoon".to_string();
-        t.card_base = "sd-card--comic".to_string();
-        t.badge_primary = "sd-badge--primary-cartoon".to_string();
-
-        // Livello 2: Configurazione dei componenti
-        let mut btn_override = ComponentOverride::new();
-        btn_override.base_class = Some("sd-btn--comic".to_string());
-        btn_override
-            .variant_classes
-            .insert("primary".to_string(), "sd-btn--primary-cartoon".to_string());
-        btn_override
-            .variant_classes
-            .insert("secondary".to_string(), "sd-btn--secondary-cartoon".to_string());
-        t.components.insert("button".to_string(), btn_override);
-
-        let mut card_override = ComponentOverride::new();
-        card_override.base_class = Some("sd-card--comic".to_string());
-        t.components.insert("card".to_string(), card_override);
-
-        let mut badge_override = ComponentOverride::new();
-        badge_override.base_class = Some("sd-badge--comic".to_string());
-        t.components.insert("badge".to_string(), badge_override);
-
-        t.apply_glow_mode(GlowMode::Off);
-        t
-    }
-
-    /// Applica un colore primario aggiornando solo i token cromatici senza distruggere
-    /// nome, superfici, componenti e configurazioni esistenti (RS-06).
+    /// Sets the accent colour. Names, surfaces and overrides are kept; all
+    /// derived tokens are recomputed when the variables are written.
     pub fn apply_primary_color(&mut self, color: PrimaryColor) {
-        let tokens = Self::color_tokens(&color);
         self.primary_color = color;
-        self.sidebar_link_active = tokens.sidebar_link_active;
-        self.border_accent = tokens.border_accent;
-        self.text_accent = tokens.text_accent;
-        self.text_accent_bright = tokens.text_accent_bright;
-        self.button_primary = tokens.button_primary;
-        self.badge_primary = tokens.badge_primary;
-        self.banner = tokens.banner;
-        self.apply_glow_mode(self.glow_mode);
     }
 
-    /// Applica una scala globale del raggio di curvatura.
+    /// Sets the radius scale.
     pub fn apply_radius_scale(&mut self, radius: RadiusScale) {
         self.radius_scale = radius;
     }
 
-    /// Applica uno stile di elevazione globale.
+    /// Sets the elevation style (`Flat` forces glow strength 0).
     pub fn apply_elevation_style(&mut self, elevation: ElevationStyle) {
         self.elevation_style = elevation;
     }
 
-    /// Applica una modalità di intensità per il micro-glow, ricalcolando tutti i componenti.
+    /// Sets the glow mode (`--sd-glow-strength`). No classes change.
     pub fn apply_glow_mode(&mut self, glow: GlowMode) {
         self.glow_mode = glow;
-        let glows = Self::calculate_glows(&self.primary_color, glow);
-        self.glow = glows.glow;
-        self.glow_button = glows.button;
-        self.glow_card = glows.card;
-        self.glow_input = glows.input;
-        self.glow_badge = glows.badge;
-        self.glow_modal = glows.modal;
-        self.glow_alert = glows.alert;
-        self.glow_dropdown = glows.dropdown;
-        self.glow_notification = glows.notification;
-        self.glow_switch = glows.switch;
-        self.glow_checkbox = glows.checkbox;
-        self.glow_select = glows.select;
-        self.glow_tooltip = glows.tooltip;
-        self.glow_drawer = glows.drawer;
     }
 
-    /// Restituisce la classe di glow configurata per un dato componente (DS-12).
+    /// The glow modifier class field of a component (`""` if it has none).
     #[must_use]
     pub fn component_glow(&self, component: &str) -> &str {
         match component {
@@ -1207,16 +884,13 @@ impl Theme {
         }
     }
 
-    /// Risolve se il glow è attivo per un componente tenendo conto dell'override opzionale.
+    /// Whether an optional glow modifier is on: only for an explicit
+    /// `Some(true)`. Default glow belongs to the SCSS recipe.
     #[must_use]
-    pub fn is_component_glow_enabled(&self, component: &str, override_glow: Option<bool>) -> bool {
-        match override_glow {
-            Some(enabled) => enabled,
-            None => !self.component_glow(component).is_empty(),
-        }
+    pub fn is_component_glow_enabled(&self, _component: &str, override_glow: Option<bool>) -> bool {
+        override_glow == Some(true)
     }
 
-    // Builder methods fluenti retrocompatibili
     #[must_use]
     pub fn with_name(mut self, name: impl Into<String>) -> Self {
         self.name = name.into();
@@ -1268,7 +942,6 @@ impl Theme {
         self
     }
 
-    // Helper per componenti (RS-05)
     #[cfg(feature = "button")]
     #[must_use]
     pub fn button_variant_classes(&self, variant: ButtonVariant) -> &str {
@@ -1339,7 +1012,7 @@ impl Theme {
     }
 }
 
-/// Builder avanzato per costruire temi in modo fluido ed ergonomico.
+/// Fluent builder for [`Theme`].
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ThemeBuilder {
     theme: Theme,
@@ -1381,6 +1054,7 @@ impl ThemeBuilder {
         self
     }
 
+    /// `--sd-void`; ignored unless a valid hex.
     #[must_use]
     pub fn surface_0(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
@@ -1390,6 +1064,7 @@ impl ThemeBuilder {
         self
     }
 
+    /// `--sd-surface-1`; ignored unless a valid hex.
     #[must_use]
     pub fn surface_1(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
@@ -1399,6 +1074,7 @@ impl ThemeBuilder {
         self
     }
 
+    /// `--sd-surface-2`; ignored unless a valid hex.
     #[must_use]
     pub fn surface_2(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
@@ -1408,6 +1084,7 @@ impl ThemeBuilder {
         self
     }
 
+    /// `--sd-surface-3`; ignored unless a valid hex.
     #[must_use]
     pub fn surface_3(mut self, val: impl Into<String>) -> Self {
         let s = val.into();
@@ -1417,7 +1094,7 @@ impl ThemeBuilder {
         self
     }
 
-    /// Personalizzazione Livello 2 per uno specifico componente.
+    /// Level 2 customisation of one component.
     #[must_use]
     pub fn override_component(
         mut self,
@@ -1431,7 +1108,7 @@ impl ThemeBuilder {
         self
     }
 
-    /// Personalizzazione Livello 2 per una specifica classe target.
+    /// Level 2 customisation of one target class.
     #[must_use]
     pub fn override_class(
         mut self,
@@ -1450,7 +1127,11 @@ impl ThemeBuilder {
     }
 }
 
-/// Provider per iniettare il tema reattivo nel Context Dioxus (RS-07, DS-02, DS-10).
+/// Provides a reactive `Signal<Theme>` to descendants and writes it as CSS
+/// variables on a `display: contents` wrapper with the classes
+/// `sd-theme sd-radius-{scale} sd-glow-{mode}` (see [`Theme::provider_classes`]
+/// and [`Theme::to_inline_css_variables`]). With `persist_key` (and the `serde`
+/// feature) the theme is restored from and saved to `localStorage`.
 #[component]
 pub fn ThemeProvider(
     #[props(default)] theme: Option<Signal<Theme>>,
@@ -1521,32 +1202,24 @@ pub fn ThemeProvider(
     }
 
     let theme_val = active_theme.read();
-    let prefix = theme_val.primary_color.css_prefix();
-    let radius_class = match theme_val.radius_scale {
-        RadiusScale::Sharp => "sd-radius-sharp",
-        RadiusScale::Medium => "sd-radius-medium",
-        RadiusScale::Soft => "sd-radius-soft",
-    };
-    let glow_class = match theme_val.glow_mode {
-        GlowMode::Off => "sd-glow-off",
-        GlowMode::Subtle => "sd-glow-subtle",
-        GlowMode::Expressive => "sd-glow-expressive",
-    };
-    let css_vars = theme_val.to_css_variables();
+    let classes = theme_val.provider_classes();
     let inline_vars = theme_val.to_inline_css_variables();
 
+    // The variables are written inline on the wrapper only (no global `:root`
+    // <style>): overlays render inside the provider subtree, and everything
+    // outside it (e.g. `body`) uses the `:root` defaults from _tokens.scss.
+    // `display: contents` keeps the wrapper out of layout; custom properties
+    // still inherit through it.
     rsx! {
         div {
-            class: "sd-theme-wrapper sd-theme-{prefix} {radius_class} {glow_class}",
-            "data-sd-theme": "{prefix}",
+            class: "{classes}",
             style: "display: contents; {inline_vars}",
-            document::Style { "{css_vars}" }
             {children}
         }
     }
 }
 
-/// Hook per accedere e modificare il tema attivo (RS-07).
+/// Reads (or, with `.write()`, changes) the active theme.
 pub fn use_theme() -> Signal<Theme> {
     match try_use_context::<Signal<Theme>>() {
         Some(s) => s,
@@ -1573,19 +1246,73 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_primary_color_custom_classes() {
-        let custom = PrimaryColor::custom("Brand", "#ff8800");
-        assert_eq!(custom.css_prefix(), "custom");
-        assert_eq!(custom.hex(), "#ff8800");
-
-        let themed = Theme::builder().primary_color(custom).build();
-        assert_eq!(themed.button_primary, "sd-btn--primary-custom");
+    fn test_accent_derivation_ultraviolet() {
+        let a = PrimaryColor::Violet.accent_tokens();
+        assert_eq!(a.accent, "#a855f7");
+        assert_eq!(a.rgb, (168, 85, 247));
+        assert_eq!(a.strong, "#c691fa");
+        assert_eq!(a.deep, "#653394");
+        assert_eq!(a.soft, "rgba(168, 85, 247, 0.14)");
+        assert_eq!(a.border, "rgba(168, 85, 247, 0.45)");
+        assert_eq!(a.fg, "#ffffff");
+        assert_eq!(a.focus_ring, a.strong);
     }
 
     #[test]
-    fn test_primary_color_custom_with_prefix_sanitized() {
+    fn test_accent_fg_follows_luminance() {
+        assert_eq!(PrimaryColor::Obsidian.accent_tokens().fg, "#000000");
+        assert_eq!(PrimaryColor::Cyan.accent_tokens().fg, "#000000");
+        assert_eq!(PrimaryColor::Emerald.accent_tokens().fg, "#000000");
+        assert_eq!(PrimaryColor::Crimson.accent_tokens().fg, "#ffffff");
+        assert_eq!(PrimaryColor::custom("Yellow", "#ffee00").accent_tokens().fg, "#000000");
+    }
+
+    #[test]
+    fn test_preset_hexes() {
+        assert_eq!(PrimaryColor::Violet.hex(), "#a855f7");
+        assert_eq!(PrimaryColor::Obsidian.hex(), "#f4f4f5");
+        assert_eq!(PrimaryColor::Crimson.hex(), "#ff1744");
+        assert_eq!(PrimaryColor::Cyan.hex(), "#00e5ff");
+        assert_eq!(PrimaryColor::Emerald.hex(), "#00ff9d");
+        for c in [
+            PrimaryColor::Violet,
+            PrimaryColor::Obsidian,
+            PrimaryColor::Crimson,
+            PrimaryColor::Cyan,
+            PrimaryColor::Emerald,
+        ] {
+            assert_eq!(c.shadow_hex(), c.accent_tokens().deep);
+        }
+    }
+
+    #[test]
+    fn test_custom_color_any_prefix_uses_generic_classes() {
         let custom = PrimaryColor::custom_with_prefix("Brand", "#ff8800", "My Brand_123!");
         assert_eq!(custom.css_prefix(), "my-brand-123");
+        let themed = Theme::builder().primary_color(custom).build();
+        assert_eq!(themed.button_primary, "sd-btn--primary");
+        assert_eq!(themed.provider_classes(), "sd-theme sd-radius-medium sd-glow-subtle");
+        let vars = themed.to_inline_css_variables();
+        assert!(vars.contains("--sd-accent: #ff8800;"));
+        assert!(vars.contains("--sd-accent-rgb: 255, 136, 0;"));
+        assert!(!vars.contains("my-brand"));
+    }
+
+    #[test]
+    fn test_invalid_hex_is_sanitised() {
+        let c = PrimaryColor::custom("Bad", "#${alert(1)}");
+        assert_eq!(c.hex(), "#a855f7");
+        let mut t = Theme::shadow();
+        t.primary_color = PrimaryColor::Custom {
+            name: "x".into(),
+            hex: "red; background: url(x)".into(),
+            css_prefix: None,
+        };
+        t.surface_1 = "}</style>".into();
+        let vars = t.to_inline_css_variables();
+        assert!(vars.contains("--sd-accent: #a855f7;"));
+        assert!(vars.contains("--sd-surface-1: #09090d;"));
+        assert!(!vars.contains("url("));
     }
 
     #[test]
@@ -1601,6 +1328,15 @@ mod tests {
     }
 
     #[test]
+    fn test_css_variables_share_one_source() {
+        let t = Theme::crimson();
+        assert_eq!(
+            t.to_css_variables(),
+            format!(":root {{ {} }}", t.to_inline_css_variables())
+        );
+    }
+
+    #[test]
     fn test_builder_preserves_overrides_when_changing_color() {
         let theme = Theme::builder()
             .override_component("button", |o| o.with_base_class("my-btn"))
@@ -1611,41 +1347,60 @@ mod tests {
     }
 
     #[test]
-    fn test_cartoon_apply_primary_color_keeps_components() {
-        let mut theme = Theme::cartoon();
-        theme.apply_primary_color(PrimaryColor::Crimson);
-        assert_eq!(theme.primary_color, PrimaryColor::Crimson);
-        assert!(theme.components.contains_key("button"));
-        assert_eq!(theme.root, "sd-root sd-root--cartoon");
+    fn test_presets_emit_identical_classes() {
+        let base = Theme::shadow();
+        for t in [Theme::obsidian(), Theme::crimson(), Theme::cyan(), Theme::emerald()] {
+            assert_eq!(t.button_primary, base.button_primary);
+            assert_eq!(t.badge_primary, base.badge_primary);
+            assert_eq!(t.sidebar_link_active, base.sidebar_link_active);
+            assert_eq!(t.banner, base.banner);
+            assert_eq!(t.glow_button, base.glow_button);
+            assert_eq!(t.text_accent, "sd-text-accent");
+        }
     }
 
     #[test]
-    fn test_vivid_violet_accent() {
-        assert_eq!(PrimaryColor::Violet.hex(), "#a855f7");
-        assert_eq!(PrimaryColor::Violet.accent_hex(), "#a855f7");
-        assert_eq!(PrimaryColor::Violet.shadow_hex(), "#3b0764");
+    fn test_radius_scale_is_provider_class_only() {
+        for r in [RadiusScale::Sharp, RadiusScale::Medium, RadiusScale::Soft] {
+            assert_eq!(r.sm(), "");
+            assert_eq!(r.md(), "");
+            assert_eq!(r.lg(), "");
+        }
+        assert_eq!(RadiusScale::Sharp.class(), "sd-radius-sharp");
+        let t = Theme::builder().radius_scale(RadiusScale::Soft).build();
+        assert!(t.provider_classes().contains("sd-radius-soft"));
     }
 
     #[test]
-    fn test_glow_modes_different() {
+    fn test_glow_strength_and_flat() {
         let mut theme = Theme::shadow();
-        theme.apply_glow_mode(GlowMode::Off);
-        assert!(theme.glow_button.is_empty());
-        assert!(theme.glow_card.is_empty());
-
-        theme.apply_glow_mode(GlowMode::Subtle);
-        assert!(!theme.glow_button.is_empty());
-        assert!(
-            theme.glow_card.is_empty(),
-            "Cards should not glow in Subtle mode"
-        );
-
+        assert_eq!(theme.glow_strength(), "0.6");
         theme.apply_glow_mode(GlowMode::Expressive);
-        assert!(!theme.glow_button.is_empty());
-        assert!(
-            !theme.glow_card.is_empty(),
-            "Cards should glow in Expressive mode"
-        );
+        assert_eq!(theme.glow_strength(), "1");
+        assert!(theme.to_inline_css_variables().contains("--sd-glow-strength: 1;"));
+        theme.apply_glow_mode(GlowMode::Off);
+        assert_eq!(theme.glow_strength(), "0");
+        theme.apply_glow_mode(GlowMode::Subtle);
+        theme.apply_elevation_style(ElevationStyle::Flat);
+        assert_eq!(theme.glow_strength(), "0");
+        assert!(theme.provider_classes().ends_with("sd-glow-off"));
+    }
+
+    #[test]
+    fn test_explicit_glow_always_yields_class() {
+        for mode in [GlowMode::Off, GlowMode::Subtle, GlowMode::Expressive] {
+            let t = Theme::builder().glow_mode(mode).build();
+            assert_eq!(t.resolve_elevation_class("button", Some(true)), "sd-btn--glow");
+            assert_eq!(t.resolve_elevation_class("card", Some(true)), "sd-card--glow");
+            assert_eq!(t.resolve_elevation_class("number_input", Some(true)), "sd-number-input--glow");
+            assert_eq!(t.resolve_elevation_class("button", None), "");
+            assert_eq!(t.resolve_elevation_class("button", Some(false)), "");
+        }
+        let t = Theme::builder()
+            .override_component("card", |o| o.with_shadow("my-shadow"))
+            .build();
+        assert_eq!(t.resolve_elevation_class("card", None), "my-shadow");
+        assert_eq!(t.resolve_elevation_class("card", Some(false)), "");
     }
 
     #[cfg(feature = "serde")]
@@ -1662,5 +1417,12 @@ mod tests {
         assert_eq!(theme.name, "Saved Theme");
         assert_eq!(theme.primary_color, PrimaryColor::Violet);
         assert_eq!(theme.radius_scale, RadiusScale::Medium);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_removed_elevation_styles_do_not_deserialize() {
+        assert!(serde_json::from_str::<ElevationStyle>(r#""HardBlock""#).is_err());
+        assert!(serde_json::from_str::<ElevationStyle>(r#""Flat""#).is_ok());
     }
 }

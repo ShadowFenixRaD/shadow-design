@@ -14,21 +14,24 @@ $z-layers: (
   'modal-back':        75,
   'modal':             80,
   'modal-content':     85,
+  'command-palette':   88,
   'notification':      90,
   'coachmark':         95,
-  'tooltip':           100,
   'popover-back':      989,
   'popover':           990,
+  'hover-card':        990,
   'dropdown-back':     995,
   'context-menu-back': 995,
   'dropdown':          1000,
-  'context-menu':      1000
+  'context-menu':      1000,
+  'keytip':            1005,
+  'tooltip':           1010
 );
 
+// Mirrors the table in AGENTS.md §4: change both together (ADR-0004 §6).
 @function z($layer) {
   @if not map.has-key($z-layers, $layer) {
-    @warn "Unknown `#{$layer}` in $z-layers.";
-    @return 1;
+    @error "Unknown z-index layer `#{$layer}`. Add it to $z-layers and AGENTS.md §4.";
   }
   @return map.get($z-layers, $layer);
 }
@@ -45,13 +48,16 @@ $z-layers: (
   .z-layer-modal-back        { z-index: z('modal-back'); }
   .z-layer-modal             { z-index: z('modal'); }
   .z-layer-modal-content     { z-index: z('modal-content'); }
+  .z-layer-command-palette   { z-index: z('command-palette'); }
   .z-layer-notification      { z-index: z('notification'); }
   .z-layer-coachmark         { z-index: z('coachmark'); }
-  .z-layer-tooltip           { z-index: z('tooltip'); }
   .z-layer-popover-back      { z-index: z('popover-back'); }
   .z-layer-popover           { z-index: z('popover'); }
+  .z-layer-hover-card        { z-index: z('hover-card'); }
   .z-layer-dropdown-back     { z-index: z('dropdown-back'); }
   .z-layer-context-menu-back { z-index: z('context-menu-back'); }
   .z-layer-dropdown          { z-index: z('dropdown'); }
   .z-layer-context-menu      { z-index: z('context-menu'); }
+  .z-layer-keytip            { z-index: z('keytip'); }
+  .z-layer-tooltip           { z-index: z('tooltip'); }
 }

@@ -100,8 +100,6 @@ pub fn ThemeBuilderPage() -> Element {
 
         let elevation_code = match t.elevation_style {
             ElevationStyle::NeonGlow => "ElevationStyle::NeonGlow",
-            ElevationStyle::HardBlock => "ElevationStyle::HardBlock",
-            ElevationStyle::SoftElevated => "ElevationStyle::SoftElevated",
             ElevationStyle::Flat => "ElevationStyle::Flat",
         };
 
@@ -302,16 +300,6 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                 toast.info("Applicato preset: Emerald Matrix");
                             },
                             "Emerald"
-                        }
-                        button {
-                            r#type: "button",
-                            class: "px-2.5 py-1 text-xs font-mono font-bold rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 cursor-pointer transition-colors shadow-sm",
-                            onclick: move |_| {
-                                *theme.write() = Theme::cartoon();
-                                apply_change();
-                                toast.success("Applicato preset: Cartoon Pop Neo-Brutalist!");
-                            },
-                            "Cartoon Pop"
                         }
                     }
                 }
@@ -625,7 +613,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                                 match r {
                                                     RadiusScale::Sharp => "2px",
                                                     RadiusScale::Medium => "8px",
-                                                    RadiusScale::Soft => "14px",
+                                                    RadiusScale::Soft => "12px",
                                                 }
                                             }
                                         }
@@ -639,9 +627,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                 div { class: "flex flex-col gap-2",
                                     for (e, label, desc) in [
                                         (ElevationStyle::NeonGlow, "Neon Glow", "Specular halo sfumato"),
-                                        (ElevationStyle::HardBlock, "Hard Block", "Ombra netta comic/manga"),
-                                        (ElevationStyle::SoftElevated, "Soft Elevated", "Ombre morbide neutre"),
-                                        (ElevationStyle::Flat, "Flat Minimal", "Zero ombre"),
+                                        (ElevationStyle::Flat, "Flat", "Nessun glow"),
                                     ] {
                                         button {
                                             r#type: "button",
@@ -705,7 +691,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                         span { class: "text-[11px] font-mono text-zinc-400 block", "Classe Base Aggiuntiva:" }
                                         input {
                                             class: "sd-input font-mono text-xs",
-                                            placeholder: "Es. sd-btn--comic",
+                                            placeholder: "Es. my-btn",
                                             value: theme().components.get("button").and_then(|c| c.base_class.clone()).unwrap_or_default(),
                                             oninput: move |e| {
                                                 let val = e.value();
@@ -725,7 +711,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                         span { class: "text-[11px] font-mono text-zinc-400 block", "Classe Base Aggiuntiva:" }
                                         input {
                                             class: "sd-input font-mono text-xs",
-                                            placeholder: "Es. sd-card--comic",
+                                            placeholder: "Es. my-card",
                                             value: theme().components.get("card").and_then(|c| c.base_class.clone()).unwrap_or_default(),
                                             oninput: move |e| {
                                                 let val = e.value();
@@ -745,7 +731,7 @@ pub fn build_my_custom_theme() -> shadow_design::theme::Theme {{
                                         span { class: "text-[11px] font-mono text-zinc-400 block", "Classe Base Aggiuntiva:" }
                                         input {
                                             class: "sd-input font-mono text-xs",
-                                            placeholder: "Es. sd-badge--comic",
+                                            placeholder: "Es. my-badge",
                                             value: theme().components.get("badge").and_then(|c| c.base_class.clone()).unwrap_or_default(),
                                             oninput: move |e| {
                                                 let val = e.value();

@@ -1,15 +1,619 @@
 // ==============================================================================
-// Shadow Design — SCSS Mixins
+// Shadow Design — Lit Glass mixins (ADR-0002 / ADR-0004, docs/design/language.md)
+// ==============================================================================
+// Mixins may contain literal values; component partials may not.
+//
+// SHADOW-SLOT CONTRACT
+//   An element's box-shadow is ALWAYS
+//     var(--sd-shadow-specular), var(--sd-shadow-elev), var(--sd-shadow-glow)
+//   and is written only by `sd-shadow` (which sd-surface / sd-lit-fill / sd-field /
+//   sd-item call for you). States and modifiers change shadows by re-assigning the
+//   slots (`--sd-shadow-glow: var(--sd-glow-sm);`), never by writing box-shadow.
+//   Slot values: a shadow token or `$sd-shadow-none`.
+//
+// NO-CLOBBER GUARANTEE
+//   * `sd-shadow` and `sd-transition` remember the selectors they were emitted
+//     for. A second include on the SAME selector merges: sd-shadow only sets the
+//     slots you pass, sd-transition re-emits the union of the property lists.
+//   * Recipe mixins only touch properties of their own recipe; state mixins
+//     (sd-selected, sd-semantic, sd-disabled) only assign slots/colours.
+//   * sd-press only declares `transform` on :active (transform is in the default
+//     sd-transition list). sd-focus-ring only declares outline on :focus-visible.
+//
+// DISABLED
+//   Mixins treat an element as disabled when it matches `:disabled`,
+//   `[aria-disabled='true']` or `[data-disabled='true']`. Hover/press rules are
+//   guarded with `:where(...)` so they keep the specificity of `&:hover`.
+//   Components that use a BEM `--disabled` modifier should also emit
+//   aria-disabled="true", or include `sd-disabled` in that modifier.
 // ==============================================================================
 @use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:string';
 @use 'variables' as *;
 
-// Helper function per ombra speculare interna (1px)
+// ------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------
+
+/// Breakpoints (media queries cannot read custom properties). Use via bp-up().
+$bp: (sm: 640px, md: 768px, lg: 1024px, xl: 1280px);
+
+/// An invisible shadow: the "empty" value of a shadow slot.
+$sd-shadow-none: 0 0 0 0 transparent;
+
+/// Selector suffix matching an element that is NOT disabled (zero specificity).
+$sd-enabled: ":where(:not(:disabled):not([aria-disabled='true']):not([data-disabled='true']))";
+
+/// Disabled-state selectors, relative to `&`.
+$sd-disabled-states: "&:disabled, &[aria-disabled='true'], &[data-disabled='true']";
+
+/// Default property list of sd-transition. Never `all`.
+$sd-transition-default: (color, background-color, border-color, box-shadow, opacity, transform, outline-color, fill, stroke);
+
+$_sd-shadow-owners: ();
+$_sd-transition-props: ();
+
+// Ternary helper (the legacy Sass `if()` function is deprecated).
+@function _sd-pick($cond, $a, $b) {
+  @if $cond {
+    @return $a;
+  }
+  @return $b;
+}
+
+@function _sd-key() {
+  @if & {
+    @return '#{&}';
+  }
+  @return '__root__';
+}
+
+// ------------------------------------------------------------------------------
+// Layout helpers
+// ------------------------------------------------------------------------------
+
+/// bp-up($bp) — min-width media query for a named breakpoint (sm|md|lg|xl).
+/// Usage:
+///   .sd-grid { @include bp-up(md) { grid-template-columns: repeat(2, 1fr); } }
+@mixin bp-up($name) {
+  @if not map.has-key($bp, $name) {
+    @error "bp-up: unknown breakpoint `#{$name}`. Use one of #{map.keys($bp)}.";
+  }
+  @media (min-width: map.get($bp, $name)) {
+    @content;
+  }
+}
+
+/// sd-hover — wraps @content in `&:hover` for enabled elements only.
+/// Usage:
+///   .sd-chip { @include sd-hover { border-color: var(--sd-border-hover); } }
+@mixin sd-hover {
+  &:hover#{$sd-enabled} {
+    @content;
+  }
+}
+
+// ------------------------------------------------------------------------------
+// Shadow composition
+// ------------------------------------------------------------------------------
+
+/// sd-shadow($specular: null, $elev: null, $glow: null)
+/// Writes `box-shadow: var(--sd-shadow-specular), var(--sd-shadow-elev), var(--sd-shadow-glow)`
+/// and initialises the three slots on THIS element (null => $sd-shadow-none), so
+/// they never inherit from a parent. A second include on the same selector only
+/// sets the slots that are passed (no reset, no clobber).
+/// Usage:
+///   .sd-card  { @include sd-shadow(var(--sd-specular), var(--sd-elev-1)); }
+///   .sd-card--glow { --sd-shadow-glow: var(--sd-glow-md); }
+@mixin sd-shadow($specular: null, $elev: null, $glow: null) {
+  $key: _sd-key();
+  @if list.index($_sd-shadow-owners, $key) {
+    @if $specular { --sd-shadow-specular: #{$specular}; }
+    @if $elev { --sd-shadow-elev: #{$elev}; }
+    @if $glow { --sd-shadow-glow: #{$glow}; }
+  } @else {
+    $_sd-shadow-owners: list.append($_sd-shadow-owners, $key) !global;
+    --sd-shadow-specular: #{_sd-pick($specular, $specular, $sd-shadow-none)};
+    --sd-shadow-elev: #{_sd-pick($elev, $elev, $sd-shadow-none)};
+    --sd-shadow-glow: #{_sd-pick($glow, $glow, $sd-shadow-none)};
+    box-shadow: var(--sd-shadow-specular), var(--sd-shadow-elev), var(--sd-shadow-glow);
+  }
+}
+
+// ------------------------------------------------------------------------------
+// Motion
+// ------------------------------------------------------------------------------
+
+/// sd-transition($props..., $duration: var(--sd-dur-fast), $easing: var(--sd-ease))
+/// Transitions the listed properties (default: $sd-transition-default). `all` is
+/// rejected. Repeated includes on the same selector merge their property lists.
+/// Usage:
+///   .sd-btn { @include sd-transition; }
+///   .sd-accordion__panel { @include sd-transition(height, opacity, $duration: var(--sd-dur-slow)); }
+@mixin sd-transition($props...) {
+  $kw: meta.keywords($props);
+  $duration: _sd-pick(map.has-key($kw, 'duration'), map.get($kw, 'duration'), var(--sd-dur-fast));
+  $easing: _sd-pick(map.has-key($kw, 'easing'), map.get($kw, 'easing'), var(--sd-ease));
+  $list: _sd-pick(list.length($props) > 0, $props, $sd-transition-default);
+  @each $p in $list {
+    @if $p == all {
+      @error "sd-transition: `all` is forbidden; list the properties.";
+    }
+  }
+  $key: _sd-key();
+  $merged: _sd-pick(map.has-key($_sd-transition-props, $key), map.get($_sd-transition-props, $key), ());
+  @each $p in $list {
+    @if not list.index($merged, $p) {
+      $merged: list.append($merged, $p, $separator: comma);
+    }
+  }
+  $_sd-transition-props: map.merge($_sd-transition-props, ($key: $merged)) !global;
+  transition-property: $merged;
+  transition-duration: $duration;
+  transition-timing-function: $easing;
+}
+
+/// sd-press($scale: .97) — tactile press: `transform: scale($scale)` on :active
+/// for enabled elements, only when the user allows motion. Declares no
+/// transition (transform is already in the default sd-transition list).
+/// Usage:
+///   .sd-btn { @include sd-transition; @include sd-press; }
+@mixin sd-press($scale: 0.97) {
+  @media (prefers-reduced-motion: no-preference) {
+    &:active#{$sd-enabled} {
+      transform: scale($scale);
+    }
+  }
+}
+
+/// sd-animate($name, $duration: var(--sd-dur), $easing: var(--sd-ease), $iteration: 1, $fill: both)
+/// Runs a keyframe animation from _animations.scss only under
+/// `prefers-reduced-motion: no-preference` (removed under reduced motion).
+/// Usage:
+///   .sd-popover { @include sd-animate(sd-pop-in); }
+///   .sd-skeleton__wave { @include sd-animate(sd-shimmer, 1.6s, linear, infinite); }
+@mixin sd-animate($name, $duration: var(--sd-dur), $easing: var(--sd-ease), $iteration: 1, $fill: both) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: $name $duration $easing $iteration $fill;
+  }
+}
+
+/// sd-animate-essential($name, $duration, $easing: linear, $iteration: infinite, $slow: 3)
+/// For loops that carry meaning (spinner, indeterminate bar): always runs, but
+/// $slow times slower under `prefers-reduced-motion: reduce`.
+/// Usage:
+///   .sd-spinner { @include sd-animate-essential(sd-spin, 800ms); }
+///   .sd-progress__bar--indeterminate { @include sd-animate-essential(sd-indeterminate, 1.5s, var(--sd-ease)); }
+@mixin sd-animate-essential($name, $duration, $easing: linear, $iteration: infinite, $slow: 3) {
+  animation: $name $duration $easing $iteration;
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: calc(#{$duration} * #{$slow});
+  }
+}
+
+// ------------------------------------------------------------------------------
+// States
+// ------------------------------------------------------------------------------
+
+/// sd-focus-ring($offset: 2px) — `:focus-visible` outline in var(--sd-focus-ring).
+/// Every interactive element includes it (use -2px inside menus/tracks).
+/// Usage:
+///   .sd-tab { @include sd-focus-ring(-2px); }
+@mixin sd-focus-ring($offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid var(--sd-focus-ring);
+    outline-offset: $offset;
+  }
+}
+
+/// sd-disabled — THE disabled treatment (language.md §3.9): disabled opacity,
+/// not-allowed cursor, no glow, inner decorations ignore the pointer.
+/// Include it inside a disabled selector (recipes already do this for
+/// :disabled / [aria-disabled='true'] / [data-disabled='true']).
+/// Usage:
+///   .sd-chip--disabled { @include sd-disabled; }
+@mixin sd-disabled {
+  opacity: var(--sd-disabled-opacity);
+  cursor: not-allowed;
+  --sd-shadow-glow: #{$sd-shadow-none};
+
+  & * {
+    pointer-events: none;
+  }
+}
+
+@mixin _sd-disabled-states {
+  #{$sd-disabled-states} {
+    @include sd-disabled;
+  }
+}
+
+/// sd-selected($style: border) — the one selected/active state (§3.7).
+///   border: accent-soft fill, accent border, accent-strong text, glow-sm.
+///   rail:   same but a 2px accent rail on the leading edge instead of the border
+///           (vertical lists, sidebar links). Uses the specular slot.
+///   row:    accent-soft fill only (table rows).
+/// Font weight never changes. Applies to `&`, `&:hover` and `&:active` so hover
+/// rules (same specificity) don't override it — include it AFTER the base rules.
+/// The element must already have sd-shadow (sd-item/sd-surface/... include it).
+/// Usage:
+///   .sd-tab--active { @include sd-selected; }
+///   .sd-nav-link--active { @include sd-selected(rail); }
+@mixin sd-selected($style: border) {
+  @if not list.index((border, rail, row), $style) {
+    @error "sd-selected: unknown style `#{$style}` (border|rail|row).";
+  }
+  &,
+  &:hover,
+  &:active {
+    background-color: var(--sd-accent-soft);
+    @if $style == border {
+      border-color: var(--sd-accent-border);
+      color: var(--sd-accent-strong);
+      --sd-shadow-glow: var(--sd-glow-sm);
+    } @else if $style == rail {
+      border-color: transparent;
+      color: var(--sd-accent-strong);
+      --sd-shadow-specular: inset 2px 0 0 0 var(--sd-accent);
+      --sd-shadow-glow: var(--sd-glow-sm);
+    }
+  }
+}
+
+/// sd-semantic($sem, $rail: false) — soft semantic surface (§3.10).
+/// $sem: success | warning | danger | info | accent (brand/neutral variant).
+/// Sets fill, border and body colour, and exposes per-element slots for children:
+///   --sd-sem (solid), --sd-sem-rgb, --sd-sem-strong (titles/icons).
+/// $rail: true adds the 3px leading rail through the specular slot (alerts,
+/// toasts); the element must have sd-shadow (e.g. via sd-surface).
+/// Usage:
+///   .sd-alert--danger { @include sd-semantic(danger, $rail: true); }
+///   .sd-alert__title { color: var(--sd-sem-strong); }
+@mixin sd-semantic($sem, $rail: false) {
+  @if not list.index((success, warning, danger, info, accent), $sem) {
+    @error "sd-semantic: unknown semantic `#{$sem}`.";
+  }
+  @if $sem == accent {
+    --sd-sem: var(--sd-accent);
+    --sd-sem-rgb: var(--sd-accent-rgb);
+    --sd-sem-strong: var(--sd-accent-strong);
+    background-color: var(--sd-accent-soft);
+    border-color: var(--sd-accent-border);
+  } @else {
+    --sd-sem: var(--sd-#{$sem});
+    --sd-sem-rgb: var(--sd-#{$sem}-rgb);
+    --sd-sem-strong: var(--sd-#{$sem}-strong);
+    background-color: var(--sd-#{$sem}-soft);
+    border-color: var(--sd-#{$sem}-border);
+  }
+  border-width: 1px;
+  border-style: solid;
+  color: var(--sd-text-muted);
+  @if $rail {
+    --sd-shadow-specular: inset 3px 0 0 0 var(--sd-sem), var(--sd-specular);
+  }
+}
+
+// ------------------------------------------------------------------------------
+// Recipes
+// ------------------------------------------------------------------------------
+
+/// sd-surface($level: 1) — the Lit Glass material (§2, §3.1–3.2). Static.
+///   1 = flat-lit container (card, table, panel, list, accordion, alert, chart):
+///       surface-1, --sd-border, radius-lg, specular + elev-1.
+///   2 = raised floating layer (menu, popover, hover card, tooltip, toast):
+///       surface-2, --sd-border-strong, radius-lg, specular + elev-2.
+///   3 = raised-max (modal, drawer, alert dialog):
+///       surface-2, --sd-border-strong, radius-xl, specular + elev-3.
+/// Includes sd-shadow. Override border-radius afterwards if the role needs it.
+/// Usage:
+///   .sd-card { @include sd-surface(1); }
+///   .sd-dropdown-menu { @include sd-surface(2); @include sd-animate(sd-pop-in); }
+@mixin sd-surface($level: 1) {
+  @if not list.index((1, 2, 3), $level) {
+    @error "sd-surface: level must be 1, 2 or 3 (got `#{$level}`).";
+  }
+  color: var(--sd-text);
+  border: 1px solid _sd-pick($level == 1, var(--sd-border), var(--sd-border-strong));
+  background-color: _sd-pick($level == 1, var(--sd-surface-1), var(--sd-surface-2));
+  border-radius: _sd-pick($level == 3, var(--sd-radius-xl), var(--sd-radius-lg));
+  @include sd-shadow(
+    var(--sd-specular),
+    _sd-pick($level == 1, var(--sd-elev-1), _sd-pick($level == 2, var(--sd-elev-2), var(--sd-elev-3)))
+  );
+}
+
+/// sd-surface-interactive — the interactive-container modifier (§3.1) for a
+/// surface that is clickable as a whole: pointer, hover border + elev-2, press,
+/// focus ring, disabled. No gradient, no glow (unless also sd-selected).
+/// Usage:
+///   .sd-card--interactive { @include sd-surface-interactive; }
+@mixin sd-surface-interactive {
+  cursor: pointer;
+  @include sd-transition;
+  @include sd-press(0.99);
+  @include sd-focus-ring;
+  @include sd-hover {
+    border-color: var(--sd-border-hover);
+    --sd-shadow-elev: var(--sd-elev-2);
+  }
+  @include _sd-disabled-states;
+}
+
+$_sd-lit-variants: (primary, secondary, outline, ghost, danger, success, warning);
+
+/// sd-lit-fill($variant: secondary) — raised control / button material (§3.5).
+/// $variant: primary | secondary | outline | ghost | danger | success | warning.
+/// Sets background, border, text colour, weight 500, pointer, the shadow slots
+/// (incl. primary glow-sm -> glow-md on hover), the enabled-only hover state,
+/// sd-transition, sd-focus-ring and the disabled state (no glow, no hover).
+/// Heights/padding stay in the component (use --sd-control-*). Add sd-press.
+/// Each call is a full recipe (every variant's hover re-states its border, so a
+/// variant modifier fully overrides the base variant's hover): put the base
+/// variant on the block and the others on modifiers, AFTER the base.
+/// Usage:
+///   .sd-btn { @include sd-lit-fill(secondary); @include sd-press; }
+///   .sd-btn--primary { @include sd-lit-fill(primary); }
+@mixin sd-lit-fill($variant: secondary) {
+  @if not list.index($_sd-lit-variants, $variant) {
+    @error "sd-lit-fill: unknown variant `#{$variant}`.";
+  }
+  border-width: 1px;
+  border-style: solid;
+  font-weight: 500;
+  cursor: pointer;
+
+  @if $variant == primary {
+    background-color: var(--sd-accent-deep);
+    background-image: linear-gradient(180deg, var(--sd-accent), var(--sd-accent-deep));
+    border-color: var(--sd-accent-border);
+    color: var(--sd-accent-fg);
+    @include sd-shadow(var(--sd-specular-strong), $sd-shadow-none, var(--sd-glow-sm));
+    @include sd-hover {
+      background-image: linear-gradient(180deg, var(--sd-accent-strong), var(--sd-accent-deep));
+      border-color: var(--sd-accent-border);
+      --sd-shadow-glow: var(--sd-glow-md);
+    }
+  } @else if $variant == secondary {
+    background-color: var(--sd-surface-2);
+    background-image: linear-gradient(180deg, var(--sd-surface-3), var(--sd-surface-2));
+    border-color: var(--sd-border-strong);
+    color: var(--sd-text);
+    @include sd-shadow(var(--sd-specular-strong), $sd-shadow-none, $sd-shadow-none);
+    @include sd-hover {
+      border-color: var(--sd-border-hover);
+    }
+  } @else if $variant == outline {
+    background-color: var(--sd-surface-1);
+    background-image: none;
+    border-color: var(--sd-accent-border);
+    color: var(--sd-accent-strong);
+    @include sd-shadow(var(--sd-specular), $sd-shadow-none, $sd-shadow-none);
+    @include sd-hover {
+      background-color: var(--sd-accent-soft);
+      border-color: var(--sd-accent-border);
+    }
+  } @else if $variant == ghost {
+    background-color: transparent;
+    background-image: none;
+    border-color: transparent;
+    color: var(--sd-text-muted);
+    @include sd-shadow($sd-shadow-none, $sd-shadow-none, $sd-shadow-none);
+    @include sd-hover {
+      background-color: var(--sd-tint-1);
+      border-color: var(--sd-border);
+      color: var(--sd-text);
+      --sd-shadow-specular: var(--sd-specular);
+    }
+  } @else {
+    // danger | success | warning: soft tint, never a solid fill.
+    background-color: var(--sd-#{$variant}-soft);
+    background-image: none;
+    border-color: var(--sd-#{$variant}-border);
+    color: var(--sd-#{$variant}-strong);
+    @include sd-shadow(var(--sd-specular), $sd-shadow-none, $sd-shadow-none);
+    @include sd-hover {
+      background-color: var(--sd-#{$variant}-soft-hover);
+      border-color: var(--sd-#{$variant}-border);
+    }
+  }
+
+  @include sd-transition;
+  @include sd-focus-ring;
+  @include _sd-disabled-states;
+}
+
+/// sd-field($size: md, $error: null) — recessed well for inputs (§3.6).
+/// Works on a bare <input>/<textarea> AND on a wrapper around one: focus uses
+/// `:focus-within`. Well fill, strong border, inset-well specular, radius-md,
+/// height --sd-control-$size (null = auto, e.g. textarea), text-md, placeholder
+/// subtle, hover border, focus = accent border + glow-sm (no outline ring),
+/// error = [aria-invalid='true'] or the extra $error selector (e.g. '&--error'),
+/// disabled. Use sd-field-bare on the inner input of a wrapper.
+/// Usage:
+///   .sd-input-wrapper { @include sd-field(md, '&--error'); }
+///   .sd-input-wrapper__input { @include sd-field-bare; }
+@mixin sd-field($size: md, $error: null) {
+  background-color: var(--sd-well);
+  border: 1px solid var(--sd-border-strong);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-text);
+  font-size: var(--sd-text-md);
+  @if $size {
+    min-height: var(--sd-control-#{$size});
+  }
+  @include sd-shadow(var(--sd-inset-well), $sd-shadow-none, $sd-shadow-none);
+  @include sd-transition(border-color, box-shadow, background-color, color, opacity);
+
+  &::placeholder,
+  & ::placeholder {
+    color: var(--sd-text-subtle);
+  }
+
+  @include sd-hover {
+    border-color: var(--sd-border-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--sd-accent);
+    --sd-shadow-glow: var(--sd-glow-sm);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  $err: "&[aria-invalid='true']";
+  @if $error {
+    $err: "#{$err}, #{$error}";
+  }
+  #{$err} {
+    &,
+    &:hover {
+      border-color: var(--sd-danger-border);
+    }
+    &:focus-within {
+      border-color: var(--sd-danger);
+      --sd-shadow-glow: var(--sd-glow-danger);
+    }
+  }
+
+  @include _sd-disabled-states;
+}
+
+/// sd-field-bare — the inner control of an sd-field wrapper: no fill, border,
+/// outline or shadow; inherits colour and font; subtle placeholder.
+/// Usage:
+///   .sd-select__search { @include sd-field-bare; }
+@mixin sd-field-bare {
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  min-width: 0;
+
+  &::placeholder {
+    color: var(--sd-text-subtle);
+  }
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+/// sd-item($size: md, $focus-offset: -2px) — item inside a track or menu (§3.4):
+/// tabs, menu items, options, segmented items, pages, tree nodes, nav links.
+/// Height --sd-item-h(-sm|-lg), padding-inline space-3, radius-sm, text-sm/500,
+/// muted text, transparent 1px border, hover tint-1 + text, pressed tint-2,
+/// focus ring, disabled; includes sd-shadow (for sd-selected's glow) and
+/// sd-transition. Use `@include sd-item-danger` for destructive items.
+/// Usage:
+///   .sd-menu__item { @include sd-item; }
+///   .sd-menu__item--active { @include sd-selected; }
+@mixin sd-item($size: md, $focus-offset: -2px) {
+  @if not list.index((sm, md, lg), $size) {
+    @error "sd-item: size must be sm, md or lg.";
+  }
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  min-height: _sd-pick($size == sm, var(--sd-item-h-sm), _sd-pick($size == lg, var(--sd-item-h-lg), var(--sd-item-h)));
+  padding-inline: var(--sd-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--sd-radius-sm);
+  background-color: transparent;
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  @include sd-shadow;
+  @include sd-transition;
+  @include sd-focus-ring($focus-offset);
+
+  @include sd-hover {
+    background-color: var(--sd-tint-1);
+    color: var(--sd-text);
+  }
+  &:active#{$sd-enabled} {
+    background-color: var(--sd-tint-2);
+  }
+
+  @include _sd-disabled-states;
+}
+
+/// sd-item-danger — destructive item colours (danger-strong, hover danger-soft).
+/// Usage:
+///   .sd-menu__item--danger { @include sd-item-danger; }
+@mixin sd-item-danger {
+  color: var(--sd-danger-strong);
+  @include sd-hover {
+    color: var(--sd-danger-strong);
+    background-color: var(--sd-danger-soft);
+  }
+}
+
+/// sd-track — the well that holds a group of items (tabs list, segmented
+/// control, pagination, menubar): well fill, --sd-border, radius-md, padding space-1.
+/// Usage:
+///   .sd-tabs__list { @include sd-track; display: flex; gap: var(--sd-space-1); }
+@mixin sd-track {
+  background-color: var(--sd-well);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-md);
+  padding: var(--sd-space-1);
+  @include sd-shadow(var(--sd-inset-well));
+}
+
+/// sd-scrollbar($size: 6px) — thin dark scrollbar for scrollable bodies.
+/// Usage:
+///   .sd-dropdown-menu__body { overflow-y: auto; @include sd-scrollbar; }
+@mixin sd-scrollbar($size: 6px) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sd-border-strong) transparent;
+
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--sd-border-strong);
+    border-radius: var(--sd-radius-full);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sd-border-hover);
+  }
+}
+
+/// text-truncate — single-line ellipsis.
+/// Usage:
+///   .sd-card__title { @include text-truncate; }
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ==============================================================================
+// LEGACY — do not use, removed after migration.
+// Kept only so not-yet-migrated component partials keep compiling. Each one is
+// replaced by: sd-shadow (+ slots), sd-surface, sd-press, sd-lit-fill,
+// sd-focus-ring, sd-scrollbar. See ADR-0004 "Removed mixins".
+// ==============================================================================
+
 @function specular($opacity: 0.08) {
   @return inset 0 1px 0 0 rgba(255, 255, 255, $opacity);
 }
 
-// Specular Highlight Superiore Componibile
 @mixin specular-top($opacity: 0.08, $extra...) {
   @if list.length($extra) > 0 {
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, $opacity), $extra;
@@ -18,23 +622,19 @@
   }
 }
 
-// Focus ring visibile per accessibilità da tastiera (A11Y-01)
 @mixin focus-ring($color: var(--sd-focus-ring, #{$violet-highlight}), $offset: 2px) {
   outline: 2px solid $color;
   outline-offset: $offset;
 }
 
-// Specular Accent Highlight (con alone interno)
 @mixin specular-accent($color, $glow-color) {
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 0 20px $glow-color;
 }
 
-// Glow Perimetrale Regolabile
 @mixin glow($color: $violet-glow, $blur: 24px, $spread: 0px) {
   box-shadow: 0 0 $blur $spread $color;
 }
 
-// Micro-scrollbar standard e compatta (DS-30)
 @mixin custom-scrollbar($width: 6px, $track: transparent, $thumb: $zinc-800, $thumb-hover: $zinc-600) {
   scrollbar-width: thin;
   scrollbar-color: $thumb $track;
@@ -57,14 +657,12 @@
   }
 }
 
-// Glassmorphism scuro
 @mixin glass-panel($bg: rgba(9, 9, 13, 0.75), $blur: 12px) {
   background-color: $bg;
   backdrop-filter: blur($blur);
   -webkit-backdrop-filter: blur($blur);
 }
 
-// Feedback tattile al tocco/click con supporto reduced-motion (A11Y-15)
 @mixin tactile-press($scale: 0.96) {
   transition: transform $duration-fast $ease-tactile;
   @media (prefers-reduced-motion: no-preference) {
@@ -74,14 +672,6 @@
   }
 }
 
-// Troncamento testo a una riga
-@mixin text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-// Premium visual polish (DS-31)
 @mixin hairline-gradient($top: rgba(255, 255, 255, 0.22), $bottom: rgba(255, 255, 255, 0.06), $bg: $color-surface-1) {
   background: $bg padding-box, linear-gradient(180deg, $top, $bottom) border-box;
   border: 1px solid transparent;
@@ -101,4 +691,3 @@
   background-image: linear-gradient(180deg, $from, $to);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
 }
-

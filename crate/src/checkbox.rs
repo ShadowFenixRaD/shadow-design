@@ -63,11 +63,7 @@ pub fn Checkbox(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let active_color_class = if theme_val.primary_color == crate::theme::PrimaryColor::Violet {
-        "sd-checkbox__box--checked".to_string()
-    } else {
-        format!("sd-checkbox__box--checked-{}", theme_val.primary_color.css_prefix())
-    };
+    let active_color_class = "sd-checkbox__box--checked".to_string();
     #[cfg(feature = "theme")]
     let glow_class = if is_checked || indeterminate {
         theme_val.resolve_elevation_class("checkbox", glow)

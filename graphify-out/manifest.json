@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "crate/src/card.rs": {
-    "mtime": 1792852953.131839,
-    "seen": 1792853831.431939,
-    "ast_hash": "242397ac067acf6a5d59d43719879eba",
+    "mtime": 1792859135.3241656,
+    "seen": 1792859634.256332,
+    "ast_hash": "28f521d2255d21cc696b4ba464a3593c",
     "semantic_hash": ""
   },
   "crate/src/carousel.rs": {
@@ -270,9 +270,9 @@
     "semantic_hash": ""
   },
   "crate/src/checkbox.rs": {
-    "mtime": 1792852953.1329186,
-    "seen": 1792853831.4319682,
-    "ast_hash": "a34b36ca5cc0e5d9452cbe1d535f9b15",
+    "mtime": 1792859135.323745,
+    "seen": 1792859634.2563655,
+    "ast_hash": "d357bc8ae962a63a4d5c5d9d9ff5a824",
     "semantic_hash": ""
   },
   "crate/src/chip.rs": {
@@ -726,9 +726,9 @@
     "semantic_hash": ""
   },
   "crate/src/switch.rs": {
-    "mtime": 1792852953.14359,
-    "seen": 1792853831.432129,
-    "ast_hash": "8309de06251dabcc10708c332e1d314a",
+    "mtime": 1792859135.3239703,
+    "seen": 1792859634.2565331,
+    "ast_hash": "e9e172e3048b0a4d4319c27b9c6b68cc",
     "semantic_hash": ""
   },
   "crate/src/table.rs": {
@@ -750,9 +750,9 @@
     "semantic_hash": ""
   },
   "crate/src/theme.rs": {
-    "mtime": 1792852953.1439197,
-    "seen": 1792853831.4321375,
-    "ast_hash": "bd6610545f4b48e2a6ed817f3301f510",
+    "mtime": 1792859125.2880707,
+    "seen": 1792859634.2565417,
+    "ast_hash": "e54385cd780ab8c76b26964f32b3c414",
     "semantic_hash": ""
   },
   "crate/src/timeline.rs": {
@@ -864,8 +864,8 @@
     "semantic_hash": ""
   },
   "scripts/check_classes.py": {
-    "mtime": 1792855308.32078,
-    "seen": 1792855577.4885852,
+    "mtime": 1792855902.0071142,
+    "seen": 1792859634.2565842,
     "ast_hash": "a8fe42f2f3858aca2afdee116c951ed9",
     "semantic_hash": ""
   },
@@ -1356,9 +1356,9 @@
     "semantic_hash": ""
   },
   "showcase/src/pages/select.rs": {
-    "mtime": 1792852953.1709225,
-    "seen": 1792853831.432356,
-    "ast_hash": "b393eeb64acfc8df01656558704d7b87",
+    "mtime": 1792859159.830952,
+    "seen": 1792859634.2567701,
+    "ast_hash": "20e4d0f15edcff1c946fd656367edd17",
     "semantic_hash": ""
   },
   "showcase/src/pages/skeletons.rs": {
@@ -1422,9 +1422,9 @@
     "semantic_hash": ""
   },
   "showcase/src/pages/theme_builder.rs": {
-    "mtime": 1792852953.1719224,
-    "seen": 1792853831.4323778,
-    "ast_hash": "ddfead40d10217b998fef479261006e5",
+    "mtime": 1792859159.837289,
+    "seen": 1792859634.2568057,
+    "ast_hash": "798f4debb62c7c9a787f7e227bfa1d33",
     "semantic_hash": ""
   },
   "showcase/src/pages/timelines.rs": {
@@ -1464,27 +1464,27 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1792855551.214967,
-    "seen": 1792855577.488901,
-    "ast_hash": "145639e0967837b44bac007a739ba0e8",
+    "mtime": 1792858077.01642,
+    "seen": 1792859634.2568235,
+    "ast_hash": "080a20ad333a5221d6f68c212c66f6e8",
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1792852953.1169858,
-    "seen": 1792853831.4323938,
-    "ast_hash": "a44e438a7b53b84543a8a68ab2985566",
+    "mtime": 1792859625.806552,
+    "seen": 1792859634.2568257,
+    "ast_hash": "48953d168671fe4824f647f847f70ba4",
     "semantic_hash": ""
   },
   "GEMINI.md": {
-    "mtime": 1792855551.214967,
-    "seen": 1792855577.4889188,
-    "ast_hash": "145639e0967837b44bac007a739ba0e8",
+    "mtime": 1792858077.01642,
+    "seen": 1792859634.25683,
+    "ast_hash": "080a20ad333a5221d6f68c212c66f6e8",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1792852953.1189172,
-    "seen": 1792853831.432401,
-    "ast_hash": "3b44d76d80d25826747f6d6cf59a56e5",
+    "mtime": 1792859168.8077435,
+    "seen": 1792859634.256832,
+    "ast_hash": "d281b1bfdd18432b4d2186b577ae9e5d",
     "semantic_hash": ""
   },
   "crate/CHANGELOG.md": {
@@ -1518,9 +1518,87 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1792855551.214967,
-    "seen": 1792855577.4889102,
-    "ast_hash": "145639e0967837b44bac007a739ba0e8",
+    "mtime": 1792858077.01642,
+    "seen": 1792859634.2568278,
+    "ast_hash": "080a20ad333a5221d6f68c212c66f6e8",
+    "semantic_hash": ""
+  },
+  ".claude/settings.json": {
+    "mtime": 1792855997.2517302,
+    "seen": 1792859634.2562387,
+    "ast_hash": "1cf76140789292496db1de25d0b00427",
+    "semantic_hash": ""
+  },
+  ".githooks/pre-commit": {
+    "mtime": 1792858227.661625,
+    "seen": 1792859634.2562563,
+    "ast_hash": "9e136634c1bbf8116a627f930c4ddb8f",
+    "semantic_hash": ""
+  },
+  "scripts/lint_design.py": {
+    "mtime": 1792858223.2821548,
+    "seen": 1792859634.2565866,
+    "ast_hash": "7e0ce37df0fdd83517dff165080f1ca3",
+    "semantic_hash": ""
+  },
+  ".agents/rules/design-system.md": {
+    "mtime": 1792858003.0741901,
+    "seen": 1792859634.2568212,
+    "ast_hash": "8510763adb8609899047446c499d699f",
+    "semantic_hash": ""
+  },
+  "docs/adr/0001-record-decisions-and-bind-agents.md": {
+    "mtime": 1792857778.6683133,
+    "seen": 1792859634.2568386,
+    "ast_hash": "5e1f3776c9bfdd30e874500d564064a7",
+    "semantic_hash": ""
+  },
+  "docs/adr/0002-lit-glass-design-language.md": {
+    "mtime": 1792857778.9023151,
+    "seen": 1792859634.2568407,
+    "ast_hash": "9515124499c76d6709757b3df6d92690",
+    "semantic_hash": ""
+  },
+  "docs/adr/0003-runtime-tokens-and-theming.md": {
+    "mtime": 1792857779.1843174,
+    "seen": 1792859634.256843,
+    "ast_hash": "3949f2e4b0dcec27fa3f1eca30ec1cc7",
+    "semantic_hash": ""
+  },
+  "docs/adr/0004-component-styling-contract.md": {
+    "mtime": 1792857956.6437836,
+    "seen": 1792859634.256845,
+    "ast_hash": "8c7a2ea51f454978d4a1c13a9765b9ef",
+    "semantic_hash": ""
+  },
+  "docs/adr/README.md": {
+    "mtime": 1792857778.3883111,
+    "seen": 1792859634.2568471,
+    "ast_hash": "78bd4523fc9d0d31ac3819a16c3d0dfa",
+    "semantic_hash": ""
+  },
+  "docs/design/README.md": {
+    "mtime": 1792859419.289595,
+    "seen": 1792859634.2568488,
+    "ast_hash": "f49dd998b923e7b061187d6d905bc2d3",
+    "semantic_hash": ""
+  },
+  "docs/design/component-checklist.md": {
+    "mtime": 1792857869.6390457,
+    "seen": 1792859634.2568507,
+    "ast_hash": "056a483e719367d195c3d7d2f4d375f1",
+    "semantic_hash": ""
+  },
+  "docs/design/language.md": {
+    "mtime": 1792857869.1420417,
+    "seen": 1792859634.2568526,
+    "ast_hash": "8ff88ffbd7a4056211a1086c5b4ad670",
+    "semantic_hash": ""
+  },
+  "docs/design/tokens.md": {
+    "mtime": 1792859419.2894633,
+    "seen": 1792859634.2568545,
+    "ast_hash": "314db9f21b96710098da48cabd794c8f",
     "semantic_hash": ""
   }
 }

@@ -29,11 +29,7 @@ pub fn Switch(
     #[cfg(feature = "theme")]
     let theme_val = theme.read();
     #[cfg(feature = "theme")]
-    let track_checked_modifier = if theme_val.primary_color == crate::theme::PrimaryColor::Violet {
-        "sd-switch__track--checked".to_string()
-    } else {
-        format!("sd-switch__track--checked-{}", theme_val.primary_color.css_prefix())
-    };
+    let track_checked_modifier = "sd-switch__track--checked".to_string();
     #[cfg(feature = "theme")]
     let glow_modifier = if is_checked {
         theme_val.resolve_elevation_class("switch", glow)

@@ -135,13 +135,13 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-// 8. Glow Pulses
+// 8. Glow Pulses (accent-driven, scaled by --sd-glow-strength)
 @keyframes sd-pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+    box-shadow: 0 0 16px rgba(var(--sd-accent-rgb), calc(0.25 * var(--sd-glow-strength, 1)));
   }
   50% {
-    box-shadow: 0 0 34px rgba(168, 85, 247, 0.60);
+    box-shadow: 0 0 34px rgba(var(--sd-accent-rgb), calc(0.6 * var(--sd-glow-strength, 1)));
   }
 }
 
@@ -169,6 +169,93 @@
   0%   { transform: scale(1); }
   40%  { transform: scale(0.93); }
   100% { transform: scale(1); }
+}
+
+// ==============================================================================
+// Lit Glass keyframes (docs/design/language.md §5). Components never declare
+// their own keyframes: run these through `@include sd-animate(...)` or
+// `@include sd-animate-essential(...)` (see _mixins.scss).
+//
+//   Name                      Use                                        Replaces local
+//   sd-pop-in                 floating layer enter (menu, popover, tooltip, hover card,
+//                             context menu, menubar, coachmark, speed dial, dialog)
+//                                                                        sd-*-enter, sd-alert-dialog-scale,
+//                                                                        sd-speed-dial-fade
+//   sd-fade-in / sd-fade-out  backdrop, overlay, panels                  sd-alert-dialog-fade,
+//                                                                        sd-loading-fade-in, sd-hovercard-enter
+//   sd-fade-up                tab panel / content swap                   sd-tab-fade-in
+//   sd-zoom-in                small marks appearing (check mark, keytip) sd-chip-check-in, sd-keytip-pop
+//   sd-slide-in-left/right/top/bottom   drawers, toasts, side panels
+//   sd-spin                   spinner (essential)
+//   sd-indeterminate          indeterminate progress bar (essential)    sd-indeterminate-shimmer
+//   sd-shimmer                skeleton wave (decorative)                 sd-skeleton-wave
+//   sd-ping                   status ping / radar ring (decorative)      ping, sd-indicator-radar
+//   sd-pulse                  opacity pulse (decorative)
+//   sd-breathe                scale pulse for live dots (decorative)     sd-pulse-p2p
+// ==============================================================================
+
+@keyframes sd-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sd-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sd-zoom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sd-indeterminate {
+  0% { transform: translateX(-125%); }
+  100% { transform: translateX(275%); }
+}
+
+@keyframes sd-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes sd-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes sd-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes sd-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 // --- Classi Utility di Animazione racchiuse in @layer sd-utilities (DS-24) ---
@@ -219,10 +306,6 @@
   }
 }
 
-@keyframes sd-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
-}
 
 .animate-bounce {
   animation: sd-bounce 1s infinite;

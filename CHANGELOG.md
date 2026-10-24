@@ -7,6 +7,14 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ## [Unreleased]
 
+### ⚠️ Breaking — fondamenta Lit Glass (ADR-0002, ADR-0003, ADR-0004)
+- Rimossi `Theme::cartoon()`, `ElevationStyle::HardBlock` e `ElevationStyle::SoftElevated` (anche come varianti serde). `ElevationStyle::Flat` ora azzera il glow.
+- Il tema scrive solo variabili CSS: `ThemeProvider` applica `sd-theme sd-radius-* sd-glow-*` e le variabili accento/superfici inline; niente più `<style>` globale `:root`, `sd-theme-{prefix}`, `data-sd-theme` né classi per-preset (`*-crimson`, `*-cyan`, `*--primary-custom`, …).
+- Accento derivato da un solo hex (`--sd-accent-strong/-deep/-soft/-border/-fg`, `--sd-focus-ring`); Obsidian è `#f4f4f5`, Cyan `#00e5ff`. `PrimaryColor::custom_with_prefix` funziona con qualsiasi prefisso.
+- `RadiusScale::sm()/md()/lg()` restituiscono `""` (nuovo `RadiusScale::class()`); i campi `border*`/`glow` di `Theme` sono vuoti, `text_accent*` è `sd-text-accent`, i campi `glow_*` sono classi generiche.
+- `resolve_elevation_class(c, Some(true))` restituisce sempre la classe `--glow` del componente; con `None` restituisce `""` (il glow di default vive nelle ricette SCSS). Il glow Subtle vale ora 0.6.
+- Nuovi `_tokens.scss` (token `--sd-*`), mixin Lit Glass (`sd-shadow`, `sd-surface`, `sd-lit-fill`, `sd-field`, `sd-item`, `sd-selected`, …) e keyframe `sd-*`; rimosso `_preset_cartoon.scss`. z-index: aggiunti `command-palette` 88, `hover-card` 990, `keytip` 1005; `tooltip` passa a 1010.
+
 ---
 
 ## [0.5.0] — 2026-10-24

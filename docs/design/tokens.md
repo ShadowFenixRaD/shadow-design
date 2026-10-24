@@ -10,12 +10,12 @@ To add a token, add it here and in `_tokens.scss` in the same change, and say wh
 | :-- | :-- | :-- | :-- |
 | `--sd-accent` | `#a855f7` | base | Solid accent: fills, rails, focused field border |
 | `--sd-accent-rgb` | `168, 85, 247` | base | `rgba(var(--sd-accent-rgb), a)` |
-| `--sd-accent-strong` | `#c99bfb` | mix(base, white, 35%) | Accent text and icons on dark, selected text |
-| `--sd-accent-deep` | `#6b2fa3` | mix(base, black, 40%) | Bottom of the primary lit fill |
+| `--sd-accent-strong` | `#c691fa` | mix(base, white, 35%) | Accent text and icons on dark, selected text |
+| `--sd-accent-deep` | `#653394` | mix(base, black, 40%) | Bottom of the primary lit fill |
 | `--sd-accent-soft` | `rgba(168,85,247,.14)` | base @ .14 | Selected fill, outline-button hover |
 | `--sd-accent-border` | `rgba(168,85,247,.45)` | base @ .45 | Selected border, primary border |
 | `--sd-accent-fg` | `#ffffff` | `#000` if luminance(base) > 0.55, else `#fff` | Text on a solid accent |
-| `--sd-focus-ring` | `#c99bfb` | = accent-strong | `:focus-visible` outline |
+| `--sd-focus-ring` | `#c691fa` | = accent-strong | `:focus-visible` outline |
 
 Presets: Ultraviolet `#a855f7`, Obsidian `#f4f4f5`, Crimson `#ff1744`, Cyan `#00e5ff`, Emerald `#00ff9d`. Any `PrimaryColor::Custom` hex goes through the same derivation.
 
@@ -70,7 +70,9 @@ For each `<sem>` in `success`, `warning`, `danger` and `info`:
 | `--sd-glow-md` | `0 0 22px -4px rgba(var(--sd-accent-rgb), calc(.55 * var(--sd-glow-strength)))` | Primary hover, opt-in container glow |
 | `--sd-glow-danger` | same as `glow-sm` with `--sd-danger-rgb` | Focused field in error |
 
-The `sd-shadow` mixin composes `--sd-shadow-specular`, `--sd-shadow-elev` and `--sd-shadow-glow`. Those three are **per-element slots**: the mixin resets them on its element, so they never leak to children.
+The `sd-shadow` mixin composes `--sd-shadow-specular`, `--sd-shadow-elev` and `--sd-shadow-glow`. Those three are **per-element slots**: the mixin resets them on its element, so they never leak to children. An empty slot is `$sd-shadow-none` (`0 0 0 0 transparent`).
+
+`sd-semantic(<sem>)` sets three more per-element slots for its children: `--sd-sem` (solid), `--sd-sem-rgb` and `--sd-sem-strong` (titles, icons). They are not defined on `:root`.
 
 ## Radius (scale class set by `ThemeProvider`)
 

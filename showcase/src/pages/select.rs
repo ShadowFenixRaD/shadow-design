@@ -58,7 +58,6 @@ pub fn SelectPage() -> Element {
         SelectItem::new("Crimson", "Crimson Phoenix"),
         SelectItem::new("CyberCyan", "Cyber Cyan"),
         SelectItem::new("EmeraldMatrix", "Emerald Matrix"),
-        SelectItem::new("CartoonPop", "Cartoon Pop"),
     ];
 
     let select_props = vec![

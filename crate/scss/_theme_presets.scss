@@ -1,331 +1,120 @@
 // ==============================================================================
-// Shadow Design — Theme Presets & Color Accents Engine
+// Shadow Design — Theme provider classes (ADR-0003)
 // ==============================================================================
-@use 'variables' as *;
+// Presets are data in crate/src/theme.rs: there are NO per-preset classes.
+// `ThemeProvider` renders `sd-theme sd-radius-{scale} sd-glow-{mode}` plus inline
+// accent/surface variables; token defaults and the radius classes live in
+// _tokens.scss. This file holds the glow-mode classes and the shell classes the
+// `Theme` struct hands out (root, header, sidebar, ...). Everything is var-driven.
+// ==============================================================================
 @use 'mixins' as *;
-@use 'preset_cartoon' as *;
 
 @layer sd-theme {
-// ------------------------------------------------------------------------------
-// 1. Dynamic Radius Scales (Sharp 2px, Medium 8-10px, Soft 14px) (DS-16)
-// ------------------------------------------------------------------------------
-:root {
-  --sd-radius-xs: #{$radius-xs};
-  --sd-radius-sm: #{$radius-sm};
-  --sd-radius-md: #{$radius-md};
-  --sd-radius-lg: #{$radius-lg};
-}
-
-.sd-radius-sharp {
-  --sd-radius-xs: 2px;
-  --sd-radius-sm: 2px;
-  --sd-radius-md: 2px;
-  --sd-radius-lg: 2px;
-}
-
-.sd-radius-md,
-.sd-radius-medium {
-  --sd-radius-xs: 3px;
-  --sd-radius-sm: 6px;
-  --sd-radius-md: 10px;
-  --sd-radius-lg: 14px;
-}
-
-.sd-radius-soft {
-  --sd-radius-xs: 6px;
-  --sd-radius-sm: 10px;
-  --sd-radius-md: 14px;
-  --sd-radius-lg: 18px;
-}
-
-.rounded-\[2px\]  { border-radius: 2px; }
-.rounded-\[8px\]  { border-radius: 8px; }
-.rounded-\[14px\] { border-radius: 14px; }
-
-// Active Scale
-.active\:scale-\[0\.98\]:active { transform: scale(0.98); }
-
-// ------------------------------------------------------------------------------
-// 2. Dynamic Accent Properties & Preset Color Ramps (DS-02, DS-10)
-// ------------------------------------------------------------------------------
-:root {
-  --sd-accent: #a855f7;
-  --sd-accent-rgb: 168, 85, 247;
-  --sd-accent-strong: #c084fc;
-  --sd-accent-soft-bg: rgba(59, 7, 100, 0.4);
-  --sd-accent-fg: #ffffff;
-  --sd-accent-glow: rgba(168, 85, 247, 0.4);
-  --sd-focus-ring: #c084fc;
-  --sd-surface-0: #030305;
-  --sd-surface-1: #09090d;
-  --sd-surface-2: #111118;
-  --sd-surface-3: #181824;
-  --sd-glow-strength: 1;
-}
-
-.sd-theme-violet, [data-sd-theme="violet"] {
-  --sd-accent: #a855f7;
-  --sd-accent-rgb: 168, 85, 247;
-  --sd-accent-strong: #c084fc;
-  --sd-accent-soft-bg: rgba(59, 7, 100, 0.4);
-  --sd-accent-fg: #ffffff;
-  --sd-accent-glow: rgba(168, 85, 247, 0.4);
-  --sd-focus-ring: #c084fc;
-}
-
-.sd-theme-crimson, [data-sd-theme="crimson"] {
-  --sd-accent: #ff1744;
-  --sd-accent-rgb: 255, 23, 68;
-  --sd-accent-strong: #ff5277;
-  --sd-accent-soft-bg: rgba(76, 5, 25, 0.4);
-  --sd-accent-fg: #ffffff;
-  --sd-accent-glow: rgba(255, 23, 68, 0.45);
-  --sd-focus-ring: #ff5277;
-}
-
-.sd-theme-cyan, [data-sd-theme="cyan"] {
-  --sd-accent: #00f0ff;
-  --sd-accent-rgb: 0, 240, 255;
-  --sd-accent-strong: #80f7ff;
-  --sd-accent-soft-bg: rgba(8, 51, 68, 0.4);
-  --sd-accent-fg: #000000;
-  --sd-accent-glow: rgba(0, 240, 255, 0.45);
-  --sd-focus-ring: #80f7ff;
-}
-
-.sd-theme-emerald, [data-sd-theme="emerald"] {
-  --sd-accent: #00ff9d;
-  --sd-accent-rgb: 0, 255, 157;
-  --sd-accent-strong: #6ee7b7;
-  --sd-accent-soft-bg: rgba(2, 44, 34, 0.4);
-  --sd-accent-fg: #000000;
-  --sd-accent-glow: rgba(0, 255, 157, 0.45);
-  --sd-focus-ring: #6ee7b7;
-}
-
-.sd-theme-obsidian, [data-sd-theme="obsidian"] {
-  --sd-accent: #ffffff;
-  --sd-accent-rgb: 255, 255, 255;
-  --sd-accent-strong: #ffffff;
-  --sd-accent-soft-bg: rgba(255, 255, 255, 0.1);
-  --sd-accent-fg: #000000;
-  --sd-accent-glow: rgba(255, 255, 255, 0.25);
-  --sd-focus-ring: #ffffff;
-}
-
-.sd-theme-custom, [data-sd-theme="custom"] {
-  --sd-accent: var(--sd-primary-color, #a855f7);
-  --sd-accent-strong: var(--sd-primary-color, #a855f7);
-  --sd-accent-soft-bg: rgba(var(--sd-accent-rgb, 168, 85, 247), 0.2);
-  --sd-accent-fg: #ffffff;
-  --sd-accent-glow: rgba(var(--sd-accent-rgb, 168, 85, 247), 0.4);
-  --sd-focus-ring: var(--sd-primary-color, #c084fc);
-}
-
-// Glow Modes (DS-13)
-.sd-glow-off {
-  --sd-glow-strength: 0;
-}
-.sd-glow-subtle {
-  --sd-glow-strength: 0.5;
-}
-.sd-glow-expressive {
-  --sd-glow-strength: 1;
-}
-
-// ------------------------------------------------------------------------------
-// 3. Custom Primary Color Classes (RS-02)
-// ------------------------------------------------------------------------------
-.sd-btn--primary-custom {
-  background-color: var(--sd-primary-color, #a855f7);
-  color: var(--sd-accent-fg, #ffffff);
-  border-color: var(--sd-primary-color, #a855f7);
-  &:hover {
-    filter: brightness(1.15);
-  }
-}
-
-.sd-btn--glow-custom {
-  box-shadow: 0 0 calc(20px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-.sd-switch__track--checked-custom {
-  background-color: var(--sd-primary-color, #a855f7) !important;
-}
-
-.sd-switch__track--glow-custom {
-  box-shadow: 0 0 calc(16px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-.sd-checkbox__box--checked-custom {
-  background-color: var(--sd-primary-color, #a855f7) !important;
-  border-color: var(--sd-primary-color, #a855f7) !important;
-}
-
-.sd-card--glow-custom {
-  box-shadow: 0 0 calc(25px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-.sd-badge--glow-custom {
-  box-shadow: 0 0 calc(12px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-.sd-modal-dialog--glow-custom {
-  box-shadow: 0 0 calc(30px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-.glow-custom {
-  box-shadow: 0 0 calc(25px * var(--sd-glow-strength, 1)) var(--sd-accent-glow, rgba(168, 85, 247, 0.4));
-}
-
-// Custom Theme Tokens
-.border-custom { border-color: rgba(var(--sd-accent-rgb, 168, 85, 247), 0.40); }
-.text-custom { color: var(--sd-primary-color, #a855f7); }
-.text-custom-bright { color: color-mix(in srgb, var(--sd-primary-color, #a855f7) 80%, white); }
-
-// ------------------------------------------------------------------------------
-// 4. Semantic Layout Elements
-// ------------------------------------------------------------------------------
-.sd-root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--sd-surface-0, $color-void);
-  color: $zinc-100;
-  overflow-x: clip;
-}
-
-.sd-header {
-  border-bottom: $border-hairline;
-  background-color: rgba(3, 3, 5, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  @include specular-top(0.08, 0 4px 30px rgba(0, 0, 0, 0.8));
-}
-
-.sd-sidebar {
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
-  background-color: var(--sd-surface-0, $color-void);
-}
-
-.sd-sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: var(--sd-radius-md, 8px);
-  font-size: 12px;
-  font-weight: 500;
-  color: $zinc-400;
-  transition: all $duration-fast ease;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    color: $zinc-100;
-    background-color: rgba(255, 255, 255, 0.04);
+  // ----------------------------------------------------------------------------
+  // 1. Glow mode (GlowMode: Off 0, Subtle 0.6, Expressive 1)
+  // ----------------------------------------------------------------------------
+  .sd-glow-off {
+    --sd-glow-strength: 0;
   }
 
-  &--active {
-    background-color: var(--sd-accent-soft-bg, rgba(59, 7, 100, 0.4));
-    color: var(--sd-accent-strong, #e9d5ff);
-    font-weight: 600;
-    border: 1px solid rgba(var(--sd-accent-rgb), 0.3);
-    box-shadow: 0 0 15px rgba(var(--sd-accent-rgb), 0.15);
+  .sd-glow-subtle {
+    --sd-glow-strength: 0.6;
   }
 
-  &--active-obsidian {
-    background-color: #27272a;
-    color: #ffffff;
-    font-weight: 600;
-    border: 1px solid #52525b;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  .sd-glow-expressive {
+    --sd-glow-strength: 1;
   }
 
-  &--active-crimson {
-    background-color: rgba(76, 5, 25, 0.4);
-    color: #fecdd3;
-    font-weight: 600;
-    border: 1px solid rgba(255, 23, 68, 0.4);
-    box-shadow: 0 0 15px rgba(255, 23, 68, 0.25);
+  // ----------------------------------------------------------------------------
+  // 2. Generic accent helpers returned by Theme fields
+  // ----------------------------------------------------------------------------
+  // Theme::text_accent / text_accent_bright.
+  .sd-text-accent {
+    color: var(--sd-accent-strong);
   }
 
-  &--active-cyan {
-    background-color: rgba(8, 51, 68, 0.4);
-    color: #cffafe;
-    font-weight: 600;
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+  // Theme::resolve_elevation_class("card", Some(true)).
+  // LEGACY bridge — moves to components/_cards.scss with the card migration.
+  .sd-card--glow {
+    border-color: var(--sd-accent-border);
+    box-shadow: var(--sd-specular), var(--sd-elev-1), var(--sd-glow-md);
   }
 
-  &--active-emerald {
-    background-color: rgba(2, 44, 34, 0.4);
-    color: #a7f3d0;
-    font-weight: 600;
-    border: 1px solid rgba(0, 255, 157, 0.4);
-    box-shadow: 0 0 15px rgba(0, 255, 157, 0.25);
-  }
-}
-
-.sd-content {
-  background-color: var(--sd-surface-0, $color-void);
-  color: $zinc-100;
-}
-
-.sd-surface {
-  background-color: var(--sd-surface-1, $color-surface-1);
-  border: $border-hairline;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-}
-
-.sd-panel {
-  background-color: var(--sd-surface-2, $color-surface-2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-}
-
-.sd-banner {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-radius: var(--sd-radius-md, 12px);
-  background-color: var(--sd-surface-1, $color-surface-1);
-  border: 1px solid rgba(var(--sd-accent-rgb, 168, 85, 247), 0.25);
-  box-shadow: 0 10px 25px rgba(var(--sd-accent-rgb, 59, 7, 100), 0.2);
-
-  &--obsidian {
-    border-color: #3f3f46;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  // Explicit `glow: true` modifiers handed out by Theme fields for components
+  // whose partial has no --glow rule yet. Slot-only: they take effect once the
+  // partial uses sd-shadow. LEGACY bridge — move into the partial on migration.
+  .sd-input--glow,
+  .sd-alert--glow,
+  .sd-toast--glow {
+    --sd-shadow-glow: var(--sd-glow-sm);
   }
 
-  &--crimson {
-    border-color: rgba(255, 23, 68, 0.35);
-    box-shadow: 0 10px 25px rgba(76, 5, 25, 0.25);
+  // ----------------------------------------------------------------------------
+  // 3. Application shell (Theme::root / header / sidebar / sidebar_link /
+  //    content / surface / panel / banner) and showcase toolbar helpers.
+  // ----------------------------------------------------------------------------
+  .sd-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--sd-void);
+    color: var(--sd-text);
+    overflow-x: clip;
   }
 
-  &--cyan {
-    border-color: rgba(0, 240, 255, 0.35);
-    box-shadow: 0 10px 25px rgba(8, 51, 68, 0.25);
+  .sd-header {
+    border-bottom: 1px solid var(--sd-border);
+    background-color: rgba(3, 3, 5, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    @include sd-shadow(var(--sd-specular), var(--sd-elev-1));
   }
 
-  &--emerald {
-    border-color: rgba(0, 255, 157, 0.35);
-    box-shadow: 0 10px 25px rgba(2, 44, 34, 0.25);
+  .sd-sidebar {
+    border-right: 1px solid var(--sd-border);
+    background-color: var(--sd-void);
   }
-}
 
-.sd-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background-color: #060608;
-  padding: 6px 12px;
-  border-radius: var(--sd-radius-md, 12px);
-  border: $border-hairline;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-}
+  .sd-sidebar-link {
+    @include sd-item(md);
+    gap: 10px;
+    font-size: var(--sd-text-xs);
 
-.sd-swatch-active {
-  box-shadow: 0 0 0 2px #000000, 0 0 0 4px #ffffff;
-  transform: scale(1.1);
-}
+    &--active {
+      @include sd-selected(border);
+    }
+  }
+
+  .sd-content {
+    background-color: var(--sd-void);
+    color: var(--sd-text);
+  }
+
+  .sd-surface {
+    @include sd-surface(1);
+  }
+
+  .sd-panel {
+    @include sd-surface(2);
+  }
+
+  .sd-banner {
+    @include sd-surface(1);
+    margin-bottom: var(--sd-space-6);
+    padding: var(--sd-space-4);
+    border-color: var(--sd-accent-border);
+  }
+
+  .sd-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--sd-space-3);
+    @include sd-track;
+    padding: 6px var(--sd-space-3);
+  }
+
+  .sd-swatch-active {
+    @include sd-shadow(0 0 0 2px var(--sd-void), 0 0 0 4px var(--sd-text));
+    transform: scale(1.1);
+  }
 }

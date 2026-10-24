@@ -11,7 +11,8 @@ Read this folder before any UI work, after the ADRs in [`docs/adr/`](../adr/READ
 Code that implements these documents:
 
 - `crate/scss/_tokens.scss`: runtime token defaults (`:root`, layer `sd-base`) and the radius scale classes.
-- `crate/scss/_mixins.scss`: `sd-surface`, `sd-shadow`, `sd-lit-fill`, `sd-field`, `sd-item`, `sd-selected`, `sd-focus-ring`, `sd-transition`, `sd-press`, `sd-animate`, `sd-scrollbar`, `bp-up`.
+- `crate/scss/_mixins.scss`: `sd-surface`, `sd-surface-interactive`, `sd-shadow`, `sd-lit-fill`, `sd-field`, `sd-field-bare`, `sd-item`, `sd-item-danger`, `sd-track`, `sd-selected`, `sd-semantic`, `sd-focus-ring`, `sd-hover`, `sd-transition`, `sd-press`, `sd-animate`, `sd-animate-essential`, `sd-disabled`, `sd-scrollbar`, `bp-up`. Each has a doc comment with parameters and usage.
+- `crate/scss/_animations.scss`: the `sd-*` keyframes (table at the top of the Lit Glass section).
 - `crate/scss/_zindex.scss`: the z-index map, read through `z()`.
 - `crate/src/theme.rs`: computes accent tokens from one hex and writes them as CSS variables.
 - `scripts/lint_design.py`: enforces what a machine can check.
